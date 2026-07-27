@@ -92,6 +92,12 @@
   caret-color: var(--color-text-main);
 }
 
+/* Ocultar el ojo nativo de Edge/Chrome para contraseñas */
+.form-group input[type="password"]::-ms-reveal,
+.form-group input[type="password"]::-ms-clear {
+  display: none;
+}
+
 .auth-submit {
   width: 100%;
   padding: 12px;
