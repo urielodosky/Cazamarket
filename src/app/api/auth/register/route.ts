@@ -1,4 +1,5 @@
-import { createClient } from '@/lib/supabase/server';
+import { createClient as createServerClient } from '@/lib/supabase/server';
+import { createClient as createAdminClient } from '@supabase/supabase-js';
 import { NextResponse } from 'next/server';
 
 export async function POST(request: Request) {
@@ -12,11 +13,16 @@ export async function POST(request: Request) {
       );
     }
 
-    const supabase = await createClient();
+    const supabase = await createServerClient();
+    
+    // Crear cliente admin con plenos poderes
+    const supabaseAdmin = createAdminClient(
+      process.env.NEXT_PUBLIC_SUPABASE_URL!,
+      process.env.SUPABASE_SERVICE_ROLE_KEY!
+    );
 
-    // 1. Validar nombre de usuario único
-    // Buscamos si existe algún perfil con este username (independiente de mayúsculas)
-    const { data: existingUser, error: checkError } = await supabase
+    // 1. LIMPIEZA: Verificar si el nombre de usuario está secuestrado por una cuenta fantasma
+    const { data: existingUser } = await supabaseAdmin
       .from('profiles')
       .select('id, full_name')
       .ilike('full_name', username)
@@ -24,13 +30,24 @@ export async function POST(request: Request) {
       .maybeSingle();
 
     if (existingUser) {
-      return NextResponse.json(
-        { error: 'El nombre de usuario ya está en uso. Por favor, elige otro.' },
-        { status: 400 }
-      );
+      // El username existe, veamos si es fantasma (sin confirmar)
+      const { data: authUser } = await supabaseAdmin.auth.admin.getUserById(existingUser.id);
+      
+      if (authUser && authUser.user) {
+        if (!authUser.user.email_confirmed_at) {
+          // ¡ES UN FANTASMA! Lo destruimos sin piedad para liberar el nombre.
+          await supabaseAdmin.auth.admin.deleteUser(existingUser.id);
+        } else {
+          // Es un usuario real verificado
+          return NextResponse.json(
+            { error: 'El nombre de usuario ya está en uso por una cuenta verificada. Por favor, elige otro.' },
+            { status: 400 }
+          );
+        }
+      }
     }
 
-    // 2. Proceder con el registro
+    // 2. Proceder con el registro normal
     const { data, error } = await supabase.auth.signUp({
       email,
       password,
@@ -43,10 +60,31 @@ export async function POST(request: Request) {
     });
 
     if (error) {
-      // Supabase lanza un error si el correo ya existe, capturamos eso y devolvemos un mensaje claro.
       if (error.message.includes('already registered')) {
+        // LIMPIEZA 2: El correo existe. Veamos si es fantasma.
+        const { data: usersData } = await supabaseAdmin.auth.admin.listUsers();
+        if (usersData && usersData.users) {
+          const ghost = usersData.users.find(u => u.email === email && !u.email_confirmed_at);
+          if (ghost) {
+            // El correo está secuestrado por un fantasma. Lo destruimos.
+            await supabaseAdmin.auth.admin.deleteUser(ghost.id);
+            
+            // Reintentamos el registro limpio
+            const retry = await supabase.auth.signUp({
+              email,
+              password,
+              options: { data: { full_name: username, avatar_url: '' } }
+            });
+            
+            if (retry.error) {
+              return NextResponse.json({ error: retry.error.message }, { status: 400 });
+            }
+            return NextResponse.json({ success: true, data: retry.data });
+          }
+        }
+        
         return NextResponse.json(
-          { error: 'Este correo electrónico ya está registrado. Por favor, inicia sesión.' },
+          { error: 'Este correo electrónico ya está registrado y verificado. Por favor, inicia sesión.' },
           { status: 400 }
         );
       }
