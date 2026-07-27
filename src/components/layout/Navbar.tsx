@@ -281,7 +281,17 @@ export default function Navbar() {
           
           <div className="divider-vertical-animated" style={{ display: 'none' }}></div>
 
-          <div className={`links-wrapper ${isMobileMenuOpen ? 'mobile-open' : ''}`}>
+          <div 
+            className={`links-wrapper ${isMobileMenuOpen ? 'mobile-open' : ''}`}
+            style={{ 
+              display: 'flex',
+              overflow: 'hidden',
+              maxWidth: isFiltersOpen && !isMobileMenuOpen ? '0px' : '600px',
+              opacity: isFiltersOpen && !isMobileMenuOpen ? 0 : 1,
+              transition: 'max-width 0.5s cubic-bezier(0.4, 0, 0.2, 1), opacity 0.3s',
+              whiteSpace: 'nowrap'
+            }}
+          >
             <NavLinks />
           </div>
         </div>
@@ -290,11 +300,6 @@ export default function Navbar() {
           <div 
             className="filters-panel"
           style={{
-            position: 'absolute',
-            top: '100%',
-            left: '50%',
-            transform: 'translateX(-50%)',
-            marginTop: '10px',
             width: isFiltersOpen ? (pathname.startsWith('/comunidad') ? '340px' : '640px') : '0px',
             opacity: isFiltersOpen ? 1 : 0,
             visibility: isFiltersOpen ? 'visible' : 'hidden',
@@ -306,10 +311,10 @@ export default function Navbar() {
             display: 'flex',
             flexDirection: 'column',
             justifyContent: 'center',
-            zIndex: 50,
+            marginLeft: isFiltersOpen ? '0' : '-16px',
+            zIndex: 5,
             backgroundColor: '#1a1e16', /* Solid dark background, not glass */
-            border: '1px solid rgba(255, 255, 255, 0.05)',
-            boxShadow: '0 20px 40px rgba(0,0,0,0.6)'
+            border: '1px solid rgba(255, 255, 255, 0.05)'
           }}
         >
           <div style={{ 
