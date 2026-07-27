@@ -178,123 +178,122 @@ export default function Navbar() {
           </Link>
         </div>
         
-        <div className="navbar-middle-area" style={{ display: 'flex', gap: '16px', transition: 'all 0.5s cubic-bezier(0.4, 0, 0.2, 1)', alignItems: 'flex-start', transform: isFiltersOpen ? 'translateX(50px)' : 'none' }}>
+        <div 
+          className="navbar-middle-area" 
+          style={{ 
+            display: 'flex', 
+            gap: '16px', 
+            transition: 'all 0.5s cubic-bezier(0.4, 0, 0.2, 1)', 
+            alignItems: 'flex-start', 
+            transform: isFiltersOpen ? 'translateX(-15vw)' : 'none' 
+          }}
+        >
           <div className={`navbar-center glass-panel ${navbarModeClass}`}>
             <div className="search-bar-animated" style={{ zIndex: 10 }}>
-            <button 
-              className="search-icon-btn" 
-              onClick={() => executeSearch()} 
-              title="Buscar"
-              style={{ 
-                background: 'var(--color-primary)', 
-                color: 'white',
-                border: 'none', 
-                width: '32px',
-                height: '32px',
-                borderRadius: '50%',
-                cursor: 'pointer', 
-                display: 'flex', 
-                alignItems: 'center',
-                justifyContent: 'center',
-                flexShrink: 0,
-                transition: 'transform 0.2s, background-color 0.2s'
-              }}
-              onMouseEnter={(e) => e.currentTarget.style.transform = 'scale(1.05)'}
-              onMouseLeave={(e) => e.currentTarget.style.transform = 'scale(1)'}
-            >
-              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" style={{ width: '16px', height: '16px' }}>
-                <circle cx="11" cy="11" r="8"></circle>
-                <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
-              </svg>
-            </button>
-            <input 
-              suppressHydrationWarning
-              type="text" 
-              value={searchQuery}
-              onChange={(e) => setSearchQuery(e.target.value)}
-              placeholder={searchPlaceholder} 
-              onKeyDown={(e) => { if (e.key === 'Enter') executeSearch(); }}
-              style={{ marginLeft: '12px', color: themeColors.textWhite }}
-            />
-            <button 
-              suppressHydrationWarning
-              type="button"
-              className="filter-btn-premium"
-              onClick={(e) => {
-                e.preventDefault();
-                e.stopPropagation();
-                setIsFiltersOpen(!isFiltersOpen);
-              }}
-              style={{ 
-                borderRadius: 'var(--radius-full)', 
-                fontSize: '0.9rem', 
-                fontWeight: 600,
-                display: 'flex', 
-                alignItems: 'center', 
-                gap: '8px', 
-                padding: '8px 18px',
-                background: isFiltersOpen ? 'var(--color-primary)' : themeColors.bgSubtle3,
-                border: isFiltersOpen ? '1px solid var(--color-primary)' : `1px solid ${themeColors.borderSubtle3}`,
-                color: isFiltersOpen ? 'white' : themeColors.textWhite,
-                cursor: 'pointer',
-                pointerEvents: 'auto',
-                transition: 'all 0.4s cubic-bezier(0.4, 0, 0.2, 1)',
-                backdropFilter: 'blur(10px)'
-              }}
-              onMouseEnter={(e) => {
-                if (isFiltersOpen) return;
-                e.currentTarget.style.background = themeColors.bgSubtle4;
-                e.currentTarget.style.borderColor = themeColors.borderSubtle;
-                e.currentTarget.style.transform = 'translateY(-1px)';
-              }}
-              onMouseLeave={(e) => {
-                if (isFiltersOpen) return;
-                e.currentTarget.style.background = themeColors.bgSubtle3;
-                e.currentTarget.style.borderColor = themeColors.borderSubtle3;
-                e.currentTarget.style.transform = 'translateY(0)';
-              }}
-            >
-              <svg 
-                width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" 
+              <button 
+                className="search-icon-btn" 
+                onClick={() => executeSearch()} 
+                title="Buscar"
                 style={{ 
-                  color: isFiltersOpen ? 'white' : 'var(--color-primary)',
-                  transition: 'transform 0.5s cubic-bezier(0.4, 0, 0.2, 1)',
-                  transform: isFiltersOpen ? 'rotate(180deg)' : 'rotate(0deg)',
-                  pointerEvents: 'none'
+                  background: 'var(--color-primary)', 
+                  color: 'white',
+                  border: 'none', 
+                  width: '32px',
+                  height: '32px',
+                  borderRadius: '50%',
+                  cursor: 'pointer', 
+                  display: 'flex', 
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                  flexShrink: 0,
+                  transition: 'transform 0.2s, background-color 0.2s'
+                }}
+                onMouseEnter={(e) => e.currentTarget.style.transform = 'scale(1.05)'}
+                onMouseLeave={(e) => e.currentTarget.style.transform = 'scale(1)'}
+              >
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" style={{ width: '16px', height: '16px' }}>
+                  <circle cx="11" cy="11" r="8"></circle>
+                  <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
+                </svg>
+              </button>
+              <input 
+                suppressHydrationWarning
+                type="text" 
+                value={searchQuery}
+                onChange={(e) => setSearchQuery(e.target.value)}
+                placeholder={searchPlaceholder} 
+                onKeyDown={(e) => { if (e.key === 'Enter') executeSearch(); }}
+                style={{ marginLeft: '12px', color: themeColors.textWhite }}
+              />
+              <button 
+                suppressHydrationWarning
+                type="button"
+                className="filter-btn-premium"
+                onClick={(e) => {
+                  e.preventDefault();
+                  e.stopPropagation();
+                  setIsFiltersOpen(!isFiltersOpen);
+                }}
+                style={{ 
+                  borderRadius: 'var(--radius-full)', 
+                  fontSize: '0.9rem', 
+                  fontWeight: 600,
+                  display: 'flex', 
+                  alignItems: 'center', 
+                  gap: '8px', 
+                  padding: '8px 18px',
+                  background: isFiltersOpen ? 'var(--color-primary)' : themeColors.bgSubtle3,
+                  border: isFiltersOpen ? '1px solid var(--color-primary)' : `1px solid ${themeColors.borderSubtle3}`,
+                  color: isFiltersOpen ? 'white' : themeColors.textWhite,
+                  cursor: 'pointer',
+                  pointerEvents: 'auto',
+                  transition: 'all 0.4s cubic-bezier(0.4, 0, 0.2, 1)',
+                  backdropFilter: 'blur(10px)'
+                }}
+                onMouseEnter={(e) => {
+                  if (isFiltersOpen) return;
+                  e.currentTarget.style.background = themeColors.bgSubtle4;
+                  e.currentTarget.style.borderColor = themeColors.borderSubtle;
+                  e.currentTarget.style.transform = 'translateY(-1px)';
+                }}
+                onMouseLeave={(e) => {
+                  if (isFiltersOpen) return;
+                  e.currentTarget.style.background = themeColors.bgSubtle3;
+                  e.currentTarget.style.borderColor = themeColors.borderSubtle3;
+                  e.currentTarget.style.transform = 'translateY(0)';
                 }}
               >
-                <circle cx="6" cy="14" r="3"></circle>
-                <line x1="6" y1="3" x2="6" y2="11"></line>
-                <line x1="6" y1="17" x2="6" y2="21"></line>
-
-                <circle cx="12" cy="8" r="3"></circle>
-                <line x1="12" y1="3" x2="12" y2="5"></line>
-                <line x1="12" y1="11" x2="12" y2="21"></line>
-
-                <circle cx="18" cy="16" r="3"></circle>
-                <line x1="18" y1="3" x2="18" y2="13"></line>
-                <line x1="18" y1="19" x2="18" y2="21"></line>
-              </svg>
-              Filtros
-            </button>
+                <svg 
+                  width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" 
+                  style={{ 
+                    color: isFiltersOpen ? 'white' : 'var(--color-primary)',
+                    transition: 'transform 0.5s cubic-bezier(0.4, 0, 0.2, 1)',
+                    transform: isFiltersOpen ? 'rotate(180deg)' : 'rotate(0deg)',
+                    pointerEvents: 'none'
+                  }}
+                >
+                  <circle cx="6" cy="14" r="3"></circle>
+                  <line x1="6" y1="3" x2="6" y2="11"></line>
+                  <line x1="6" y1="17" x2="6" y2="21"></line>
+  
+                  <circle cx="12" cy="8" r="3"></circle>
+                  <line x1="12" y1="3" x2="12" y2="5"></line>
+                  <line x1="12" y1="11" x2="12" y2="21"></line>
+  
+                  <circle cx="18" cy="16" r="3"></circle>
+                  <line x1="18" y1="3" x2="18" y2="13"></line>
+                  <line x1="18" y1="19" x2="18" y2="21"></line>
+                </svg>
+                Filtros
+              </button>
+            </div>
+            
+            <div className="divider-vertical-animated" style={{ display: 'none' }}></div>
+  
+            <div className={`links-wrapper ${isMobileMenuOpen ? 'mobile-open' : ''}`}>
+              <NavLinks />
+            </div>
           </div>
-          
-          <div className="divider-vertical-animated" style={{ display: 'none' }}></div>
-
-          <div 
-            className={`links-wrapper ${isMobileMenuOpen ? 'mobile-open' : ''}`}
-            style={{ 
-              display: 'flex',
-              overflow: 'hidden',
-              maxWidth: isFiltersOpen && !isMobileMenuOpen ? '0px' : '600px',
-              opacity: isFiltersOpen && !isMobileMenuOpen ? 0 : 1,
-              transition: 'max-width 0.5s cubic-bezier(0.4, 0, 0.2, 1), opacity 0.3s',
-              whiteSpace: 'nowrap'
-            }}
-          >
-            <NavLinks />
-          </div>
-        </div>
 
         {/* Panel de Filtros Animado */}
           <div 
