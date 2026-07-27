@@ -285,7 +285,9 @@ export default function RegistroPage() {
               </label>
             </div>
           )}
-          
+          </>
+        )}
+
           <button type="submit" className="auth-submit" disabled={isLoading}>
             {isLoading ? 'Cargando...' : (isAwaitingOTP ? 'Verificar y Entrar' : isLoginView ? 'Iniciar Sesión' : 'Crear Cuenta')}
           </button>
@@ -315,8 +317,6 @@ export default function RegistroPage() {
             </div>
           )}
           
-          </>
-        )}
         </form>
 
         <div className="auth-footer">
