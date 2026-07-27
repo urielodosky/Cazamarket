@@ -1,6 +1,6 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import Link from 'next/link';
 import { createClient } from '@/lib/supabase/client';
@@ -22,6 +22,40 @@ export default function RegistroPage() {
   const [username, setUsername] = useState('');
   const [isAwaitingOTP, setIsAwaitingOTP] = useState(false);
   const [otpCode, setOtpCode] = useState('');
+  const [resendCount, setResendCount] = useState(0);
+  const [resendTimer, setResendTimer] = useState(0);
+
+  useEffect(() => {
+    let timer: NodeJS.Timeout;
+    if (resendTimer > 0) {
+      timer = setTimeout(() => setResendTimer(resendTimer - 1), 1000);
+    }
+    return () => clearTimeout(timer);
+  }, [resendTimer]);
+
+  const handleResendOTP = async () => {
+    if (resendCount >= 3 || resendTimer > 0) return;
+    
+    setIsLoading(true);
+    setErrorMsg('');
+    try {
+      const { error } = await supabase.auth.resend({
+        type: 'signup',
+        email
+      });
+      if (error) {
+        setErrorMsg(error.message);
+      } else {
+        setSuccessMsg('¡Código reenviado! Revisa tu bandeja de entrada o spam.');
+        setResendCount(prev => prev + 1);
+        setResendTimer(120);
+      }
+    } catch (err: any) {
+      setErrorMsg(err.message || 'Error al reenviar el código');
+    } finally {
+      setIsLoading(false);
+    }
+  };
 
   const handleVerifyOTP = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -257,13 +291,28 @@ export default function RegistroPage() {
           </button>
           
           {isAwaitingOTP && (
-            <button 
-              type="button" 
-              onClick={() => { setIsAwaitingOTP(false); setErrorMsg(''); setSuccessMsg(''); }}
-              style={{ background: 'none', border: 'none', color: 'var(--color-text-muted)', cursor: 'pointer', marginTop: '16px', fontSize: '0.9rem', width: '100%' }}
-            >
-              Volver al registro
-            </button>
+            <div style={{ display: 'flex', flexDirection: 'column', gap: '8px', marginTop: '16px' }}>
+              {resendCount < 3 && (
+                <button 
+                  type="button" 
+                  onClick={handleResendOTP}
+                  disabled={resendTimer > 0 || isLoading}
+                  style={{ background: 'none', border: 'none', color: resendTimer > 0 ? 'var(--color-text-muted)' : 'var(--color-primary)', cursor: resendTimer > 0 ? 'not-allowed' : 'pointer', fontSize: '0.9rem', width: '100%', fontWeight: 'bold' }}
+                >
+                  {resendTimer > 0 
+                    ? `Reenviar código en ${Math.floor(resendTimer / 60)}:${(resendTimer % 60).toString().padStart(2, '0')}` 
+                    : 'Reenviar código'}
+                </button>
+              )}
+              
+              <button 
+                type="button" 
+                onClick={() => { setIsAwaitingOTP(false); setErrorMsg(''); setSuccessMsg(''); }}
+                style={{ background: 'none', border: 'none', color: 'var(--color-text-muted)', cursor: 'pointer', fontSize: '0.9rem', width: '100%' }}
+              >
+                Volver al registro
+              </button>
+            </div>
           )}
           
           </>
