@@ -1,148 +1,134 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useState } from 'react';
 import Link from 'next/link';
+import { 
+  BuildingStorefrontIcon, 
+  MapIcon, 
+  ShoppingBagIcon, 
+  ChevronDownIcon, 
+  ChevronUpIcon,
+  EyeIcon,
+  CursorArrowRaysIcon
+} from '@heroicons/react/24/outline';
+
+const TOP_NEGOCIOS = Array.from({ length: 10 }).map((_, i) => ({
+  id: i + 1,
+  name: `Negocio Destacado ${i + 1}`,
+  category: i % 2 === 0 ? 'Armería' : 'Camping',
+  views: Math.floor(Math.random() * 5000) + 1000,
+  image: `https://images.unsplash.com/photo-${1500000000000 + i}?q=80&w=150&auto=format&fit=crop`
+}));
+
+const TOP_SERVICIOS = Array.from({ length: 10 }).map((_, i) => ({
+  id: i + 1,
+  name: `Servicio Premium ${i + 1}`,
+  location: 'Patagonia, Arg',
+  clicks: Math.floor(Math.random() * 3000) + 500,
+  image: `https://images.unsplash.com/photo-${1600000000000 + i}?q=80&w=150&auto=format&fit=crop`
+}));
+
+const TOP_PRODUCTOS = Array.from({ length: 10 }).map((_, i) => ({
+  id: i + 1,
+  name: `Producto Élite ${i + 1}`,
+  price: Math.floor(Math.random() * 50000) + 5000,
+  clicks: Math.floor(Math.random() * 4000) + 800,
+  image: `https://images.unsplash.com/photo-${1700000000000 + i}?q=80&w=150&auto=format&fit=crop`
+}));
 
 export default function TrendingSection() {
-  const [products, setProducts] = useState<any[]>([]);
-  const [services, setServices] = useState<any[]>([]);
-  const [businesses, setBusinesses] = useState<any[]>([]);
-
-  const [showAllProducts, setShowAllProducts] = useState(false);
-  const [showAllServices, setShowAllServices] = useState(false);
   const [showAllBusinesses, setShowAllBusinesses] = useState(false);
+  const [showAllServices, setShowAllServices] = useState(false);
+  const [showAllProducts, setShowAllProducts] = useState(false);
 
-  useEffect(() => {
-    try {
-      const pStr = localStorage.getItem('cazamarket_my_products');
-      if (pStr) setProducts(JSON.parse(pStr));
-      
-      const sStr = localStorage.getItem('cazamarket_my_services');
-      if (sStr) setServices(JSON.parse(sStr));
-      
-      const profileStr = localStorage.getItem('cazamarket_profile');
-      if (profileStr) {
-        const parsed = JSON.parse(profileStr);
-        setBusinesses([{
-          id: 1,
-          name: parsed.storeName || parsed.nombre || parsed.username || 'Mi Negocio',
-          location: parsed.localidad || parsed.provincia || 'Ubicación no definida',
-          image: parsed.avatar || 'https://ui-avatars.com/api/?name=Mi+Negocio&background=ff7300&color=fff'
-        }]);
-      }
-    } catch(e) {}
-  }, []);
+  const formatNumber = (num: number) => new Intl.NumberFormat('es-AR').format(num);
 
-  if (products.length === 0 && services.length === 0 && businesses.length === 0) {
-    return null;
-  }
+  const renderList = (
+    title: string, 
+    icon: React.ReactNode, 
+    items: any[], 
+    showAll: boolean, 
+    setShowAll: (v: boolean) => void,
+    type: 'negocios' | 'servicios' | 'productos'
+  ) => {
+    const displayedItems = showAll ? items : items.slice(0, 5);
 
-  const displayedProducts = showAllProducts ? products : products.slice(0, 3);
-  const displayedServices = showAllServices ? services : services.slice(0, 3);
-  const displayedBusinesses = showAllBusinesses ? businesses : businesses.slice(0, 3);
+    return (
+      <div className="trending-column" style={{ background: 'var(--card-bg)', padding: '20px', borderRadius: 'var(--radius-lg)', border: '1px solid var(--border-color)' }}>
+        <h3 style={{ display: 'flex', alignItems: 'center', gap: '10px', fontSize: '1.25rem', color: 'var(--primary-color)', marginBottom: '20px', paddingBottom: '10px', borderBottom: '1px solid var(--border-color)' }}>
+          {icon}
+          {title}
+        </h3>
+        
+        <div style={{ display: 'flex', flexDirection: 'column', gap: '15px' }}>
+          {displayedItems.map((item, index) => (
+            <Link 
+              key={item.id} 
+              href={`/${type}/${item.id}`}
+              style={{ display: 'flex', alignItems: 'center', gap: '15px', textDecoration: 'none', color: 'inherit', padding: '10px', borderRadius: 'var(--radius-md)', transition: 'background 0.2s' }}
+              className="trending-item-hover"
+            >
+              <div style={{ position: 'relative' }}>
+                <div style={{ width: '60px', height: '60px', borderRadius: 'var(--radius-md)', backgroundColor: 'var(--border-color)', backgroundImage: `url(${item.image})`, backgroundSize: 'cover', backgroundPosition: 'center' }} />
+                <span style={{ position: 'absolute', top: '-8px', left: '-8px', background: 'var(--primary-color)', color: 'white', width: '24px', height: '24px', borderRadius: '50%', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '0.8rem', fontWeight: 'bold', border: '2px solid var(--card-bg)' }}>
+                  {index + 1}
+                </span>
+              </div>
+              
+              <div style={{ flex: 1, overflow: 'hidden' }}>
+                <h4 style={{ margin: '0 0 4px 0', fontSize: '1rem', whiteSpace: 'nowrap', textOverflow: 'ellipsis', overflow: 'hidden' }}>{item.name}</h4>
+                
+                {type === 'negocios' && <p style={{ margin: 0, fontSize: '0.85rem', color: 'var(--text-secondary)' }}>{item.category}</p>}
+                {type === 'servicios' && <p style={{ margin: 0, fontSize: '0.85rem', color: 'var(--text-secondary)' }}>{item.location}</p>}
+                {type === 'productos' && <p style={{ margin: 0, fontSize: '0.85rem', color: 'var(--primary-color)', fontWeight: 'bold' }}>${formatNumber(item.price)}</p>}
+                
+                <div style={{ display: 'flex', alignItems: 'center', gap: '4px', marginTop: '6px', fontSize: '0.75rem', color: 'var(--text-secondary)' }}>
+                  {type === 'negocios' ? (
+                    <><EyeIcon style={{ width: '14px', height: '14px' }} /> {formatNumber(item.views)} visitas</>
+                  ) : (
+                    <><CursorArrowRaysIcon style={{ width: '14px', height: '14px' }} /> {formatNumber(item.clicks)} clics</>
+                  )}
+                </div>
+              </div>
+            </Link>
+          ))}
+        </div>
+
+        <button 
+          onClick={() => setShowAll(!showAll)}
+          style={{ width: '100%', marginTop: '20px', padding: '10px', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '8px', background: 'transparent', border: '1px dashed var(--border-color)', borderRadius: 'var(--radius-md)', color: 'var(--primary-color)', cursor: 'pointer', transition: 'all 0.2s', fontWeight: 'bold' }}
+          onMouseOver={(e) => (e.currentTarget.style.background = 'rgba(220,100,0,0.05)')}
+          onMouseOut={(e) => (e.currentTarget.style.background = 'transparent')}
+        >
+          {showAll ? (
+            <>Ver Menos <ChevronUpIcon style={{ width: '16px' }} /></>
+          ) : (
+            <>Mostrar Más (Top 10) <ChevronDownIcon style={{ width: '16px' }} /></>
+          )}
+        </button>
+      </div>
+    );
+  };
 
   return (
-    <section className="trending-section">
-      <h2 className="section-title">Destacados de la Semana</h2>
-      
-      <div className="trending-grid">
-        {/* Productos */}
-        <div className="trending-column">
-          <h3>
-            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" style={{ width: '20px', height: '20px' }}>
-              <path d="M8.5 14.5A2.5 2.5 0 0 0 11 12c0-1.38-.5-2-1-3-1.072-2.143-.224-4.054 2-6 .5 2.5 2 4.9 4 6.5 2 1.6 3 3.5 3 5.5a7 7 0 1 1-14 0c0-1.153.433-2.294 1-3a2.5 2.5 0 0 0 2.5 2.5z"></path>
-            </svg>
-            Top Productos
-          </h3>
-          <div className="trending-list">
-            {displayedProducts.map(p => (
-              <div key={p.id} className="trending-item glass-panel" style={{ cursor: 'pointer' }} onClick={() => window.location.href = `/productos/${p.id}`}>
-                <div className="item-img" style={{ backgroundImage: `url(${p.image || p.images?.[0]})` }}></div>
-                <div className="item-info">
-                  <h4>{p.name}</h4>
-                  <span className="price">{p.price}</span>
-                </div>
-              </div>
-            ))}
-          </div>
-          <button 
-            className="btn btn-outline" 
-            style={{ width: '100%', marginTop: '16px', padding: '8px', fontSize: '0.9rem' }}
-            onClick={() => setShowAllProducts(!showAllProducts)}
-          >
-            {showAllProducts ? 'Ver Menos' : 'Ver Más'}
-          </button>
-        </div>
-
-        {/* Servicios */}
-        <div className="trending-column">
-          <h3>
-            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" style={{ width: '20px', height: '20px' }}>
-              <polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"></polygon>
-            </svg>
-            Top Servicios
-          </h3>
-          <div className="trending-list">
-            {displayedServices.map(s => (
-              <div key={s.id} className="trending-item glass-panel" style={{ cursor: 'pointer' }} onClick={() => window.location.href = `/servicios/${s.id}`}>
-                <div className="item-img" style={{ backgroundImage: `url(${s.image || s.media?.[0]?.url || 'https://images.unsplash.com/photo-1595246140625-573b715d11dc?q=80&w=1200&auto=format&fit=crop'})` }}></div>
-                <div className="item-info">
-                  <h4>{s.title || s.name}</h4>
-                  <span className="location">{s.location || s.serviceLocation || 'Ubicación a consultar'}</span>
-                </div>
-              </div>
-            ))}
-          </div>
-          <button 
-            className="btn btn-outline" 
-            style={{ width: '100%', marginTop: '16px', padding: '8px', fontSize: '0.9rem' }}
-            onClick={() => setShowAllServices(!showAllServices)}
-          >
-            {showAllServices ? 'Ver Menos' : 'Ver Más'}
-          </button>
-        </div>
-
-        {/* Negocios */}
-        <div className="trending-column">
-          <h3>
-            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" style={{ width: '20px', height: '20px' }}>
-              <path d="M6 9H4.5a2.5 2.5 0 0 1 0-5H6"></path>
-              <path d="M18 9h1.5a2.5 2.5 0 0 0 0-5H18"></path>
-              <path d="M4 22h16"></path>
-              <path d="M10 14.66V17c0 .55-.47.98-.97 1.21C7.85 18.75 7 20.24 7 22"></path>
-              <path d="M14 14.66V17c0 .55.47.98.97 1.21C16.15 18.75 17 20.24 17 22"></path>
-              <path d="M18 2H6v7a6 6 0 0 0 12 0V2z"></path>
-            </svg>
-            Top Negocios
-          </h3>
-          <div className="trending-list">
-            {displayedBusinesses.map(b => (
-              <div key={b.id} className="trending-item glass-panel" style={{ cursor: 'pointer' }} onClick={() => window.location.href = `/negocios/${b.id}`}>
-                <div className="item-icon-wrapper" style={{ overflow: 'hidden' }}>
-                   {b.image.includes('unsplash') || b.image.includes('ui-avatars') || b.image.startsWith('data:') ? (
-                     <img src={b.image} alt={b.name} style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
-                   ) : (
-                    <svg viewBox="0 0 24 24" fill="none" stroke="var(--color-primary)" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" style={{ width: '24px', height: '24px' }}>
-                      <path d="M12 2L2 22h20L12 2z"></path>
-                    </svg>
-                   )}
-                </div>
-                <div className="item-info">
-                  <h4>{b.name}</h4>
-                  <span className="location">{b.location}</span>
-                </div>
-              </div>
-            ))}
-          </div>
-          <button 
-            className="btn btn-outline" 
-            style={{ width: '100%', marginTop: '16px', padding: '8px', fontSize: '0.9rem' }}
-            onClick={() => setShowAllBusinesses(!showAllBusinesses)}
-          >
-            {showAllBusinesses ? 'Ver Menos' : 'Ver Más'}
-          </button>
-        </div>
+    <section className="trending-section" style={{ width: '100%', maxWidth: '1200px', margin: '40px auto', padding: '0 20px' }}>
+      <div style={{ textAlign: 'center', marginBottom: '40px' }}>
+        <h2 style={{ fontSize: '2rem', fontWeight: 'bold', margin: '0 0 10px 0' }}>Los Más Populares</h2>
+        <p style={{ color: 'var(--text-secondary)', margin: 0 }}>Descubre lo más visitado y buscado por la comunidad esta semana.</p>
       </div>
+      
+      <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(320px, 1fr))', gap: '30px' }}>
+        {renderList("Top Negocios", <BuildingStorefrontIcon style={{ width: '24px' }} />, TOP_NEGOCIOS, showAllBusinesses, setShowAllBusinesses, 'negocios')}
+        {renderList("Top Servicios", <MapIcon style={{ width: '24px' }} />, TOP_SERVICIOS, showAllServices, setShowAllServices, 'servicios')}
+        {renderList("Top Productos", <ShoppingBagIcon style={{ width: '24px' }} />, TOP_PRODUCTOS, showAllProducts, setShowAllProducts, 'productos')}
+      </div>
+
+      <style dangerouslySetInnerHTML={{__html: `
+        .trending-item-hover:hover {
+          background-color: rgba(255,255,255,0.05);
+          transform: translateX(5px);
+        }
+      `}} />
     </section>
   );
 }

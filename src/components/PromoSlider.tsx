@@ -1,150 +1,140 @@
 'use client';
 
-import { useState, useEffect } from 'react';
-import Link from 'next/link';
-
-// Dummy data (en un escenario real vendría de una API o base de datos)
-const RAW_BANNER_DATA = [
-  {
-    id: 1,
-    title: 'Armería El Cazador',
-    description: '20% de descuento en toda la indumentaria de camuflaje. ¡Solo por hoy!',
-    badge: 'Patrocinado',
-    image: 'https://images.unsplash.com/photo-1599351431202-1e0f0137899a?q=80&w=1200&auto=format&fit=crop',
-    link: '/negocios/armeria-el-cazador',
-    buttonText: 'Ver Oferta'
-  },
-  {
-    id: 2,
-    title: 'Coto de Caza La Estrella',
-    description: 'Reserva tu fin de semana con pensión completa al mejor precio. Guías expertos disponibles.',
-    badge: 'Patrocinado',
-    image: 'https://images.unsplash.com/photo-1502082553048-f009c37129b9?q=80&w=1200&auto=format&fit=crop',
-    link: '/servicios/coto-la-estrella',
-    buttonText: 'Más Información'
-  },
-  {
-    id: 3,
-    title: 'Camping del Valle',
-    description: 'Todo lo que necesitas para tu próxima aventura al aire libre. Envíos a todo el país.',
-    badge: 'Destacado',
-    image: 'https://images.unsplash.com/photo-1522204523234-8729aa6e3d5f?q=80&w=1200&auto=format&fit=crop',
-    link: '/negocios/camping-del-valle',
-    buttonText: 'Explorar Catálogo'
-  }
-];
-
-// Limitar a máximo 10
-let BANNER_DATA = RAW_BANNER_DATA.slice(0, 10);
-
-// Fallback por defecto si no hay banners
-if (BANNER_DATA.length === 0) {
-  BANNER_DATA = [{
-    id: 0,
-    title: 'Bienvenido a CazaMarket',
-    description: 'La comunidad más grande de cazadores, pescadores y amantes del campo. Explora, conecta y equipa tu próxima aventura.',
-    badge: 'Comunidad',
-    image: 'https://images.unsplash.com/photo-1542673898-7c85854b73b2?q=80&w=1200&auto=format&fit=crop',
-    link: '/registro',
-    buttonText: 'Únete Ahora'
-  }];
-}
+import { useState } from 'react';
 
 export default function PromoSlider() {
-  const [currentIndex, setCurrentIndex] = useState(0);
-
-  useEffect(() => {
-    const timer = setInterval(() => {
-      setCurrentIndex((prev) => (prev + 1) % BANNER_DATA.length);
-    }, 5000);
-    return () => clearInterval(timer);
-  }, []);
-
-  const goToSlide = (index: number) => {
-    setCurrentIndex(index);
-  };
-
-  const nextSlide = () => {
-    setCurrentIndex((prev) => (prev + 1) % BANNER_DATA.length);
-  };
-
-  const prevSlide = () => {
-    setCurrentIndex((prev) => (prev - 1 + BANNER_DATA.length) % BANNER_DATA.length);
-  };
-
-  const [touchStart, setTouchStart] = useState(0);
-  const [touchEnd, setTouchEnd] = useState(0);
-
-  const handleTouchStart = (e: React.TouchEvent) => {
-    setTouchStart(e.targetTouches[0].clientX);
-  };
-
-  const handleTouchMove = (e: React.TouchEvent) => {
-    setTouchEnd(e.targetTouches[0].clientX);
-  };
-
-  const handleTouchEnd = () => {
-    if (!touchStart || !touchEnd) return;
-    const distance = touchStart - touchEnd;
-    if (distance > 50) {
-      nextSlide();
-    }
-    if (distance < -50) {
-      prevSlide();
-    }
-    setTouchStart(0);
-    setTouchEnd(0);
-  };
+  const [isModalOpen, setIsModalOpen] = useState(false);
 
   return (
-    <div className="promo-slider-container"
-         onTouchStart={handleTouchStart}
-         onTouchMove={handleTouchMove}
-         onTouchEnd={handleTouchEnd}
-         style={{ touchAction: 'pan-y' }}>
+    <div className="ad-banner-container" style={{ margin: '20px 0', padding: '0 20px' }}>
       <div 
-        className="promo-slider-track"
-        style={{ transform: `translateX(-${currentIndex * 100}%)` }}
+        className="ad-banner" 
+        style={{
+          background: 'linear-gradient(135deg, var(--card-bg) 0%, rgba(220,100,0,0.1) 100%)',
+          border: '1px solid var(--border-color)',
+          borderRadius: 'var(--radius-lg)',
+          padding: '30px',
+          display: 'flex',
+          flexDirection: 'column',
+          alignItems: 'center',
+          textAlign: 'center',
+          gap: '15px',
+          boxShadow: 'var(--shadow-sm)'
+        }}
       >
-        {BANNER_DATA.map((banner) => (
-          <div key={banner.id} className="promo-slide">
-            <div className="promo-banner glass-panel" style={{ height: '380px' }}>
-              <div className="promo-content">
-                <span className="promo-badge">{banner.badge}</span>
-                <h3>{banner.title}</h3>
-                <p>{banner.description}</p>
-                <Link href={banner.link} className="btn btn-primary" style={{ padding: '10px 24px', fontSize: '1rem', marginTop: '20px', display: 'inline-block' }}>
-                  {banner.buttonText}
-                </Link>
+        <span style={{ 
+          background: 'var(--primary-color)', 
+          color: 'white', 
+          padding: '4px 10px', 
+          borderRadius: 'var(--radius-full)', 
+          fontSize: '0.75rem', 
+          fontWeight: 'bold',
+          letterSpacing: '1px'
+        }}>
+          ANUNCIA AQUÍ
+        </span>
+        <h2 style={{ fontSize: '1.5rem', fontWeight: 'bold', margin: '0' }}>Destaca tu Negocio</h2>
+        <p style={{ color: 'var(--text-secondary)', maxWidth: '500px', margin: '0' }}>
+          Paga para tener más publicidad y conseguir un anuncio personalizado visible para miles de cazadores y pescadores.
+        </p>
+        <button 
+          className="btn btn-primary"
+          onClick={() => setIsModalOpen(true)}
+          style={{ 
+            marginTop: '10px',
+            padding: '12px 24px', 
+            borderRadius: 'var(--radius-full)', 
+            fontWeight: 'bold',
+            boxShadow: '0 4px 15px rgba(220,100,0,0.3)'
+          }}
+        >
+          Ver Planes de Publicidad
+        </button>
+      </div>
+
+      {isModalOpen && (
+        <div style={{
+          position: 'fixed',
+          top: 0, left: 0, right: 0, bottom: 0,
+          backgroundColor: 'rgba(0,0,0,0.7)',
+          zIndex: 9999,
+          display: 'flex',
+          alignItems: 'center',
+          justifyContent: 'center',
+          padding: '20px',
+          backdropFilter: 'blur(5px)'
+        }}>
+          <div style={{
+            background: 'var(--bg-color)',
+            borderRadius: 'var(--radius-lg)',
+            width: '100%',
+            maxWidth: '600px',
+            padding: '30px',
+            position: 'relative',
+            border: '1px solid var(--border-color)',
+            boxShadow: 'var(--shadow-lg)'
+          }}>
+            <button 
+              onClick={() => setIsModalOpen(false)}
+              style={{
+                position: 'absolute',
+                top: '15px',
+                right: '15px',
+                background: 'none',
+                border: 'none',
+                color: 'var(--text-secondary)',
+                fontSize: '1.5rem',
+                cursor: 'pointer'
+              }}
+            >
+              ×
+            </button>
+            <h2 style={{ fontSize: '1.5rem', fontWeight: 'bold', marginBottom: '20px', textAlign: 'center' }}>Planes de Publicidad</h2>
+            
+            <div style={{ display: 'flex', flexDirection: 'column', gap: '15px' }}>
+              <div style={{
+                border: '2px solid var(--primary-color)',
+                borderRadius: 'var(--radius-md)',
+                padding: '20px',
+                display: 'flex',
+                justifyContent: 'space-between',
+                alignItems: 'center',
+                flexWrap: 'wrap',
+                gap: '15px'
+              }}>
+                <div>
+                  <h3 style={{ margin: '0 0 5px 0', fontSize: '1.2rem', color: 'var(--primary-color)' }}>Aparición Semanal</h3>
+                  <p style={{ margin: 0, color: 'var(--text-secondary)', fontSize: '0.9rem' }}>Tu anuncio personalizado aparecerá destacado 1 vez por semana.</p>
+                </div>
+                <button className="btn btn-primary" onClick={() => alert('Próximamente integración de pago')}>
+                  Seleccionar
+                </button>
               </div>
-              <div className="promo-image" style={{ backgroundImage: `url(${banner.image})` }}></div>
+
+              <div style={{
+                border: '1px solid var(--border-color)',
+                borderRadius: 'var(--radius-md)',
+                padding: '20px',
+                display: 'flex',
+                justifyContent: 'space-between',
+                alignItems: 'center',
+                flexWrap: 'wrap',
+                gap: '15px',
+                background: 'var(--card-bg)'
+              }}>
+                <div>
+                  <h3 style={{ margin: '0 0 5px 0', fontSize: '1.2rem' }}>Aparición Mensual</h3>
+                  <p style={{ margin: 0, color: 'var(--text-secondary)', fontSize: '0.9rem' }}>Ideal para mantener presencia. Aparece 1 vez por mes.</p>
+                </div>
+                <button className="btn btn-outline" onClick={() => alert('Próximamente integración de pago')}>
+                  Seleccionar
+                </button>
+              </div>
             </div>
+
           </div>
-        ))}
-      </div>
-
-      <button className="slider-arrow slider-arrow-left" onClick={prevSlide} aria-label="Previous slide">
-        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-          <polyline points="15 18 9 12 15 6"></polyline>
-        </svg>
-      </button>
-
-      <button className="slider-arrow slider-arrow-right" onClick={nextSlide} aria-label="Next slide">
-        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-          <polyline points="9 18 15 12 9 6"></polyline>
-        </svg>
-      </button>
-
-      <div className="slider-controls">
-        {BANNER_DATA.map((_, index) => (
-          <button
-            key={index}
-            className={`slider-dot ${index === currentIndex ? 'active' : ''}`}
-            onClick={() => goToSlide(index)}
-            aria-label={`Go to slide ${index + 1}`}
-          />
-        ))}
-      </div>
+        </div>
+      )}
     </div>
   );
 }

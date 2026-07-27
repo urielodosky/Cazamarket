@@ -1,43 +1,27 @@
 import Link from 'next/link';
+import { PRODUCT_PLANS, SERVICE_PLANS, MIXED_PLANS } from '@/types/planTypes';
 import '../app/planes/planes.css';
+
+// Obtener los planes "Comercial" (los más elegidos) de cada categoría
+const productComercial = PRODUCT_PLANS.find(p => p.tier === 'comercial')!;
+const mixedComercial = MIXED_PLANS.find(p => p.tier === 'comercial')!;
+const serviceComercial = SERVICE_PLANS.find(p => p.tier === 'comercial')!;
 
 const PREVIEW_PLANS = [
   {
-    name: 'Emprendedor',
+    ...productComercial,
     category: 'Productos',
-    price: 18,
-    features: [
-      { text: '40 Productos', included: true },
-      { text: 'Banner + Categorías', included: true },
-      { text: 'Botón WhatsApp', included: true },
-      { text: 'Chat interno', included: false },
-    ],
-    recommended: false
-  },
-  {
-    name: 'Comercial',
-    category: 'Mixto',
-    originalPrice: 64,
-    price: 60,
-    features: [
-      { text: '100 Prods + 10 Servs', included: true },
-      { text: 'Carrito a WhatsApp', included: true },
-      { text: 'Chat + Mapas', included: true },
-      { text: 'Bot asesor', included: false },
-    ],
     recommended: true
   },
   {
-    name: 'Emprendedor',
+    ...mixedComercial,
+    category: 'Mixto',
+    recommended: true
+  },
+  {
+    ...serviceComercial,
     category: 'Servicios',
-    price: 18,
-    features: [
-      { text: '5 Servicios', included: true },
-      { text: 'Banner + Categorías', included: true },
-      { text: 'Botón WhatsApp', included: true },
-      { text: 'Mapas ni calendario', included: false },
-    ],
-    recommended: false
+    recommended: true
   }
 ];
 
