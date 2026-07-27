@@ -36,7 +36,11 @@ export default function RegistroPage() {
       });
 
       if (error) {
-        setErrorMsg(error.message);
+        if (error.message.includes('Token has expired or is invalid')) {
+          setErrorMsg('El código ingresado es incorrecto o ha expirado. Por favor, verifica tu correo.');
+        } else {
+          setErrorMsg(error.message);
+        }
       } else {
         router.push('/configuracion');
       }
