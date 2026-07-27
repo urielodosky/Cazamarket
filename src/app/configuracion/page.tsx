@@ -5,6 +5,7 @@ import './config.css';
 import { useAuth } from '@/contexts/AuthContext';
 import { usePlan } from '@/contexts/PlanContext';
 import CustomSelect, { SelectOption } from '@/components/ui/CustomSelect';
+import { isValidCuit } from '@/utils/validateCuit';
 
 function SucursalEditor({ index, sucursal, provincias, onChange, onRemove }: { index: number, sucursal: any, provincias: SelectOption[], onChange: (updated: any) => void, onRemove: () => void }) {
   const [localidades, setLocalidades] = useState<SelectOption[]>([]);
@@ -134,6 +135,9 @@ export default function ConfiguracionPage() {
     { red: 'X', usuario: '' }
   ]);
 
+  const [cuitStatus, setCuitStatus] = useState<'idle' | 'loading' | 'valid' | 'invalid'>('idle');
+  const [cuitMessage, setCuitMessage] = useState('');
+
   // Efecto para inicializar el formulario (sincronizar con context y localStorage para simular backend)
   useEffect(() => {
     const savedProfile = localStorage.getItem('cazamarket_profile');
@@ -165,6 +169,50 @@ export default function ConfiguracionPage() {
       setFormData(prev => ({ ...prev, username, nombre: '', apellido: '', avatar: avatar || '' }));
     }
   }, [username, avatar]);
+
+  useEffect(() => {
+    const cuit = formData.cuit || '';
+    const cleanCuit = cuit.replace(/\D/g, '');
+
+    if (cleanCuit.length < 11) {
+      setCuitStatus('idle');
+      setCuitMessage('');
+      return;
+    }
+
+    if (cleanCuit.length === 11) {
+      if (!isValidCuit(cleanCuit)) {
+        setCuitStatus('invalid');
+        setCuitMessage('El CUIT es inválido (Falló verificación de dígitos)');
+        return;
+      }
+
+      setCuitStatus('loading');
+      setCuitMessage('Verificando en AFIP...');
+
+      fetch(`/api/cuit?cuit=${cleanCuit}`)
+        .then(res => res.json())
+        .then(data => {
+          if (data.success && data.razonSocial) {
+            setCuitStatus('valid');
+            setCuitMessage('');
+            setFormData(prev => ({ ...prev, storeName: data.razonSocial }));
+          } else if (data.error === 'API_KEY_MISSING') {
+            setCuitStatus('valid');
+            setCuitMessage('API Key de apicuit.com no configurada. Ingresa tu Razón Social manualmente.');
+          } else {
+            setCuitStatus('invalid');
+            setCuitMessage(data.message || 'Error al validar el CUIT');
+          }
+        })
+        .catch(err => {
+          console.error(err);
+          // Permite escribirlo a mano en caso de caída total del sistema
+          setCuitStatus('valid');
+          setCuitMessage('Servicio de validación no disponible. Ingresa tu Razón Social manualmente.');
+        });
+    }
+  }, [formData.cuit]);
 
   // Estados para la API de Georef
   const [provincias, setProvincias] = useState<SelectOption[]>([]);
@@ -276,6 +324,14 @@ export default function ConfiguracionPage() {
     if (formData.tipoPersona === 'juridica') {
       if (!formData.cuit || formData.cuit.trim() === '') {
         showToast('Debes ingresar el CUIT obligatoriamente (Persona Jurídica).', 'error');
+        return;
+      }
+      if (cuitStatus === 'invalid') {
+        showToast('El CUIT ingresado es inválido. Por favor, corrígelo.', 'error');
+        return;
+      }
+      if (cuitStatus === 'loading') {
+        showToast('Espera a que termine la validación del CUIT en AFIP.', 'info');
         return;
       }
     }
@@ -805,7 +861,36 @@ export default function ConfiguracionPage() {
             {formData.tipoPersona === 'juridica' && (
               <div className="form-group-config">
                 <label htmlFor="cuit">CUIT <span style={{ color: 'var(--color-primary)' }}>*</span></label>
-                <input type="text" id="cuit" value={formData.cuit || ''} onChange={handleInputChange} placeholder="Ej. 30-12345678-9" />
+                <div style={{ position: 'relative' }}>
+                  <input 
+                    type="text" 
+                    id="cuit" 
+                    value={formData.cuit || ''} 
+                    onChange={handleInputChange} 
+                    placeholder="Ej. 30-12345678-9" 
+                    style={{ 
+                      borderColor: cuitStatus === 'invalid' ? '#ef4444' : cuitStatus === 'valid' ? '#22c55e' : undefined,
+                      paddingRight: cuitStatus === 'loading' ? '40px' : '16px'
+                    }}
+                  />
+                  {cuitStatus === 'loading' && (
+                    <div style={{ position: 'absolute', right: '12px', top: '50%', transform: 'translateY(-50%)' }}>
+                      <svg className="spinner" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="var(--color-primary)" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" style={{ animation: 'spin 1s linear infinite' }}>
+                        <line x1="12" y1="2" x2="12" y2="6"></line><line x1="12" y1="18" x2="12" y2="22"></line><line x1="4.93" y1="4.93" x2="7.76" y2="7.76"></line><line x1="16.24" y1="16.24" x2="19.07" y2="19.07"></line><line x1="2" y1="12" x2="6" y2="12"></line><line x1="18" y1="12" x2="22" y2="12"></line><line x1="4.93" y1="19.07" x2="7.76" y2="16.24"></line><line x1="16.24" y1="7.76" x2="19.07" y2="4.93"></line>
+                      </svg>
+                      <style>{`@keyframes spin { 100% { transform: translateY(-50%) rotate(360deg); } }`}</style>
+                    </div>
+                  )}
+                </div>
+                {cuitMessage && (
+                  <p style={{ 
+                    marginTop: '6px', 
+                    fontSize: '0.85rem', 
+                    color: cuitStatus === 'invalid' ? '#ef4444' : cuitStatus === 'valid' ? '#22c55e' : 'var(--color-text-muted)' 
+                  }}>
+                    {cuitMessage}
+                  </p>
+                )}
               </div>
             )}
 
