@@ -161,7 +161,37 @@ export default function RegistroPage() {
   return (
     <div className="auth-container">
       <div className="auth-card glass-panel">
-        <div className="auth-header">
+        <div className="auth-header" style={{ position: 'relative' }}>
+          {isAwaitingOTP && (
+            <button
+              type="button"
+              onClick={() => { setIsAwaitingOTP(false); setErrorMsg(''); setSuccessMsg(''); }}
+              style={{
+                position: 'absolute',
+                left: '-10px',
+                top: '-10px',
+                background: 'rgba(255,255,255,0.05)',
+                border: '1px solid rgba(255,255,255,0.1)',
+                color: 'var(--color-text-main)',
+                cursor: 'pointer',
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'center',
+                width: '32px',
+                height: '32px',
+                borderRadius: '8px',
+                transition: 'all 0.2s ease',
+              }}
+              onMouseOver={(e) => e.currentTarget.style.background = 'rgba(255,255,255,0.1)'}
+              onMouseOut={(e) => e.currentTarget.style.background = 'rgba(255,255,255,0.05)'}
+              title="Volver al registro"
+            >
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                <line x1="19" y1="12" x2="5" y2="12"></line>
+                <polyline points="12 19 5 12 12 5"></polyline>
+              </svg>
+            </button>
+          )}
           <h1>{isAwaitingOTP ? 'Verifica tu correo' : isLoginView ? 'Inicia sesión' : 'Crea tu cuenta'} en CazaMarket</h1>
           <p>
             {isAwaitingOTP 
@@ -314,21 +344,13 @@ export default function RegistroPage() {
                   type="button" 
                   onClick={handleResendOTP}
                   disabled={resendTimer > 0 || isLoading}
-                  style={{ background: 'none', border: 'none', color: resendTimer > 0 ? 'var(--color-text-muted)' : 'var(--color-primary)', cursor: resendTimer > 0 ? 'not-allowed' : 'pointer', fontSize: '0.9rem', width: '100%', fontWeight: 'bold' }}
+                  style={{ background: 'none', border: 'none', color: resendTimer > 0 ? 'var(--color-text-muted)' : 'var(--color-primary)', cursor: resendTimer > 0 ? 'not-allowed' : 'pointer', fontSize: '0.95rem', width: '100%', fontWeight: 'bold' }}
                 >
                   {resendTimer > 0 
                     ? `Reenviar código en ${Math.floor(resendTimer / 60)}:${(resendTimer % 60).toString().padStart(2, '0')}` 
                     : 'Reenviar código'}
                 </button>
               )}
-              
-              <button 
-                type="button" 
-                onClick={() => { setIsAwaitingOTP(false); setErrorMsg(''); setSuccessMsg(''); }}
-                style={{ background: 'none', border: 'none', color: 'var(--color-text-muted)', cursor: 'pointer', fontSize: '0.9rem', width: '100%' }}
-              >
-                Volver al registro
-              </button>
             </div>
           )}
           
