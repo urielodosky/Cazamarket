@@ -2,6 +2,7 @@
 
 import { useState } from 'react';
 import { useRouter } from 'next/navigation';
+import { useAuth } from '@/contexts/AuthContext';
 import { usePlan } from '@/contexts/PlanContext';
 import LoadingScreen from '@/components/ui/LoadingScreen';
 import {
@@ -15,8 +16,10 @@ import './planes.css';
 
 export default function PlanesPage() {
   const { selectPlan, cancelPlan, productPlanTier, servicePlanTier } = usePlan();
+  const { isLoggedIn, isVendor } = useAuth();
   const [activeTab, setActiveTab] = useState<PlanCategory>('productos');
   const [isActivating, setIsActivating] = useState(false);
+  const [authModal, setAuthModal] = useState<{show: boolean, type: 'login' | 'vendor'}>({show: false, type: 'login'});
   const router = useRouter();
 
   const getPlans = (): PlanCardData[] => {
@@ -26,6 +29,15 @@ export default function PlanesPage() {
   };
 
   const handleSelectPlan = (plan: PlanCardData) => {
+    if (!isLoggedIn) {
+      setAuthModal({ show: true, type: 'login' });
+      return;
+    }
+    if (!isVendor) {
+      setAuthModal({ show: true, type: 'vendor' });
+      return;
+    }
+    
     setIsActivating(true);
     setTimeout(() => {
       selectPlan(plan.tier, activeTab);
@@ -138,6 +150,53 @@ export default function PlanesPage() {
           ))}
         </div>
       </div>
+
+      {/* MODAL DE VALIDACIÓN */}
+      {authModal.show && (
+        <div style={{
+          position: 'fixed', top: 0, left: 0, right: 0, bottom: 0,
+          backgroundColor: 'rgba(0, 0, 0, 0.8)', display: 'flex', alignItems: 'center', justifyContent: 'center',
+          zIndex: 9999, backdropFilter: 'blur(5px)', padding: '20px'
+        }}>
+          <div style={{
+            background: '#1a1a1a', borderRadius: '16px', width: '100%', maxWidth: '450px',
+            padding: '30px', position: 'relative', border: '1px solid #333',
+            boxShadow: '0 10px 40px rgba(0,0,0,0.8)', textAlign: 'center'
+          }}>
+            <button 
+              onClick={() => setAuthModal({ show: false, type: 'login' })}
+              style={{ position: 'absolute', top: '15px', right: '15px', background: 'none', border: 'none', color: '#888', fontSize: '1.5rem', cursor: 'pointer' }}
+            >×</button>
+            
+            <div style={{ 
+              width: '60px', height: '60px', borderRadius: '50%', background: 'rgba(255, 115, 0, 0.2)',
+              display: 'flex', alignItems: 'center', justifyContent: 'center', margin: '0 auto 20px',
+              color: 'var(--color-primary)', fontSize: '2rem', fontWeight: 'bold', border: '2px solid var(--color-primary)'
+            }}>!</div>
+            
+            <h3 style={{ margin: '0 0 10px 0', fontSize: '1.3rem', color: 'white' }}>
+              {authModal.type === 'login' ? 'Inicia sesión para continuar' : 'Configura tu Negocio'}
+            </h3>
+            
+            <p style={{ color: '#aaa', fontSize: '0.95rem', margin: '0 0 25px 0', lineHeight: 1.5 }}>
+              {authModal.type === 'login' 
+                ? 'Para poder adquirir y gestionar un plan, necesitas tener una cuenta en CazaMarket.' 
+                : 'Antes de elegir un plan comercial, necesitas completar los datos obligatorios de tu negocio en la configuración.'}
+            </p>
+            
+            <button 
+              className="btn btn-primary"
+              style={{ width: '100%', padding: '12px', fontSize: '1.05rem', fontWeight: 600 }}
+              onClick={() => {
+                setAuthModal({ show: false, type: 'login' });
+                router.push(authModal.type === 'login' ? '/registro' : '/configuracion');
+              }}
+            >
+              {authModal.type === 'login' ? 'Ir a Iniciar Sesión / Registrarse' : 'Completar datos del negocio'}
+            </button>
+          </div>
+        </div>
+      )}
     </div>
   );
 }
