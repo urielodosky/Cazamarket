@@ -184,8 +184,7 @@ export default function Navbar() {
             display: 'flex', 
             gap: '16px', 
             transition: 'all 0.5s cubic-bezier(0.4, 0, 0.2, 1)', 
-            alignItems: 'flex-start', 
-            transform: isFiltersOpen ? 'translateX(-15vw)' : 'none' 
+            alignItems: 'flex-start'
           }}
         >
           <div className={`navbar-center glass-panel ${navbarModeClass}`}>
@@ -299,14 +298,15 @@ export default function Navbar() {
           <div 
             className="filters-panel"
           style={{
-            width: isFiltersOpen ? (pathname.startsWith('/comunidad') ? '340px' : '640px') : '0px',
+            width: isFiltersOpen ? (pathname.startsWith('/comunidad') ? '240px' : '420px') : '0px',
             opacity: isFiltersOpen ? 1 : 0,
             visibility: isFiltersOpen ? 'visible' : 'hidden',
             overflow: isFiltersOpen ? 'visible' : 'hidden',
             transition: 'width 0.5s cubic-bezier(0.4, 0, 0.2, 1), opacity 0.5s',
             borderRadius: '20px',
             padding: isFiltersOpen ? '16px 20px' : '0px',
-            height: '112px', // Matches expanded-mode height
+            height: isFiltersOpen ? 'auto' : '112px',
+            minHeight: isFiltersOpen ? '112px' : '112px',
             display: 'flex',
             flexDirection: 'column',
             justifyContent: 'center',
@@ -321,13 +321,12 @@ export default function Navbar() {
             flexWrap: 'wrap',
             gap: '12px', 
             width: '100%', 
-            minWidth: pathname.startsWith('/comunidad') ? '280px' : '600px', 
             opacity: isFiltersOpen ? 1 : 0, 
             transition: 'opacity 0.3s ease 0.2s' 
           }}>
             
             {/* Categoría */}
-            <div style={{ flex: pathname.startsWith('/comunidad') ? '1 1 100%' : '1 1 30%', minWidth: 0, zIndex: 120 }}>
+            <div style={{ flex: '1 1 45%', minWidth: '160px', zIndex: 120 }}>
               <CustomSelect 
                 options={(() => {
                   const isProd = pathname.startsWith('/productos');
@@ -365,7 +364,7 @@ export default function Navbar() {
             {/* Filtros adicionales (solo para secciones fuera de comunidad) */}
             {!pathname.startsWith('/comunidad') && (
               <>
-                <div style={{ flex: '1 1 30%', minWidth: 0, zIndex: 120 }}>
+                <div style={{ flex: '1 1 45%', minWidth: '160px', zIndex: 120 }}>
                   <CustomSelect 
                     options={
                       pathname.startsWith('/productos')
@@ -395,7 +394,7 @@ export default function Navbar() {
                   />
                 </div>
 
-                <div style={{ flex: '1 1 30%', minWidth: 0, zIndex: 110 }}>
+                <div style={{ flex: '1 1 45%', minWidth: '160px', zIndex: 110 }}>
                   <CustomSelect 
                     options={
                       pathname.startsWith('/productos')
@@ -431,7 +430,7 @@ export default function Navbar() {
             
             {/* Provincia (API) */}
             {!pathname.startsWith('/comunidad') && (
-              <div style={{ flex: '1 1 30%', minWidth: 0, zIndex: 100 }}>
+              <div style={{ flex: '1 1 45%', minWidth: '160px', zIndex: 100 }}>
                 <CustomSelect 
                   options={provincias.length > 0 ? provincias : [{ value: '', label: 'Cargando...' }]} 
                   value={provincia} 
@@ -444,7 +443,7 @@ export default function Navbar() {
             
             {/* Localidad (API) */}
             {!pathname.startsWith('/comunidad') && (
-              <div style={{ flex: '1 1 30%', minWidth: 0, zIndex: 100 }}>
+              <div style={{ flex: '1 1 45%', minWidth: '160px', zIndex: 100 }}>
                 <CustomSelect 
                   options={provincia ? (localidades.length > 0 ? localidades : [{ value: '', label: 'Cargando...' }]) : []} 
                   value={localidad} 
