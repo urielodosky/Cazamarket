@@ -17,6 +17,35 @@ export default function RegistroPage() {
   const [errorMsg, setErrorMsg] = useState('');
   const [successMsg, setSuccessMsg] = useState('');
   const [termsAccepted, setTermsAccepted] = useState(false);
+  
+  // Nombres y OTP
+  const [username, setUsername] = useState('');
+  const [isAwaitingOTP, setIsAwaitingOTP] = useState(false);
+  const [otpCode, setOtpCode] = useState('');
+
+  const handleVerifyOTP = async (e: React.FormEvent) => {
+    e.preventDefault();
+    setIsLoading(true);
+    setErrorMsg('');
+    
+    try {
+      const { error } = await supabase.auth.verifyOtp({
+        email,
+        token: otpCode,
+        type: 'signup'
+      });
+
+      if (error) {
+        setErrorMsg(error.message);
+      } else {
+        router.push('/configuracion');
+      }
+    } catch (err: any) {
+      setErrorMsg(err.message || 'Error inesperado al verificar');
+    } finally {
+      setIsLoading(false);
+    }
+  };
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -48,7 +77,7 @@ export default function RegistroPage() {
           password,
           options: {
             data: {
-              full_name: email.split('@')[0],
+              full_name: username,
               avatar_url: ''
             }
           }
@@ -61,7 +90,8 @@ export default function RegistroPage() {
             // Ya está logueado (si el email confirm está desactivado)
             router.push('/configuracion');
           } else {
-            setSuccessMsg('¡Cuenta creada! Por favor revisa tu bandeja de entrada para verificar tu correo electrónico.');
+            setIsAwaitingOTP(true);
+            setSuccessMsg('¡Código enviado! Revisa tu bandeja de entrada o spam.');
           }
         }
       }
@@ -76,9 +106,11 @@ export default function RegistroPage() {
     <div className="auth-container">
       <div className="auth-card glass-panel">
         <div className="auth-header">
-          <h1>{isLoginView ? 'Inicia sesión' : 'Crea tu cuenta'} en CazaMarket</h1>
+          <h1>{isAwaitingOTP ? 'Verifica tu correo' : isLoginView ? 'Inicia sesión' : 'Crea tu cuenta'} en CazaMarket</h1>
           <p>
-            {isLoginView 
+            {isAwaitingOTP 
+              ? 'Ingresa el código de 6 dígitos que te enviamos por correo.'
+              : isLoginView 
               ? 'Bienvenido de nuevo cazador. Ingresa a tu cuenta.' 
               : 'Únete a la comunidad más grande de caza y pesca.'}
           </p>
@@ -96,8 +128,38 @@ export default function RegistroPage() {
           </div>
         )}
 
-        <form className="auth-form" onSubmit={handleSubmit}>
-          <div className="form-group">
+        <form className="auth-form" onSubmit={isAwaitingOTP ? handleVerifyOTP : handleSubmit}>
+          {isAwaitingOTP ? (
+            <div className="form-group">
+              <label htmlFor="otpCode">Código de verificación</label>
+              <input 
+                type="text" 
+                id="otpCode" 
+                placeholder="Ej: 123456" 
+                value={otpCode}
+                onChange={(e) => setOtpCode(e.target.value)}
+                maxLength={6}
+                required 
+                style={{ textAlign: 'center', fontSize: '1.2rem', letterSpacing: '4px' }}
+              />
+            </div>
+          ) : (
+            <>
+              {!isLoginView && (
+                <div className="form-group">
+                  <label htmlFor="username">Nombre de usuario</label>
+                  <input 
+                    type="text" 
+                    id="username" 
+                    placeholder="Ej: CazadorPro" 
+                    value={username}
+                    onChange={(e) => setUsername(e.target.value)}
+                    minLength={3}
+                    required 
+                  />
+                </div>
+              )}
+              <div className="form-group">
             <label htmlFor="email">Correo electrónico</label>
             <input 
               type="email" 
@@ -182,10 +244,23 @@ export default function RegistroPage() {
               </label>
             </div>
           )}
-
+          
           <button type="submit" className="auth-submit" disabled={isLoading}>
-            {isLoading ? 'Cargando...' : (isLoginView ? 'Iniciar Sesión' : 'Crear Cuenta')}
+            {isLoading ? 'Cargando...' : (isAwaitingOTP ? 'Verificar y Entrar' : isLoginView ? 'Iniciar Sesión' : 'Crear Cuenta')}
           </button>
+          
+          {isAwaitingOTP && (
+            <button 
+              type="button" 
+              onClick={() => { setIsAwaitingOTP(false); setErrorMsg(''); setSuccessMsg(''); }}
+              style={{ background: 'none', border: 'none', color: 'var(--color-text-muted)', cursor: 'pointer', marginTop: '16px', fontSize: '0.9rem', width: '100%' }}
+            >
+              Volver al registro
+            </button>
+          )}
+          
+          </>
+        )}
         </form>
 
         <div className="auth-footer">
