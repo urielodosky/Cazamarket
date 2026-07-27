@@ -2,6 +2,7 @@
 
 import { useState } from 'react';
 import { useRouter } from 'next/navigation';
+import Link from 'next/link';
 import { createClient } from '@/lib/supabase/client';
 import './registro.css';
 
@@ -151,16 +152,33 @@ export default function RegistroPage() {
           </div>
           
           {!isLoginView && (
-            <div className="form-group" style={{ flexDirection: 'row', alignItems: 'center', gap: '8px', marginBottom: '20px' }}>
-              <input 
-                type="checkbox" 
-                id="terms" 
-                checked={termsAccepted}
-                onChange={(e) => setTermsAccepted(e.target.checked)}
-                style={{ width: 'auto', margin: 0, cursor: 'pointer', accentColor: 'var(--color-primary)' }}
-              />
-              <label htmlFor="terms" style={{ margin: 0, fontSize: '0.85rem', color: 'var(--color-text-muted)', cursor: 'pointer', fontWeight: 'normal' }}>
-                Acepto los <a href="#" className="auth-link">Términos y Condiciones</a> y la <a href="#" className="auth-link">Política de Privacidad</a>
+            <div className="form-group" style={{ flexDirection: 'row', alignItems: 'flex-start', gap: '12px', marginBottom: '24px' }}>
+              <div 
+                className="custom-checkbox-wrapper" 
+                style={{ 
+                  display: 'flex', 
+                  alignItems: 'center', 
+                  justifyContent: 'center',
+                  width: '20px',
+                  height: '20px',
+                  minWidth: '20px',
+                  borderRadius: '6px',
+                  border: `2px solid ${termsAccepted ? 'var(--color-primary)' : 'rgba(255,255,255,0.2)'}`,
+                  background: termsAccepted ? 'var(--color-primary)' : 'rgba(0,0,0,0.2)',
+                  cursor: 'pointer',
+                  transition: 'all 0.2s ease',
+                  marginTop: '2px'
+                }}
+                onClick={() => setTermsAccepted(!termsAccepted)}
+              >
+                {termsAccepted && (
+                  <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="white" strokeWidth="4" strokeLinecap="round" strokeLinejoin="round">
+                    <polyline points="20 6 9 17 4 12"></polyline>
+                  </svg>
+                )}
+              </div>
+              <label style={{ margin: 0, fontSize: '0.9rem', color: 'var(--color-text-main)', cursor: 'pointer', fontWeight: 'normal', lineHeight: '1.4' }}>
+                He leído y acepto los <Link href="/terminos-y-condiciones" target="_blank" className="auth-link" style={{textDecoration: 'underline'}}>Términos y Condiciones</Link> y la <Link href="/politica-de-privacidad" target="_blank" className="auth-link" style={{textDecoration: 'underline'}}>Política de Privacidad</Link>
               </label>
             </div>
           )}
