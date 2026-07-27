@@ -15,6 +15,7 @@ export default function RegistroPage() {
   const [isLoading, setIsLoading] = useState(false);
   const [errorMsg, setErrorMsg] = useState('');
   const [successMsg, setSuccessMsg] = useState('');
+  const [termsAccepted, setTermsAccepted] = useState(false);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -35,6 +36,12 @@ export default function RegistroPage() {
           router.push('/');
         }
       } else {
+        if (!termsAccepted) {
+          setErrorMsg('Debes aceptar los Términos y Condiciones para crear tu cuenta.');
+          setIsLoading(false);
+          return;
+        }
+
         const { data, error } = await supabase.auth.signUp({
           email,
           password,
@@ -143,6 +150,21 @@ export default function RegistroPage() {
             )}
           </div>
           
+          {!isLoginView && (
+            <div className="form-group" style={{ flexDirection: 'row', alignItems: 'center', gap: '8px', marginBottom: '20px' }}>
+              <input 
+                type="checkbox" 
+                id="terms" 
+                checked={termsAccepted}
+                onChange={(e) => setTermsAccepted(e.target.checked)}
+                style={{ width: 'auto', margin: 0, cursor: 'pointer', accentColor: 'var(--color-primary)' }}
+              />
+              <label htmlFor="terms" style={{ margin: 0, fontSize: '0.85rem', color: 'var(--color-text-muted)', cursor: 'pointer', fontWeight: 'normal' }}>
+                Acepto los <a href="#" className="auth-link">Términos y Condiciones</a> y la <a href="#" className="auth-link">Política de Privacidad</a>
+              </label>
+            </div>
+          )}
+
           <button type="submit" className="auth-submit" disabled={isLoading}>
             {isLoading ? 'Cargando...' : (isLoginView ? 'Iniciar Sesión' : 'Crear Cuenta')}
           </button>
