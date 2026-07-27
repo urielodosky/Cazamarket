@@ -72,21 +72,24 @@ export default function RegistroPage() {
           return;
         }
 
-        const { data, error } = await supabase.auth.signUp({
-          email,
-          password,
-          options: {
-            data: {
-              full_name: username,
-              avatar_url: ''
-            }
-          }
+        const res = await fetch('/api/auth/register', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json'
+          },
+          body: JSON.stringify({
+            email,
+            password,
+            username
+          })
         });
 
-        if (error) {
-          setErrorMsg(error.message);
+        const data = await res.json();
+
+        if (!res.ok || data.error) {
+          setErrorMsg(data.error || 'Error al crear la cuenta');
         } else {
-          if (data?.session) {
+          if (data.data?.session) {
             // Ya está logueado (si el email confirm está desactivado)
             router.push('/configuracion');
           } else {
