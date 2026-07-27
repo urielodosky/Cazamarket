@@ -1,0 +1,381 @@
+.user-menu-container {
+  position: relative;
+}
+
+.user-menu-trigger {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: none;
+  border: none;
+  padding: 0;
+  cursor: pointer;
+  outline: none;
+  transition: transform var(--transition-fast);
+}
+
+.user-menu-trigger:hover {
+  transform: scale(1.05);
+}
+
+.user-avatar-trigger {
+  width: 38px;
+  height: 38px;
+  border-radius: 50%;
+  background: linear-gradient(135deg, var(--color-primary), #ff9900);
+  padding: 2px;
+  box-shadow: 0 4px 10px rgba(255, 115, 0, 0.25);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  overflow: hidden;
+  transition: all 0.3s ease;
+}
+
+.user-avatar-trigger:hover {
+  box-shadow: 0 5px 14px rgba(255, 115, 0, 0.45);
+}
+
+.user-avatar-trigger img {
+  width: 100%;
+  height: 100%;
+  border-radius: 50%;
+  object-fit: cover;
+}
+
+.user-avatar-trigger svg {
+  width: 20px;
+  height: 20px;
+  color: #ffffff;
+}
+
+/* Dropdown Container */
+.user-dropdown-menu {
+  position: absolute;
+  top: calc(100% + 8px);
+  right: 0;
+  width: 215px;
+  border-radius: 14px;
+  background: rgba(18, 20, 16, 0.96) !important;
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  box-shadow: 0 16px 40px rgba(0, 0, 0, 0.9), 0 0 0 1px rgba(255, 115, 0, 0.15);
+  padding: 6px 0;
+  display: flex;
+  flex-direction: column;
+  animation: userMenuPop 0.2s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+  z-index: 1000;
+  transform-origin: top right;
+}
+
+@keyframes userMenuPop {
+  from {
+    opacity: 0;
+    transform: scale(0.94) translateY(-6px);
+  }
+  to {
+    opacity: 1;
+    transform: scale(1) translateY(0);
+  }
+}
+
+/* Header Section */
+.user-dropdown-header {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 10px 12px;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+  margin-bottom: 4px;
+  background: rgba(255, 255, 255, 0.02);
+  border-top-left-radius: 14px;
+  border-top-right-radius: 14px;
+}
+
+.user-header-avatar {
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
+  overflow: hidden;
+  background: rgba(255, 115, 0, 0.2);
+  border: 1px solid rgba(255, 115, 0, 0.4);
+  flex-shrink: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.user-header-avatar img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.user-header-avatar svg {
+  width: 18px;
+  height: 18px;
+  color: var(--color-primary);
+}
+
+.user-header-info {
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+}
+
+.user-name {
+  font-weight: 700;
+  font-size: 0.85rem;
+  color: #ffffff;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  margin: 0;
+}
+
+.user-email {
+  font-size: 0.72rem;
+  color: rgba(255, 255, 255, 0.6);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  margin: 1px 0 4px 0;
+}
+
+.user-role-badge {
+  display: inline-block;
+  align-self: flex-start;
+  padding: 1px 6px;
+  border-radius: 10px;
+  font-size: 0.65rem;
+  font-weight: 600;
+  letter-spacing: 0.2px;
+  text-transform: uppercase;
+}
+
+.user-role-badge.vendor {
+  background: rgba(255, 115, 0, 0.18);
+  color: var(--color-primary);
+  border: 1px solid rgba(255, 115, 0, 0.35);
+}
+
+.user-role-badge.buyer {
+  background: rgba(255, 255, 255, 0.08);
+  color: rgba(255, 255, 255, 0.8);
+  border: 1px solid rgba(255, 255, 255, 0.12);
+}
+
+/* Body & Footer */
+.user-dropdown-body, .user-dropdown-footer {
+  display: flex;
+  flex-direction: column;
+}
+
+.user-dropdown-footer {
+  border-top: 1px solid rgba(255, 255, 255, 0.08);
+  margin-top: 4px;
+  padding-top: 4px;
+}
+
+/* Menu Items */
+.dropdown-item {
+  display: flex !important;
+  align-items: center !important;
+  gap: 10px;
+  padding: 7px 10px;
+  margin: 1px 6px;
+  border-radius: 8px;
+  color: rgba(255, 255, 255, 0.88);
+  text-decoration: none;
+  font-size: 0.82rem;
+  font-weight: 500;
+  font-family: inherit;
+  transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+  background: transparent;
+  border: none;
+  width: auto;
+  text-align: left;
+  cursor: pointer;
+}
+
+.dropdown-item svg {
+  display: block;
+  flex-shrink: 0;
+  color: rgba(255, 255, 255, 0.6);
+  transition: color 0.2s ease, transform 0.2s ease;
+}
+
+.dropdown-item:hover {
+  background-color: rgba(255, 115, 0, 0.12);
+  color: #ffffff;
+  transform: translateX(3px);
+}
+
+.dropdown-item:hover svg {
+  color: var(--color-primary);
+  transform: scale(1.08);
+}
+
+.dropdown-item.toggle-mode-btn {
+  color: var(--color-primary);
+  font-weight: 600;
+  background: rgba(255, 115, 0, 0.08);
+  border: 1px dashed rgba(255, 115, 0, 0.3);
+  margin-bottom: 3px;
+}
+
+.dropdown-item.toggle-mode-btn svg {
+  color: var(--color-primary);
+}
+
+.dropdown-item.toggle-mode-btn:hover {
+  background: rgba(255, 115, 0, 0.2);
+  border-style: solid;
+}
+
+.dropdown-item.logout-btn {
+  color: #ef4444;
+}
+
+.dropdown-item.logout-btn svg {
+  color: #ef4444;
+}
+
+.dropdown-item.logout-btn:hover {
+  background-color: rgba(239, 68, 68, 0.12);
+  color: #f87171;
+}
+
+.dropdown-item.logout-btn:hover svg {
+  color: #f87171;
+}
+
+/* Theme Toggle */
+.dropdown-item.theme-toggle-btn {
+  justify-content: space-between;
+  padding: 7px 10px;
+}
+
+.theme-toggle-switch {
+  position: relative;
+  width: 36px;
+  height: 20px;
+  background: rgba(255, 255, 255, 0.12);
+  border-radius: 10px;
+  transition: background 0.3s ease;
+  flex-shrink: 0;
+  cursor: pointer;
+}
+
+.theme-toggle-switch.active {
+  background: rgba(255, 115, 0, 0.35);
+}
+
+.theme-toggle-switch::after {
+  content: '';
+  position: absolute;
+  top: 2px;
+  left: 2px;
+  width: 16px;
+  height: 16px;
+  background: #ffffff;
+  border-radius: 50%;
+  transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1), background 0.3s ease;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.3);
+}
+
+.theme-toggle-switch.active::after {
+  transform: translateX(16px);
+  background: var(--color-primary);
+}
+
+/* ========================================
+   LIGHT MODE OVERRIDES
+   ======================================== */
+[data-theme="light"] .user-avatar-trigger {
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.12);
+}
+
+[data-theme="light"] .user-avatar-trigger:hover {
+  box-shadow: 0 4px 12px rgba(224, 104, 0, 0.25);
+}
+
+[data-theme="light"] .user-dropdown-menu {
+  background: rgba(255, 255, 255, 0.97) !important;
+  border: 1px solid rgba(0, 0, 0, 0.1);
+  box-shadow: 0 12px 36px rgba(0, 0, 0, 0.15), 0 0 0 1px rgba(224, 104, 0, 0.1);
+}
+
+[data-theme="light"] .user-dropdown-header {
+  border-bottom: 1px solid rgba(0, 0, 0, 0.06);
+  background: rgba(0, 0, 0, 0.02);
+}
+
+[data-theme="light"] .user-header-avatar {
+  background: rgba(224, 104, 0, 0.1);
+  border: 1px solid rgba(224, 104, 0, 0.25);
+}
+
+[data-theme="light"] .user-name {
+  color: #1a1c18;
+}
+
+[data-theme="light"] .user-email {
+  color: rgba(0, 0, 0, 0.5);
+}
+
+[data-theme="light"] .user-role-badge.vendor {
+  background: rgba(224, 104, 0, 0.1);
+  border: 1px solid rgba(224, 104, 0, 0.25);
+}
+
+[data-theme="light"] .user-role-badge.buyer {
+  background: rgba(0, 0, 0, 0.05);
+  color: rgba(0, 0, 0, 0.65);
+  border: 1px solid rgba(0, 0, 0, 0.1);
+}
+
+[data-theme="light"] .dropdown-item {
+  color: rgba(0, 0, 0, 0.75);
+}
+
+[data-theme="light"] .dropdown-item svg {
+  color: rgba(0, 0, 0, 0.45);
+}
+
+[data-theme="light"] .dropdown-item:hover {
+  background-color: rgba(224, 104, 0, 0.08);
+  color: #1a1c18;
+}
+
+[data-theme="light"] .dropdown-item:hover svg {
+  color: var(--color-primary);
+}
+
+[data-theme="light"] .dropdown-item.toggle-mode-btn {
+  background: rgba(224, 104, 0, 0.06);
+  border: 1px dashed rgba(224, 104, 0, 0.25);
+}
+
+[data-theme="light"] .dropdown-item.toggle-mode-btn:hover {
+  background: rgba(224, 104, 0, 0.12);
+  border-style: solid;
+}
+
+[data-theme="light"] .user-dropdown-footer {
+  border-top: 1px solid rgba(0, 0, 0, 0.06);
+}
+
+[data-theme="light"] .theme-toggle-switch {
+  background: rgba(0, 0, 0, 0.12);
+}
+
+[data-theme="light"] .theme-toggle-switch.active {
+  background: rgba(224, 104, 0, 0.3);
+}
+
+[data-theme="light"] .theme-toggle-switch::after {
+  background: #ffffff;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.2);
+}

@@ -1,0 +1,527 @@
+/* ============================================================
+   LIGHT MODE — COMPREHENSIVE GLOBAL OVERRIDES
+   
+   Strategy: Use [data-theme="light"] + !important to override
+   ALL inline dark-mode styles. CSS !important beats inline styles.
+   ============================================================ */
+
+/* ===== BASE ===== */
+[data-theme="light"] body {
+  background-color: #f5f3ee !important;
+  color: #1a1c18 !important;
+}
+
+[data-theme="light"] main {
+  background-color: #f5f3ee !important;
+}
+
+/* ===== GLASS PANELS (cards, containers) ===== */
+[data-theme="light"] .glass-panel {
+  background: #ffffff !important;
+  border-color: rgba(0, 0, 0, 0.08) !important;
+  box-shadow: 0 4px 24px rgba(0, 0, 0, 0.04) !important;
+}
+
+/* ===== GRID CARDS ===== */
+[data-theme="light"] .responsive-grid-250 > div,
+[data-theme="light"] .responsive-grid-280 > div,
+[data-theme="light"] .responsive-grid-300 > div {
+  background: #ffffff !important;
+  border: 1px solid rgba(0, 0, 0, 0.06) !important;
+  box-shadow: 0 1px 6px rgba(0, 0, 0, 0.05) !important;
+  border-radius: var(--radius-lg);
+}
+
+/* ===== INPUTS ===== */
+[data-theme="light"] input:not([type="color"]):not([type="range"]):not([type="checkbox"]):not([type="radio"]),
+[data-theme="light"] textarea,
+[data-theme="light"] select {
+  background: #ffffff !important;
+  color: #1a1c18 !important;
+  border-color: rgba(0, 0, 0, 0.12) !important;
+}
+
+[data-theme="light"] input::placeholder,
+[data-theme="light"] textarea::placeholder {
+  color: rgba(0, 0, 0, 0.6) !important;
+}
+
+[data-theme="light"] .search-bar-animated input:not([type="color"]):not([type="range"]):not([type="checkbox"]):not([type="radio"]) {
+  background: transparent !important;
+}
+
+/* ===== BUTTONS - Keep primary buttons white text ===== */
+[data-theme="light"] .btn-primary,
+[data-theme="light"] .btn-primary:hover {
+  color: #fff !important;
+}
+
+[data-theme="light"] .btn-outline {
+  border-color: rgba(0, 0, 0, 0.15) !important;
+  color: var(--color-text-main) !important;
+}
+
+/* ===== ALL DIVs WITH DARK BACKGROUNDS (rgba white on dark) ===== */
+/* These cover the VAST majority of inline background issues */
+
+/* Very subtle backgrounds (0.02 - 0.05) */
+[data-theme="light"] div[style*="rgba(255, 255, 255, 0.02)"],
+[data-theme="light"] div[style*="rgba(255, 255, 255, 0.03)"],
+[data-theme="light"] div[style*="rgba(255, 255, 255, 0.04)"],
+[data-theme="light"] div[style*="rgba(255, 255, 255, 0.05)"],
+[data-theme="light"] div[style*="rgba(255,255,255,0.02)"],
+[data-theme="light"] div[style*="rgba(255,255,255,0.03)"],
+[data-theme="light"] div[style*="rgba(255,255,255,0.04)"],
+[data-theme="light"] div[style*="rgba(255,255,255,0.05)"] {
+  background: rgba(0, 0, 0, 0.02) !important;
+}
+
+/* Medium backgrounds (0.06 - 0.1) */
+[data-theme="light"] div[style*="rgba(255, 255, 255, 0.06)"],
+[data-theme="light"] div[style*="rgba(255, 255, 255, 0.08)"],
+[data-theme="light"] div[style*="rgba(255, 255, 255, 0.1)"],
+[data-theme="light"] div[style*="rgba(255,255,255,0.06)"],
+[data-theme="light"] div[style*="rgba(255,255,255,0.08)"],
+[data-theme="light"] div[style*="rgba(255,255,255,0.1)"] {
+  background: rgba(0, 0, 0, 0.04) !important;
+}
+
+/* Stronger backgrounds (0.12 - 0.2) */
+[data-theme="light"] div[style*="rgba(255, 255, 255, 0.12)"],
+[data-theme="light"] div[style*="rgba(255, 255, 255, 0.15)"],
+[data-theme="light"] div[style*="rgba(255, 255, 255, 0.2)"],
+[data-theme="light"] div[style*="rgba(255,255,255,0.12)"],
+[data-theme="light"] div[style*="rgba(255,255,255,0.15)"],
+[data-theme="light"] div[style*="rgba(255,255,255,0.2)"] {
+  background: rgba(0, 0, 0, 0.06) !important;
+}
+
+/* Same for SPANs (category pills etc) */
+[data-theme="light"] span[style*="rgba(255, 255, 255, 0.0"],
+[data-theme="light"] span[style*="rgba(255,255,255,0.0"],
+[data-theme="light"] span[style*="rgba(255, 255, 255, 0.1"],
+[data-theme="light"] span[style*="rgba(255,255,255,0.1"] {
+  background: rgba(0, 0, 0, 0.04) !important;
+}
+
+/* Same for BUTTONs */
+[data-theme="light"] button[style*="rgba(255, 255, 255, 0.0"],
+[data-theme="light"] button[style*="rgba(255,255,255,0.0"],
+[data-theme="light"] button[style*="rgba(255, 255, 255, 0.1"],
+[data-theme="light"] button[style*="rgba(255,255,255,0.1"] {
+  background: rgba(0, 0, 0, 0.04) !important;
+  border-color: rgba(0, 0, 0, 0.1) !important;
+}
+
+/* ===== INLINE BORDERS ===== */
+[data-theme="light"] div[style*="border: 1px solid rgba(255, 255, 255"],
+[data-theme="light"] div[style*="border: 1px solid rgba(255,255,255"],
+[data-theme="light"] div[style*="border: 1px dashed rgba(255, 255, 255"],
+[data-theme="light"] div[style*="border: 1px dashed rgba(255,255,255"],
+[data-theme="light"] button[style*="border: 1px solid rgba(255, 255, 255"],
+[data-theme="light"] button[style*="border: 1px solid rgba(255,255,255"],
+[data-theme="light"] span[style*="border: 1px solid rgba(255, 255, 255"],
+[data-theme="light"] span[style*="border: 1px solid rgba(255,255,255"] {
+  border-color: rgba(0, 0, 0, 0.1) !important;
+}
+
+/* border-bottom separators */
+[data-theme="light"] div[style*="border-bottom: 1px solid rgba(255, 255, 255"],
+[data-theme="light"] div[style*="border-bottom: 1px solid rgba(255,255,255"] {
+  border-bottom-color: rgba(0, 0, 0, 0.06) !important;
+}
+
+/* ===== WHITE TEXT ON DARK ===== */
+/* h1 with white color */
+[data-theme="light"] h1[style*="color: rgb(255, 255, 255)"],
+[data-theme="light"] h1[style*="color: rgb(244, 244, 240)"] {
+  color: #1a1c18 !important;
+}
+
+/* ===== DARK INLINE BACKGROUNDS ===== */
+/* Catch the most common dark bg patterns */
+[data-theme="light"] div[style*="background-color: rgb(17, 19, 13)"],
+[data-theme="light"] div[style*="background-color: rgb(26, 30, 22)"],
+[data-theme="light"] div[style*="background-color: rgb(37, 42, 31)"],
+[data-theme="light"] div[style*="background-color: rgb(22, 24, 20)"],
+[data-theme="light"] div[style*="background-color: rgb(10, 10, 10)"] {
+  background-color: var(--color-bg-base) !important;
+}
+
+/* min-height 100vh wrappers */
+[data-theme="light"] div[style*="min-height: 100vh"] {
+  background-color: var(--color-bg-base) !important;
+}
+
+/* ===== DROPDOWN/POPOVER SURFACES ===== */
+[data-theme="light"] div[style*="backdrop-filter: blur"] {
+  background: rgba(255, 255, 255, 0.97) !important;
+  border-color: rgba(0, 0, 0, 0.1) !important;
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.1) !important;
+}
+
+/* ===== SHADOWS ===== */
+[data-theme="light"] div[style*="box-shadow: 0 8px 24px rgba(0, 0, 0, 0.6)"],
+[data-theme="light"] div[style*="box-shadow: 0 8px 24px rgba(0,0,0,0.6)"],
+[data-theme="light"] div[style*="box-shadow: 0 15px 35px rgba(0, 0, 0, 0.85)"],
+[data-theme="light"] div[style*="box-shadow: 0 15px 35px rgba(0,0,0,0.85)"],
+[data-theme="light"] div[style*="box-shadow: 0 16px 40px rgba(0, 0, 0, 0.9)"],
+[data-theme="light"] div[style*="box-shadow: 0 16px 40px rgba(0,0,0,0.9)"] {
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.08) !important;
+}
+
+/* ===== SKELETON CARDS ===== */
+[data-theme="light"] div[style*="skeleton-pulse"] {
+  background: rgba(0, 0, 0, 0.06) !important;
+}
+
+/* ===== TEXT GRADIENT ===== */
+[data-theme="light"] .text-gradient {
+  background: linear-gradient(135deg, #e06800, #b35200) !important;
+  -webkit-background-clip: text !important;
+  -webkit-text-fill-color: transparent !important;
+  background-clip: text !important;
+}
+
+/* ===== HOME PAGE ===== */
+[data-theme="light"] .home-container {
+  background: radial-gradient(circle at center, rgba(90, 102, 48, 0.06) 0%, transparent 60%) !important;
+}
+
+/* ===== PROMO SLIDER ===== */
+[data-theme="light"] .promo-slider-container {
+  background: #ffffff !important;
+  border-color: rgba(0, 0, 0, 0.06) !important;
+}
+
+/* ===== NOT FOUND ===== */
+[data-theme="light"] .not-found-container {
+  background: #f5f3ee !important;
+}
+
+/* ===== SCROLLBAR ===== */
+[data-theme="light"] ::-webkit-scrollbar-track {
+  background: rgba(0, 0, 0, 0.03) !important;
+}
+[data-theme="light"] ::-webkit-scrollbar-thumb {
+  background: rgba(0, 0, 0, 0.12) !important;
+}
+[data-theme="light"] ::-webkit-scrollbar-thumb:hover {
+  background: var(--color-primary) !important;
+}
+
+/* ===== CUSTOM SELECT ===== */
+[data-theme="light"] .custom-select-trigger {
+  border-color: rgba(0, 0, 0, 0.12) !important;
+  background-color: #ffffff !important;
+  color: #1a1c18 !important;
+}
+
+[data-theme="light"] .custom-select-trigger:hover,
+[data-theme="light"] .custom-select-trigger.open {
+  background-color: #f8f7f4 !important;
+}
+
+[data-theme="light"] .custom-select-trigger svg {
+  color: #1a1c18 !important;
+}
+
+[data-theme="light"] .placeholder-text {
+  color: rgba(0, 0, 0, 0.45) !important;
+}
+
+[data-theme="light"] .custom-select-search-container {
+  background-color: #ffffff !important;
+  border-bottom-color: rgba(0, 0, 0, 0.06) !important;
+}
+
+[data-theme="light"] .custom-select-search {
+  background-color: #f5f3ee !important;
+  border-color: rgba(0, 0, 0, 0.1) !important;
+  color: #1a1c18 !important;
+}
+
+[data-theme="light"] .custom-select-dropdown {
+  background-color: #ffffff !important;
+  background: #ffffff !important;
+  border-color: rgba(0, 0, 0, 0.12) !important;
+  box-shadow: 0 8px 28px rgba(0, 0, 0, 0.12) !important;
+}
+
+[data-theme="light"] .custom-select-dropdown::-webkit-scrollbar-thumb {
+  background: rgba(0, 0, 0, 0.12) !important;
+}
+
+[data-theme="light"] .custom-select-option {
+  color: #1a1c18 !important;
+}
+
+[data-theme="light"] .custom-select-option:hover {
+  background-color: rgba(224, 104, 0, 0.08) !important;
+}
+
+[data-theme="light"] .custom-select-option.selected {
+  background-color: var(--color-primary) !important;
+  color: white !important;
+}
+
+/* ===== PLAN CARDS ===== */
+[data-theme="light"] .plan-card {
+  background: #ffffff !important;
+  border-color: rgba(0, 0, 0, 0.08) !important;
+  box-shadow: 0 2px 12px rgba(0, 0, 0, 0.05) !important;
+}
+
+[data-theme="light"] .plan-card:hover {
+  border-color: rgba(0, 0, 0, 0.15) !important;
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.08) !important;
+}
+
+[data-theme="light"] .plan-card.recommended {
+  background-color: rgba(224, 104, 0, 0.03) !important;
+  border-color: var(--color-primary) !important;
+}
+
+[data-theme="light"] .tab-btn:hover {
+  background: rgba(0, 0, 0, 0.04) !important;
+}
+
+[data-theme="light"] .plan-feature {
+  border-bottom-color: rgba(0, 0, 0, 0.05) !important;
+}
+
+[data-theme="light"] .plan-btn {
+  border-color: rgba(0, 0, 0, 0.15) !important;
+}
+
+/* ===== CONFIG PAGE ===== */
+[data-theme="light"] .config-card.compact-grid {
+  background: #ffffff !important;
+  border-color: rgba(0, 0, 0, 0.08) !important;
+  box-shadow: 0 2px 12px rgba(0, 0, 0, 0.06) !important;
+}
+
+[data-theme="light"] .avatar-upload-circle {
+  background-color: rgba(0, 0, 0, 0.06) !important;
+  border-color: rgba(0, 0, 0, 0.15) !important;
+}
+
+[data-theme="light"] .config-accordion {
+  border-color: rgba(0, 0, 0, 0.06) !important;
+}
+
+/* ===== SVG strokes ===== */
+[data-theme="light"] svg[stroke="rgba(255,255,255,0.2)"],
+[data-theme="light"] svg[stroke="rgba(255, 255, 255, 0.2)"] {
+  stroke: rgba(0, 0, 0, 0.12) !important;
+}
+
+/* ===== CONTAINER PAGE ===== */
+[data-theme="light"] .container-page {
+  background-color: transparent !important;
+}
+
+/* ===== COMUNIDAD / FORUM ===== */
+[data-theme="light"] div[style*="background: rgba(0, 0, 0, 0.2)"],
+[data-theme="light"] div[style*="background: rgba(0,0,0,0.2)"] {
+  background: rgba(0, 0, 0, 0.03) !important;
+}
+
+/* ===== MODAL OVERLAYS ===== */
+[data-theme="light"] div[style*="background: rgba(0, 0, 0, 0.5)"],
+[data-theme="light"] div[style*="background: rgba(0,0,0,0.5)"],
+[data-theme="light"] div[style*="background: rgba(0, 0, 0, 0.6)"],
+[data-theme="light"] div[style*="background: rgba(0,0,0,0.6)"],
+[data-theme="light"] div[style*="background: rgba(0, 0, 0, 0.7)"],
+[data-theme="light"] div[style*="background: rgba(0,0,0,0.7)"] {
+  background: rgba(0, 0, 0, 0.35) !important;
+}
+
+/* ===== BOOKING CALENDAR ===== */
+[data-theme="light"] .calendar-container {
+  background: #ffffff !important;
+}
+
+[data-theme="light"] .calendar-day {
+  color: #1a1c18 !important;
+}
+
+[data-theme="light"] .calendar-day:hover {
+  background: rgba(224, 104, 0, 0.08) !important;
+}
+
+/* ===== CHAT MODAL ===== */
+[data-theme="light"] div[style*="rgba(18, 20, 16"] {
+  background: rgba(255, 255, 255, 0.97) !important;
+}
+
+/* ===== FILTERS PANEL ===== */
+[data-theme="light"] .filters-panel {
+  background: rgba(255, 255, 255, 0.98) !important;
+  border-color: rgba(0, 0, 0, 0.08) !important;
+  box-shadow: 0 12px 36px rgba(0, 0, 0, 0.12) !important;
+}
+
+/* ===== NAVBAR ===== */
+[data-theme="light"] .navbar-center {
+  background-color: #ffffff !important;
+  border: 1px solid rgba(0, 0, 0, 0.08) !important;
+  box-shadow: 0 2px 12px rgba(0, 0, 0, 0.06) !important;
+}
+
+[data-theme="light"] .navbar-center.expanded-mode .links-wrapper {
+  border-bottom: 1px solid rgba(0, 0, 0, 0.06) !important;
+}
+
+[data-theme="light"] .navbar-center.expanded-mode .search-bar-animated {
+  background-color: #f5f3ee !important;
+  border: 1px solid rgba(0, 0, 0, 0.08) !important;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.06) !important;
+}
+
+[data-theme="light"] .search-btn-animated {
+  background: var(--color-primary) !important;
+  color: #fff !important;
+}
+
+[data-theme="light"] .filter-btn-premium {
+  background: rgba(0, 0, 0, 0.04) !important;
+  border-color: rgba(0, 0, 0, 0.1) !important;
+  color: var(--color-text-main) !important;
+}
+
+[data-theme="light"] .nav-cart-btn {
+  background: rgba(0, 0, 0, 0.03) !important;
+  border-color: rgba(0, 0, 0, 0.1) !important;
+}
+
+[data-theme="light"] .nav-bot-btn {
+  background: rgba(224, 104, 0, 0.08) !important;
+  border-color: rgba(224, 104, 0, 0.2) !important;
+}
+
+[data-theme="light"] .mobile-menu-panel {
+  background: rgba(255, 255, 255, 0.98) !important;
+  border: 1px solid rgba(0, 0, 0, 0.08) !important;
+}
+
+[data-theme="light"] .cart-badge {
+  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.15) !important;
+}
+
+/* ===== USER MENU ===== */
+[data-theme="light"] .user-avatar-trigger {
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.12) !important;
+}
+
+[data-theme="light"] .user-dropdown-menu {
+  background: rgba(255, 255, 255, 0.97) !important;
+  border: 1px solid rgba(0, 0, 0, 0.1) !important;
+  box-shadow: 0 12px 36px rgba(0, 0, 0, 0.15), 0 0 0 1px rgba(224, 104, 0, 0.1) !important;
+}
+
+[data-theme="light"] .user-dropdown-header {
+  border-bottom: 1px solid rgba(0, 0, 0, 0.06) !important;
+  background: rgba(0, 0, 0, 0.02) !important;
+}
+
+[data-theme="light"] .user-header-avatar {
+  background: rgba(224, 104, 0, 0.1) !important;
+  border: 1px solid rgba(224, 104, 0, 0.25) !important;
+}
+
+[data-theme="light"] .user-name {
+  color: #1a1c18 !important;
+}
+
+[data-theme="light"] .user-email {
+  color: rgba(0, 0, 0, 0.5) !important;
+}
+
+[data-theme="light"] .user-role-badge.vendor {
+  background: rgba(224, 104, 0, 0.1) !important;
+  border: 1px solid rgba(224, 104, 0, 0.25) !important;
+}
+
+[data-theme="light"] .user-role-badge.buyer {
+  background: rgba(0, 0, 0, 0.05) !important;
+  color: rgba(0, 0, 0, 0.65) !important;
+  border: 1px solid rgba(0, 0, 0, 0.1) !important;
+}
+
+[data-theme="light"] .dropdown-item {
+  color: rgba(0, 0, 0, 0.75) !important;
+}
+
+[data-theme="light"] .dropdown-item svg {
+  color: rgba(0, 0, 0, 0.45) !important;
+}
+
+[data-theme="light"] .dropdown-item:hover {
+  background-color: rgba(224, 104, 0, 0.08) !important;
+  color: #1a1c18 !important;
+}
+
+[data-theme="light"] .dropdown-item:hover svg {
+  color: var(--color-primary) !important;
+}
+
+[data-theme="light"] .dropdown-item.toggle-mode-btn {
+  background: rgba(224, 104, 0, 0.06) !important;
+  border: 1px dashed rgba(224, 104, 0, 0.25) !important;
+}
+
+[data-theme="light"] .user-dropdown-footer {
+  border-top: 1px solid rgba(0, 0, 0, 0.06) !important;
+}
+
+[data-theme="light"] .theme-toggle-switch {
+  background: rgba(0, 0, 0, 0.12) !important;
+}
+
+[data-theme="light"] .theme-toggle-switch.active {
+  background: rgba(224, 104, 0, 0.3) !important;
+}
+
+/* ===== TRENDING SECTION ===== */
+[data-theme="light"] .trending-section {
+  background: #ffffff !important;
+  border-color: rgba(0, 0, 0, 0.06) !important;
+}
+
+/* ===== CARD CONTENT ===== */
+[data-theme="light"] .card-content-fluid {
+  background: transparent !important;
+}
+
+/* ===== TOAST NOTIFICATIONS ===== */
+[data-theme="light"] div[style*="z-index: 9999"][style*="border-radius"] {
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.12) !important;
+}
+
+/* ===== REGISTRO PAGE ===== */
+[data-theme="light"] .registro-container,
+[data-theme="light"] .auth-container {
+  background: #f5f3ee !important;
+}
+
+[data-theme="light"] .registro-card,
+[data-theme="light"] .auth-card {
+  background: #ffffff !important;
+  border-color: rgba(0, 0, 0, 0.08) !important;
+}
+
+/* ===== FAVORITOS PAGE ===== */
+[data-theme="light"] .favoritos-container {
+  background: #f5f3ee !important;
+}
+
+/* ===== CARRITO PAGE ===== */
+[data-theme="light"] .carrito-container {
+  background: #f5f3ee !important;
+}
+
+/* ===== MENSAJES PAGE ===== */
+[data-theme="light"] .mensajes-container {
+  background: #f5f3ee !important;
+}
