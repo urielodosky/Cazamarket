@@ -290,6 +290,11 @@ export default function Navbar() {
           <div 
             className="filters-panel"
           style={{
+            position: 'absolute',
+            top: '100%',
+            left: '50%',
+            transform: 'translateX(-50%)',
+            marginTop: '10px',
             width: isFiltersOpen ? (pathname.startsWith('/comunidad') ? '340px' : '640px') : '0px',
             opacity: isFiltersOpen ? 1 : 0,
             visibility: isFiltersOpen ? 'visible' : 'hidden',
@@ -301,10 +306,10 @@ export default function Navbar() {
             display: 'flex',
             flexDirection: 'column',
             justifyContent: 'center',
-            marginLeft: isFiltersOpen ? '0' : '-16px',
-            zIndex: 5,
+            zIndex: 50,
             backgroundColor: '#1a1e16', /* Solid dark background, not glass */
-            border: '1px solid rgba(255, 255, 255, 0.05)'
+            border: '1px solid rgba(255, 255, 255, 0.05)',
+            boxShadow: '0 20px 40px rgba(0,0,0,0.6)'
           }}
         >
           <div style={{ 
