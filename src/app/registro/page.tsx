@@ -76,6 +76,14 @@ export default function RegistroPage() {
           setErrorMsg(error.message);
         }
       } else {
+        // Limpiar datos locales viejos
+        localStorage.removeItem('cazamarket_plan_tier_productos');
+        localStorage.removeItem('cazamarket_plan_tier_servicios');
+        localStorage.removeItem('cazamarket_plan_tier');
+        localStorage.removeItem('cazamarket_plan_category');
+        localStorage.removeItem('cazamarket_profile');
+        localStorage.removeItem('cazamarket_vendor_mode');
+        
         router.push('/configuracion');
       }
     } catch (err: any) {
@@ -128,7 +136,14 @@ export default function RegistroPage() {
           setErrorMsg(data.error || 'Error al crear la cuenta');
         } else {
           if (data.data?.session) {
-            // Ya está logueado (si el email confirm está desactivado)
+            // Limpiar datos locales viejos
+            localStorage.removeItem('cazamarket_plan_tier_productos');
+            localStorage.removeItem('cazamarket_plan_tier_servicios');
+            localStorage.removeItem('cazamarket_plan_tier');
+            localStorage.removeItem('cazamarket_plan_category');
+            localStorage.removeItem('cazamarket_profile');
+            localStorage.removeItem('cazamarket_vendor_mode');
+            
             router.push('/configuracion');
           } else {
             setIsAwaitingOTP(true);

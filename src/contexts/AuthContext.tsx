@@ -95,6 +95,14 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
     await supabase.auth.signOut();
     setIsVendorModeActive(false);
     localStorage.removeItem('cazamarket_vendor_mode');
+    localStorage.removeItem('cazamarket_plan_tier_productos');
+    localStorage.removeItem('cazamarket_plan_tier_servicios');
+    localStorage.removeItem('cazamarket_plan_tier');
+    localStorage.removeItem('cazamarket_plan_category');
+    localStorage.removeItem('cazamarket_profile');
+    
+    // Forzar recarga completa para limpiar los estados de react que dependen de localStorage
+    window.location.href = '/';
   };
 
   const updateUser = async (newUser: string, newEmail: string, newAvatar?: string) => {
