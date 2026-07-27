@@ -336,6 +336,12 @@ export default function ConfiguracionPage() {
       }
     }
 
+    // Validación General: Teléfono obligatorio
+    if (!formData.telefono || formData.telefono.trim() === '') {
+      showToast('El número de teléfono es obligatorio.', 'error');
+      return;
+    }
+
     // Validación de Persona Física
     if (formData.tipoPersona === 'fisica') {
       if (!formData.dob || formData.dob.trim() === '') {

@@ -38,6 +38,22 @@ export default function PlanesPage() {
       return;
     }
     
+    // Verificar que tengan los datos obligatorios (especialmente el teléfono)
+    const savedProfile = localStorage.getItem('cazamarket_profile');
+    let hasTelefono = false;
+    if (savedProfile) {
+      try {
+        const parsed = JSON.parse(savedProfile);
+        hasTelefono = !!parsed.telefono && parsed.telefono.trim() !== '';
+      } catch (e) {}
+    }
+
+    if (!hasTelefono) {
+      alert('Debes completar tus datos obligatorios (incluyendo tu teléfono) en la Configuración antes de elegir un plan.');
+      router.push('/configuracion');
+      return;
+    }
+    
     setIsActivating(true);
     setTimeout(() => {
       selectPlan(plan.tier, activeTab);
