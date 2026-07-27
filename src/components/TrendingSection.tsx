@@ -12,29 +12,9 @@ import {
   CursorArrowRaysIcon
 } from '@heroicons/react/24/outline';
 
-const TOP_NEGOCIOS = Array.from({ length: 10 }).map((_, i) => ({
-  id: i + 1,
-  name: `Negocio Destacado ${i + 1}`,
-  category: i % 2 === 0 ? 'Armería' : 'Camping',
-  views: Math.floor(Math.random() * 5000) + 1000,
-  image: `https://images.unsplash.com/photo-${1500000000000 + i}?q=80&w=150&auto=format&fit=crop`
-}));
-
-const TOP_SERVICIOS = Array.from({ length: 10 }).map((_, i) => ({
-  id: i + 1,
-  name: `Servicio Premium ${i + 1}`,
-  location: 'Patagonia, Arg',
-  clicks: Math.floor(Math.random() * 3000) + 500,
-  image: `https://images.unsplash.com/photo-${1600000000000 + i}?q=80&w=150&auto=format&fit=crop`
-}));
-
-const TOP_PRODUCTOS = Array.from({ length: 10 }).map((_, i) => ({
-  id: i + 1,
-  name: `Producto Élite ${i + 1}`,
-  price: Math.floor(Math.random() * 50000) + 5000,
-  clicks: Math.floor(Math.random() * 4000) + 800,
-  image: `https://images.unsplash.com/photo-${1700000000000 + i}?q=80&w=150&auto=format&fit=crop`
-}));
+const TOP_NEGOCIOS: any[] = [];
+const TOP_SERVICIOS: any[] = [];
+const TOP_PRODUCTOS: any[] = [];
 
 export default function TrendingSection() {
   const [showAllBusinesses, setShowAllBusinesses] = useState(false);
@@ -70,17 +50,14 @@ export default function TrendingSection() {
             >
               <div style={{ position: 'relative' }}>
                 <div style={{ width: '60px', height: '60px', borderRadius: 'var(--radius-md)', backgroundColor: 'var(--border-color)', backgroundImage: `url(${item.image})`, backgroundSize: 'cover', backgroundPosition: 'center' }} />
-                <span style={{ position: 'absolute', top: '-8px', left: '-8px', background: 'var(--primary-color)', color: 'white', width: '24px', height: '24px', borderRadius: '50%', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '0.8rem', fontWeight: 'bold', border: '2px solid var(--card-bg)' }}>
-                  {index + 1}
-                </span>
               </div>
               
               <div style={{ flex: 1, overflow: 'hidden' }}>
                 <h4 style={{ margin: '0 0 4px 0', fontSize: '1rem', whiteSpace: 'nowrap', textOverflow: 'ellipsis', overflow: 'hidden' }}>{item.name}</h4>
                 
-                {type === 'negocios' && <p style={{ margin: 0, fontSize: '0.85rem', color: 'var(--text-secondary)' }}>{item.category}</p>}
+                {type === 'negocios' && <p style={{ margin: 0, fontSize: '0.85rem', color: 'var(--text-secondary)' }}>{item.type}</p>}
                 {type === 'servicios' && <p style={{ margin: 0, fontSize: '0.85rem', color: 'var(--text-secondary)' }}>{item.location}</p>}
-                {type === 'productos' && <p style={{ margin: 0, fontSize: '0.85rem', color: 'var(--primary-color)', fontWeight: 'bold' }}>${formatNumber(item.price)}</p>}
+                {type === 'productos' && <p style={{ margin: 0, fontSize: '0.85rem', color: 'var(--primary-color)', fontWeight: 'bold' }}>-</p>}
                 
                 <div style={{ display: 'flex', alignItems: 'center', gap: '4px', marginTop: '6px', fontSize: '0.75rem', color: 'var(--text-secondary)' }}>
                   {type === 'negocios' ? (
