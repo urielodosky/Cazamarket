@@ -15,7 +15,6 @@
 }
 
 .navbar-logo {
-  flex: 1;
   display: flex;
   justify-content: flex-start;
   padding-top: 6px;
@@ -37,7 +36,7 @@
 /* Sliding Navbar Animation */
 .navbar-center {
   position: relative;
-  background-color: #1a1e16;
+  background-color: var(--color-bg-surface-elevated);
   border-radius: var(--radius-full);
   border: 1px solid rgba(255, 255, 255, 0.05); /* Borde sutil, no naranja */
   transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
@@ -67,7 +66,7 @@
   height: 112px;
   border-radius: 20px;
   flex-direction: column;
-  width: 480px; /* Fixed width for stability during transition */
+  width: 580px; /* Fixed width for stability during transition */
   max-width: 100%;
 }
 
@@ -214,7 +213,6 @@
 }
 
 .navbar-actions {
-  flex: 1;
   display: flex;
   justify-content: flex-end;
   align-items: flex-start;
