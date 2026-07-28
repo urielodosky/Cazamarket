@@ -192,8 +192,11 @@ export default function Navbar() {
         <div 
           className="navbar-middle-area" 
           style={{ 
+            position: 'absolute',
+            left: '50%',
+            transform: 'translateX(-50%)',
             display: 'flex', 
-            gap: '16px', 
+            gap: '12px', 
             transition: 'all 0.5s cubic-bezier(0.4, 0, 0.2, 1)', 
             alignItems: 'flex-start'
           }}
@@ -318,9 +321,10 @@ export default function Navbar() {
             overflow: isFiltersOpen ? 'visible' : 'hidden',
             transition: 'width 0.5s cubic-bezier(0.4, 0, 0.2, 1), opacity 0.5s',
             borderRadius: '20px',
-            padding: isFiltersOpen ? '16px 20px' : '0px',
-            height: isFiltersOpen ? 'auto' : '112px',
-            minHeight: isFiltersOpen ? '112px' : '112px',
+            padding: isFiltersOpen ? '14px 20px' : '0px',
+            height: '112px',
+            minHeight: '112px',
+            boxSizing: 'border-box',
             display: 'flex',
             flexDirection: 'column',
             marginLeft: isFiltersOpen ? '12px' : '-16px',
