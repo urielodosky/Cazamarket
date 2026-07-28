@@ -157,7 +157,7 @@ export default function ConfiguracionPage() {
         telefono: phone || '',
         dob: birthDate || '',
         avatar: avatar || '',
-        tipoPersona: personType || 'Física',
+        tipoPersona: (personType || 'fisica').toLowerCase().includes('jur') ? 'juridica' : 'fisica',
         cuit: cuit || '',
         storeName: storeName || '',
         storeDescription: storeDescription || '',
