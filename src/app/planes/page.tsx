@@ -134,7 +134,7 @@ export default function PlanesPage() {
               onClick={() => setActiveTab('mixto')}
             >
               Mixtos
-              <span className="discount-badge">¡Ahorro!</span>
+              <span className="discount-badge">Ahorro</span>
             </button>
           </div>
         </div>
@@ -281,7 +281,7 @@ export default function PlanesPage() {
                 </svg>
                 <div>
                   <h3 style={{ margin: 0, color: 'white', fontSize: '1.15rem', fontWeight: 700 }}>
-                    {paymentStep === 'success' ? '¡Pago exitoso!' : paymentStep === 'processing' ? 'Procesando pago...' : 'Finalizar compra'}
+                    {paymentStep === 'success' ? 'Pago exitoso' : paymentStep === 'processing' ? 'Procesando pago...' : 'Finalizar compra'}
                   </h3>
                   <p style={{ margin: 0, color: 'rgba(255,255,255,0.8)', fontSize: '0.85rem' }}>
                     {paymentStep === 'success' ? 'Tu plan ha sido activado' : paymentStep === 'processing' ? 'No cierres esta ventana' : 'Simulación de pago'}
@@ -442,7 +442,7 @@ export default function PlanesPage() {
                     </svg>
                   </div>
                   <p style={{ color: 'white', fontSize: '1.1rem', fontWeight: 600, margin: '0 0 8px' }}>
-                    ¡Pago confirmado!
+                    Pago confirmado
                   </p>
                   <p style={{ color: '#888', fontSize: '0.9rem', margin: '0 0 4px' }}>
                     Plan <strong style={{ color: 'var(--color-primary)' }}>{paymentModal.plan.name}</strong> activado
