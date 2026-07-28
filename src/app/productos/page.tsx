@@ -41,7 +41,7 @@ function ProductosContent() {
   useEffect(() => {
     const fetchProducts = async () => {
       const supabase = createClient();
-      let query = supabase.from('products').select('*');
+      let query = supabase.from('products').select('*, profiles(first_name, last_name, avatar_url, store_name, branches)');
       
       // En modo vendedor en esta vista específica, mostramos solo sus productos
       // Opcional: si queremos que el vendedor vea el marketplace completo, podemos quitar esto
@@ -58,6 +58,7 @@ function ProductosContent() {
           ...p,
           store: p.profiles?.store_name || `${p.profiles?.first_name || ''} ${p.profiles?.last_name || ''}`.trim() || 'Usuario Anónimo',
           avatar: p.profiles?.avatar_url || 'https://images.unsplash.com/photo-1511497584788-876760111969?q=80&w=200&auto=format&fit=crop',
+          branches: p.profiles?.branches || []
         }));
         setLocalProducts(formattedData);
       }
@@ -315,15 +316,44 @@ function ProductosContent() {
                 
                 {/* Shipping / Retiro */}
                 <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-                  <span style={{ fontSize: '0.75rem', color: 'color-mix(in srgb, var(--color-text-main) 60%, transparent)' }}>
-                    {producto.shipping_mode === 'gratis' || producto.seller?.shippingCost === 0 || producto.shippingCost === 0
-                      ? 'Envío gratis'
-                      : producto.shipping_mode === 'costo_extra' || (producto.seller?.shippingCost && typeof producto.seller.shippingCost === 'number' && producto.seller.shippingCost > 0) || producto.shippingCost > 0
-                        ? 'Envío con costo'
-                        : producto.pickup_available === 'si' || (producto.seller?.branches && producto.seller.branches.length > 0)
-                          ? 'Retiro en sucursal'
-                          : ''}
-                  </span>
+                  <div style={{ fontSize: '0.75rem', color: 'color-mix(in srgb, var(--color-text-main) 60%, transparent)', display: 'flex', alignItems: 'center', gap: '6px' }}>
+                    {(() => {
+                      const hasShipping = producto.shipping_mode === 'gratis' || producto.shipping_mode === 'costo_extra' || typeof producto.seller?.shippingCost === 'number' || typeof producto.shippingCost === 'number';
+                      const shippingText = producto.shipping_mode === 'gratis' || producto.seller?.shippingCost === 0 || producto.shippingCost === 0 ? 'Envío gratis' : 'Envío con costo';
+                      const hasPickup = producto.pickup_available === 'si' || (producto.seller?.branches && producto.seller.branches.length > 0);
+                      const branches = producto.branches || producto.seller?.branches || [];
+                      const branchesCount = branches.length;
+                      
+                      const branchesTooltip = branchesCount > 0 
+                        ? branches.map((b: any) => `${b.calle || ''} ${b.numero || ''}, ${b.localidad || ''}`.trim().replace(/^,/, '').trim()).join(' | ') 
+                        : 'Ver sucursales';
+
+                      if (hasShipping) {
+                        return (
+                          <>
+                            <span>{shippingText}</span>
+                            {hasPickup && (
+                              <span title={`Retiro en sucursal: ${branchesTooltip}`} style={{ background: 'rgba(255, 115, 0, 0.1)', color: 'var(--color-primary)', padding: '2px 6px', borderRadius: 'var(--radius-full)', border: '1px solid rgba(255,115,0,0.2)', cursor: 'help', fontWeight: 600 }}>
+                                +{branchesCount > 0 ? branchesCount : 1}
+                              </span>
+                            )}
+                          </>
+                        );
+                      } else if (hasPickup) {
+                        return (
+                          <>
+                            <span>Retiro en sucursal</span>
+                            {branchesCount > 0 && (
+                              <span title={branchesTooltip} style={{ background: 'rgba(255, 115, 0, 0.1)', color: 'var(--color-primary)', padding: '2px 6px', borderRadius: 'var(--radius-full)', border: '1px solid rgba(255,115,0,0.2)', cursor: 'help', fontWeight: 600 }}>
+                                +{branchesCount}
+                              </span>
+                            )}
+                          </>
+                        );
+                      }
+                      return null;
+                    })()}
+                  </div>
                   <button 
                     onClick={(e) => { e.stopPropagation(); router.push(`/productos/${producto.id}`); }}
                     style={{ 
