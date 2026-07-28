@@ -750,7 +750,7 @@ export default function ServicioDetailPage({ params }: { params: Promise<{ id: s
           {service.description && (
             <div style={{ marginBottom: '40px' }}>
               <h3 style={{ fontSize: '1.4rem', marginBottom: '20px', borderBottom: '1px solid var(--color-border)', paddingBottom: '12px', color: 'var(--color-text-main)' }}>Descripción del Servicio</h3>
-              <p style={{ color: 'var(--color-text-muted)', lineHeight: 1.8, fontSize: '1.05rem' }}>
+              <p style={{ color: 'var(--color-text-muted)', lineHeight: 1.8, fontSize: '1.05rem', wordBreak: 'break-word', overflowWrap: 'anywhere' }}>
                 {service.description}
               </p>
             </div>
@@ -761,7 +761,7 @@ export default function ServicioDetailPage({ params }: { params: Promise<{ id: s
               <h3 style={{ fontSize: '1.4rem', marginBottom: '20px', borderBottom: '1px solid var(--color-border)', paddingBottom: '12px', color: 'var(--color-text-main)' }}>¿Qué incluye?</h3>
               <ul style={{ color: 'var(--color-text-muted)', lineHeight: 1.8, fontSize: '1.05rem', paddingLeft: '24px', margin: 0 }}>
                 {service.features.map((feature: string, idx: number) => (
-                  <li key={idx} style={{ marginBottom: '12px' }}>{feature}</li>
+                  <li key={idx} style={{ marginBottom: '12px', wordBreak: 'break-word', overflowWrap: 'anywhere' }}>{feature}</li>
                 ))}
               </ul>
             </div>
