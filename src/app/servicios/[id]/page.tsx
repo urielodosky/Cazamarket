@@ -69,6 +69,7 @@ function formatAddress(raw: string) {
 export default function ServicioDetailPage({ params }: { params: Promise<{ id: string }> }) {
   const unwrappedParams = use(params);
   const serviceId = unwrappedParams.id;
+  const router = useRouter();
   const [service, setService] = useState<any>(null);
   const [selectedDates, setSelectedDates] = useState<string[]>([]);
   const [activeImage, setActiveImage] = useState(0);
@@ -80,15 +81,18 @@ export default function ServicioDetailPage({ params }: { params: Promise<{ id: s
   const { hasFeature } = usePlan();
   const { username } = useAuth();
   const themeColors = useThemeColors();
+  const supabase = createClient();
 
   const nextImage = (e: React.MouseEvent) => {
     e.stopPropagation();
+    if (!service) return;
     const len = service.media && service.media.length > 0 ? service.media.length : 1;
     setActiveImage((prev) => (prev === len - 1 ? 0 : prev + 1));
   };
 
   const prevImage = (e: React.MouseEvent) => {
     e.stopPropagation();
+    if (!service) return;
     const len = service.media && service.media.length > 0 ? service.media.length : 1;
     setActiveImage((prev) => (prev === 0 ? len - 1 : prev - 1));
   };
@@ -96,59 +100,96 @@ export default function ServicioDetailPage({ params }: { params: Promise<{ id: s
   const [otherServices, setOtherServices] = useState<any[]>([]);
 
   useEffect(() => {
-    let currentService = null;
-    try {
-      const savedServices = localStorage.getItem('cazamarket_my_services');
-      if (savedServices) {
-        const parsedServices = JSON.parse(savedServices);
-        const myService = parsedServices.find((s: any) => String(s.id) === String(serviceId));
-        if (myService) {
-          currentService = { ...myService };
-          if (myService.storeId) {
-            currentService.seller = { ...currentService.seller, id: myService.storeId };
+    const fetchService = async () => {
+      try {
+        const { data, error } = await supabase
+          .from('services')
+          .select('*, profiles!user_id(*)')
+          .eq('id', serviceId)
+          .single();
+
+        if (data && !error) {
+          const sellerProfile = data.profiles || {};
+          
+          setService({
+            id: data.id,
+            name: data.name,
+            price: data.price,
+            category: data.category,
+            description: data.description,
+            images: [data.image],
+            media: data.media || [{ url: data.image, type: 'image' }],
+            features: data.features || [],
+            location: data.service_location,
+            areaPoints: data.location_radius ? JSON.parse(data.location_radius) : [],
+            discount: data.has_discount ? { name: data.discount_name, type: data.discount_type, value: data.discount_value } : undefined,
+            timeDiscounts: data.time_discounts || [],
+            earlyBirdDiscounts: data.early_bird_discounts || [],
+            seasonRules: data.season_rules || [],
+            volumeDiscounts: data.volume_discounts || [],
+            seller: {
+              id: data.user_id,
+              name: sellerProfile.store_name || sellerProfile.full_name || 'Mi Negocio',
+              avatar: sellerProfile.avatar_url || '',
+              phone: sellerProfile.phone || '',
+            }
+          });
+          setIsLoading(false);
+          return;
+        }
+      } catch (e) {
+        console.error(e);
+      }
+
+      let currentService = null;
+      try {
+        const savedServices = localStorage.getItem('cazamarket_my_services');
+        if (savedServices) {
+          const parsedServices = JSON.parse(savedServices);
+          const myService = parsedServices.find((s: any) => String(s.id) === String(serviceId));
+          if (myService) {
+            currentService = { ...myService };
+            if (myService.storeId) {
+              currentService.seller = { ...currentService.seller, id: myService.storeId };
+            }
+          }
+
+          const others = parsedServices.filter((s: any) => String(s.id) !== String(serviceId)).slice(0, 4);
+          setOtherServices(others);
+        }
+
+        if (currentService) {
+          const savedProfile = localStorage.getItem('cazamarket_profile');
+          if (savedProfile) {
+            const parsedProfile = JSON.parse(savedProfile);
+            setService((prev: any) => {
+              if (!prev) return prev;
+              return {
+                ...prev,
+                seller: {
+                  ...prev.seller,
+                  phone: parsedProfile.telefono || prev.seller?.phone,
+                  socials: parsedProfile.redesSociales || prev.seller?.socials || [],
+                  theme: parsedProfile.theme || prev.seller?.theme
+                }
+              };
+            });
+            const clean = (val?: string) => (val && val.toLowerCase() !== 'uriel' ? val : '');
+            const resolvedName = clean(parsedProfile.storeName) || clean(parsedProfile.username) || clean(parsedProfile.nombre) || clean(currentService.seller?.name) || 'Mi Negocio';
+            currentService.seller = {
+              ...currentService.seller,
+              name: resolvedName,
+              avatar: parsedProfile.avatar || currentService.seller?.avatar || '',
+              phone: parsedProfile.telefono || currentService.seller?.phone || 'No especificado',
+              socials: parsedProfile.redesSociales || currentService.seller?.socials || [],
+              theme: parsedProfile.theme || currentService.seller?.theme || null
+            };
           }
         }
+      } catch (e) { }
 
-        const others = parsedServices.filter((s: any) => String(s.id) !== String(serviceId)).slice(0, 4);
-        setOtherServices(others);
-      }
-
-      if (currentService) {
-        const savedProfile = localStorage.getItem('cazamarket_profile');
-        if (savedProfile) {
-          const parsedProfile = JSON.parse(savedProfile);
-          setService((prev: any) => {
-            if (!prev) return prev;
-            return {
-              ...prev,
-              seller: {
-                ...prev.seller,
-                phone: parsedProfile.telefono || prev.seller?.phone,
-                socials: parsedProfile.redesSociales || prev.seller?.socials || [],
-                theme: parsedProfile.theme || prev.seller?.theme
-              }
-            };
-          });
-          const clean = (val?: string) => (val && val.toLowerCase() !== 'uriel' ? val : '');
-          const resolvedName = clean(parsedProfile.storeName) || clean(parsedProfile.username) || clean(parsedProfile.nombre) || clean(currentService.seller?.name) || 'Mi Negocio';
-          currentService.seller = {
-            ...currentService.seller,
-            name: resolvedName,
-            avatar: parsedProfile.avatar || currentService.seller?.avatar || '',
-            phone: parsedProfile.telefono || currentService.seller?.phone || 'No especificado',
-            socials: parsedProfile.redesSociales || currentService.seller?.socials || [],
-            theme: parsedProfile.theme || currentService.seller?.theme || null
-          };
-        }
-      }
-    } catch (e) { }
-
-    setService(currentService);
-
-    // Simular carga de datos para mostrar la pantalla de carga premium
-    const timer = setTimeout(() => {
+      setService(currentService);
       setIsLoading(false);
-      // Auto-scroll después de cargar
       if (currentService) {
         setTimeout(() => {
           window.scrollTo({ top: 180, behavior: 'smooth' });

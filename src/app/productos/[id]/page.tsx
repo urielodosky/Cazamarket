@@ -29,6 +29,8 @@ function getSocialUrl(platform: string, handle: string) {
   }
 }
 
+import { createClient } from '@/utils/supabase/client';
+
 export default function ProductoDetailPage({ params }: { params: Promise<{ id: string }> }) {
   const unwrappedParams = use(params);
   const productId = unwrappedParams.id;
@@ -42,10 +44,12 @@ export default function ProductoDetailPage({ params }: { params: Promise<{ id: s
   const { hasFeature } = usePlan();
   const { username } = useAuth();
   const themeColors = useThemeColors();
+  const supabase = createClient();
 
-  const isInCart = cart.some(item => item.id === `producto-${product.id}`);
+  const isInCart = cart.some(item => item.id === `producto-${product?.id}`);
 
   const getSellerFeature = (feature: any) => {
+    if (!product) return false;
     if (product.seller?.id === 1) {
       return hasFeature(feature);
     }
@@ -67,88 +71,114 @@ export default function ProductoDetailPage({ params }: { params: Promise<{ id: s
 
   const nextImage = (e: React.MouseEvent) => {
     e.stopPropagation();
+    if (!product) return;
     const len = product.media ? product.media.length : product.images.length;
     setActiveImage((prev) => (prev === len - 1 ? 0 : prev + 1));
   };
 
   const prevImage = (e: React.MouseEvent) => {
     e.stopPropagation();
+    if (!product) return;
     const len = product.media ? product.media.length : product.images.length;
     setActiveImage((prev) => (prev === 0 ? len - 1 : prev - 1));
   };
 
-
   useEffect(() => {
-    let baseProduct = PRODUCTOS_DATA.find(p => p.id.toString() === productId);
+    const fetchProduct = async () => {
+      try {
+        const { data, error } = await supabase
+          .from('products')
+          .select('*, profiles!user_id(*)')
+          .eq('id', productId)
+          .single();
 
-    const existingStr = localStorage.getItem('cazamarket_my_products');
-    if (existingStr) {
-      const existing = JSON.parse(existingStr);
-      let foundCustom = false;
-      const customProduct = existing.find((p: any) => p.id.toString() === productId);
-      if (customProduct) {
-        setProduct({
-          ...(baseProduct || {}),
-          id: customProduct.id,
-          name: customProduct.name,
-          price: customProduct.price,
-          category: customProduct.category,
-          condition: customProduct.condition,
-          description: customProduct.description || baseProduct?.description || '',
-          images: customProduct.image ? [customProduct.image] : baseProduct?.images || [],
-          media: customProduct.media || (customProduct.image ? [{ url: customProduct.image, type: 'image' }] : baseProduct?.media || []),
-          features: customProduct.features || baseProduct?.features || [],
-          originalPrice: customProduct.discount ? (customProduct.discount.type === 'fijo' ? (parseFloat(customProduct.price.replace(/[^0-9.]/g, '')) + parseFloat(customProduct.discount.value)) : (parseFloat(customProduct.price.replace(/[^0-9.]/g, '')) / (1 - parseFloat(customProduct.discount.value) / 100))) : undefined,
-          discount: customProduct.discount,
-          seller: {
-            ...(baseProduct?.seller || {}),
-            id: customProduct.storeId || baseProduct?.seller?.id || 1,
-            name: customProduct.store || baseProduct?.seller?.name || 'Mi Negocio',
-            avatar: customProduct.avatar || baseProduct?.seller?.avatar || '',
-            shippingCost: customProduct.shippingCost,
-            branches: customProduct.branches || []
-          }
-        });
-        foundCustom = true;
+        if (data && !error) {
+          const sellerProfile = data.profiles || {};
+          
+          setProduct({
+            id: data.id,
+            name: data.name,
+            price: data.price,
+            category: data.category,
+            condition: data.condition,
+            description: data.description,
+            images: [data.image],
+            media: data.media || [{ url: data.image, type: 'image' }],
+            features: data.features || [],
+            originalPrice: data.has_discount && data.discount_type === 'fijo' 
+              ? (parseFloat(data.price.replace(/[^0-9.]/g, '')) + parseFloat(data.discount_value)) 
+              : data.has_discount && data.discount_type === 'porcentaje'
+              ? (parseFloat(data.price.replace(/[^0-9.]/g, '')) / (1 - (parseFloat(data.discount_value) / 100))) 
+              : undefined,
+            discount: data.has_discount ? { name: data.discount_name, type: data.discount_type, value: data.discount_value } : undefined,
+            seller: {
+              id: data.user_id,
+              name: sellerProfile.store_name || sellerProfile.full_name || 'Mi Negocio',
+              avatar: sellerProfile.avatar_url || '',
+              phone: sellerProfile.phone || '',
+              shippingCost: data.shipping_cost,
+              branches: data.pickup_branches || []
+            }
+          });
+          setIsLoading(false);
+          return;
+        }
+      } catch (e) {
+        console.error(e);
       }
-    }
 
-    if (baseProduct) {
-      setProduct((prev: any) => prev || baseProduct);
-    }
+      // Fallback a los datos mock
+      let baseProduct = PRODUCTOS_DATA.find(p => p.id.toString() === productId);
+      
+      // Fallback a localStorage (antiguo)
+      const existingStr = localStorage.getItem('cazamarket_my_products');
+      if (existingStr) {
+        const existing = JSON.parse(existingStr);
+        const customProduct = existing.find((p: any) => p.id.toString() === productId);
+        if (customProduct) {
+          setProduct({
+            ...(baseProduct || {}),
+            id: customProduct.id,
+            name: customProduct.name,
+            price: customProduct.price,
+            category: customProduct.category,
+            condition: customProduct.condition,
+            description: customProduct.description || baseProduct?.description || '',
+            images: customProduct.image ? [customProduct.image] : baseProduct?.images || [],
+            media: customProduct.media || (customProduct.image ? [{ url: customProduct.image, type: 'image' }] : baseProduct?.media || []),
+            features: customProduct.features || baseProduct?.features || [],
+            originalPrice: customProduct.discount ? (customProduct.discount.type === 'fijo' ? (parseFloat(customProduct.price.replace(/[^0-9.]/g, '')) + parseFloat(customProduct.discount.value)) : (parseFloat(customProduct.price.replace(/[^0-9.]/g, '')) / (1 - parseFloat(customProduct.discount.value) / 100))) : undefined,
+            discount: customProduct.discount,
+            seller: {
+              ...(baseProduct?.seller || {}),
+              id: customProduct.storeId || baseProduct?.seller?.id || 1,
+              name: customProduct.store || baseProduct?.seller?.name || 'Mi Negocio',
+              avatar: customProduct.avatar || baseProduct?.seller?.avatar || '',
+              shippingCost: customProduct.shippingCost,
+              branches: customProduct.branches || []
+            }
+          });
+          setIsLoading(false);
+          return;
+        }
+      }
 
+      if (baseProduct) {
+        setProduct((prev: any) => prev || baseProduct);
+      }
+      setIsLoading(false);
+    };
 
-    // Attempt to load seller phone from profile
-    const savedProfile = localStorage.getItem('cazamarket_profile');
-    if (savedProfile) {
-      const parsedProfile = JSON.parse(savedProfile);
-      setProduct((prev: any) => {
-        if (!prev) return prev;
-        return {
-          ...prev,
-          seller: {
-            ...prev.seller,
-            phone: parsedProfile.telefono || prev.seller?.phone,
-            socials: parsedProfile.redesSociales || prev.seller?.socials || [],
-            theme: parsedProfile.theme || prev.seller?.theme
-          }
-        };
-      });
-    }
+    fetchProduct();
   }, [productId]);
 
   useEffect(() => {
-    // Simular carga de datos para mostrar la pantalla de carga premium
-    const timer = setTimeout(() => {
-      setIsLoading(false);
-      // Auto-scroll después de cargar
+    if (!isLoading) {
       setTimeout(() => {
         window.scrollTo({ top: 180, behavior: 'smooth' });
       }, 50);
-    }, 1200);
-
-    return () => clearTimeout(timer);
-  }, []);
+    }
+  }, [isLoading]);
 
   if (isLoading) {
     return <LoadingScreen message="Buscando los detalles del producto..." />;
