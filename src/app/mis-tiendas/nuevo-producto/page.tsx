@@ -286,6 +286,7 @@ function NuevoProductoContent() {
 
     if (!supabaseUser) {
       setFormError('Debes iniciar sesión para publicar un producto.');
+      window.scrollTo({ top: 0, behavior: 'smooth' });
       return;
     }
 
@@ -338,6 +339,8 @@ function NuevoProductoContent() {
         shipping_cost: shippingMode === 'gratis' ? 'Envío gratis' : shippingMode === 'costo_extra' ? (!shippingCost || parseFloat(shippingCost) <= 0 ? 'A acordar' : `${shippingCurrency} ${shippingCost}`) : null,
         pickup_available: pickupAvailable,
         pickup_branches: pickupAvailable === 'si' ? pickupBranches : null,
+        stock_mode: stockMode,
+        stock: stockMode === 'definido' && stock ? parseInt(stock) : null,
         features: features,
         has_discount: hasDiscount,
         discount_name: hasDiscount && discountName.trim() !== '' && discountValue.trim() !== '' ? discountName : null,
@@ -949,9 +952,10 @@ function NuevoProductoContent() {
                 type="button" 
                 className="btn btn-primary"
                 onClick={handleSubmit}
-                style={{ padding: '12px 32px', borderRadius: 'var(--radius-full)' }}
+                disabled={isSubmitting}
+                style={{ padding: '12px 32px', borderRadius: 'var(--radius-full)', opacity: isSubmitting ? 0.7 : 1, cursor: isSubmitting ? 'not-allowed' : 'pointer' }}
               >
-                {editId ? 'Guardar Cambios' : 'Publicar Producto'}
+                {isSubmitting ? (editId ? 'Guardando...' : 'Publicando...') : (editId ? 'Guardar Cambios' : 'Publicar Producto')}
               </button>
             )}
           </div>
