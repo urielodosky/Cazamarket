@@ -95,6 +95,7 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
     await supabase.auth.signOut();
     setIsVendorModeActive(false);
     localStorage.removeItem('cazamarket_vendor_mode');
+    // Limpiar claves genéricas antiguas (las per-usuario se quedan, no molestan)
     localStorage.removeItem('cazamarket_plan_tier_productos');
     localStorage.removeItem('cazamarket_plan_tier_servicios');
     localStorage.removeItem('cazamarket_plan_tier');

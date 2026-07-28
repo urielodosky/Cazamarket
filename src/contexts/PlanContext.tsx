@@ -28,49 +28,78 @@ interface PlanContextType {
 
 const PlanContext = createContext<PlanContextType | undefined>(undefined);
 
+// Helper: construir la clave de localStorage vinculada al usuario
+function userPlanKey(userId: string, suffix: string) {
+  return `cazamarket_plan_${userId}_${suffix}`;
+}
+
 export function PlanProvider({ children }: { children: React.ReactNode }) {
-  const { isVendor, upgradeToVendor } = useAuth();
+  const { isVendor, upgradeToVendor, supabaseUser, isLoggedIn } = useAuth();
   const [productPlanTier, setProductPlanTier] = useState<PlanTier>('gratis');
   const [servicePlanTier, setServicePlanTier] = useState<PlanTier>('gratis');
   const [mounted, setMounted] = useState(false);
 
-  // Load from localStorage on mount
-  useEffect(() => {
-    const savedProdTier = localStorage.getItem('cazamarket_plan_tier_productos') as PlanTier | null;
-    const savedServTier = localStorage.getItem('cazamarket_plan_tier_servicios') as PlanTier | null;
+  const userId = supabaseUser?.id || '';
 
-    if (!savedProdTier && !savedServTier) {
-      // Migrar del modelo antiguo si existe
-      const oldTier = localStorage.getItem('cazamarket_plan_tier') as PlanTier | null;
-      const oldCat = localStorage.getItem('cazamarket_plan_category') as PlanCategory | null;
-      if (oldTier && oldCat) {
-         if (oldCat === 'productos') setProductPlanTier(oldTier);
-         else if (oldCat === 'servicios') setServicePlanTier(oldTier);
-         else if (oldCat === 'mixto') {
-           setProductPlanTier(oldTier);
-           setServicePlanTier(oldTier);
-         }
+  // Cargar planes del usuario actual (o resetear a gratis si no hay usuario)
+  useEffect(() => {
+    if (!userId) {
+      // No hay usuario logueado → todo gratis
+      setProductPlanTier('gratis');
+      setServicePlanTier('gratis');
+      setMounted(true);
+      return;
+    }
+
+    // Leer planes específicos de este usuario
+    const savedProd = localStorage.getItem(userPlanKey(userId, 'productos')) as PlanTier | null;
+    const savedServ = localStorage.getItem(userPlanKey(userId, 'servicios')) as PlanTier | null;
+
+    // Migrar del modelo antiguo (claves genéricas) si existen y este usuario no tiene claves propias
+    if (!savedProd && !savedServ) {
+      const oldProd = localStorage.getItem('cazamarket_plan_tier_productos') as PlanTier | null;
+      const oldServ = localStorage.getItem('cazamarket_plan_tier_servicios') as PlanTier | null;
+      if (oldProd || oldServ) {
+        // Migrar al nuevo modelo per-usuario
+        if (oldProd) {
+          localStorage.setItem(userPlanKey(userId, 'productos'), oldProd);
+          setProductPlanTier(oldProd);
+        }
+        if (oldServ) {
+          localStorage.setItem(userPlanKey(userId, 'servicios'), oldServ);
+          setServicePlanTier(oldServ);
+        }
+        // Limpiar las claves viejas genéricas
+        localStorage.removeItem('cazamarket_plan_tier_productos');
+        localStorage.removeItem('cazamarket_plan_tier_servicios');
+        localStorage.removeItem('cazamarket_plan_tier');
+        localStorage.removeItem('cazamarket_plan_category');
+      } else {
+        setProductPlanTier('gratis');
+        setServicePlanTier('gratis');
       }
     } else {
-      if (savedProdTier) setProductPlanTier(savedProdTier);
-      if (savedServTier) setServicePlanTier(savedServTier);
+      setProductPlanTier(savedProd || 'gratis');
+      setServicePlanTier(savedServ || 'gratis');
     }
-    
+
     setMounted(true);
-  }, []);
+  }, [userId]);
 
   const selectPlan = useCallback((tier: PlanTier, category: PlanCategory) => {
+    if (!userId) return;
+
     if (category === 'productos') {
       setProductPlanTier(tier);
-      localStorage.setItem('cazamarket_plan_tier_productos', tier);
+      localStorage.setItem(userPlanKey(userId, 'productos'), tier);
     } else if (category === 'servicios') {
       setServicePlanTier(tier);
-      localStorage.setItem('cazamarket_plan_tier_servicios', tier);
+      localStorage.setItem(userPlanKey(userId, 'servicios'), tier);
     } else if (category === 'mixto') {
       setProductPlanTier(tier);
       setServicePlanTier(tier);
-      localStorage.setItem('cazamarket_plan_tier_productos', tier);
-      localStorage.setItem('cazamarket_plan_tier_servicios', tier);
+      localStorage.setItem(userPlanKey(userId, 'productos'), tier);
+      localStorage.setItem(userPlanKey(userId, 'servicios'), tier);
     }
 
     const newProdTier = category === 'productos' || category === 'mixto' ? tier : productPlanTier;
@@ -83,20 +112,22 @@ export function PlanProvider({ children }: { children: React.ReactNode }) {
     if (newProdTier !== 'gratis' || newServTier !== 'gratis') {
       upgradeToVendor();
     }
-  }, [productPlanTier, servicePlanTier, upgradeToVendor]);
+  }, [userId, productPlanTier, servicePlanTier, upgradeToVendor]);
 
   const cancelPlan = useCallback((category: PlanCategory) => {
+    if (!userId) return;
+
     if (category === 'productos') {
       setProductPlanTier('gratis');
-      localStorage.setItem('cazamarket_plan_tier_productos', 'gratis');
+      localStorage.setItem(userPlanKey(userId, 'productos'), 'gratis');
     } else if (category === 'servicios') {
       setServicePlanTier('gratis');
-      localStorage.setItem('cazamarket_plan_tier_servicios', 'gratis');
+      localStorage.setItem(userPlanKey(userId, 'servicios'), 'gratis');
     } else if (category === 'mixto') {
       setProductPlanTier('gratis');
       setServicePlanTier('gratis');
-      localStorage.setItem('cazamarket_plan_tier_productos', 'gratis');
-      localStorage.setItem('cazamarket_plan_tier_servicios', 'gratis');
+      localStorage.setItem(userPlanKey(userId, 'productos'), 'gratis');
+      localStorage.setItem(userPlanKey(userId, 'servicios'), 'gratis');
     }
 
     const newProdTier = category === 'productos' || category === 'mixto' ? 'gratis' : productPlanTier;
@@ -105,7 +136,7 @@ export function PlanProvider({ children }: { children: React.ReactNode }) {
     if (newProdTier !== 'empresarial' && newServTier !== 'empresarial') {
       localStorage.removeItem('cazamarket_virtual_advisor');
     }
-  }, [productPlanTier, servicePlanTier]);
+  }, [userId, productPlanTier, servicePlanTier]);
 
   const permissions = getPlanPermissions(
     mounted ? productPlanTier : 'gratis',
