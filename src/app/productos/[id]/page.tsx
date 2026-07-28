@@ -670,7 +670,7 @@ export default function ProductoDetailPage({ params }: { params: Promise<{ id: s
             </button>
 
             {/* 4. Chat Directo (Sólo si tiene plan compatible) */}
-            {hasFeature('chat') && (
+            {hasFeature('chatInterno') && (
               <Link href="/chat" style={{ textDecoration: 'none', width: '100%' }}>
                 <button 
                   style={{ 
