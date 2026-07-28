@@ -226,7 +226,7 @@ function NuevoServicioContent() {
 
       let hasEarlyBirdError = false;
       earlyBirdDiscounts.forEach(rule => {
-        if (!rule.daysInAdvance || parseInt(rule.daysInAdvance) < 1 || !rule.value || rule.value.trim() === '') hasEarlyBirdError = true;
+        if (!rule.minDays || parseInt(rule.minDays) < 1 || !rule.value || rule.value.trim() === '') hasEarlyBirdError = true;
       });
 
       let hasSeasonError = false;
@@ -236,7 +236,7 @@ function NuevoServicioContent() {
 
       let hasVolumeError = false;
       volumeDiscounts.forEach(rule => {
-        if (!rule.minQty || parseInt(rule.minQty) < 2 || !rule.value || rule.value.trim() === '') hasVolumeError = true;
+        if (!rule.minTime || parseInt(rule.minTime) < 2 || !rule.value || rule.value.trim() === '') hasVolumeError = true;
       });
 
       if (hasTimeError || hasEarlyBirdError || hasSeasonError || hasVolumeError) {
