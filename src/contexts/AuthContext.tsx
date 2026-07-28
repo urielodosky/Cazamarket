@@ -138,6 +138,7 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
         .single();
 
       if (profile) {
+        console.log("PROFILE FETCHED FROM SUPABASE:", profile);
         setUsername(profile.full_name || user.email?.split('@')[0] || '');
         setAvatar(profile.avatar_url || '');
         setIsVendor(profile.role === 'negocio');
@@ -216,8 +217,14 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
       if (data.socialMedia !== undefined) updates.social_media = data.socialMedia;
       if (data.branches !== undefined) updates.branches = data.branches;
       if (data.schedules !== undefined) updates.schedules = data.schedules;
-
-      await supabase.from('profiles').update(updates).eq('id', supabaseUser.id);
+      const res = await fetch('/api/profile/update', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(updates),
+      });
+      if (!res.ok) {
+        console.error("Error updating profile via API:", await res.text());
+      }
       
       if (data.username !== undefined) setUsername(data.username);
       if (data.avatar !== undefined) setAvatar(data.avatar);
@@ -250,7 +257,14 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
 
   const upgradeToVendor = async () => {
     if (supabaseUser) {
-      await supabase.from('profiles').update({ role: 'negocio' }).eq('id', supabaseUser.id);
+      const res = await fetch('/api/profile/update', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ role: 'negocio' }),
+      });
+      if (!res.ok) {
+        console.error("Error upgrading to vendor via API:", await res.text());
+      }
       setIsVendor(true);
       setIsVendorModeActive(true);
       localStorage.setItem('cazamarket_vendor_mode', 'true');
