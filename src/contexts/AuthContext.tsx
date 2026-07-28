@@ -143,7 +143,18 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
         setAvatar(profile.avatar_url || '');
         setIsVendor(profile.role === 'negocio');
         setPersonType(profile.person_type || '');
-        setBirthDate(profile.birth_date || '');
+        
+        if (profile.birth_date && profile.birth_date.includes('-')) {
+          const parts = profile.birth_date.split('-');
+          if (parts.length === 3) {
+            setBirthDate(`${parts[2]}/${parts[1]}/${parts[0]}`);
+          } else {
+            setBirthDate(profile.birth_date);
+          }
+        } else {
+          setBirthDate(profile.birth_date || '');
+        }
+        
         setCuit(profile.cuit || '');
         setPhone(profile.phone || '');
         setContactEmail(profile.contact_email || user.email || '');
@@ -202,7 +213,18 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
       if (data.username !== undefined) updates.full_name = data.username;
       if (data.avatar !== undefined) updates.avatar_url = data.avatar;
       if (data.personType !== undefined) updates.person_type = data.personType;
-      if (data.birthDate !== undefined) updates.birth_date = data.birthDate;
+      if (data.birthDate !== undefined) {
+        if (data.birthDate.includes('/')) {
+          const parts = data.birthDate.split('/');
+          if (parts.length === 3) {
+            updates.birth_date = `${parts[2]}-${parts[1]}-${parts[0]}`;
+          } else {
+            updates.birth_date = data.birthDate;
+          }
+        } else {
+          updates.birth_date = data.birthDate;
+        }
+      }
       if (data.cuit !== undefined) updates.cuit = data.cuit;
       if (data.phone !== undefined) updates.phone = data.phone;
       if (data.contactEmail !== undefined) updates.contact_email = data.contactEmail;
