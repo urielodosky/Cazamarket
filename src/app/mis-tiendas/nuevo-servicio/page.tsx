@@ -212,6 +212,44 @@ function NuevoServicioContent() {
     return null;
   };
 
+  const validateStep3 = () => {
+    if (hasDiscount) {
+      const hasPromo = discountName.trim() !== '' || discountValue.trim() !== '';
+      if (hasPromo && (!discountName.trim() || !discountValue.trim())) {
+        return 'Para el descuento promocional, debes completar tanto el nombre como el valor.';
+      }
+
+      let hasTimeError = false;
+      timeDiscounts.forEach(rule => {
+        if (!rule.value || rule.value.trim() === '') hasTimeError = true;
+      });
+
+      let hasEarlyBirdError = false;
+      earlyBirdDiscounts.forEach(rule => {
+        if (!rule.daysInAdvance || parseInt(rule.daysInAdvance) < 1 || !rule.value || rule.value.trim() === '') hasEarlyBirdError = true;
+      });
+
+      let hasSeasonError = false;
+      seasonRules.forEach(rule => {
+        if (!rule.value || rule.value.trim() === '') hasSeasonError = true;
+      });
+
+      let hasVolumeError = false;
+      volumeDiscounts.forEach(rule => {
+        if (!rule.minQty || parseInt(rule.minQty) < 2 || !rule.value || rule.value.trim() === '') hasVolumeError = true;
+      });
+
+      if (hasTimeError || hasEarlyBirdError || hasSeasonError || hasVolumeError) {
+        return 'Todas las reglas de descuento que agregues deben tener los valores completos.';
+      }
+
+      if (!hasPromo && timeDiscounts.length === 0 && earlyBirdDiscounts.length === 0 && seasonRules.length === 0 && volumeDiscounts.length === 0) {
+        return 'Activaste la opción de descuentos, pero no ingresaste ninguno. Por favor completa algún descuento o desactiva la opción.';
+      }
+    }
+    return null;
+  };
+
   const handleNext = () => {
     setFormError(null);
     let error: string | null = null;
@@ -237,6 +275,13 @@ function NuevoServicioContent() {
 
     if (!supabaseUser) {
       setFormError('Debes iniciar sesión para publicar un servicio.');
+      return;
+    }
+
+    const step3Error = validateStep3();
+    if (step3Error) {
+      setFormError(step3Error);
+      window.scrollTo({ top: 0, behavior: 'smooth' });
       return;
     }
 
@@ -279,9 +324,9 @@ function NuevoServicioContent() {
         location_radius: showServiceArea ? (areaPoints.length > 0 ? JSON.stringify(areaPoints) : null) : null,
         features: features,
         has_discount: hasDiscount,
-        discount_name: hasDiscount ? discountName : null,
-        discount_type: hasDiscount ? discountType : null,
-        discount_value: hasDiscount ? discountValue : null,
+        discount_name: hasDiscount && discountName.trim() !== '' && discountValue.trim() !== '' ? discountName : null,
+        discount_type: hasDiscount && discountName.trim() !== '' && discountValue.trim() !== '' ? discountType : null,
+        discount_value: hasDiscount && discountName.trim() !== '' && discountValue.trim() !== '' ? discountValue : null,
         time_discounts: hasDiscount && timeDiscounts.length > 0 ? timeDiscounts : [],
         early_bird_discounts: hasDiscount && earlyBirdDiscounts.length > 0 ? earlyBirdDiscounts : [],
         season_rules: hasDiscount && seasonRules.length > 0 ? seasonRules : [],

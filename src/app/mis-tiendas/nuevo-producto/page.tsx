@@ -235,6 +235,30 @@ function NuevoProductoContent() {
     return null;
   };
 
+  const validateStep3 = () => {
+    if (hasDiscount) {
+      const hasPromo = discountName.trim() !== '' || discountValue.trim() !== '';
+      if (hasPromo && (!discountName.trim() || !discountValue.trim())) {
+        return 'Para el descuento promocional, debes completar tanto el nombre como el valor.';
+      }
+
+      let hasVolumeError = false;
+      volumeDiscounts.forEach(rule => {
+        if (!rule.minQty || parseInt(rule.minQty) < 2 || !rule.value || rule.value.trim() === '') {
+          hasVolumeError = true;
+        }
+      });
+      if (hasVolumeError) {
+        return 'Todas las reglas de descuento por cantidad deben tener un mínimo válido (>=2) y un valor.';
+      }
+
+      if (!hasPromo && volumeDiscounts.length === 0) {
+        return 'Activaste la opción de descuentos, pero no ingresaste ninguno. Por favor completa algún descuento o desactiva la opción.';
+      }
+    }
+    return null;
+  };
+
   const handleNext = () => {
     setFormError(null);
     let error: string | null = null;
@@ -262,6 +286,13 @@ function NuevoProductoContent() {
 
     if (!supabaseUser) {
       setFormError('Debes iniciar sesión para publicar un producto.');
+      return;
+    }
+
+    const step3Error = validateStep3();
+    if (step3Error) {
+      setFormError(step3Error);
+      window.scrollTo({ top: 0, behavior: 'smooth' });
       return;
     }
 
@@ -309,9 +340,9 @@ function NuevoProductoContent() {
         pickup_branches: pickupAvailable === 'si' ? pickupBranches : null,
         features: features,
         has_discount: hasDiscount,
-        discount_name: hasDiscount ? discountName : null,
-        discount_type: hasDiscount ? discountType : null,
-        discount_value: hasDiscount ? discountValue : null,
+        discount_name: hasDiscount && discountName.trim() !== '' && discountValue.trim() !== '' ? discountName : null,
+        discount_type: hasDiscount && discountName.trim() !== '' && discountValue.trim() !== '' ? discountType : null,
+        discount_value: hasDiscount && discountName.trim() !== '' && discountValue.trim() !== '' ? discountValue : null,
         volume_discounts: hasDiscount && volumeDiscounts.length > 0 ? volumeDiscounts : []
       };
 
