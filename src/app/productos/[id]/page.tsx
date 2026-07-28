@@ -348,7 +348,7 @@ export default function ProductoDetailPage({ params }: { params: Promise<{ id: s
               {product.name}
             </h1>
 
-            {/* ID, Condición y Stock */}
+            {/* ID y Condición */}
             <div style={{ display: 'flex', alignItems: 'center', gap: '12px', marginBottom: '24px', flexWrap: 'wrap' }}>
               <span style={{ color: 'color-mix(in srgb, var(--color-text-main) 60%, transparent)', fontSize: '0.9rem' }}>
                 ID: #{productId}
@@ -357,14 +357,6 @@ export default function ProductoDetailPage({ params }: { params: Promise<{ id: s
               <span style={{ color: 'var(--color-primary)', fontSize: '0.9rem', fontWeight: 600, textTransform: 'uppercase' }}>
                 {product.condition}
               </span>
-              {product.stockMode === 'definido' && product.stock !== null && (
-                <>
-                  <span style={{ color: 'color-mix(in srgb, var(--color-text-main) 30%, transparent)' }}>•</span>
-                  <span style={{ color: 'var(--color-text-muted)', fontSize: '0.9rem' }}>
-                    Stock disponible: <strong style={{ color: 'var(--color-text-main)' }}>{product.stock}</strong>
-                  </span>
-                </>
-              )}
             </div>
 
             {/* Precio */}
@@ -385,6 +377,15 @@ export default function ProductoDetailPage({ params }: { params: Promise<{ id: s
                 </div>
               )}
             </div>
+
+            {/* Stock debajo del precio */}
+            {product.stockMode === 'definido' && product.stock !== null && (
+              <div style={{ marginTop: '8px', marginBottom: '8px' }}>
+                <span style={{ fontSize: '0.95rem', color: 'var(--color-text-muted)' }}>
+                  Stock disponible: <strong style={{ color: 'var(--color-text-main)', fontWeight: 600 }}>{product.stock} unid.</strong>
+                </span>
+              </div>
+            )}
 
             {/* Opciones de Envío y Retiro */}
             {(product.seller.shippingCost || (product.seller.branches && product.seller.branches.length > 0)) && (
