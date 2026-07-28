@@ -25,6 +25,9 @@ const NavLinks = () => (
 export default function Navbar() {
   const pathname = usePathname();
   const isHome = pathname === '/';
+  // Solo mostrar filtros en las páginas donde tiene sentido buscar/filtrar
+  const FILTERABLE_PAGES = ['/productos', '/servicios', '/negocios', '/comunidad'];
+  const isFilterablePage = FILTERABLE_PAGES.some(p => pathname.startsWith(p));
   const router = useRouter();
   const searchParams = useSearchParams();
   const { mode, toggleMode } = useTheme();
@@ -52,6 +55,13 @@ export default function Navbar() {
   useEffect(() => {
     setIsClient(true);
   }, []);
+
+  // Cerrar filtros automáticamente al navegar a una página sin filtros
+  useEffect(() => {
+    if (!isFilterablePage) {
+      setIsFiltersOpen(false);
+    }
+  }, [pathname, isFilterablePage]);
 
   useEffect(() => {
     const fetchProvincias = async () => {
@@ -226,7 +236,7 @@ export default function Navbar() {
                   onKeyDown={(e) => { if (e.key === 'Enter') executeSearch(); }}
                   style={{ marginLeft: '12px', color: themeColors.textWhite }}
                 />
-                <button 
+                {isFilterablePage && <button 
                   suppressHydrationWarning
                   type="button"
                   className="filter-btn-premium"
@@ -286,7 +296,7 @@ export default function Navbar() {
                     <line x1="18" y1="19" x2="18" y2="21"></line>
                   </svg>
                   Filtros
-                </button>
+                </button>}
               </div>
             )}
             
@@ -298,10 +308,13 @@ export default function Navbar() {
           </div>
 
         {/* Panel de Filtros Animado */}
-        {!isHome && (
+        {isFilterablePage && (
           <div 
             className="filters-panel"
           style={{
+            position: 'absolute',
+            right: '60px',
+            top: '18px',
             width: isFiltersOpen ? (pathname.startsWith('/comunidad') ? '240px' : '420px') : '0px',
             opacity: isFiltersOpen ? 1 : 0,
             visibility: isFiltersOpen ? 'visible' : 'hidden',
@@ -314,9 +327,8 @@ export default function Navbar() {
             display: 'flex',
             flexDirection: 'column',
             justifyContent: 'center',
-            marginLeft: isFiltersOpen ? '0' : '-16px',
-            zIndex: 5,
-            backgroundColor: '#1a1e16', /* Solid dark background, not glass */
+            zIndex: 50,
+            backgroundColor: '#1a1e16',
             border: '1px solid rgba(255, 255, 255, 0.05)'
           }}
         >
