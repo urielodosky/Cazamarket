@@ -280,6 +280,9 @@ function NuevoProductoContent() {
   };
 
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const [showLoadingOverlay, setShowLoadingOverlay] = useState(false);
+  const [loadingText, setLoadingText] = useState('');
+  const [loadingProgress, setLoadingProgress] = useState(0);
 
   const handleSubmit = async () => {
     setFormError(null);
@@ -298,10 +301,21 @@ function NuevoProductoContent() {
     }
 
     setIsSubmitting(true);
+    setShowLoadingOverlay(true);
+    setLoadingText('Preparando tu producto...');
+    setLoadingProgress(15);
 
     try {
       // Subir archivos nuevos a Supabase Storage
       const uploadedMedia = [];
+      const newFiles = mediaPreview.filter(m => m.file);
+      
+      if (newFiles.length > 0) {
+        setLoadingText('Subiendo imágenes a la nube...');
+        setLoadingProgress(30);
+      }
+      
+      let uploadCount = 0;
       for (const m of mediaPreview) {
         if (m.file) {
           const fileExt = m.file.name.split('.').pop();
@@ -319,11 +333,19 @@ function NuevoProductoContent() {
           
           const { data } = supabase.storage.from('MediaCazaMarket').getPublicUrl(filePath);
           uploadedMedia.push({ url: data.publicUrl, type: m.type });
+          
+          uploadCount++;
+          // Anima un poco la barra por cada archivo
+          const newProgress = 30 + (uploadCount / newFiles.length) * 30; // sube del 30 al 60%
+          setLoadingProgress(newProgress);
         } else {
           // Ya estaba subido o es de mockup
           uploadedMedia.push({ url: m.url, type: m.type });
         }
       }
+
+      setLoadingText('Guardando los detalles en la base de datos...');
+      setLoadingProgress(70);
 
       const newProduct = {
         user_id: supabaseUser.id,
@@ -357,12 +379,21 @@ function NuevoProductoContent() {
         if (error) throw error;
       }
       
+      setLoadingText('¡Casi listo! Ajustando últimos detalles...');
+      setLoadingProgress(99);
+      
+      // Simular una carga emocionante
+      await new Promise(resolve => setTimeout(resolve, 800));
+      setLoadingText('¡Producto publicado con éxito!');
+      setLoadingProgress(100);
+      await new Promise(resolve => setTimeout(resolve, 600));
+
       router.push('/mis-tiendas');
     } catch (error: any) {
       console.error('DB error:', error);
       setFormError('Ocurrió un error al guardar el producto. Inténtalo de nuevo.');
       window.scrollTo({ top: 0, behavior: 'smooth' });
-    } finally {
+      setShowLoadingOverlay(false);
       setIsSubmitting(false);
     }
   };
@@ -967,6 +998,73 @@ function NuevoProductoContent() {
           onClose={() => setIsAdvisorModalOpen(false)} 
           productId={editId}
         />
+      )}
+
+      {/* Loading Overlay */}
+      {showLoadingOverlay && (
+        <div style={{
+          position: 'fixed',
+          top: 0, left: 0, right: 0, bottom: 0,
+          background: 'rgba(0, 0, 0, 0.8)',
+          backdropFilter: 'blur(8px)',
+          zIndex: 9999,
+          display: 'flex',
+          flexDirection: 'column',
+          justifyContent: 'center',
+          alignItems: 'center',
+          padding: '20px'
+        }}>
+          <div style={{
+            background: 'var(--color-bg-surface-elevated)',
+            padding: '40px',
+            borderRadius: '24px',
+            border: '1px solid rgba(255, 255, 255, 0.1)',
+            boxShadow: '0 25px 50px -12px rgba(0, 0, 0, 0.5)',
+            width: '100%',
+            maxWidth: '400px',
+            textAlign: 'center',
+            display: 'flex',
+            flexDirection: 'column',
+            alignItems: 'center',
+            gap: '24px'
+          }}>
+            {/* Spinner divertido */}
+            <div style={{ position: 'relative', width: '80px', height: '80px', display: 'flex', justifyContent: 'center', alignItems: 'center' }}>
+              <div style={{ 
+                position: 'absolute', width: '100%', height: '100%', borderRadius: '50%', 
+                border: '4px solid rgba(255,255,255,0.1)', borderTopColor: 'var(--color-primary)', 
+                animation: 'spin 1s ease-in-out infinite' 
+              }}></div>
+              {loadingProgress === 100 ? (
+                <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="#25D366" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round"><polyline points="20 6 9 17 4 12"></polyline></svg>
+              ) : (
+                <span style={{ fontSize: '1.2rem', fontWeight: 800, color: 'var(--color-primary)' }}>{Math.round(loadingProgress)}%</span>
+              )}
+            </div>
+            
+            <h3 style={{ fontSize: '1.4rem', color: 'var(--color-text-main)', margin: 0 }}>
+              {loadingProgress === 100 ? '¡Listo!' : 'Publicando...'}
+            </h3>
+            
+            <p style={{ color: 'var(--color-text-muted)', fontSize: '0.95rem', margin: 0, height: '24px', transition: 'all 0.3s' }}>
+              {loadingText}
+            </p>
+
+            <div style={{ width: '100%', height: '8px', background: 'rgba(255,255,255,0.1)', borderRadius: '4px', overflow: 'hidden' }}>
+              <div style={{ 
+                width: `${loadingProgress}%`, 
+                height: '100%', 
+                background: loadingProgress === 100 ? '#25D366' : 'var(--color-primary)', 
+                transition: 'width 0.4s cubic-bezier(0.4, 0, 0.2, 1), background 0.3s' 
+              }} />
+            </div>
+          </div>
+          <style>{`
+            @keyframes spin {
+              to { transform: rotate(360deg); }
+            }
+          `}</style>
+        </div>
       )}
     </div>
   );
