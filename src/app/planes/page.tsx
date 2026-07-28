@@ -19,7 +19,7 @@ type PaymentStep = 'select' | 'processing' | 'success';
 
 export default function PlanesPage() {
   const { selectPlan, cancelPlan, productPlanTier, servicePlanTier } = usePlan();
-  const { isLoggedIn, isVendor, phone } = useAuth();
+  const { isLoggedIn, isVendor, phone, personType, birthDate, cuit, updateUser } = useAuth();
   const [activeTab, setActiveTab] = useState<PlanCategory>('productos');
   const [isActivating, setIsActivating] = useState(false);
   const [authModal, setAuthModal] = useState<{show: boolean, type: 'login' | 'vendor'}>({show: false, type: 'login'});
@@ -41,17 +41,18 @@ export default function PlanesPage() {
       setAuthModal({ show: true, type: 'login' });
       return;
     }
-    if (!isVendor) {
+    const hasTelefono = !!phone && phone.trim() !== '';
+    // Física necesita Fecha de nacimiento, Jurídica necesita CUIT
+    const hasMandatoryFields = hasTelefono && (personType === 'fisica' ? !!birthDate && birthDate.trim() !== '' : !!cuit && cuit.trim() !== '');
+
+    if (!hasMandatoryFields) {
       setAuthModal({ show: true, type: 'vendor' });
       return;
     }
-    
-    const hasTelefono = !!phone && phone.trim() !== '';
 
-    if (!hasTelefono) {
-      alert('Debes completar tus datos obligatorios (incluyendo tu teléfono) en la Configuración antes de elegir un plan.');
-      router.push('/configuracion');
-      return;
+    // Si tiene todos los datos pero todavía no es 'negocio' oficialmente, lo actualizamos ahora
+    if (!isVendor) {
+      updateUser({ role: 'negocio' });
     }
 
     // Plan gratuito → activar directo sin pago

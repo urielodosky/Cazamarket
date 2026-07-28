@@ -415,7 +415,8 @@ export default function ConfiguracionPage() {
       locality: selectedLocalidad,
       socialMedia: redesSociales,
       branches: sucursales,
-      schedules: horarios
+      schedules: horarios,
+      role: !isVendor ? 'negocio' : undefined
     });
 
     // Actualizar retroactivamente el nombre de la tienda en los productos ya creados
@@ -434,10 +435,6 @@ export default function ConfiguracionPage() {
         });
         localStorage.setItem('cazamarket_my_products', JSON.stringify(existing));
       } catch(e) {}
-    }
-
-    if (!isVendor) {
-      upgradeToVendor();
     }
 
     showToast('Configuración guardada exitosamente.', 'success');

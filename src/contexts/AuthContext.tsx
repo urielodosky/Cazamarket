@@ -205,7 +205,7 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
   const updateUser = async (data: { 
     username?: string, avatar?: string, personType?: string, birthDate?: string, cuit?: string, phone?: string, contactEmail?: string,
     firstName?: string, lastName?: string, storeName?: string, storeDescription?: string, street?: string, streetNumber?: string, province?: string, locality?: string,
-    socialMedia?: any[], branches?: any[], schedules?: any[]
+    socialMedia?: any[], branches?: any[], schedules?: any[], role?: string
   }) => {
     // Actualizar base de datos
     if (supabaseUser) {
@@ -239,6 +239,7 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
       if (data.socialMedia !== undefined) updates.social_media = data.socialMedia;
       if (data.branches !== undefined) updates.branches = data.branches;
       if (data.schedules !== undefined) updates.schedules = data.schedules;
+      if (data.role !== undefined) updates.role = data.role;
       const { error } = await supabase.from('profiles').update(updates).eq('id', supabaseUser.id);
       if (error) {
         console.error("Error updating profile in Supabase:", error);
@@ -263,6 +264,11 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
       if (data.socialMedia !== undefined) setSocialMedia(data.socialMedia);
       if (data.branches !== undefined) setBranches(data.branches);
       if (data.schedules !== undefined) setSchedules(data.schedules);
+      if (data.role === 'negocio') {
+        setIsVendor(true);
+        setIsVendorModeActive(true);
+        localStorage.setItem('cazamarket_vendor_mode', 'true');
+      }
     }
   };
 
@@ -279,6 +285,7 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
       const { error } = await supabase.from('profiles').update({ role: 'negocio' }).eq('id', supabaseUser.id);
       if (error) {
         console.error("Error upgrading to vendor in Supabase:", error);
+        alert("Error al intentar actualizar el rol: " + (error.message || JSON.stringify(error)));
       }
       setIsVendor(true);
       setIsVendorModeActive(true);
