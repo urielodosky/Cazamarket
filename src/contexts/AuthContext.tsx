@@ -217,13 +217,10 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
       if (data.socialMedia !== undefined) updates.social_media = data.socialMedia;
       if (data.branches !== undefined) updates.branches = data.branches;
       if (data.schedules !== undefined) updates.schedules = data.schedules;
-      const res = await fetch('/api/profile/update', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(updates),
-      });
-      if (!res.ok) {
-        console.error("Error updating profile via API:", await res.text());
+      const { error } = await supabase.from('profiles').update(updates).eq('id', supabaseUser.id);
+      if (error) {
+        console.error("Error updating profile in Supabase:", error);
+        alert("Error al guardar en base de datos: " + (error.message || JSON.stringify(error)));
       }
       
       if (data.username !== undefined) setUsername(data.username);
@@ -257,13 +254,9 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
 
   const upgradeToVendor = async () => {
     if (supabaseUser) {
-      const res = await fetch('/api/profile/update', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ role: 'negocio' }),
-      });
-      if (!res.ok) {
-        console.error("Error upgrading to vendor via API:", await res.text());
+      const { error } = await supabase.from('profiles').update({ role: 'negocio' }).eq('id', supabaseUser.id);
+      if (error) {
+        console.error("Error upgrading to vendor in Supabase:", error);
       }
       setIsVendor(true);
       setIsVendorModeActive(true);
