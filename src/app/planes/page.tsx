@@ -46,7 +46,6 @@ export default function PlanesPage() {
     const hasMandatoryFields = hasTelefono && (personType === 'fisica' ? !!birthDate && birthDate.trim() !== '' : !!cuit && cuit.trim() !== '');
 
     if (!hasMandatoryFields) {
-      alert(`DEBUG INFO - Por favor mandame captura de esto:\nTelefono: "${phone}"\nTipo: "${personType}"\nFecha Nacimiento: "${birthDate}"\nCUIT: "${cuit}"`);
       setAuthModal({ show: true, type: 'vendor' });
       return;
     }
