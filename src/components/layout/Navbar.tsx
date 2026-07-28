@@ -315,7 +315,7 @@ export default function Navbar() {
           <div 
             className="filters-panel"
           style={{
-            width: isFiltersOpen ? (pathname.startsWith('/comunidad') ? '240px' : '520px') : '0px',
+            width: isFiltersOpen ? (pathname.startsWith('/comunidad') ? '240px' : '580px') : '0px',
             opacity: isFiltersOpen ? 1 : 0,
             visibility: isFiltersOpen ? 'visible' : 'hidden',
             overflow: isFiltersOpen ? 'visible' : 'hidden',
@@ -327,9 +327,9 @@ export default function Navbar() {
             boxSizing: 'border-box',
             display: 'flex',
             flexDirection: 'column',
-            marginLeft: isFiltersOpen ? '12px' : '-16px',
+            marginLeft: isFiltersOpen ? '0px' : '-16px',
             zIndex: 5,
-            backgroundColor: '#1a1e16',
+            backgroundColor: 'var(--color-bg-surface-elevated)',
             border: '1px solid rgba(255, 255, 255, 0.05)'
           }}
         >
