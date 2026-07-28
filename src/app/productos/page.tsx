@@ -11,6 +11,7 @@ import { useCart } from '@/contexts/CartContext';
 import { usePlan } from '@/contexts/PlanContext';
 
 import { PRODUCTOS_DATA } from '@/data/mock';
+import { createClient } from '@/lib/supabase/client';
 
 const MIS_PRODUCTOS_DATA: typeof PRODUCTOS_DATA = [];
 
@@ -26,27 +27,39 @@ function ProductosContent() {
   const [openMenuId, setOpenMenuId] = useState<number | null>(null);
   const [theme, setTheme] = useState<{primaryColor?: string, textColor?: string, bgColor?: string} | null>(null);
 
-  const handleDeleteProduct = (e: React.MouseEvent, id: any) => {
+  const handleDeleteProduct = async (e: React.MouseEvent, id: any) => {
     e.stopPropagation();
+    
+    const supabase = createClient();
+    // Delete from Supabase (solo funciona si el usuario es el dueño gracias a RLS)
+    await supabase.from('products').delete().eq('id', id);
+
     const updated = localProducts.filter(p => String(p.id) !== String(id));
     setLocalProducts(updated);
-    localStorage.setItem('cazamarket_my_products', JSON.stringify(updated));
-
-    const servsStr = localStorage.getItem('cazamarket_my_services');
-    if (servsStr) {
-      try {
-        const servs = JSON.parse(servsStr);
-        const updatedServs = servs.filter((s: any) => String(s.id) !== String(id));
-        localStorage.setItem('cazamarket_my_services', JSON.stringify(updatedServs));
-      } catch (err) {}
-    }
   };
 
   useEffect(() => {
-    const existingStr = localStorage.getItem('cazamarket_my_products');
-    if (existingStr) {
-      setLocalProducts(JSON.parse(existingStr));
-    }
+    const fetchProducts = async () => {
+      const supabase = createClient();
+      let query = supabase.from('products').select('*');
+      
+      // En modo vendedor en esta vista específica, mostramos solo sus productos
+      // Opcional: si queremos que el vendedor vea el marketplace completo, podemos quitar esto
+      // pero mantenemos el comportamiento actual por ahora.
+      const { data: userData } = await supabase.auth.getUser();
+      if (isVendorModeActive && userData?.user) {
+        query = query.eq('user_id', userData.user.id);
+      }
+      
+      const { data, error } = await query;
+      if (data && !error) {
+        // Formatear los productos de Supabase para que coincidan con la UI si es necesario
+        // Supabase usa image, price, condition etc. 
+        setLocalProducts(data);
+      }
+    };
+    fetchProducts();
+
     const savedProfile = localStorage.getItem('cazamarket_profile');
     if (savedProfile) {
       try {
@@ -58,7 +71,7 @@ function ProductosContent() {
       setIsLoading(false);
     }, 1200);
     return () => clearTimeout(timer);
-  }, []);
+  }, [isVendorModeActive]);
 
   const searchParams = useSearchParams();
   const q = searchParams?.get('q')?.toLowerCase() || '';
