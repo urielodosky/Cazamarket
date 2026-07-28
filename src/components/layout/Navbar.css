@@ -7,14 +7,15 @@
 }
 
 .navbar-container {
-  display: grid;
-  grid-template-columns: 1fr auto 1fr;
+  display: flex;
+  justify-content: space-between;
   align-items: flex-start;
   width: 100%;
   padding: var(--spacing-4) var(--spacing-4);
 }
 
 .navbar-logo {
+  flex: 1;
   display: flex;
   justify-content: flex-start;
   padding-top: 6px;
@@ -213,6 +214,7 @@
 }
 
 .navbar-actions {
+  flex: 1;
   display: flex;
   justify-content: flex-end;
   align-items: flex-start;
