@@ -19,7 +19,7 @@ type PaymentStep = 'select' | 'processing' | 'success';
 
 export default function PlanesPage() {
   const { selectPlan, cancelPlan, productPlanTier, servicePlanTier } = usePlan();
-  const { isLoggedIn, isVendor } = useAuth();
+  const { isLoggedIn, isVendor, phone } = useAuth();
   const [activeTab, setActiveTab] = useState<PlanCategory>('productos');
   const [isActivating, setIsActivating] = useState(false);
   const [authModal, setAuthModal] = useState<{show: boolean, type: 'login' | 'vendor'}>({show: false, type: 'login'});
@@ -46,15 +46,7 @@ export default function PlanesPage() {
       return;
     }
     
-    // Verificar que tengan los datos obligatorios (especialmente el teléfono)
-    const savedProfile = localStorage.getItem('cazamarket_profile');
-    let hasTelefono = false;
-    if (savedProfile) {
-      try {
-        const parsed = JSON.parse(savedProfile);
-        hasTelefono = !!parsed.telefono && parsed.telefono.trim() !== '';
-      } catch (e) {}
-    }
+    const hasTelefono = !!phone && phone.trim() !== '';
 
     if (!hasTelefono) {
       alert('Debes completar tus datos obligatorios (incluyendo tu teléfono) en la Configuración antes de elegir un plan.');

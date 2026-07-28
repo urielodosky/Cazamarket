@@ -77,7 +77,7 @@ function SucursalEditor({ index, sucursal, provincias, onChange, onRemove }: { i
 export default function ConfiguracionPage() {
   const supabase = createClient();
   const { 
-    username, email, avatar, updateUser, isVendor, 
+    username, email, avatar, updateUser, isVendor, upgradeToVendor,
     personType, birthDate, cuit, phone, contactEmail,
     firstName, lastName, storeName, storeDescription, street, streetNumber, province, locality,
     socialMedia, branches, schedules 
@@ -434,6 +434,10 @@ export default function ConfiguracionPage() {
         });
         localStorage.setItem('cazamarket_my_products', JSON.stringify(existing));
       } catch(e) {}
+    }
+
+    if (!isVendor) {
+      upgradeToVendor();
     }
 
     showToast('Configuración guardada exitosamente.', 'success');
