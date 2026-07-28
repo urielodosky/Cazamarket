@@ -4,6 +4,7 @@ import { useRef, useState, useEffect } from 'react';
 import './config.css';
 import { useAuth } from '@/contexts/AuthContext';
 import { usePlan } from '@/contexts/PlanContext';
+import { createClient } from '@/lib/supabase/client';
 import CustomSelect, { SelectOption } from '@/components/ui/CustomSelect';
 import { isValidCuit } from '@/utils/validateCuit';
 
@@ -74,9 +75,16 @@ function SucursalEditor({ index, sucursal, provincias, onChange, onRemove }: { i
 }
 
 export default function ConfiguracionPage() {
-  const { username, email, avatar, updateUser, isVendor } = useAuth();
+  const supabase = createClient();
+  const { 
+    username, email, avatar, updateUser, isVendor, 
+    personType, birthDate, cuit, phone, contactEmail,
+    firstName, lastName, storeName, storeDescription, street, streetNumber, province, locality,
+    socialMedia, branches, schedules 
+  } = useAuth();
   const { planDisplayName, isPaidPlan, productPlanTier, servicePlanTier } = usePlan();
   const fileInputRef = useRef<HTMLInputElement>(null);
+  const [isUploading, setIsUploading] = useState(false);
 
   const validateTime = (val: string) => {
     let v = val.replace(/\D/g, '');
@@ -114,7 +122,8 @@ export default function ConfiguracionPage() {
     storeName: '',
     storeDescription: '',
     calle: '',
-    numero: ''
+    numero: '',
+    contactEmail: ''
   });
   
   const defaultHorarios = [
@@ -138,37 +147,36 @@ export default function ConfiguracionPage() {
   const [cuitStatus, setCuitStatus] = useState<'idle' | 'loading' | 'valid' | 'invalid'>('idle');
   const [cuitMessage, setCuitMessage] = useState('');
 
-  // Efecto para inicializar el formulario (sincronizar con context y localStorage para simular backend)
   useEffect(() => {
-    const savedProfile = localStorage.getItem('cazamarket_profile');
-    if (savedProfile) {
-      const parsed = JSON.parse(savedProfile);
+    if (username || email || personType || cuit) {
       setFormData(prev => ({
         ...prev,
-        username: parsed.username || username || '',
-        nombre: parsed.nombre || '',
-        apellido: parsed.apellido || '',
-        telefono: parsed.telefono || '',
-        dob: parsed.dob || '',
-        avatar: parsed.avatar || avatar || '',
-        tipoPersona: parsed.tipoPersona || 'fisica',
-        cuit: parsed.cuit || '',
-        storeName: parsed.storeName || '',
-        storeDescription: parsed.storeDescription || '',
-        calle: parsed.calle || '',
-        numero: parsed.numero || ''
+        username: username || '',
+        nombre: firstName || '',
+        apellido: lastName || '',
+        telefono: phone || '',
+        dob: birthDate || '',
+        avatar: avatar || '',
+        tipoPersona: personType || 'Física',
+        cuit: cuit || '',
+        storeName: storeName || '',
+        storeDescription: storeDescription || '',
+        calle: street || '',
+        numero: streetNumber || '',
+        contactEmail: contactEmail || email || ''
       }));
-      if (parsed.horarios && Array.isArray(parsed.horarios)) {
-        setHorarios(parsed.horarios);
-      }
-      if (parsed.provincia) setSelectedProvincia(parsed.provincia);
-      if (parsed.localidad) setSelectedLocalidad(parsed.localidad);
-      if (parsed.sucursales) setSucursales(parsed.sucursales);
-      if (parsed.redesSociales) setRedesSociales(parsed.redesSociales);
-    } else if (username) {
-      setFormData(prev => ({ ...prev, username, nombre: '', apellido: '', avatar: avatar || '' }));
+      
+      if (province) setSelectedProvincia(province);
+      if (locality) setSelectedLocalidad(locality);
+      if (schedules && schedules.length > 0) setHorarios(schedules);
+      if (branches && branches.length > 0) setSucursales(branches);
+      if (socialMedia && socialMedia.length > 0) setRedesSociales(socialMedia);
     }
-  }, [username, avatar]);
+  }, [
+    username, avatar, personType, birthDate, cuit, phone, contactEmail, email,
+    firstName, lastName, storeName, storeDescription, street, streetNumber, province, locality,
+    schedules, branches, socialMedia
+  ]);
 
   useEffect(() => {
     const cuit = formData.cuit || '';
@@ -274,8 +282,8 @@ export default function ConfiguracionPage() {
   }, [selectedProvincia]);
 
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {
-    const { id, value } = e.target;
-    setFormData(prev => ({ ...prev, [id]: value }));
+    const field = e.target.name || e.target.id;
+    setFormData(prev => ({ ...prev, [field]: e.target.value }));
   };
 
   const handleDobChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -389,36 +397,26 @@ export default function ConfiguracionPage() {
       }
     }
 
-    // Guardar simulado en localStorage para persistencia
-    const savedProfileStr = localStorage.getItem('cazamarket_profile');
-    let existingProfile = {};
-    if (savedProfileStr) {
-      try { existingProfile = JSON.parse(savedProfileStr); } catch(e) {}
-    }
-
-    const profileToSave = {
-      ...existingProfile,
+    updateUser({
       username: formData.username,
-      nombre: formData.nombre,
-      apellido: formData.apellido,
-      telefono: formData.telefono,
-      dob: formData.dob,
-      provincia: selectedProvincia,
-      localidad: selectedLocalidad,
       avatar: (formData as any).avatar,
-      tipoPersona: formData.tipoPersona,
+      personType: formData.tipoPersona,
+      birthDate: formData.dob,
       cuit: formData.cuit,
+      phone: formData.telefono,
+      contactEmail: formData.contactEmail,
+      firstName: formData.nombre,
+      lastName: formData.apellido,
       storeName: formData.storeName,
       storeDescription: formData.storeDescription,
-      calle: formData.calle,
-      numero: formData.numero,
-      sucursales: sucursales,
-      redesSociales: redesSociales,
-      horarios: horarios
-    };
-    localStorage.setItem('cazamarket_profile', JSON.stringify(profileToSave));
-
-    updateUser(formData.username, email || '', (formData as any).avatar);
+      street: formData.calle,
+      streetNumber: formData.numero,
+      province: selectedProvincia,
+      locality: selectedLocalidad,
+      socialMedia: redesSociales,
+      branches: sucursales,
+      schedules: horarios
+    });
 
     // Actualizar retroactivamente el nombre de la tienda en los productos ya creados
     const existingStr = localStorage.getItem('cazamarket_my_products');
@@ -449,20 +447,41 @@ export default function ConfiguracionPage() {
     }
   };
 
-  const handleAvatarChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+  const handleAvatarChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
     if (file) {
       if (file.size > 2 * 1024 * 1024) {
         showToast('La imagen es muy grande (máximo 2MB).', 'error');
         return;
       }
-      const reader = new FileReader();
-      reader.onloadend = () => {
-        const base64String = reader.result as string;
-        setFormData(prev => ({ ...prev, avatar: base64String }));
-        showToast('Foto actualizada (recuerda guardar cambios).', 'success');
-      };
-      reader.readAsDataURL(file);
+      
+      setIsUploading(true);
+      showToast('Subiendo imagen...', 'info');
+
+      try {
+        const fileExt = file.name.split('.').pop();
+        const fileName = `${username || 'user'}-${Date.now()}.${fileExt}`;
+        const filePath = `avatars/${fileName}`;
+
+        const { error: uploadError } = await supabase.storage
+          .from('MediaCazaMarket')
+          .upload(filePath, file);
+
+        if (uploadError) {
+          throw uploadError;
+        }
+
+        const { data } = supabase.storage.from('MediaCazaMarket').getPublicUrl(filePath);
+
+        if (data && data.publicUrl) {
+          setFormData(prev => ({ ...prev, avatar: data.publicUrl }));
+          showToast('Foto subida exitosamente (recuerda guardar cambios).', 'success');
+        }
+      } catch (error: any) {
+        showToast(`Error al subir la imagen: ${error.message}`, 'error');
+      } finally {
+        setIsUploading(false);
+      }
     }
   };
 
@@ -549,7 +568,12 @@ export default function ConfiguracionPage() {
         <div style={{ display: 'flex', flexWrap: 'wrap', gap: '32px', alignItems: 'flex-start', background: 'rgba(255,255,255,0.03)', padding: '32px', borderRadius: 'var(--radius-lg)', border: '1px solid var(--color-border)' }}>
           <div className="avatar-cell" style={{ flexShrink: 0 }}>
             <div className="avatar-upload-circle" onClick={() => fileInputRef.current?.click()} title="Subir nueva foto" style={{ overflow: 'hidden', width: '120px', height: '120px', borderRadius: '50%', background: 'rgba(0,0,0,0.5)', position: 'relative', cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-              {(formData as any).avatar ? (
+              {isUploading ? (
+                <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', color: 'rgba(255,255,255,0.7)' }}>
+                   <div className="spinner" style={{ width: '24px', height: '24px', border: '3px solid rgba(255,255,255,0.2)', borderTopColor: 'var(--color-primary)', borderRadius: '50%', animation: 'spin 1s linear infinite', marginBottom: '8px' }}></div>
+                   <span style={{ fontSize: '0.8rem' }}>Subiendo...</span>
+                </div>
+              ) : (formData as any).avatar ? (
                 <img src={(formData as any).avatar} alt="Avatar" style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
               ) : (
                 <svg viewBox="0 0 24 24" fill="none" stroke="rgba(255,255,255,0.5)" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" style={{ width: '50px', height: '50px' }}>
@@ -557,11 +581,13 @@ export default function ConfiguracionPage() {
                   <circle cx="12" cy="7" r="4"></circle>
                 </svg>
               )}
-              <div className="avatar-overlay">
-                <span>Cambiar</span>
-              </div>
+              {!isUploading && (
+                <div className="avatar-overlay">
+                  <span>Cambiar</span>
+                </div>
+              )}
             </div>
-            <input type="file" ref={fileInputRef} className="hidden-file-input" accept="image/png, image/jpeg, image/gif" onChange={handleAvatarChange} />
+            <input type="file" ref={fileInputRef} disabled={isUploading} className="hidden-file-input" accept="image/png, image/jpeg, image/gif" onChange={handleAvatarChange} />
           </div>
           
           <div style={{ flex: '1 1 300px', display: 'flex', flexDirection: 'column', gap: '16px' }}>
@@ -590,8 +616,12 @@ export default function ConfiguracionPage() {
           </summary>
           <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(250px, 1fr))', gap: '24px', marginTop: '24px' }}>
             <div className="form-group-config">
-              <label htmlFor="correo">Correo electrónico</label>
-              <input type="email" id="correo" value={email || ''} readOnly title="No puedes cambiar tu correo electrónico directamente" className="readonly-input" />
+              <label htmlFor="authEmail">Correo de inicio de sesión</label>
+              <input type="email" id="authEmail" value={email || ''} readOnly title="No puedes cambiar tu correo electrónico directamente" className="readonly-input" />
+            </div>
+            <div className="form-group-config">
+              <label htmlFor="contactEmail">Correo de Contacto (Público)</label>
+              <input type="email" id="contactEmail" value={formData.contactEmail || ''} onChange={handleInputChange} placeholder="tu@correo.com" />
             </div>
             <div className="form-group-config">
               <label htmlFor="telefono">Número de teléfono</label>
@@ -861,6 +891,18 @@ export default function ConfiguracionPage() {
                 value={formData.tipoPersona || 'fisica'}
                 onChange={(val) => setFormData(prev => ({ ...prev, tipoPersona: val }))}
                 placeholder="Seleccione el tipo"
+              />
+            </div>
+
+            <div className="form-group-config">
+              <label htmlFor="telefonoObligatorio">Número de teléfono <span style={{ color: 'var(--color-primary)' }}>*</span></label>
+              <input 
+                type="tel" 
+                id="telefonoObligatorio" 
+                name="telefono"
+                value={formData.telefono || ''} 
+                onChange={handleInputChange} 
+                placeholder="+54 9 11 1234-5678" 
               />
             </div>
 

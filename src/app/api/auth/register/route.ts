@@ -4,7 +4,7 @@ import { NextResponse } from 'next/server';
 
 export async function POST(request: Request) {
   try {
-    const { email, password, username } = await request.json();
+    const { email, password, username, person_type, birth_date, cuit, phone, contact_email } = await request.json();
 
     if (!email || !password || !username) {
       return NextResponse.json(
@@ -55,6 +55,12 @@ export async function POST(request: Request) {
         data: {
           full_name: username,
           avatar_url: '',
+          person_type: person_type || null,
+          birth_date: birth_date || null,
+          cuit: cuit || null,
+          phone: phone || null,
+          contact_email: contact_email || email,
+          terms_accepted_at: new Date().toISOString(),
         },
       },
     });
@@ -73,7 +79,18 @@ export async function POST(request: Request) {
             const retry = await supabase.auth.signUp({
               email,
               password,
-              options: { data: { full_name: username, avatar_url: '' } }
+              options: { 
+                data: { 
+                  full_name: username, 
+                  avatar_url: '',
+                  person_type: person_type || null,
+                  birth_date: birth_date || null,
+                  cuit: cuit || null,
+                  phone: phone || null,
+                  contact_email: contact_email || email,
+                  terms_accepted_at: new Date().toISOString(),
+                } 
+              }
             });
             
             if (retry.error) {

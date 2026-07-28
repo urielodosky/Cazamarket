@@ -20,6 +20,10 @@ export default function RegistroPage() {
   
   // Nombres y OTP
   const [username, setUsername] = useState('');
+  const [personType, setPersonType] = useState('Física');
+  const [cuit, setCuit] = useState('');
+  const [birthDate, setBirthDate] = useState('');
+  const [phone, setPhone] = useState('');
   const [isAwaitingOTP, setIsAwaitingOTP] = useState(false);
   const [otpCode, setOtpCode] = useState('');
   const [resendCount, setResendCount] = useState(0);
@@ -126,7 +130,12 @@ export default function RegistroPage() {
           body: JSON.stringify({
             email,
             password,
-            username
+            username,
+            person_type: personType,
+            cuit,
+            birth_date: birthDate,
+            phone,
+            contact_email: email // We'll just use the auth email initially
           })
         });
 
@@ -233,18 +242,89 @@ export default function RegistroPage() {
           ) : (
             <>
               {!isLoginView && (
-                <div className="form-group">
-                  <label htmlFor="username">Nombre de usuario</label>
-                  <input 
-                    type="text" 
-                    id="username" 
-                    placeholder="Ej: CazadorPro" 
-                    value={username}
-                    onChange={(e) => setUsername(e.target.value)}
-                    minLength={3}
-                    required 
-                  />
-                </div>
+                <>
+                  <div className="form-group">
+                    <label htmlFor="username">Nombre de usuario</label>
+                    <input 
+                      type="text" 
+                      id="username" 
+                      placeholder="Ej: CazadorPro" 
+                      value={username}
+                      onChange={(e) => setUsername(e.target.value)}
+                      minLength={3}
+                      required 
+                    />
+                  </div>
+                  
+                  <div className="form-group">
+                    <label htmlFor="personType">Tipo de Persona</label>
+                    <select 
+                      id="personType"
+                      value={personType}
+                      onChange={(e) => setPersonType(e.target.value)}
+                      required
+                      style={{
+                        width: '100%',
+                        padding: '12px',
+                        background: 'rgba(255,255,255,0.05)',
+                        border: '1px solid rgba(255,255,255,0.1)',
+                        borderRadius: '8px',
+                        color: 'white',
+                        fontSize: '1rem',
+                        outline: 'none'
+                      }}
+                    >
+                      <option value="Física">Persona Física</option>
+                      <option value="Jurídica">Persona Jurídica (Empresa)</option>
+                    </select>
+                  </div>
+
+                  <div className="form-group">
+                    <label htmlFor="cuit">{personType === 'Física' ? 'CUIT / CUIL / DNI' : 'CUIT'}</label>
+                    <input 
+                      type="text" 
+                      id="cuit" 
+                      placeholder={personType === 'Física' ? "Sin guiones ni espacios" : "Ej: 30-12345678-9"} 
+                      value={cuit}
+                      onChange={(e) => setCuit(e.target.value)}
+                      required 
+                    />
+                  </div>
+
+                  <div className="form-group">
+                    <label htmlFor="birthDate">Fecha de Nacimiento</label>
+                    <input 
+                      type="date" 
+                      id="birthDate" 
+                      value={birthDate}
+                      onChange={(e) => setBirthDate(e.target.value)}
+                      required 
+                      style={{
+                        width: '100%',
+                        padding: '12px',
+                        background: 'rgba(255,255,255,0.05)',
+                        border: '1px solid rgba(255,255,255,0.1)',
+                        borderRadius: '8px',
+                        color: 'white',
+                        fontSize: '1rem',
+                        outline: 'none',
+                        colorScheme: 'dark'
+                      }}
+                    />
+                  </div>
+
+                  <div className="form-group">
+                    <label htmlFor="phone">Teléfono de Contacto</label>
+                    <input 
+                      type="tel" 
+                      id="phone" 
+                      placeholder="Ej: +54 9 11 1234-5678" 
+                      value={phone}
+                      onChange={(e) => setPhone(e.target.value)}
+                      required 
+                    />
+                  </div>
+                </>
               )}
               <div className="form-group">
             <label htmlFor="email">Correo electrónico</label>

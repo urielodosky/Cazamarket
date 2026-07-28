@@ -10,6 +10,7 @@ import { isAtLeast } from '@/types/planTypes';
 import CustomSelect from '@/components/ui/CustomSelect';
 import type { SelectOption } from '@/components/ui/CustomSelect';
 import { CATEGORIES_DATA } from '@/constants/categoriesData';
+import { createClient } from '@/lib/supabase/client';
 
 const PROVINCES_MAP: Record<string, string> = {
   "02": "Ciudad Autónoma de Buenos Aires",
@@ -133,28 +134,25 @@ export default function MiNegocioPage() {
   const [sucursales, setSucursales] = useState<any[]>([]);
   const [redesSociales, setRedesSociales] = useState<{ red: string, usuario: string }[]>([]);
 
+  const supabase = createClient();
+  const { supabaseUser } = useAuth();
+
   React.useEffect(() => {
-    let prods: any[] = [];
-    let servs: any[] = [];
-
-    const existingStr = localStorage.getItem('cazamarket_my_products');
-    if (existingStr) try { prods = JSON.parse(existingStr) || []; } catch(e) {}
-
-    const existingServStr = localStorage.getItem('cazamarket_my_services');
-    if (existingServStr) try { servs = JSON.parse(existingServStr) || []; } catch(e) {}
-
-    if (Array.isArray(prods) && prods.length > 0) {
-      const misplacedServices = prods.filter((p: any) => p.usesCalendar || p.serviceLocation || p.pricePeriod);
-      if (misplacedServices.length > 0) {
-        servs = [...misplacedServices, ...servs];
-        prods = prods.filter((p: any) => !(p.usesCalendar || p.serviceLocation || p.pricePeriod));
-        localStorage.setItem('cazamarket_my_services', JSON.stringify(servs));
-        localStorage.setItem('cazamarket_my_products', JSON.stringify(prods));
+    const fetchProductsAndServices = async () => {
+      if (supabaseUser) {
+        try {
+          const { data: prods } = await supabase.from('products').select('*').eq('user_id', supabaseUser.id);
+          const { data: servs } = await supabase.from('services').select('*').eq('user_id', supabaseUser.id);
+          
+          if (prods) setMyProducts(prods);
+          if (servs) setMyServices(servs);
+        } catch (error) {
+          console.error('Error fetching catalog:', error);
+        }
       }
-    }
+    };
+    fetchProductsAndServices();
 
-    setMyProducts(prods);
-    setMyServices(servs);
     const savedProfile = localStorage.getItem('cazamarket_profile');
     if (savedProfile) {
       const parsed = JSON.parse(savedProfile);
@@ -233,7 +231,7 @@ export default function MiNegocioPage() {
       const reader = new FileReader();
       reader.onload = (event) => {
         if (event.target?.result) {
-          updateUser(name, email, event.target.result as string);
+          updateUser({ username: name, avatar: event.target.result as string });
         }
       };
       reader.readAsDataURL(e.target.files[0]);
@@ -252,37 +250,21 @@ export default function MiNegocioPage() {
     }
   };
 
-  const handleDeleteProduct = (e: React.MouseEvent, id: any) => {
+  const handleDeleteProduct = async (e: React.MouseEvent, id: any) => {
     e.stopPropagation();
-    const updated = myProducts.filter(p => String(p.id) !== String(id));
-    setMyProducts(updated);
-    localStorage.setItem('cazamarket_my_products', JSON.stringify(updated));
-
-    const servsStr = localStorage.getItem('cazamarket_my_services');
-    if (servsStr) {
-      try {
-        const servs = JSON.parse(servsStr);
-        const updatedS = servs.filter((s: any) => String(s.id) !== String(id));
-        setMyServices(updatedS);
-        localStorage.setItem('cazamarket_my_services', JSON.stringify(updatedS));
-      } catch (err) {}
+    if (supabaseUser) {
+      await supabase.from('products').delete().eq('id', id).eq('user_id', supabaseUser.id);
+      const updated = myProducts.filter(p => String(p.id) !== String(id));
+      setMyProducts(updated);
     }
   };
 
-  const handleDeleteService = (e: React.MouseEvent, id: any) => {
+  const handleDeleteService = async (e: React.MouseEvent, id: any) => {
     e.stopPropagation();
-    const updated = myServices.filter(s => String(s.id) !== String(id));
-    setMyServices(updated);
-    localStorage.setItem('cazamarket_my_services', JSON.stringify(updated));
-
-    const prodsStr = localStorage.getItem('cazamarket_my_products');
-    if (prodsStr) {
-      try {
-        const prods = JSON.parse(prodsStr);
-        const updatedP = prods.filter((p: any) => String(p.id) !== String(id));
-        setMyProducts(updatedP);
-        localStorage.setItem('cazamarket_my_products', JSON.stringify(updatedP));
-      } catch (err) {}
+    if (supabaseUser) {
+      await supabase.from('services').delete().eq('id', id).eq('user_id', supabaseUser.id);
+      const updated = myServices.filter(p => String(p.id) !== String(id));
+      setMyServices(updated);
     }
   };
 
@@ -423,12 +405,12 @@ export default function MiNegocioPage() {
                       onChange={(e) => setName(e.target.value)}
                       onBlur={() => {
                         setIsEditingName(false);
-                        updateUser(name, email, avatar);
+                        updateUser({ username: name, avatar });
                       }}
                       onKeyDown={(e) => { 
                         if (e.key === 'Enter') {
                           setIsEditingName(false);
-                          updateUser(name, email, avatar);
+                          updateUser({ username: name, avatar });
                         }
                       }}
                       style={{ fontSize: '2.5rem', fontWeight: 'bold', margin: '0 0 12px 0', color: '#fff', background: 'rgba(255,255,255,0.05)', border: '1px dashed var(--color-primary)', borderRadius: 'var(--radius-md)', padding: '4px 12px', width: '100%', outline: 'none', lineHeight: 1.1 }}

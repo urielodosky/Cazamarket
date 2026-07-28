@@ -5,6 +5,7 @@ import Link from 'next/link';
 import { useRouter, useSearchParams } from 'next/navigation';
 import CustomSelect from '@/components/ui/CustomSelect';
 import { useAuth } from '@/contexts/AuthContext';
+import { createClient } from '@/lib/supabase/client';
 import { usePlan } from '@/contexts/PlanContext';
 import VirtualAdvisorModal from '@/components/chat/VirtualAdvisorModal';
 import { PRODUCT_MAIN_CATEGORIES, getSubcategoriesForCategory } from '@/constants/categoriesData';
@@ -13,14 +14,17 @@ function NuevoProductoContent() {
   const router = useRouter();
   const searchParams = useSearchParams();
   const editId = searchParams?.get('editId');
-  const { username, avatar: userAvatar } = useAuth();
-  const { hasFeature } = usePlan();
+  const { username, avatar: userAvatar, supabaseUser } = useAuth();
+  const { hasFeature, permissions } = usePlan();
   
   const canUseBot = hasFeature('botAsesor');
+  
+  const supabase = createClient();
+  
   const [isAdvisorModalOpen, setIsAdvisorModalOpen] = useState(false);
   
   const [stockMode, setStockMode] = useState<'definido' | 'no_necesario'>('no_necesario');
-  const [mediaPreview, setMediaPreview] = useState<{url: string, type: string, file: File}[]>([]);
+  const [mediaPreview, setMediaPreview] = useState<{url: string, type: string, file?: File}[]>([]);
   const [uploadError, setUploadError] = useState<string | null>(null);
   const [currency, setCurrency] = useState('USD');
   const [category, setCategory] = useState('');
@@ -78,70 +82,72 @@ function NuevoProductoContent() {
     
     // Load existing product if editId is present
     if (editId) {
-      const existingStr = localStorage.getItem('cazamarket_my_products');
-      if (existingStr) {
-        try {
-          const existing = JSON.parse(existingStr);
-          const product = existing.find((p: any) => p.id === Number(editId));
-          if (product) {
-            setTitle(product.name || '');
-            if (product.price) {
-              const priceParts = product.price.split(' ');
-              if (priceParts.length > 1) {
-                setCurrency(priceParts[0]);
-                setPrice(priceParts.slice(1).join(' '));
-              } else {
-                setPrice(product.price);
-              }
-            }
-            setCategory(product.category || '');
-            setSubcategory(product.subcategory || '');
-            setDescription(product.description || '');
-            if (product.condition) setCondition(product.condition.toLowerCase());
-            
-            if (product.media && product.media.length > 0) {
-              setMediaPreview(product.media.map((m: any) => ({ url: m.url, type: m.type, file: new File([], 'mock') })));
-            } else if (product.image) {
-              setMediaPreview([{ url: product.image, type: 'image', file: new File([], 'mock') }]);
-            }
-            
-            if (product.shippingCost === 'Envío gratis') {
-              setShippingMode('gratis');
-            } else if (product.shippingCost && product.shippingCost !== 'Envío gratis') {
-              setShippingMode('costo_extra');
-              if (product.shippingCost !== 'A acordar') {
-                const sParts = product.shippingCost.split(' ');
-                if (sParts.length > 1) {
-                  setShippingCurrency(sParts[0]);
-                  setShippingCost(sParts.slice(1).join(' '));
-                }
-              }
-            } else if (product.shippingCost === undefined || product.shippingCost === null) {
-              setShippingMode('sin_envio');
-            }
-            
-            if (product.branches && product.branches.length > 0) {
-              setPickupAvailable('si');
-              setPickupBranches(product.branches.join(', '));
-            }
-            
-            if (product.features) {
-              setFeatures(product.features);
-            }
-            
-            if (product.discount) {
-              setHasDiscount(true);
-              setDiscountName(product.discount.name || '');
-              setDiscountType(product.discount.type || 'porcentaje');
-              setDiscountValue(product.discount.value || '');
-            }
-            
-            if (product.volumeDiscounts) {
-              setVolumeDiscounts(product.volumeDiscounts);
+      const fetchProduct = async () => {
+        const { data: product, error } = await supabase
+          .from('products')
+          .select('*')
+          .eq('id', editId)
+          .single();
+          
+        if (product) {
+          setTitle(product.name || '');
+          if (product.price) {
+            const priceParts = product.price.split(' ');
+            if (priceParts.length > 1) {
+              setCurrency(priceParts[0]);
+              setPrice(priceParts.slice(1).join(' '));
+            } else {
+              setPrice(product.price);
             }
           }
-        } catch(e) {}
-      }
+          setCategory(product.category || '');
+          setSubcategory(product.subcategory || '');
+          setDescription(product.description || '');
+          if (product.condition) setCondition(product.condition.toLowerCase());
+          
+          if (product.media && product.media.length > 0) {
+            setMediaPreview(product.media.map((m: any) => ({ url: m.url, type: m.type, file: undefined })));
+          } else if (product.image) {
+            setMediaPreview([{ url: product.image, type: 'image', file: undefined }]);
+          }
+          
+          if (product.shipping_cost === 'Envío gratis') {
+            setShippingMode('gratis');
+          } else if (product.shipping_cost && product.shipping_cost !== 'Envío gratis') {
+            setShippingMode('costo_extra');
+            if (product.shipping_cost !== 'A acordar') {
+              const sParts = product.shipping_cost.split(' ');
+              if (sParts.length > 1) {
+                setShippingCurrency(sParts[0]);
+                setShippingCost(sParts.slice(1).join(' '));
+              }
+            }
+          } else if (product.shipping_cost === undefined || product.shipping_cost === null) {
+            setShippingMode('sin_envio');
+          }
+          
+          if (product.pickup_available === 'si' && product.pickup_branches) {
+            setPickupAvailable('si');
+            setPickupBranches(product.pickup_branches);
+          }
+          
+          if (product.features) {
+            setFeatures(product.features);
+          }
+          
+          if (product.has_discount) {
+            setHasDiscount(true);
+            setDiscountName(product.discount_name || '');
+            setDiscountType(product.discount_type || 'porcentaje');
+            setDiscountValue(product.discount_value || '');
+          }
+          
+          if (product.volume_discounts) {
+            setVolumeDiscounts(product.volume_discounts);
+          }
+        }
+      };
+      fetchProduct();
     }
   }, [editId]);
 
@@ -204,7 +210,9 @@ function NuevoProductoContent() {
   const removeMedia = (index: number) => {
     setMediaPreview(prev => {
       const newPreview = [...prev];
-      URL.revokeObjectURL(newPreview[index].url); // Avoid memory leaks
+      if (newPreview[index].url.startsWith('blob:')) {
+        URL.revokeObjectURL(newPreview[index].url);
+      }
       newPreview.splice(index, 1);
       return newPreview;
     });
@@ -247,87 +255,81 @@ function NuevoProductoContent() {
     window.scrollTo({ top: 0, behavior: 'smooth' });
   };
 
-  const handleSubmit = () => {
+  const [isSubmitting, setIsSubmitting] = useState(false);
+
+  const handleSubmit = async () => {
     setFormError(null);
 
-    const savedProfile = localStorage.getItem('cazamarket_profile');
-    if (!savedProfile) {
-      setFormError('Debes completar la configuración de tu cuenta antes de publicar.');
-      return;
-    }
-    
-    const profile = JSON.parse(savedProfile);
-    if (profile.tipoPersona === 'juridica' && (!profile.cuit || profile.cuit.trim() === '')) {
-      setFormError('Falta información: Debes ingresar tu CUIT en la página de configuración antes de publicar.');
-      return;
-    }
-    
-    if (profile.tipoPersona === 'fisica' && (!profile.dob || profile.dob.trim() === '')) {
-      setFormError('Falta información: Debes ingresar tu fecha de nacimiento / edad en la página de configuración antes de publicar.');
+    if (!supabaseUser) {
+      setFormError('Debes iniciar sesión para publicar un producto.');
       return;
     }
 
-    // Validation removed for shipping cost (0 or empty means 'a acordar')
-
-    // Si todo esta OK, simulamos publicacion y volvemos
-    const newProduct = {
-      id: editId ? Number(editId) : Date.now(),
-      name: title,
-      price: `${currency} ${price}`, // Formatted
-      store: profile.storeName || username || 'Mi Negocio',
-      storeId: 1,
-      sellerType: 'Mixto',
-      verified: true,
-      avatar: profile.avatar || userAvatar || 'https://ui-avatars.com/api/?name=Mi+Negocio&background=ff7300&color=fff',
-      category: category,
-      subcategory: subcategory,
-      description: description,
-      image: mediaPreview.find(m => m.type === 'image')?.url || 'https://images.unsplash.com/photo-1595246140625-573b715d11dc?q=80&w=1200&auto=format&fit=crop',
-      media: mediaPreview.map(m => ({ url: m.url, type: m.type })),
-      condition: condition.charAt(0).toUpperCase() + condition.slice(1), // Nuevo -> Nuevo
-      rating: '0.0',
-      shippingCost: shippingMode === 'gratis' ? 'Envío gratis' : shippingMode === 'costo_extra' ? (!shippingCost || parseFloat(shippingCost) <= 0 ? 'A acordar' : `${shippingCurrency} ${shippingCost}`) : undefined,
-      branches: pickupAvailable === 'si' ? pickupBranches.split(',').map(s => s.trim()).filter(Boolean) : [],
-      features: features,
-      discount: hasDiscount ? { name: discountName, type: discountType, value: discountValue } : null,
-      volumeDiscounts: hasDiscount && volumeDiscounts.length > 0 ? volumeDiscounts : []
-    };
-
-    const existingStr = localStorage.getItem('cazamarket_my_products');
-    let existing = existingStr ? JSON.parse(existingStr) : [];
-    
-    // Cleanup: Remove massive base64 strings ONLY from old products (not the one being added)
-    existing = existing.map((p: any) => {
-      // Ignoramos el producto actual si se está editando
-      if (editId && p.id === Number(editId)) return p;
-      
-      if (p.image && p.image.length > 1000 && p.image.startsWith('data:')) {
-        p.image = 'https://images.unsplash.com/photo-1595246140625-573b715d11dc?q=80&w=1200&auto=format&fit=crop';
-      }
-      if (p.media) {
-        p.media = p.media.map((m: any) => ({
-          ...m,
-          url: m.url && m.url.length > 1000 && m.url.startsWith('data:') ? 'https://images.unsplash.com/photo-1595246140625-573b715d11dc?q=80&w=1200&auto=format&fit=crop' : m.url
-        }));
-      }
-      return p;
-    });
+    setIsSubmitting(true);
 
     try {
-      if (editId) {
-        const idx = existing.findIndex((p: any) => p.id === Number(editId));
-        if (idx !== -1) {
-          existing[idx] = { ...existing[idx], ...newProduct };
-          localStorage.setItem('cazamarket_my_products', JSON.stringify(existing));
+      // Subir archivos nuevos a Supabase Storage
+      const uploadedMedia = [];
+      for (const m of mediaPreview) {
+        if (m.file) {
+          const fileExt = m.file.name.split('.').pop();
+          const fileName = `${Math.random()}.${fileExt}`;
+          const filePath = `${supabaseUser.id}/${fileName}`;
+          
+          const { error: uploadError } = await supabase.storage
+            .from('MediaCazaMarket')
+            .upload(filePath, m.file);
+            
+          if (uploadError) {
+            console.error('Upload error:', uploadError);
+            continue;
+          }
+          
+          const { data } = supabase.storage.from('MediaCazaMarket').getPublicUrl(filePath);
+          uploadedMedia.push({ url: data.publicUrl, type: m.type });
+        } else {
+          // Ya estaba subido o es de mockup
+          uploadedMedia.push({ url: m.url, type: m.type });
         }
-      } else {
-        localStorage.setItem('cazamarket_my_products', JSON.stringify([newProduct, ...existing]));
       }
+
+      const newProduct = {
+        user_id: supabaseUser.id,
+        name: title,
+        price: `${currency} ${price}`,
+        category: category,
+        subcategory: subcategory,
+        description: description,
+        condition: condition.charAt(0).toUpperCase() + condition.slice(1),
+        image: uploadedMedia.find(m => m.type === 'image')?.url || 'https://images.unsplash.com/photo-1595246140625-573b715d11dc?q=80&w=1200&auto=format&fit=crop',
+        media: uploadedMedia,
+        shipping_mode: shippingMode,
+        shipping_cost: shippingMode === 'gratis' ? 'Envío gratis' : shippingMode === 'costo_extra' ? (!shippingCost || parseFloat(shippingCost) <= 0 ? 'A acordar' : `${shippingCurrency} ${shippingCost}`) : null,
+        pickup_available: pickupAvailable,
+        pickup_branches: pickupAvailable === 'si' ? pickupBranches : null,
+        features: features,
+        has_discount: hasDiscount,
+        discount_name: hasDiscount ? discountName : null,
+        discount_type: hasDiscount ? discountType : null,
+        discount_value: hasDiscount ? discountValue : null,
+        volume_discounts: hasDiscount && volumeDiscounts.length > 0 ? volumeDiscounts : []
+      };
+
+      if (editId) {
+        const { error } = await supabase.from('products').update(newProduct).eq('id', editId).eq('user_id', supabaseUser.id);
+        if (error) throw error;
+      } else {
+        const { error } = await supabase.from('products').insert([newProduct]);
+        if (error) throw error;
+      }
+      
       router.push('/mis-tiendas');
-    } catch (error) {
-      console.warn('Quota exceeded:', error);
-      setFormError('Error: Se superó el límite de almacenamiento local (5MB). Por favor sube imágenes más pequeñas o elimina productos viejos.');
+    } catch (error: any) {
+      console.error('DB error:', error);
+      setFormError('Ocurrió un error al guardar el producto. Inténtalo de nuevo.');
       window.scrollTo({ top: 0, behavior: 'smooth' });
+    } finally {
+      setIsSubmitting(false);
     }
   };
 

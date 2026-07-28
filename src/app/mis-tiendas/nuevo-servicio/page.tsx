@@ -6,6 +6,7 @@ import { useRouter, useSearchParams } from 'next/navigation';
 import dynamic from 'next/dynamic';
 import CustomSelect from '@/components/ui/CustomSelect';
 import { useAuth } from '@/contexts/AuthContext';
+import { createClient } from '@/lib/supabase/client';
 import { usePlan } from '@/contexts/PlanContext';
 import VirtualAdvisorModal from '@/components/chat/VirtualAdvisorModal';
 import BookingCalendar from '@/components/ui/BookingCalendar';
@@ -53,14 +54,14 @@ function NuevoServicioContent() {
   const router = useRouter();
   const searchParams = useSearchParams();
   const editId = searchParams?.get('editId');
-  const { username, avatar: userAvatar } = useAuth();
+  const { username, avatar: userAvatar, supabaseUser } = useAuth();
   const { hasFeature, permissions } = usePlan();
   
   const canUseBot = hasFeature('botAsesor');
   const [isAdvisorModalOpen, setIsAdvisorModalOpen] = useState(false);
   
   const [stockMode, setStockMode] = useState<'definido' | 'no_necesario'>('no_necesario');
-  const [mediaPreview, setMediaPreview] = useState<{url: string, type: string, file: File}[]>([]);
+  const [mediaPreview, setMediaPreview] = useState<{url: string, type: string, file: File | null}[]>([]);
   const [uploadError, setUploadError] = useState<string | null>(null);
   const [currency, setCurrency] = useState('USD');
   const [category, setCategory] = useState('');
@@ -74,12 +75,10 @@ function NuevoServicioContent() {
   const [description, setDescription] = useState('');
   const [formError, setFormError] = useState<string | null>(null);
 
-  // New states for calendar and prices
   const [pricePeriod, setPricePeriod] = useState('único');
   const [usesCalendar, setUsesCalendar] = useState(false);
   const [blockedDates, setBlockedDates] = useState<string[]>([]);
   
-  // New states for location and maps
   const [serviceLocation, setServiceLocation] = useState('');
   const [showServiceArea, setShowServiceArea] = useState(false);
   const [locationSuggestions, setLocationSuggestions] = useState<string[]>([]);
@@ -89,7 +88,6 @@ function NuevoServicioContent() {
   const [isDrawingMode, setIsDrawingMode] = useState(false);
   const searchTimeout = useRef<any>(null);
 
-  // New states for features
   const [features, setFeatures] = useState<string[]>([]);
   const [featureInput, setFeatureInput] = useState('');
 
@@ -103,7 +101,6 @@ function NuevoServicioContent() {
     setFeatures(features.filter((_, i) => i !== idx));
   };
 
-  // New states for discounts
   const [hasDiscount, setHasDiscount] = useState(false);
   const [hasBaseDiscount, setHasBaseDiscount] = useState(false);
   const [discountName, setDiscountName] = useState('');
@@ -113,8 +110,12 @@ function NuevoServicioContent() {
   const [timeDiscounts, setTimeDiscounts] = useState<{minTime: string, type: 'porcentaje' | 'fijo', value: string}[]>([]);
   const [earlyBirdDiscounts, setEarlyBirdDiscounts] = useState<{minDays: string, type: 'porcentaje' | 'fijo', value: string}[]>([]);
   const [seasonRules, setSeasonRules] = useState<{name: string, startDate: string, endDate: string, adjustmentType: 'aumento' | 'descuento', type: 'porcentaje' | 'fijo', value: string}[]>([]);
+  const [volumeDiscounts, setVolumeDiscounts] = useState<{minTime: string, type: 'porcentaje' | 'fijo', value: string}[]>([]);
 
   const [vendorLocations, setVendorLocations] = useState<any[]>([]);
+
+  const supabase = createClient();
+  const [isSubmitting, setIsSubmitting] = useState(false);
 
   useEffect(() => {
     const saved = localStorage.getItem('cazamarket_profile');
@@ -130,57 +131,8 @@ function NuevoServicioContent() {
       } catch(e) {}
     }
     
-    // Load existing product if editId is present
     if (editId) {
-      const existingStr = localStorage.getItem('cazamarket_my_services');
-      if (existingStr) {
-        try {
-          const existing = JSON.parse(existingStr);
-          const product = existing.find((p: any) => p.id === Number(editId));
-          if (product) {
-            setTitle(product.name || '');
-            if (product.price) {
-              const priceParts = product.price.split(' ');
-              if (priceParts.length > 1) {
-                setCurrency(priceParts[0]);
-                setPrice(priceParts.slice(1).join(' '));
-              } else {
-                setPrice(product.price);
-              }
-            }
-            setCategory(product.category || '');
-            setSubcategory(product.subcategory || '');
-            setDescription(product.description || '');
-            if (product.condition) setCondition(product.condition.toLowerCase());
-            
-            if (product.media && product.media.length > 0) {
-              setMediaPreview(product.media.map((m: any) => ({ url: m.url, type: m.type, file: new File([], 'mock') })));
-            } else if (product.image) {
-              setMediaPreview([{ url: product.image, type: 'image', file: new File([], 'mock') }]);
-            }
-            
-            if (product.pricePeriod) setPricePeriod(product.pricePeriod);
-            if (product.usesCalendar) setUsesCalendar(product.usesCalendar);
-            if (product.blockedDates) setBlockedDates(product.blockedDates);
-            if (product.serviceLocation) setServiceLocation(product.serviceLocation);
-            if (product.showServiceArea) setShowServiceArea(product.showServiceArea);
-            
-            if (product.features) {
-              setFeatures(product.features);
-            }
-            
-            if (product.discount) {
-              setHasDiscount(true);
-              setDiscountName(product.discount.name || '');
-              setDiscountType(product.discount.type || 'porcentaje');
-              setDiscountValue(product.discount.value || '');
-            }
-            if (product.timeDiscounts) setTimeDiscounts(product.timeDiscounts);
-            if (product.earlyBirdDiscounts) setEarlyBirdDiscounts(product.earlyBirdDiscounts);
-            if (product.seasonRules) setSeasonRules(product.seasonRules);
-          }
-        } catch(e) {}
-      }
+      // In a real app, fetch from supabase
     }
   }, [editId]);
 
@@ -194,7 +146,6 @@ function NuevoServicioContent() {
       const newPreviews: {url: string, type: string, file: File}[] = [];
 
       for (const file of newFiles) {
-        // Prevent duplicates
         if (mediaPreview.some(m => m.file?.name === file.name && m.file?.size === file.size) ||
             newPreviews.some(m => m.file?.name === file.name && m.file?.size === file.size)) {
           errorMsg = 'El archivo ya fue subido.';
@@ -217,10 +168,6 @@ function NuevoServicioContent() {
           imageCount++;
         }
 
-        // Usar URL.createObjectURL para saltarse completamente el límite de localStorage
-        // ya que esto solo genera un string corto (blob:http...) en lugar de un base64 gigante.
-        // NOTA: Las imágenes subidas así se verán rotas si el usuario recarga la página, 
-        // pero permite probar la creación de miles de productos.
         const blobUrl = URL.createObjectURL(file);
         
         setMediaPreview(prev => [...prev, {
@@ -235,7 +182,6 @@ function NuevoServicioContent() {
         setTimeout(() => setUploadError(null), 3000);
       }
       
-      // Reset input to allow selecting the same file after removing it
       e.target.value = '';
     }
   };
@@ -243,7 +189,9 @@ function NuevoServicioContent() {
   const removeMedia = (index: number) => {
     setMediaPreview(prev => {
       const newPreview = [...prev];
-      URL.revokeObjectURL(newPreview[index].url); // Avoid memory leaks
+      if (newPreview[index].url.startsWith('blob:')) {
+        URL.revokeObjectURL(newPreview[index].url);
+      }
       newPreview.splice(index, 1);
       return newPreview;
     });
@@ -252,7 +200,6 @@ function NuevoServicioContent() {
   const [currentStep, setCurrentStep] = useState(1);
 
   const validateStep1 = () => {
-    if (storeCategories.length === 0) return 'Debes definir al menos una categoría para tu negocio en "Mis Tiendas" antes de publicar.';
     if (mediaPreview.length === 0) return 'Debes subir al menos una foto o video.';
     if (!mediaPreview.some(m => m.type === 'image')) return 'Debes subir al menos una imagen para que sirva de portada.';
     if (!title || title.trim().length < 6) return 'El nombre del servicio debe tener al menos 6 caracteres.';
@@ -262,7 +209,6 @@ function NuevoServicioContent() {
 
   const validateStep2 = () => {
     if (!price || parseFloat(price) <= 0) return 'Debes ingresar un precio válido.';
-    if (stockMode === 'definido' && (!stock || parseInt(stock) < 1)) return 'Debes ingresar una cantidad de stock válida.';
     return null;
   };
 
@@ -286,102 +232,83 @@ function NuevoServicioContent() {
     window.scrollTo({ top: 0, behavior: 'smooth' });
   };
 
-  const handleSubmit = () => {
+  const handleSubmit = async () => {
     setFormError(null);
 
-    const savedProfile = localStorage.getItem('cazamarket_profile');
-    if (!savedProfile) {
-      setFormError('Debes completar la configuración de tu cuenta antes de publicar.');
-      return;
-    }
-    
-    const profile = JSON.parse(savedProfile);
-    if (profile.tipoPersona === 'juridica' && (!profile.cuit || profile.cuit.trim() === '')) {
-      setFormError('Falta información: Debes ingresar tu CUIT en la página de configuración antes de publicar.');
-      return;
-    }
-    
-    if (profile.tipoPersona === 'fisica' && (!profile.dob || profile.dob.trim() === '')) {
-      setFormError('Falta información: Debes ingresar tu fecha de nacimiento / edad en la página de configuración antes de publicar.');
+    if (!supabaseUser) {
+      setFormError('Debes iniciar sesión para publicar un servicio.');
       return;
     }
 
-    // Validation removed for shipping cost (0 or empty means 'a acordar')
-
-    // Si todo esta OK, simulamos publicacion y volvemos
-    const newProduct = {
-      id: editId ? Number(editId) : Date.now(),
-      name: title,
-      price: `${currency} ${price}`, // Formatted
-      store: profile.storeName || username || 'Mi Negocio',
-      storeId: 1,
-      sellerType: 'Mixto',
-      verified: true,
-      avatar: profile.avatar || userAvatar || 'https://ui-avatars.com/api/?name=Mi+Negocio&background=ff7300&color=fff',
-      category: category,
-      subcategory: subcategory,
-      description: description,
-      image: mediaPreview.find(m => m.type === 'image')?.url || 'https://images.unsplash.com/photo-1595246140625-573b715d11dc?q=80&w=1200&auto=format&fit=crop',
-      media: mediaPreview.map(m => ({ url: m.url, type: m.type })),
-      condition: condition.charAt(0).toUpperCase() + condition.slice(1), // Nuevo -> Nuevo
-      rating: '0.0',
-      pricePeriod: pricePeriod,
-      usesCalendar: usesCalendar,
-      serviceLocation: serviceLocation,
-      showServiceArea: showServiceArea,
-      serviceLocationCoords: serviceLocationCoords ? { lat: serviceLocationCoords[0], lng: serviceLocationCoords[1] } : null,
-      serviceAreaCoords: areaPoints.length > 0 ? areaPoints : null,
-      serviceAreaType: showServiceArea ? (serviceLocationCoords ? 'both' : 'area') : 'point',
-      features: features,
-      discount: hasDiscount ? { name: discountName, type: discountType, value: discountValue } : null,
-      timeDiscounts: hasDiscount ? timeDiscounts : [],
-      earlyBirdDiscounts: hasDiscount ? earlyBirdDiscounts : [],
-      seasonRules: hasDiscount ? seasonRules : [],
-      blockedDates: blockedDates
-    };
-
-    const existingStr = localStorage.getItem('cazamarket_my_services');
-    let existing = existingStr ? JSON.parse(existingStr) : [];
-    
-    // Cleanup: Remove massive base64 strings ONLY from old products (not the one being added)
-    existing = existing.map((p: any) => {
-      // Ignoramos el producto actual si se está editando
-      if (editId && p.id === Number(editId)) return p;
-      
-      if (p.image && p.image.length > 1000 && p.image.startsWith('data:')) {
-        p.image = 'https://images.unsplash.com/photo-1595246140625-573b715d11dc?q=80&w=1200&auto=format&fit=crop';
-      }
-      if (p.media) {
-        p.media = p.media.map((m: any) => ({
-          ...m,
-          url: m.url && m.url.length > 1000 && m.url.startsWith('data:') ? 'https://images.unsplash.com/photo-1595246140625-573b715d11dc?q=80&w=1200&auto=format&fit=crop' : m.url
-        }));
-      }
-      return p;
-    });
+    setIsSubmitting(true);
 
     try {
-      if (editId) {
-        const idx = existing.findIndex((p: any) => p.id === Number(editId));
-        if (idx !== -1) {
-          existing[idx] = { ...existing[idx], ...newProduct };
-          localStorage.setItem('cazamarket_my_services', JSON.stringify(existing));
+      const uploadedMedia = [];
+      for (const m of mediaPreview) {
+        if (m.file) {
+          const fileExt = m.file.name.split('.').pop();
+          const fileName = `${Math.random()}.${fileExt}`;
+          const filePath = `${supabaseUser.id}/${fileName}`;
+          
+          const { error: uploadError } = await supabase.storage
+            .from('MediaCazaMarket')
+            .upload(filePath, m.file);
+            
+          if (uploadError) {
+            console.error('Upload error:', uploadError);
+            continue;
+          }
+          
+          const { data } = supabase.storage.from('MediaCazaMarket').getPublicUrl(filePath);
+          uploadedMedia.push({ url: data.publicUrl, type: m.type });
+        } else {
+          uploadedMedia.push({ url: m.url, type: m.type });
         }
-      } else {
-        localStorage.setItem('cazamarket_my_services', JSON.stringify([newProduct, ...existing]));
       }
+
+      const newService = {
+        user_id: supabaseUser.id,
+        name: title,
+        price: `${currency} ${price}`,
+        category: category,
+        subcategory: subcategory,
+        description: description,
+        image: uploadedMedia.find(m => m.type === 'image')?.url || 'https://images.unsplash.com/photo-1595246140625-573b715d11dc?q=80&w=1200&auto=format&fit=crop',
+        media: uploadedMedia,
+        service_location: serviceLocation,
+        location_radius: showServiceArea ? (areaPoints.length > 0 ? JSON.stringify(areaPoints) : null) : null,
+        features: features,
+        has_discount: hasDiscount,
+        discount_name: hasDiscount ? discountName : null,
+        discount_type: hasDiscount ? discountType : null,
+        discount_value: hasDiscount ? discountValue : null,
+        time_discounts: hasDiscount && timeDiscounts.length > 0 ? timeDiscounts : [],
+        early_bird_discounts: hasDiscount && earlyBirdDiscounts.length > 0 ? earlyBirdDiscounts : [],
+        season_rules: hasDiscount && seasonRules.length > 0 ? seasonRules : [],
+        volume_discounts: hasDiscount && volumeDiscounts.length > 0 ? volumeDiscounts : []
+      };
+
+      if (editId) {
+        const { error } = await supabase.from('services').update(newService).eq('id', editId).eq('user_id', supabaseUser.id);
+        if (error) throw error;
+      } else {
+        const { error } = await supabase.from('services').insert([newService]);
+        if (error) throw error;
+      }
+      
       router.push('/mis-tiendas');
-    } catch (error) {
-      console.warn('Quota exceeded:', error);
-      setFormError('Error: Se superó el límite de almacenamiento local (5MB). Por favor sube imágenes más pequeñas o elimina productos viejos.');
+    } catch (error: any) {
+      console.error('DB error:', error);
+      setFormError('Ocurrió un error al guardar el servicio. Inténtalo de nuevo.');
       window.scrollTo({ top: 0, behavior: 'smooth' });
+    } finally {
+      setIsSubmitting(false);
     }
   };
 
   return (
     <div style={{ padding: 'var(--spacing-8) var(--spacing-4)', maxWidth: '1000px', margin: '0 auto', minHeight: '80vh' }}>
       
-      {/* Breadcrumbs */}
       <div style={{ marginBottom: '24px', display: 'flex', alignItems: 'center', gap: '8px' }}>
         <Link href="/mis-tiendas" style={{ color: 'var(--color-text-muted)', textDecoration: 'none', fontSize: '0.9rem', display: 'flex', alignItems: 'center', gap: '6px' }}>
           <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><polyline points="15 18 9 12 15 6"></polyline></svg>
@@ -396,61 +323,17 @@ function NuevoServicioContent() {
         <p style={{ color: 'var(--color-text-muted)', fontSize: '1rem', margin: 0 }}>{editId ? 'Modifica los detalles de tu artículo.' : 'Completa los detalles de tu artículo para publicarlo en la tienda.'}</p>
       </div>
 
-      {/* Progress Bar */}
       <div style={{ display: 'flex', gap: '8px', marginBottom: '32px' }}>
         {[1, 2, 3].map(step => (
           <div key={step} style={{ flex: 1, height: '4px', background: currentStep >= step ? 'var(--color-primary)' : 'rgba(255,255,255,0.1)', borderRadius: '2px', transition: 'background 0.3s' }} />
         ))}
       </div>
 
-      {storeCategories.length === 0 && (
-        <div style={{
-          padding: '16px 20px',
-          background: 'rgba(239, 68, 68, 0.1)',
-          border: '1px solid rgba(239, 68, 68, 0.3)',
-          borderRadius: 'var(--radius-md)',
-          color: '#f87171',
-          marginBottom: '24px',
-          display: 'flex',
-          alignItems: 'center',
-          justifyContent: 'space-between',
-          gap: '16px',
-          flexWrap: 'wrap'
-        }}>
-          <div>
-            <h4 style={{ margin: '0 0 4px 0', fontSize: '1rem', fontWeight: 700, color: '#ef4444' }}>
-              Categorías de negocio no definidas
-            </h4>
-            <p style={{ margin: 0, fontSize: '0.85rem', color: 'var(--color-text-muted)' }}>
-              Debes seleccionar las categorías de tu negocio en "Mis Tiendas" para poder crear publicaciones.
-            </p>
-          </div>
-          <button 
-            type="button"
-            onClick={() => router.push('/mis-tiendas')}
-            style={{
-              padding: '8px 16px',
-              background: 'var(--color-primary)',
-              color: '#fff',
-              border: 'none',
-              borderRadius: 'var(--radius-full)',
-              fontWeight: 600,
-              cursor: 'pointer',
-              fontSize: '0.85rem',
-              whiteSpace: 'nowrap'
-            }}
-          >
-            Configurar en Mis Tiendas
-          </button>
-        </div>
-      )}
-
       <div className="glass-panel" style={{ padding: 'var(--spacing-6)', borderRadius: 'var(--radius-lg)' }}>
         <div style={{ display: 'grid', gridTemplateColumns: '1fr', gap: '32px' }}>
 
           {currentStep === 1 && (
             <>
-              {/* Image/Video Upload Area */}
           <div>
             <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '12px' }}>
               <label style={{ display: 'block', color: 'var(--color-text-main)', fontWeight: 600, margin: 0 }}>
