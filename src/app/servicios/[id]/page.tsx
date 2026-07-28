@@ -445,6 +445,18 @@ export default function ServicioDetailPage({ params }: { params: Promise<{ id: s
               </div>
             </div>
 
+            {/* Categoría */}
+            <div style={{ display: 'flex', gap: '8px', flexWrap: 'wrap', marginBottom: '12px' }}>
+              <span style={{ background: 'transparent', color: 'var(--color-primary)', border: '1px solid var(--color-primary)', padding: '4px 12px', borderRadius: '12px', fontSize: '0.8rem', fontWeight: 600, display: 'inline-block' }}>
+                {service.category || 'Servicio'}
+              </span>
+              {service.subcategory && (
+                <span style={{ background: 'transparent', color: 'var(--color-text-main)', border: '1px solid var(--color-border)', padding: '4px 12px', borderRadius: '12px', fontSize: '0.8rem', fontWeight: 600, display: 'inline-block' }}>
+                  {service.subcategory}
+                </span>
+              )}
+            </div>
+
             {/* Título */}
             <h1 style={{ fontSize: '2.2rem', margin: '0 0 12px 0', color: 'var(--color-text-main)', lineHeight: 1.2 }}>
               {service.name}
@@ -711,34 +723,37 @@ export default function ServicioDetailPage({ params }: { params: Promise<{ id: s
               </div>
             )}
 
-            <div style={{ display: 'flex', gap: '12px', width: '100%', marginTop: '12px' }}>
-              <Link href="/chat" style={{ textDecoration: 'none', flex: 1 }}>
-                <button
-                  style={{ 
-                    width: '100%', 
-                    padding: '14px 18px', 
-                    fontSize: '0.95rem', 
-                    fontWeight: 600, 
-                    borderRadius: '12px', 
-                    background: themeColors.surfaceElevated, 
-                    border: `1px solid ${themeColors.borderSubtle3}`, 
-                    color: themeColors.textWhite, 
-                    cursor: 'pointer', 
-                    transition: 'all 0.2s ease', 
-                    display: 'flex', 
-                    justifyContent: 'center', 
-                    alignItems: 'center', 
-                    gap: '8px',
-                    boxShadow: '0 4px 15px rgba(0, 0, 0, 0.05)'
-                  }}
-                  onMouseEnter={(e) => { e.currentTarget.style.borderColor = 'var(--color-primary)'; e.currentTarget.style.color = 'var(--color-primary)'; e.currentTarget.style.transform = 'translateY(-2px)'; }}
-                  onMouseLeave={(e) => { e.currentTarget.style.borderColor = themeColors.borderSubtle3; e.currentTarget.style.color = themeColors.textWhite; e.currentTarget.style.transform = 'translateY(0)'; }}
-                >
-                  <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="var(--color-primary)" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"></path></svg>
-                  <span>Chat Directo</span>
-                </button>
-              </Link>
-            </div>
+            {/* Chat Directo (Sólo si tiene plan compatible) */}
+            {hasFeature('chat') && (
+              <div style={{ display: 'flex', gap: '12px', width: '100%', marginTop: '12px' }}>
+                <Link href="/chat" style={{ textDecoration: 'none', flex: 1 }}>
+                  <button
+                    style={{ 
+                      width: '100%', 
+                      padding: '14px 18px', 
+                      fontSize: '0.95rem', 
+                      fontWeight: 600, 
+                      borderRadius: '12px', 
+                      background: themeColors.surfaceElevated, 
+                      border: `1px solid ${themeColors.borderSubtle3}`, 
+                      color: themeColors.textWhite, 
+                      cursor: 'pointer', 
+                      transition: 'all 0.2s ease', 
+                      display: 'flex', 
+                      justifyContent: 'center', 
+                      alignItems: 'center', 
+                      gap: '8px',
+                      boxShadow: '0 4px 15px rgba(0, 0, 0, 0.05)'
+                    }}
+                    onMouseEnter={(e) => { e.currentTarget.style.borderColor = 'var(--color-primary)'; e.currentTarget.style.color = 'var(--color-primary)'; e.currentTarget.style.transform = 'translateY(-2px)'; }}
+                    onMouseLeave={(e) => { e.currentTarget.style.borderColor = themeColors.borderSubtle3; e.currentTarget.style.color = themeColors.textWhite; e.currentTarget.style.transform = 'translateY(0)'; }}
+                  >
+                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="var(--color-primary)" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"></path></svg>
+                    <span>Chat Directo</span>
+                  </button>
+                </Link>
+              </div>
+            )}
           </div>
 
         </div>

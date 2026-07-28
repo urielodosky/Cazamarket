@@ -100,15 +100,18 @@ export default function ProductoDetailPage({ params }: { params: Promise<{ id: s
             name: data.name,
             price: data.price,
             category: data.category,
+            subcategory: data.subcategory,
             condition: data.condition,
+            stockMode: data.stock_mode || 'ilimitado',
+            stock: data.stock || null,
             description: data.description,
             images: [data.image],
             media: data.media || [{ url: data.image, type: 'image' }],
             features: data.features || [],
-            originalPrice: data.has_discount && data.discount_type === 'fijo' 
-              ? (parseFloat(data.price.replace(/[^0-9.]/g, '')) + parseFloat(data.discount_value)) 
-              : data.has_discount && data.discount_type === 'porcentaje'
-              ? (parseFloat(data.price.replace(/[^0-9.]/g, '')) / (1 - (parseFloat(data.discount_value) / 100))) 
+            originalPrice: data.has_discount && data.discount_type === 'fijo' && parseFloat(data.discount_value) > 0
+              ? (parseFloat(String(data.price).replace(/[^0-9.]/g, '')) + parseFloat(data.discount_value)) 
+              : data.has_discount && data.discount_type === 'porcentaje' && parseFloat(data.discount_value) > 0
+              ? (parseFloat(String(data.price).replace(/[^0-9.]/g, '')) / (1 - (parseFloat(data.discount_value) / 100))) 
               : undefined,
             discount: data.has_discount ? { name: data.discount_name, type: data.discount_type, value: data.discount_value } : undefined,
             seller: {
@@ -331,15 +334,22 @@ export default function ProductoDetailPage({ params }: { params: Promise<{ id: s
         <div style={{ display: 'flex', flexDirection: 'column', gap: '20px' }}>
 
           <div>
-            <span style={{ background: 'transparent', color: 'var(--color-primary)', border: '1px solid var(--color-primary)', padding: '4px 12px', borderRadius: '12px', fontSize: '0.8rem', fontWeight: 600, display: 'inline-block', marginBottom: '12px' }}>
-              {product.category}
-            </span>
+            <div style={{ display: 'flex', gap: '8px', flexWrap: 'wrap', marginBottom: '12px' }}>
+              <span style={{ background: 'transparent', color: 'var(--color-primary)', border: '1px solid var(--color-primary)', padding: '4px 12px', borderRadius: '12px', fontSize: '0.8rem', fontWeight: 600, display: 'inline-block' }}>
+                {product.category}
+              </span>
+              {product.subcategory && (
+                <span style={{ background: 'transparent', color: 'var(--color-text-main)', border: '1px solid var(--color-border)', padding: '4px 12px', borderRadius: '12px', fontSize: '0.8rem', fontWeight: 600, display: 'inline-block' }}>
+                  {product.subcategory}
+                </span>
+              )}
+            </div>
             <h1 style={{ fontSize: '2.2rem', color: 'var(--color-text-main)', margin: '0 0 12px 0', lineHeight: 1.2, fontWeight: 700, letterSpacing: '-0.3px' }}>
               {product.name}
             </h1>
 
-            {/* ID y Condición */}
-            <div style={{ display: 'flex', alignItems: 'center', gap: '12px', marginBottom: '24px' }}>
+            {/* ID, Condición y Stock */}
+            <div style={{ display: 'flex', alignItems: 'center', gap: '12px', marginBottom: '24px', flexWrap: 'wrap' }}>
               <span style={{ color: 'color-mix(in srgb, var(--color-text-main) 60%, transparent)', fontSize: '0.9rem' }}>
                 ID: #{productId}
               </span>
@@ -347,6 +357,14 @@ export default function ProductoDetailPage({ params }: { params: Promise<{ id: s
               <span style={{ color: 'var(--color-primary)', fontSize: '0.9rem', fontWeight: 600, textTransform: 'uppercase' }}>
                 {product.condition}
               </span>
+              {product.stockMode === 'definido' && product.stock !== null && (
+                <>
+                  <span style={{ color: 'color-mix(in srgb, var(--color-text-main) 30%, transparent)' }}>•</span>
+                  <span style={{ color: 'var(--color-text-muted)', fontSize: '0.9rem' }}>
+                    Stock disponible: <strong style={{ color: 'var(--color-text-main)' }}>{product.stock}</strong>
+                  </span>
+                </>
+              )}
             </div>
 
             {/* Precio */}
@@ -651,33 +669,35 @@ export default function ProductoDetailPage({ params }: { params: Promise<{ id: s
               )}
             </button>
 
-            {/* 4. Chat Directo */}
-            <Link href="/chat" style={{ textDecoration: 'none', width: '100%' }}>
-              <button 
-                style={{ 
-                  width: '100%', 
-                  padding: '14px 18px', 
-                  fontSize: '0.95rem', 
-                  fontWeight: 600, 
-                  borderRadius: '12px', 
-                  background: themeColors.surfaceElevated, 
-                  border: `1px solid ${themeColors.borderSubtle3}`, 
-                  color: themeColors.textWhite, 
-                  cursor: 'pointer', 
-                  transition: 'all 0.2s ease', 
-                  display: 'flex', 
-                  justifyContent: 'center', 
-                  alignItems: 'center', 
-                  gap: '8px',
-                  boxShadow: '0 4px 15px rgba(0, 0, 0, 0.05)' 
-                }}
-                onMouseEnter={(e) => { e.currentTarget.style.borderColor = 'var(--color-primary)'; e.currentTarget.style.color = 'var(--color-primary)'; e.currentTarget.style.transform = 'translateY(-2px)'; }}
-                onMouseLeave={(e) => { e.currentTarget.style.borderColor = themeColors.borderSubtle3; e.currentTarget.style.color = themeColors.textWhite; e.currentTarget.style.transform = 'translateY(0)'; }}
-              >
-                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="var(--color-primary)" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"></path></svg>
-                <span>Chat</span>
-              </button>
-            </Link>
+            {/* 4. Chat Directo (Sólo si tiene plan compatible) */}
+            {hasFeature('chat') && (
+              <Link href="/chat" style={{ textDecoration: 'none', width: '100%' }}>
+                <button 
+                  style={{ 
+                    width: '100%', 
+                    padding: '14px 18px', 
+                    fontSize: '0.95rem', 
+                    fontWeight: 600, 
+                    borderRadius: '12px', 
+                    background: themeColors.surfaceElevated, 
+                    border: `1px solid ${themeColors.borderSubtle3}`, 
+                    color: themeColors.textWhite, 
+                    cursor: 'pointer', 
+                    transition: 'all 0.2s ease', 
+                    display: 'flex', 
+                    justifyContent: 'center', 
+                    alignItems: 'center', 
+                    gap: '8px',
+                    boxShadow: '0 4px 15px rgba(0, 0, 0, 0.05)' 
+                  }}
+                  onMouseEnter={(e) => { e.currentTarget.style.borderColor = 'var(--color-primary)'; e.currentTarget.style.color = 'var(--color-primary)'; e.currentTarget.style.transform = 'translateY(-2px)'; }}
+                  onMouseLeave={(e) => { e.currentTarget.style.borderColor = themeColors.borderSubtle3; e.currentTarget.style.color = themeColors.textWhite; e.currentTarget.style.transform = 'translateY(0)'; }}
+                >
+                  <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="var(--color-primary)" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"></path></svg>
+                  <span>Chat</span>
+                </button>
+              </Link>
+            )}
           </div>
 
         </div>
