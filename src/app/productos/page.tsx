@@ -54,8 +54,12 @@ function ProductosContent() {
       const { data, error } = await query;
       if (data && !error) {
         // Formatear los productos de Supabase para que coincidan con la UI si es necesario
-        // Supabase usa image, price, condition etc. 
-        setLocalProducts(data);
+        const formattedData = data.map(p => ({
+          ...p,
+          store: p.profiles?.store_name || `${p.profiles?.first_name || ''} ${p.profiles?.last_name || ''}`.trim() || 'Usuario Anónimo',
+          avatar: p.profiles?.avatar_url || 'https://images.unsplash.com/photo-1511497584788-876760111969?q=80&w=200&auto=format&fit=crop',
+        }));
+        setLocalProducts(formattedData);
       }
     };
     fetchProducts();
@@ -258,84 +262,85 @@ function ProductosContent() {
             <div className="aspect-image-4-3" style={{ backgroundImage: `url(${producto.image})` }}>
             </div>
             <div className="card-content-fluid" style={{ display: 'flex', flexDirection: 'column', flex: 1 }}>
-              
-              <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '8px' }}>
-                 <div 
-                   style={{ display: 'flex', alignItems: 'center', gap: '8px', cursor: (producto.storeId === 1 && !hasFeature('tiendaVirtual')) ? 'default' : 'pointer' }}
-                   onClick={(e) => {
-                     e.stopPropagation();
-                     if (producto.storeId === 1 && !hasFeature('tiendaVirtual')) return;
-                     if (producto.storeId) router.push(`/negocios/${producto.storeId}`);
-                   }}
-                 >
-                   <div style={{ position: 'relative', width: '36px', height: '36px', flexShrink: 0 }}>
-                     <img 
-                       src={producto.avatar} 
-                       alt={producto.store} 
-                       style={{ width: '100%', height: '100%', borderRadius: '50%', objectFit: 'cover', border: '1px solid var(--color-border)', color: 'transparent' }} 
-                     />
-                     {(producto.storeId === 1 ? hasFeature('insigniaVerificada') : producto.verified) && (
-                       <span title="Negocio Verificado" style={{ position: 'absolute', bottom: '-2px', right: '-2px', width: '16px', height: '16px', borderRadius: '50%', background: 'var(--color-primary)', display: 'flex', alignItems: 'center', justifyContent: 'center', border: '2px solid var(--color-bg-base)' }}>
-                         <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="#fff" strokeWidth="4" strokeLinecap="round" strokeLinejoin="round"><polyline points="20 6 9 17 4 12"></polyline></svg>
-                       </span>
-                     )}
-                   </div>
-                   <span style={{ color: 'var(--color-primary)', fontSize: '0.75rem', textTransform: 'uppercase', fontWeight: 'bold' }}>
-                     {producto.store}
-                   </span>
-                 </div>
-                  <div style={{ display: 'flex', gap: '4px', flexWrap: 'wrap' }}>
-                    <span style={{ background: 'rgba(255,255,255,0.05)', color: 'var(--color-text-muted)', fontSize: '0.7rem', padding: '2px 8px', borderRadius: 'var(--radius-full)' }}>
-                      {producto.category}
+              {/* Foto de perfil + Username */}
+              <div style={{ display: 'flex', alignItems: 'center', gap: '8px', cursor: (producto.storeId === 1 && !hasFeature('tiendaVirtual')) ? 'default' : 'pointer', marginBottom: '8px' }} onClick={(e) => { e.stopPropagation(); if (producto.storeId === 1 && !hasFeature('tiendaVirtual')) return; if (producto.storeId) router.push(`/negocios/${producto.storeId}`); }}>
+                <div style={{ position: 'relative', width: '30px', height: '30px', flexShrink: 0 }}>
+                  <img src={producto.avatar} alt={producto.store} style={{ width: '100%', height: '100%', borderRadius: '50%', objectFit: 'cover', border: '1px solid var(--color-border)' }} />
+                  {(producto.storeId === 1 ? hasFeature('insigniaVerificada') : producto.verified) && (
+                    <span title="Negocio Verificado" style={{ position: 'absolute', bottom: '-2px', right: '-2px', width: '12px', height: '12px', borderRadius: '50%', background: 'var(--color-primary)', display: 'flex', alignItems: 'center', justifyContent: 'center', border: '2px solid var(--color-bg-base)' }}>
+                      <svg width="8" height="8" viewBox="0 0 24 24" fill="none" stroke="#fff" strokeWidth="4" strokeLinecap="round" strokeLinejoin="round"><polyline points="20 6 9 17 4 12"></polyline></svg>
                     </span>
-                    {producto.subcategory && (
-                      <span style={{ background: 'rgba(255, 115, 0, 0.1)', color: 'var(--color-primary)', fontSize: '0.7rem', padding: '2px 8px', borderRadius: 'var(--radius-full)', border: '1px solid rgba(255, 115, 0, 0.2)' }}>
-                        {producto.subcategory}
-                      </span>
-                    )}
-                  </div>
+                  )}
+                </div>
+                <span style={{ color: 'var(--color-primary)', fontSize: '0.8rem', textTransform: 'uppercase', fontWeight: 'bold' }}>{producto.store}</span>
               </div>
 
+              {/* Nombre del producto */}
               <h3 style={{ fontSize: '1.1rem', color: 'var(--color-text-main)', margin: '0 0 var(--spacing-2) 0' }}>{producto.name}</h3>
               
-              <p style={{ color: 'var(--color-text-muted)', fontSize: '0.85rem', lineHeight: 1.4, margin: '0 0 var(--spacing-4) 0', display: '-webkit-box', WebkitLineClamp: 2, WebkitBoxOrient: 'vertical', overflow: 'hidden' }}>
+              {/* Descripcion (max 3 lineas) */}
+              <p style={{ color: 'var(--color-text-muted)', fontSize: '0.85rem', lineHeight: 1.4, margin: '0 0 var(--spacing-4) 0', display: '-webkit-box', WebkitLineClamp: 3, WebkitBoxOrient: 'vertical', overflow: 'hidden' }}>
                 {producto.description}
               </p>
+
+              {/* Categoria + +1 */}
+              <div style={{ display: 'flex', gap: '4px', flexWrap: 'wrap', marginBottom: 'auto' }}>
+                <span style={{ background: 'rgba(255,255,255,0.05)', color: 'var(--color-text-muted)', fontSize: '0.7rem', padding: '2px 8px', borderRadius: 'var(--radius-full)' }}>
+                  {producto.category}
+                </span>
+                {producto.subcategory && (
+                  <span title={producto.subcategory} style={{ background: 'rgba(255, 115, 0, 0.1)', color: 'var(--color-primary)', fontSize: '0.7rem', padding: '2px 8px', borderRadius: 'var(--radius-full)', border: '1px solid rgba(255, 115, 0, 0.2)', cursor: 'help' }}>
+                    +1
+                  </span>
+                )}
+              </div>
               
-              <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-end', marginTop: 'auto' }}>
-                <div>
-                  <span style={{ display: 'block', fontSize: '0.8rem', color: 'var(--color-text-muted)' }}>{producto.condition}</span>
+              <div style={{ marginTop: '12px' }}>
+                {/* Price + Stock */}
+                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'baseline', marginBottom: '4px' }}>
                   <div style={{ display: 'flex', alignItems: 'baseline', gap: '4px' }}>
-                    {producto.price.includes(' ') ? (
+                    {producto.price?.includes && producto.price.includes(' ') ? (
                       <>
                         <span style={{ fontSize: '1.2rem', fontWeight: 'bold', color: '#a8b87c' }}>{producto.price.split(' ').slice(1).join(' ')}</span>
                         <span style={{ fontSize: '0.8rem', fontWeight: 'bold', color: '#a8b87c' }}>{producto.price.split(' ')[0]}</span>
                       </>
                     ) : (
-                      <span style={{ fontSize: '1.2rem', fontWeight: 'bold', color: '#a8b87c' }}>{producto.price}</span>
+                      <span style={{ fontSize: '1.2rem', fontWeight: 'bold', color: '#a8b87c' }}>{typeof producto.price === 'number' ? '$ ' + producto.price.toLocaleString('es-AR') : producto.price}</span>
                     )}
                   </div>
+                  {((producto.stock_mode === 'definido' || producto.stockMode === 'definido') && producto.stock !== null && producto.stock !== undefined) && (
+                    <span style={{ fontSize: '0.75rem', color: 'var(--color-text-muted)' }}>Stock: {producto.stock}</span>
+                  )}
                 </div>
                 
-                <button 
-                  onClick={(e) => {
-                    e.stopPropagation();
-                    router.push(`/productos/${producto.id}`);
-                  }}
-                  style={{ 
-                    padding: '8px 16px', 
-                    borderRadius: 'var(--radius-full)', 
-                    color: 'var(--color-primary)', 
-                    fontSize: '0.85rem',
-                    fontWeight: 600,
-                    whiteSpace: 'nowrap',
-                    background: 'transparent',
-                    border: '1px solid var(--color-primary)',
-                    cursor: 'pointer'
-                  }}
-                >
-                  Ver
-                </button>
+                {/* Shipping / Retiro */}
+                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                  <span style={{ fontSize: '0.75rem', color: 'color-mix(in srgb, var(--color-text-main) 60%, transparent)' }}>
+                    {producto.shipping_mode === 'gratis' || producto.seller?.shippingCost === 0 || producto.shippingCost === 0
+                      ? 'Envío gratis'
+                      : producto.shipping_mode === 'costo_extra' || (producto.seller?.shippingCost && typeof producto.seller.shippingCost === 'number' && producto.seller.shippingCost > 0) || producto.shippingCost > 0
+                        ? 'Envío con costo'
+                        : producto.pickup_available === 'si' || (producto.seller?.branches && producto.seller.branches.length > 0)
+                          ? 'Retiro en sucursal'
+                          : ''}
+                  </span>
+                  <button 
+                    onClick={(e) => { e.stopPropagation(); router.push(`/productos/${producto.id}`); }}
+                    style={{ 
+                      padding: '8px 16px', 
+                      borderRadius: 'var(--radius-full)', 
+                      color: 'var(--color-primary)', 
+                      fontSize: '0.85rem',
+                      fontWeight: 600,
+                      whiteSpace: 'nowrap',
+                      background: 'transparent',
+                      border: '1px solid var(--color-primary)',
+                      cursor: 'pointer'
+                    }}
+                  >
+                    Ver
+                  </button>
+                </div>
               </div>
             </div>
           </div>
