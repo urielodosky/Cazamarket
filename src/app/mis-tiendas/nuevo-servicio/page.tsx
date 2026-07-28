@@ -467,9 +467,9 @@ function NuevoServicioContent() {
               {features.length > 0 && (
                 <ul style={{ listStyle: 'none', padding: 0, margin: 0, display: 'flex', flexDirection: 'column', gap: '8px' }}>
                   {features.map((feat, i) => (
-                    <li key={i} style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', background: 'rgba(255,255,255,0.05)', padding: '8px 12px', borderRadius: 'var(--radius-sm)' }}>
-                      <span style={{ color: 'var(--color-text-main)' }}>• {feat}</span>
-                      <button type="button" onClick={() => removeFeature(i)} style={{ background: 'none', border: 'none', color: '#ef4444', cursor: 'pointer' }}>✕</button>
+                    <li key={i} style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', background: 'rgba(255,255,255,0.05)', padding: '8px 12px', borderRadius: 'var(--radius-sm)' }}>
+                      <span style={{ color: 'var(--color-text-main)', overflowWrap: 'break-word', wordBreak: 'break-word', flex: 1, marginRight: '8px' }}>• {feat}</span>
+                      <button type="button" onClick={() => removeFeature(i)} style={{ background: 'none', border: 'none', color: '#ef4444', cursor: 'pointer', flexShrink: 0 }}>✕</button>
                     </li>
                   ))}
                 </ul>
