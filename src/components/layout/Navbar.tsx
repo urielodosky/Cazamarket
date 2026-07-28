@@ -192,13 +192,10 @@ export default function Navbar() {
         <div 
           className="navbar-middle-area" 
           style={{ 
-            position: 'absolute',
-            left: '50%',
-            transform: 'translateX(-50%)',
             display: 'flex', 
             gap: '12px', 
             transition: 'all 0.5s cubic-bezier(0.4, 0, 0.2, 1)', 
-            alignItems: 'flex-start'
+            alignItems: 'stretch'
           }}
         >
           <div className={`navbar-center glass-panel ${navbarModeClass}`}>
@@ -315,7 +312,7 @@ export default function Navbar() {
           <div 
             className="filters-panel"
           style={{
-            width: isFiltersOpen ? (pathname.startsWith('/comunidad') ? '240px' : '580px') : '0px',
+            width: isFiltersOpen ? (pathname.startsWith('/comunidad') ? '240px' : '480px') : '0px',
             opacity: isFiltersOpen ? 1 : 0,
             visibility: isFiltersOpen ? 'visible' : 'hidden',
             overflow: isFiltersOpen ? 'visible' : 'hidden',
@@ -329,7 +326,7 @@ export default function Navbar() {
             flexDirection: 'column',
             marginLeft: isFiltersOpen ? '0px' : '-16px',
             zIndex: 5,
-            backgroundColor: 'var(--color-bg-surface-elevated)',
+            backgroundColor: '#1a1e16',
             border: '1px solid rgba(255, 255, 255, 0.05)'
           }}
         >

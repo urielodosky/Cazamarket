@@ -37,7 +37,7 @@
 /* Sliding Navbar Animation */
 .navbar-center {
   position: relative;
-  background-color: var(--color-bg-surface-elevated);
+  background-color: #1a1e16;
   border-radius: var(--radius-full);
   border: 1px solid rgba(255, 255, 255, 0.05); /* Borde sutil, no naranja */
   transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
@@ -67,7 +67,7 @@
   height: 112px;
   border-radius: 20px;
   flex-direction: column;
-  width: 580px; /* Fixed width for stability during transition */
+  width: 480px; /* Fixed width for stability during transition */
   max-width: 100%;
 }
 
