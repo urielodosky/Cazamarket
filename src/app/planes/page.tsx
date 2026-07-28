@@ -256,27 +256,37 @@ export default function PlanesPage() {
           }}>
             {/* Header del modal de pago */}
             <div style={{
-              background: 'linear-gradient(135deg, var(--color-primary), #e06500)',
               padding: '24px 30px',
-              position: 'relative'
+              position: 'relative',
+              borderBottom: '1px solid rgba(255,255,255,0.08)',
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'space-between'
             }}>
               {paymentStep === 'select' && (
                 <button 
                   onClick={() => setPaymentModal({ show: false, plan: null })}
-                  style={{ position: 'absolute', top: '15px', right: '18px', background: 'none', border: 'none', color: 'rgba(255,255,255,0.7)', fontSize: '1.5rem', cursor: 'pointer' }}
+                  style={{ position: 'absolute', top: '24px', right: '24px', background: 'none', border: 'none', color: 'rgba(255,255,255,0.5)', fontSize: '1.5rem', cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center', width: '32px', height: '32px', borderRadius: '50%', transition: 'background 0.2s ease' }}
+                  onMouseOver={(e) => e.currentTarget.style.background = 'rgba(255,255,255,0.1)'}
+                  onMouseOut={(e) => e.currentTarget.style.background = 'transparent'}
                 >×</button>
               )}
-              <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
-                <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="white" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-                  <rect x="1" y="4" width="22" height="16" rx="2" ry="2"></rect>
-                  <line x1="1" y1="10" x2="23" y2="10"></line>
-                </svg>
+              <div style={{ display: 'flex', alignItems: 'center', gap: '16px' }}>
+                <div style={{
+                  width: '48px', height: '48px', borderRadius: '12px', background: 'rgba(255, 115, 0, 0.1)', border: '1px solid rgba(255, 115, 0, 0.2)',
+                  display: 'flex', alignItems: 'center', justifyContent: 'center'
+                }}>
+                  <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="var(--color-primary)" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                    <rect x="1" y="4" width="22" height="16" rx="2" ry="2"></rect>
+                    <line x1="1" y1="10" x2="23" y2="10"></line>
+                  </svg>
+                </div>
                 <div>
-                  <h3 style={{ margin: 0, color: 'white', fontSize: '1.15rem', fontWeight: 700 }}>
+                  <h3 style={{ margin: 0, color: 'white', fontSize: '1.25rem', fontWeight: 600, letterSpacing: '-0.02em' }}>
                     {paymentStep === 'success' ? 'Pago exitoso' : paymentStep === 'processing' ? 'Procesando pago...' : 'Finalizar compra'}
                   </h3>
-                  <p style={{ margin: 0, color: 'rgba(255,255,255,0.8)', fontSize: '0.85rem' }}>
-                    {paymentStep === 'success' ? 'Tu plan ha sido activado' : paymentStep === 'processing' ? 'No cierres esta ventana' : 'Simulación de pago'}
+                  <p style={{ margin: '4px 0 0', color: 'rgba(255,255,255,0.5)', fontSize: '0.85rem' }}>
+                    {paymentStep === 'success' ? 'Tu plan ha sido activado' : paymentStep === 'processing' ? 'No cierres esta ventana' : 'Simulación de pago segura'}
                   </p>
                 </div>
               </div>
