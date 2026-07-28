@@ -301,12 +301,12 @@ export default function MiNegocioPage() {
         </div>
         <div style={{ display: 'flex', alignItems: 'center', gap: '8px', padding: '6px 16px', borderRadius: 'var(--radius-full)', background: 'var(--color-bg-surface-elevated)', border: '1px solid var(--color-border)' }}>
           <span style={{ color: 'var(--color-text-muted)', fontSize: '0.85rem' }}>Productos:</span>
-          <span style={{ color: themeColors.textWhite, fontWeight: 600, fontSize: '0.85rem' }}>0 / {permissions.maxProductos === Infinity ? '∞' : permissions.maxProductos}</span>
+          <span style={{ color: themeColors.textWhite, fontWeight: 600, fontSize: '0.85rem' }}>{myProducts.length} / {permissions.maxProductos === Infinity ? '∞' : permissions.maxProductos}</span>
         </div>
         {permissions.maxServicios > 0 && (
           <div style={{ display: 'flex', alignItems: 'center', gap: '8px', padding: '6px 16px', borderRadius: 'var(--radius-full)', background: 'var(--color-bg-surface-elevated)', border: '1px solid var(--color-border)' }}>
             <span style={{ color: 'var(--color-text-muted)', fontSize: '0.85rem' }}>Servicios:</span>
-            <span style={{ color: themeColors.textWhite, fontWeight: 600, fontSize: '0.85rem' }}>0 / {permissions.maxServicios}</span>
+            <span style={{ color: themeColors.textWhite, fontWeight: 600, fontSize: '0.85rem' }}>{myServices.length} / {permissions.maxServicios}</span>
           </div>
         )}
       </div>
