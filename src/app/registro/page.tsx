@@ -161,41 +161,42 @@ export default function RegistroPage() {
   return (
     <div className="auth-container">
       <div className="auth-card glass-panel">
-        <div className="auth-header" style={{ position: 'relative' }}>
-          {isAwaitingOTP && (
-            <button
-              type="button"
-              onClick={() => { setIsAwaitingOTP(false); setErrorMsg(''); setSuccessMsg(''); }}
-              style={{
-                position: 'absolute',
-                left: '-10px',
-                top: '-10px',
-                background: 'rgba(255,255,255,0.05)',
-                border: '1px solid rgba(255,255,255,0.1)',
-                color: 'var(--color-text-main)',
-                cursor: 'pointer',
-                display: 'flex',
-                alignItems: 'center',
-                justifyContent: 'center',
-                width: '32px',
-                height: '32px',
-                borderRadius: '8px',
-                transition: 'all 0.2s ease',
-              }}
-              onMouseOver={(e) => e.currentTarget.style.background = 'rgba(255,255,255,0.1)'}
-              onMouseOut={(e) => e.currentTarget.style.background = 'rgba(255,255,255,0.05)'}
-              title="Volver al registro"
-            >
-              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-                <line x1="19" y1="12" x2="5" y2="12"></line>
-                <polyline points="12 19 5 12 12 5"></polyline>
-              </svg>
-            </button>
-          )}
-          <h1>{isAwaitingOTP ? 'Verifica tu correo' : isLoginView ? 'Inicia sesión' : 'Crea tu cuenta'} en CazaMarket</h1>
+        <div className="auth-header">
+          <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', position: 'relative', marginBottom: '8px' }}>
+            {isAwaitingOTP && (
+              <button
+                type="button"
+                onClick={() => { setIsAwaitingOTP(false); setErrorMsg(''); setSuccessMsg(''); }}
+                style={{
+                  position: 'absolute',
+                  left: '0',
+                  background: 'transparent',
+                  border: 'none',
+                  color: 'var(--color-text-muted)',
+                  cursor: 'pointer',
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                  width: '32px',
+                  height: '32px',
+                  borderRadius: '50%',
+                  transition: 'all 0.2s ease',
+                }}
+                onMouseOver={(e) => { e.currentTarget.style.background = 'rgba(255,255,255,0.1)'; e.currentTarget.style.color = 'white'; }}
+                onMouseOut={(e) => { e.currentTarget.style.background = 'transparent'; e.currentTarget.style.color = 'var(--color-text-muted)'; }}
+                title="Volver al registro"
+              >
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
+                  <line x1="19" y1="12" x2="5" y2="12"></line>
+                  <polyline points="12 19 5 12 12 5"></polyline>
+                </svg>
+              </button>
+            )}
+            <h1 style={{ margin: 0, fontSize: '1.4rem' }}>{isAwaitingOTP ? 'Verificación' : isLoginView ? 'Inicia sesión' : 'Crea tu cuenta'}</h1>
+          </div>
           <p>
             {isAwaitingOTP 
-              ? 'Ingresa el código de 6 dígitos que te enviamos por correo.'
+              ? 'Ingresa el código de 6 dígitos que te enviamos.'
               : isLoginView 
               ? 'Bienvenido de nuevo cazador. Ingresa a tu cuenta.' 
               : 'Únete a la comunidad más grande de caza y pesca.'}
