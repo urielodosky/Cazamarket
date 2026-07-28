@@ -12,6 +12,8 @@ import { useCart } from '@/contexts/CartContext';
 import { usePlan } from '@/contexts/PlanContext';
 import { useThemeColors } from '@/hooks/useThemeColors';
 import { useAuth } from '@/contexts/AuthContext';
+import { useRouter } from 'next/navigation';
+import { createClient } from '@/lib/supabase/client';
 
 function getSocialUrl(platform: string, handle: string) {
   if (!handle) return null;
@@ -189,16 +191,15 @@ export default function ServicioDetailPage({ params }: { params: Promise<{ id: s
       } catch (e) { }
 
       setService(currentService);
-      setIsLoading(false);
       if (currentService) {
         setTimeout(() => {
           window.scrollTo({ top: 180, behavior: 'smooth' });
         }, 50);
       }
-    }, 1200);
+    };
 
-    return () => clearTimeout(timer);
-  }, []);
+    fetchService();
+  }, [serviceId]);
 
   if (isLoading) {
     return <LoadingScreen message="Buscando los detalles del servicio..." />;

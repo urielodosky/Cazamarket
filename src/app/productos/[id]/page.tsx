@@ -29,7 +29,7 @@ function getSocialUrl(platform: string, handle: string) {
   }
 }
 
-import { createClient } from '@/utils/supabase/client';
+import { createClient } from '@/lib/supabase/client';
 
 export default function ProductoDetailPage({ params }: { params: Promise<{ id: string }> }) {
   const unwrappedParams = use(params);
