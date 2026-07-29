@@ -114,6 +114,39 @@ export default function NegocioDetailPage({ params }: { params: Promise<{ id: st
   }, [searchParams]);
 
   useEffect(() => {
+    const isUuid = /^[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12}$/.test(unwrappedParams.id);
+
+    if (isUuid) {
+      // It's a Supabase UUID, load from Supabase
+      const loadSupabaseProfile = async () => {
+        const supabase = createClient();
+        const { data: profile } = await supabase.from('profiles').select('*').eq('id', unwrappedParams.id).single();
+        
+        if (profile) {
+          const { data: prods } = await supabase.from('products').select('*').eq('user_id', unwrappedParams.id).limit(permissions.maxProductos);
+          const { data: servs } = await supabase.from('services').select('*').eq('user_id', unwrappedParams.id).limit(permissions.maxServicios);
+          
+          setNegocio({
+            ...BLANK_NEGOCIO,
+            id: unwrappedParams.id,
+            name: profile.store_name || profile.full_name || 'Mi Negocio',
+            description: profile.store_description || 'Bienvenido a mi tienda oficial en CazaMarket.',
+            avatar: profile.avatar_url || 'https://images.unsplash.com/photo-1511497584788-876760111969?q=80&w=200&auto=format&fit=crop',
+            phone: profile.phone || 'No especificado',
+            productsCount: prods ? prods.length : 0,
+            servicesCount: servs ? servs.length : 0,
+            productSections: prods && prods.length > 0 ? [{ name: 'Catálogo', products: prods }] : [],
+            serviceSections: servs && servs.length > 0 ? [{ name: 'Catálogo', services: servs }] : []
+          });
+        } else {
+          // If no profile found but it's a valid UUID, just show blank (maybe deleted user)
+          setNegocio({ ...BLANK_NEGOCIO, id: unwrappedParams.id });
+        }
+      };
+      loadSupabaseProfile();
+      return;
+    }
+
     if (negocioId === 1) {
       const savedProfile = localStorage.getItem('cazamarket_profile');
       if (savedProfile) {
@@ -232,7 +265,7 @@ export default function NegocioDetailPage({ params }: { params: Promise<{ id: st
         });
       }
     }
-  }, [negocioId]);
+  }, [unwrappedParams.id, negocioId, permissions.maxProductos, permissions.maxServicios]);
 
   useEffect(() => {
     if (panelRef.current) {
