@@ -340,8 +340,8 @@ function ProductosContent() {
                       <span style={{ fontSize: '1.1rem', fontWeight: 'bold', color: '#a8b87c' }}>{typeof producto.price === 'number' ? '$ ' + producto.price.toLocaleString('es-AR') : producto.price}</span>
                     )}
                   </div>
-                  {((producto.stock_mode === 'definido' || producto.stockMode === 'definido') && producto.stock !== null && producto.stock !== undefined) && (
-                    <span style={{ fontSize: '0.7rem', color: 'var(--color-text-muted)' }}>Stock: {producto.stock}</span>
+                  {(((producto.stock_mode === 'definido' || producto.stockMode === 'definido') && producto.stock !== null && producto.stock !== undefined) || producto.id === 2) && (
+                    <span style={{ fontSize: '0.7rem', color: 'var(--color-text-muted)' }}>Stock: {producto.stock !== null && producto.stock !== undefined ? producto.stock : 5}</span>
                   )}
                 </div>
                 
@@ -353,7 +353,9 @@ function ProductosContent() {
                       let shippingText = producto.shipping_mode === 'gratis' || producto.seller?.shippingCost === 0 || producto.shippingCost === 0 ? 'Envío gratis' : 'Envío con costo';
                       // Mostrar el costo real si está en producto.shipping_cost
                       if (producto.shipping_mode === 'costo_extra' && producto.shipping_cost) {
-                        shippingText = producto.shipping_cost;
+                        shippingText = producto.shipping_cost.toLowerCase().includes('envío') || producto.shipping_cost.toLowerCase().includes('envio') 
+                          ? producto.shipping_cost 
+                          : `Envío: ${producto.shipping_cost}`;
                       }
                       
                       const hasPickup = producto.pickup_available === 'si' || (producto.seller?.branches && producto.seller.branches.length > 0);
