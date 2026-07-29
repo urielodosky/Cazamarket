@@ -219,9 +219,15 @@ function ProductosContent() {
             return (
           <div key={producto.id} className="glass-panel" 
                onClick={() => router.push(`/productos/${producto.id}`)}
-               style={{ position: 'relative', borderRadius: 'var(--radius-lg)', overflow: 'hidden', display: 'flex', flexDirection: 'column', transition: 'transform 0.2s', cursor: 'pointer', ...cardStyles }}
-               onMouseEnter={(e) => e.currentTarget.style.transform = 'translateY(-5px)'}
-               onMouseLeave={(e) => e.currentTarget.style.transform = 'none'}>
+               style={{ position: 'relative', borderRadius: 'var(--radius-lg)', display: 'flex', flexDirection: 'column', transition: 'transform 0.2s', cursor: 'pointer', ...cardStyles }}
+               onMouseEnter={(e) => {
+                 e.currentTarget.style.transform = 'translateY(-5px)';
+                 e.currentTarget.style.zIndex = '100';
+               }}
+               onMouseLeave={(e) => {
+                 e.currentTarget.style.transform = 'none';
+                 e.currentTarget.style.zIndex = '1';
+               }}>
 
             {/* Menu Button (Only for vendor's own products) */}
             {isVendorModeActive && producto.storeId === 1 && (
@@ -272,9 +278,9 @@ function ProductosContent() {
                 <svg width="18" height="18" viewBox="0 0 24 24" fill={isFavorite('productos', producto.id.toString()) ? '#ff4d4d' : 'none'} stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"></path></svg>
               </button>
             </div>
-            <div className="aspect-image-4-3" style={{ backgroundImage: `url(${producto.image})` }}>
+            <div className="aspect-image-4-3" style={{ backgroundImage: `url(${producto.image})`, borderTopLeftRadius: 'var(--radius-lg)', borderTopRightRadius: 'var(--radius-lg)' }}>
             </div>
-            <div className="card-content-fluid" style={{ display: 'flex', flexDirection: 'column', flex: 1 }}>
+            <div className="card-content-fluid" style={{ display: 'flex', flexDirection: 'column', flex: 1, borderBottomLeftRadius: 'var(--radius-lg)', borderBottomRightRadius: 'var(--radius-lg)' }}>
               {/* Foto de perfil + Username */}
               <div style={{ display: 'flex', alignItems: 'center', gap: '8px', cursor: (producto.storeId === 1 && !hasFeature('tiendaVirtual')) ? 'default' : 'pointer', marginBottom: '8px' }} onClick={(e) => { e.stopPropagation(); if (producto.storeId === 1 && !hasFeature('tiendaVirtual')) return; if (producto.storeId) router.push(`/negocios/${producto.storeId}`); }}>
                 <div style={{ position: 'relative', width: '30px', height: '30px', flexShrink: 0 }}>
