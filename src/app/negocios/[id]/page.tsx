@@ -165,6 +165,48 @@ export default function NegocioDetailPage({ params }: { params: Promise<{ id: st
             });
           }
           
+          let localUpdates: any = {};
+          if (isOwnProfile) {
+            const savedProfile = localStorage.getItem('cazamarket_profile');
+            if (savedProfile) {
+              try {
+                const parsed = JSON.parse(savedProfile);
+                
+                const parsedLocations: any[] = [];
+                if (parsed.provincia || parsed.calle) {
+                  parsedLocations.push({
+                    province: getProvinceName(parsed.provincia),
+                    city: parsed.localidad || '',
+                    address: `${parsed.calle || ''} ${parsed.numero || ''}`.trim()
+                  });
+                }
+                if (parsed.sucursales) {
+                  parsed.sucursales.forEach((suc: any) => {
+                    parsedLocations.push({
+                      province: getProvinceName(suc.provincia),
+                      city: suc.localidad || '',
+                      address: `${suc.calle || ''} ${suc.numero || ''}`.trim()
+                    });
+                  });
+                }
+                
+                const parsedSocials = (parsed.redesSociales || [])
+                  .filter((r: any) => r.usuario && r.usuario.trim() !== '')
+                  .map((r: any) => ({ platform: r.red, handle: r.usuario }));
+                  
+                localUpdates = {
+                  businessType: parsed.businessType,
+                  categories: parsed.categories ? (Array.isArray(parsed.categories) ? parsed.categories : [parsed.categories]) : undefined,
+                  locations: parsedLocations.length > 0 ? parsedLocations : undefined,
+                  socials: parsedSocials.length > 0 ? parsedSocials : undefined,
+                  hours: parsed.horarios,
+                  theme: parsed.theme
+                };
+                Object.keys(localUpdates).forEach(key => localUpdates[key] === undefined && delete localUpdates[key]);
+              } catch(e) {}
+            }
+          }
+          
           setNegocio({
             ...BLANK_NEGOCIO,
             id: unwrappedParams.id,
@@ -178,7 +220,8 @@ export default function NegocioDetailPage({ params }: { params: Promise<{ id: st
             productsCount: prods ? prods.length : 0,
             servicesCount: servs ? servs.length : 0,
             productSections: prods && prods.length > 0 ? [{ name: 'Catálogo', products: prods }] : [],
-            serviceSections: servs && servs.length > 0 ? [{ name: 'Catálogo', services: servs }] : []
+            serviceSections: servs && servs.length > 0 ? [{ name: 'Catálogo', services: servs }] : [],
+            ...localUpdates
           });
         } else {
           // If no profile found but it's a valid UUID, just show blank (maybe deleted user)
