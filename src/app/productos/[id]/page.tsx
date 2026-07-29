@@ -69,6 +69,21 @@ export default function ProductoDetailPage({ params }: { params: Promise<{ id: s
     setTimeout(() => setToast(null), 4000); // Ocultar después de 4 segundos
   };
 
+  const handleContactIntent = async () => {
+    if (supabaseUser && product?.seller?.id) {
+      try {
+        await supabase.from('interactions').insert({
+          buyer_id: supabaseUser.id,
+          seller_id: product.seller.id || '00000000-0000-0000-0000-000000000000',
+          product_id: product.id,
+          status: 'pending_time'
+        });
+      } catch(err) {
+        console.error("Error al registrar interacción", err);
+      }
+    }
+  };
+
   const nextImage = (e: React.MouseEvent) => {
     e.stopPropagation();
     if (!product) return;
@@ -506,19 +521,9 @@ export default function ProductoDetailPage({ params }: { params: Promise<{ id: s
                       href={waUrl}
                       target="_blank"
                       rel="noopener noreferrer"
-                      onClick={async () => {
+                      onClick={() => {
                         setIsContactMenuOpen(false);
-                        if (supabaseUser && product?.seller?.id) {
-                          // Registrar intención de compra silenciosamente
-                          try {
-                            const { error } = await supabase.from('interactions').insert({
-                              buyer_id: supabaseUser.id,
-                              seller_id: product.seller.id || '00000000-0000-0000-0000-000000000000',
-                              product_id: product.id,
-                              status: 'pending_time'
-                            });
-                          } catch(err) {}
-                        }
+                        handleContactIntent();
                       }}
                       style={{
                         display: 'flex',
@@ -631,7 +636,7 @@ export default function ProductoDetailPage({ params }: { params: Promise<{ id: s
 
             {/* 4. Chat Directo (Sólo si tiene plan compatible) */}
             {hasFeature('chatInterno') && (
-              <Link href="/chat" style={{ textDecoration: 'none', width: '100%' }}>
+              <Link href="/chat" style={{ textDecoration: 'none', width: '100%' }} onClick={() => handleContactIntent()}>
                 <button 
                   style={{ 
                     width: '100%', 
