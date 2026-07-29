@@ -170,6 +170,26 @@ export default function ProductoDetailPage({ params }: { params: Promise<{ id: s
             sellerRating = parseFloat((sum / sellerReviewsCount).toFixed(1));
           }
 
+          let relatedList: any[] = [];
+          const { data: relProds } = await supabase
+            .from('products')
+            .select('id, name, price, category, image, media, has_discount, discount_type, discount_value, user_id, profiles!user_id(store_name, full_name)')
+            .eq('user_id', data.user_id)
+            .eq('category', data.category)
+            .neq('id', data.id)
+            .limit(4);
+
+          if (relProds && relProds.length > 0) {
+            relatedList = relProds.map(p => ({
+              id: p.id,
+              name: p.name,
+              price: p.price,
+              category: p.category,
+              image: p.image || (p.media && p.media[0]?.url) || 'https://images.unsplash.com/photo-1542673898-7c85854b73b2?q=80&w=300&auto=format&fit=crop',
+              seller: { id: p.user_id, name: p.profiles?.store_name || p.profiles?.full_name || 'Mi Negocio' }
+            }));
+          }
+
           setProduct({
             id: data.id,
             name: data.name,
@@ -201,7 +221,8 @@ export default function ProductoDetailPage({ params }: { params: Promise<{ id: s
               branches: data.pickup_branches || [],
               rating: sellerRating,
               reviewsCount: sellerReviewsCount
-            }
+            },
+            relatedProducts: relatedList
           });
           setIsLoading(false);
           return;
@@ -239,7 +260,8 @@ export default function ProductoDetailPage({ params }: { params: Promise<{ id: s
               avatar: customProduct.avatar || baseProduct?.seller?.avatar || '',
               shippingCost: customProduct.shippingCost,
               branches: customProduct.branches || []
-            }
+            },
+            relatedProducts: PRODUCTOS_DATA.filter(p => p.seller.id === (customProduct.storeId || baseProduct?.seller?.id || 1) && p.category === customProduct.category && p.id.toString() !== productId).slice(0, 4)
           });
           setIsLoading(false);
           return;
@@ -247,7 +269,7 @@ export default function ProductoDetailPage({ params }: { params: Promise<{ id: s
       }
 
       if (baseProduct) {
-        setProduct((prev: any) => prev || baseProduct);
+        setProduct((prev: any) => prev || { ...baseProduct, relatedProducts: PRODUCTOS_DATA.filter(p => p.seller.id === baseProduct?.seller.id && p.category === baseProduct?.category && p.id.toString() !== productId).slice(0, 4) });
       }
       setIsLoading(false);
     };
@@ -822,6 +844,30 @@ export default function ProductoDetailPage({ params }: { params: Promise<{ id: s
               )}
             </div>
           </div>
+          
+          {/* PRODUCTOS RELACIONADOS */}
+          {getSellerFeature('categorias') && product.relatedProducts && product.relatedProducts.length > 0 && (
+            <div style={{ marginTop: '48px', borderTop: '1px solid var(--color-border)', paddingTop: '32px' }}>
+              <h3 style={{ fontSize: '1.4rem', marginBottom: '8px', color: 'var(--color-text-main)' }}>
+                Más de la categoría: {product.category}
+              </h3>
+              <p style={{ color: 'var(--color-text-muted)', margin: '0 0 24px 0', fontSize: '0.95rem' }}>Otros productos de {product.seller?.name || 'este vendedor'} que podrían interesarte.</p>
+              
+              <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(200px, 1fr))', gap: '20px' }}>
+                {product.relatedProducts.map((rel: any) => (
+                  <Link key={rel.id} href={`/productos/${rel.id}`} style={{ textDecoration: 'none' }}>
+                    <div style={{ border: '1px solid var(--color-border)', borderRadius: 'var(--radius-lg)', overflow: 'hidden', background: 'rgba(255,255,255,0.02)', transition: 'transform 0.2s', paddingBottom: '12px' }} onMouseEnter={(e) => e.currentTarget.style.transform = 'translateY(-4px)'} onMouseLeave={(e) => e.currentTarget.style.transform = 'translateY(0)'}>
+                      <img src={rel.image || (rel.media && rel.media[0]?.url) || 'https://images.unsplash.com/photo-1542673898-7c85854b73b2?q=80&w=300&auto=format&fit=crop'} alt={rel.name} style={{ width: '100%', height: '160px', objectFit: 'cover' }} />
+                      <div style={{ padding: '12px' }}>
+                        <h4 style={{ margin: '0 0 8px 0', fontSize: '0.95rem', color: 'var(--color-text-main)', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>{rel.name}</h4>
+                        <div style={{ fontWeight: 'bold', color: 'var(--color-primary)' }}>USD {rel.price}</div>
+                      </div>
+                    </div>
+                  </Link>
+                ))}
+              </div>
+            </div>
+          )}
         </div>
         </div>
       </div>
