@@ -8,6 +8,7 @@ import { PlanTier, isAtLeast } from '@/types/planTypes';
 import { usePlan } from '@/contexts/PlanContext';
 import { NEGOCIOS_DATA, PRODUCTOS_DATA } from '@/data/mock';
 import { useThemeColors } from '@/hooks/useThemeColors';
+import { createClient } from '@/lib/supabase/client';
 
 const PROVINCES_MAP: Record<string, string> = {
   "02": "Ciudad Autónoma de Buenos Aires",
@@ -155,29 +156,45 @@ export default function NegocioDetailPage({ params }: { params: Promise<{ id: st
         }));
       }
 
-      const savedProductsStr = localStorage.getItem('cazamarket_my_products');
-      if (savedProductsStr) {
-        let savedProducts = JSON.parse(savedProductsStr);
-        if (savedProducts && Array.isArray(savedProducts)) {
-          // Aplicar el límite de productos que permite el plan activo
-          savedProducts = savedProducts.slice(0, permissions.maxProductos);
-          
-          if (savedProducts.length > 0) {
+      const fetchStoreProducts = async () => {
+        const supabase = createClient();
+        const { data: userData } = await supabase.auth.getUser();
+        if (userData?.user) {
+          const { data, error } = await supabase.from('products').select('*').eq('user_id', userData.user.id).limit(permissions.maxProductos);
+          if (data && !error && data.length > 0) {
             setNegocio((prev: any) => {
               const hasSection = prev.productSections.some((s: any) => s.name === 'Mis Productos');
               if (hasSection) return prev;
+              
+              const formattedProducts = data.map(p => {
+                const localProf = localStorage.getItem('cazamarket_profile');
+                let parsedProf: any = null;
+                if (localProf) {
+                  try { parsedProf = JSON.parse(localProf); } catch(e) {}
+                }
+                const fallbackStore = parsedProf ? (parsedProf.storeName || parsedProf.username || parsedProf.firstName) : 'Usuario Anónimo';
+                const fallbackAvatar = parsedProf?.avatar ? parsedProf.avatar : 'https://images.unsplash.com/photo-1511497584788-876760111969?q=80&w=200&auto=format&fit=crop';
+                return {
+                  ...p,
+                  store: fallbackStore,
+                  avatar: fallbackAvatar,
+                  branches: parsedProf?.branches || []
+                };
+              });
+
               return {
                 ...prev,
-                productsCount: prev.productsCount + savedProducts.length,
+                productsCount: prev.productsCount + formattedProducts.length,
                 productSections: [
-                  { name: 'Mis Productos', products: savedProducts },
+                  { name: 'Mis Productos', products: formattedProducts },
                   ...prev.productSections
                 ]
               };
             });
           }
         }
-      }
+      };
+      fetchStoreProducts();
 
       const savedServicesStr = localStorage.getItem('cazamarket_my_services');
       if (savedServicesStr) {
@@ -514,7 +531,7 @@ export default function NegocioDetailPage({ params }: { params: Promise<{ id: st
                                 const isObj = typeof p === 'object';
                                 const id = isObj ? p.id : p;
                                 const name = isObj ? p.name : `Producto ${p}`;
-                                const priceStr = isObj ? p.price : `$ ${(p * 24500).toLocaleString('es-AR')}`;
+                                const priceStr = isObj ? (typeof p.price === 'number' ? `$ ${p.price.toLocaleString('es-AR')}` : p.price) : `$ ${(p * 24500).toLocaleString('es-AR')}`;
                                 const image = isObj && p.image ? p.image : '';
                                 
                                 return (
@@ -548,7 +565,7 @@ export default function NegocioDetailPage({ params }: { params: Promise<{ id: st
                         const isObj = typeof p === 'object';
                         const id = isObj ? p.id : p;
                         const name = isObj ? p.name : `Producto ${p}`;
-                        const priceStr = isObj ? p.price : `$ ${(p * 24500).toLocaleString('es-AR')}`;
+                        const priceStr = isObj ? (typeof p.price === 'number' ? `$ ${p.price.toLocaleString('es-AR')}` : p.price) : `$ ${(p * 24500).toLocaleString('es-AR')}`;
                         const image = isObj && p.image ? p.image : '';
 
                         return (
