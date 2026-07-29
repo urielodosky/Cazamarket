@@ -41,7 +41,7 @@ function ProductosContent() {
   useEffect(() => {
     const fetchProducts = async () => {
       const supabase = createClient();
-      let query = supabase.from('products').select('*, profiles(first_name, last_name, avatar_url, store_name, branches)');
+      let query = supabase.from('products').select('*, profiles(first_name, last_name, full_name, avatar_url, store_name, branches)');
       
       // En modo vendedor en esta vista específica, mostramos solo sus productos
       // Opcional: si queremos que el vendedor vea el marketplace completo, podemos quitar esto
@@ -67,7 +67,7 @@ function ProductosContent() {
           
           return {
             ...p,
-            store: p.profiles?.store_name || p.profiles?.full_name || `${p.profiles?.first_name || ''} ${p.profiles?.last_name || ''}`.trim() || fallbackStore,
+            store: p.profiles?.store_name || p.profiles?.full_name || fallbackStore || `${p.profiles?.first_name || ''} ${p.profiles?.last_name || ''}`.trim() || 'Usuario Anónimo',
             avatar: p.profiles?.avatar_url || fallbackAvatar,
             branches: p.profiles?.branches || (isOwn && parsedProf?.branches ? parsedProf.branches : [])
           };
@@ -219,7 +219,7 @@ function ProductosContent() {
             return (
           <div key={producto.id} className="glass-panel" 
                onClick={() => router.push(`/productos/${producto.id}`)}
-               style={{ position: 'relative', borderRadius: 'var(--radius-lg)', display: 'flex', flexDirection: 'column', transition: 'transform 0.2s', cursor: 'pointer', ...cardStyles }}
+               style={{ position: 'relative', borderRadius: 'var(--radius-lg)', display: 'flex', flexDirection: 'column', height: '100%', transition: 'transform 0.2s', cursor: 'pointer', ...cardStyles }}
                onMouseEnter={(e) => {
                  e.currentTarget.style.transform = 'translateY(-5px)';
                  e.currentTarget.style.zIndex = '100';
@@ -303,7 +303,7 @@ function ProductosContent() {
               </p>
 
               {/* Categoria + Subcategoria */}
-              <div style={{ display: 'flex', gap: '4px', flexWrap: 'wrap', marginBottom: 'auto' }}>
+              <div style={{ display: 'flex', gap: '4px', flexWrap: 'wrap', marginTop: 'auto', marginBottom: '8px' }}>
                 <span style={{ background: 'rgba(255,255,255,0.05)', color: 'var(--color-text-muted)', fontSize: '0.65rem', padding: '2px 6px', borderRadius: 'var(--radius-full)' }}>
                   {producto.category}
                 </span>
