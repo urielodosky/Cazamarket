@@ -468,23 +468,7 @@ export default function ProductoDetailPage({ params }: { params: Promise<{ id: s
                 const waMessage = `Hola, soy ${buyerName} y te escribo para pedir información sobre el producto ${product.name}`;
                 const waUrl = `https://wa.me/${cleanPhone}?text=${encodeURIComponent(waMessage)}`;
 
-                // Gather seller social networks or default ones
-                let socialsList: { red: string; usuario: string }[] = product.seller.socials || [];
-                if ((!socialsList || socialsList.length === 0) && typeof window !== 'undefined') {
-                  try {
-                    const prof = JSON.parse(localStorage.getItem('cazamarket_profile') || '{}');
-                    if (prof.redesSociales && Array.isArray(prof.redesSociales)) {
-                      socialsList = prof.redesSociales.filter((s: any) => s.usuario);
-                    }
-                  } catch(e) {}
-                }
 
-                if (!socialsList || socialsList.length === 0) {
-                  socialsList = [
-                    { red: 'Instagram', usuario: 'cazamarket_ar' },
-                    { red: 'Facebook', usuario: 'cazamarket' }
-                  ];
-                }
 
                 return (
                   <div 
@@ -540,52 +524,7 @@ export default function ProductoDetailPage({ params }: { params: Promise<{ id: s
                       <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="color-mix(in srgb, var(--color-text-main) 40%, transparent)" strokeWidth="2"><line x1="7" y1="17" x2="17" y2="7"></line><polyline points="7 7 17 7 17 17"></polyline></svg>
                     </a>
 
-                    {/* 2. Links Directos a Redes Sociales */}
-                    {socialsList.map((social: any, idx: number) => {
-                      if (!social.usuario) return null;
-                      const socialUrl = getSocialUrl(social.red, social.usuario);
-                      if (!socialUrl) return null;
 
-                      const isInsta = social.red.toLowerCase() === 'instagram';
-                      const isFb = social.red.toLowerCase() === 'facebook';
-                      const iconColor = isInsta ? '#E1306C' : isFb ? '#1877F2' : 'var(--color-primary)';
-
-                      return (
-                        <a
-                          key={idx}
-                          href={socialUrl}
-                          target="_blank"
-                          rel="noopener noreferrer"
-                          onClick={() => setIsContactMenuOpen(false)}
-                          style={{
-                            display: 'flex',
-                            alignItems: 'center',
-                            justifyContent: 'space-between',
-                            padding: '9px 12px',
-                            color: 'color-mix(in srgb, var(--color-text-main) 90%, transparent)',
-                            textDecoration: 'none',
-                            borderRadius: '10px',
-                            transition: 'background 0.2s ease',
-                            fontSize: '0.9rem',
-                            fontWeight: 500
-                          }}
-                          onMouseEnter={e => e.currentTarget.style.background = 'color-mix(in srgb, var(--color-text-main) 8%, transparent)'}
-                          onMouseLeave={e => e.currentTarget.style.background = 'transparent'}
-                        >
-                          <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
-                            {isInsta ? (
-                              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke={iconColor} strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><rect x="2" y="2" width="20" height="20" rx="5" ry="5"></rect><path d="M16 11.37A4 4 0 1 1 12.63 8 4 4 0 0 1 16 11.37z"></path><line x1="17.5" y1="6.5" x2="17.51" y2="6.5"></line></svg>
-                            ) : isFb ? (
-                              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke={iconColor} strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M18 2h-3a5 5 0 0 0-5 5v3H7v4h3v8h4v-8h3l1-4h-4V7a1 1 0 0 1 1-1h3z"></path></svg>
-                            ) : (
-                              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke={iconColor} strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"></path><path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"></path></svg>
-                            )}
-                            <span>{social.red}</span>
-                          </div>
-                          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="rgba(255,255,255,0.4)" strokeWidth="2"><line x1="7" y1="17" x2="17" y2="7"></line><polyline points="7 7 17 7 17 17"></polyline></svg>
-                        </a>
-                      );
-                    })}
                   </div>
                 );
               })()}
