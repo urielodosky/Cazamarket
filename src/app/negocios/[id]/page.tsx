@@ -4,6 +4,7 @@ import React, { useState, use, useEffect, useRef } from 'react';
 import Link from 'next/link';
 import { useRouter, useSearchParams } from 'next/navigation';
 import CustomSelect from '@/components/ui/CustomSelect';
+import LoadingScreen from '@/components/ui/LoadingScreen';
 import { PlanTier, isAtLeast } from '@/types/planTypes';
 import { usePlan } from '@/contexts/PlanContext';
 import { NEGOCIOS_DATA, PRODUCTOS_DATA } from '@/data/mock';
@@ -86,6 +87,7 @@ export default function NegocioDetailPage({ params }: { params: Promise<{ id: st
   const unwrappedParams = use(params);
   const [activeTab, setActiveTab] = useState('productos');
   const [isFiltersOpen, setIsFiltersOpen] = useState(false);
+  const [isLoading, setIsLoading] = useState(true);
   const [categoria, setCategoria] = useState('');
   const [condicion, setCondicion] = useState('');
   const [envio, setEnvio] = useState('');
@@ -178,6 +180,7 @@ export default function NegocioDetailPage({ params }: { params: Promise<{ id: st
           // If no profile found but it's a valid UUID, just show blank (maybe deleted user)
           setNegocio({ ...BLANK_NEGOCIO, id: unwrappedParams.id });
         }
+        setIsLoading(false);
       };
       loadSupabaseProfile();
       return;
@@ -303,7 +306,9 @@ export default function NegocioDetailPage({ params }: { params: Promise<{ id: st
           }
         }
       };
-      fetchStoreProducts();
+      fetchStoreProducts().finally(() => {
+        setIsLoading(false);
+      });
 
       const savedServicesStr = localStorage.getItem('cazamarket_my_services');
       if (savedServicesStr) {
@@ -340,6 +345,7 @@ export default function NegocioDetailPage({ params }: { params: Promise<{ id: st
           ] : []
         });
       }
+      setIsLoading(false);
     }
   }, [unwrappedParams.id, negocioId, permissions.maxProductos, permissions.maxServicios]);
 
@@ -351,6 +357,10 @@ export default function NegocioDetailPage({ params }: { params: Promise<{ id: st
       }, 100);
     }
   }, []);
+
+  if (isLoading) {
+    return <LoadingScreen message="Cargando negocio..." />;
+  }
 
   if (negocioId === 1 && !hasFeature('tiendaVirtual')) {
     return (
