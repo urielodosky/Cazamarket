@@ -11,6 +11,7 @@ import { usePlan } from '@/contexts/PlanContext';
 import { PRODUCTOS_DATA } from '@/data/mock';
 import { useThemeColors } from '@/hooks/useThemeColors';
 import { getPlanPermissions } from '@/types/planTypes';
+import WhatsAppVerificationModal from '@/components/WhatsAppVerificationModal';
 function getSocialUrl(platform: string, handle: string) {
   if (handle.startsWith('http') || handle.startsWith('www')) {
     return handle.startsWith('www') ? `https://${handle}` : handle;
@@ -42,9 +43,10 @@ export default function ProductoDetailPage({ params }: { params: Promise<{ id: s
   const [isLoading, setIsLoading] = useState(true);
   const { cart, addToCart, canAddToCart } = useCart();
   const { hasFeature } = usePlan();
-  const { username } = useAuth();
+  const { username, isLoggedIn, phoneVerified, supabaseUser } = useAuth();
   const themeColors = useThemeColors();
   const supabase = createClient();
+  const [isWhatsAppModalOpen, setIsWhatsAppModalOpen] = useState(false);
 
   const isInCart = cart.some(item => item.id === `producto-${product?.id}`);
 
@@ -426,7 +428,17 @@ export default function ProductoDetailPage({ params }: { params: Promise<{ id: s
             {/* 1. Contactar Vendedor */}
             <div style={{ position: 'relative', width: '100%' }}>
               <button 
-                onClick={() => setIsContactMenuOpen(!isContactMenuOpen)}
+                onClick={(e) => {
+                  if (!isLoggedIn) {
+                    showToast('Debes iniciar sesión para contactar al vendedor', 'error');
+                    return;
+                  }
+                  if (!phoneVerified) {
+                    setIsWhatsAppModalOpen(true);
+                    return;
+                  }
+                  setIsContactMenuOpen(!isContactMenuOpen);
+                }}
                 style={{ 
                   width: '100%', 
                   padding: '14px 18px', 
@@ -500,7 +512,20 @@ export default function ProductoDetailPage({ params }: { params: Promise<{ id: s
                       href={waUrl}
                       target="_blank"
                       rel="noopener noreferrer"
-                      onClick={() => setIsContactMenuOpen(false)}
+                      onClick={async () => {
+                        setIsContactMenuOpen(false);
+                        if (supabaseUser && product?.seller?.id) {
+                          // Registrar intención de compra silenciosamente
+                          try {
+                            const { error } = await supabase.from('interactions').insert({
+                              buyer_id: supabaseUser.id,
+                              seller_id: product.seller.id || '00000000-0000-0000-0000-000000000000',
+                              product_id: product.id,
+                              status: 'pending_time'
+                            });
+                          } catch(err) {}
+                        }
+                      }}
                       style={{
                         display: 'flex',
                         alignItems: 'center',
@@ -667,6 +692,14 @@ export default function ProductoDetailPage({ params }: { params: Promise<{ id: s
         </div>
         </div>
       </div>
+      <WhatsAppVerificationModal 
+        isOpen={isWhatsAppModalOpen} 
+        onClose={() => setIsWhatsAppModalOpen(false)} 
+        onSuccess={() => {
+          setIsWhatsAppModalOpen(false);
+          setIsContactMenuOpen(true);
+        }} 
+      />
     </div>
   );
 }

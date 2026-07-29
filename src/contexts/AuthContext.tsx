@@ -213,7 +213,7 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
   const updateUser = async (data: { 
     username?: string, avatar?: string, personType?: string, birthDate?: string, cuit?: string, phone?: string, contactEmail?: string,
     firstName?: string, lastName?: string, storeName?: string, storeDescription?: string, street?: string, streetNumber?: string, province?: string, locality?: string,
-    socialMedia?: any[], branches?: any[], schedules?: any[], role?: string
+    socialMedia?: any[], branches?: any[], schedules?: any[], role?: string, phone_verified?: boolean
   }) => {
     // Actualizar base de datos
     if (supabaseUser) {
