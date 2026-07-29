@@ -178,13 +178,7 @@ export default function Navbar() {
               src={logoPng}
               alt="CazaMarket Logo" 
               height={70}
-              style={{ 
-                width: 'auto', 
-                display: 'block', 
-                objectFit: 'contain', 
-                transform: 'scale(1.9) translate(-22px, 5px)', 
-                transformOrigin: 'left center' 
-              }}  
+              className="navbar-logo-img"
             />
           </Link>
         </div>

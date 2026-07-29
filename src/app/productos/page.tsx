@@ -53,16 +53,26 @@ function ProductosContent() {
       
       const { data, error } = await query;
       if (data && !error) {
-        const { data: allReviews } = await supabase.from('reviews').select('product_id, product_rating').eq('is_published', true).not('product_id', 'is', null);
         const ratingsMap: Record<number, { sum: number, count: number }> = {};
-        if (allReviews) {
-          allReviews.forEach((r: any) => {
-            if (r.product_id && r.product_rating) {
-              if (!ratingsMap[r.product_id]) ratingsMap[r.product_id] = { sum: 0, count: 0 };
-              ratingsMap[r.product_id].sum += r.product_rating;
-              ratingsMap[r.product_id].count += 1;
-            }
-          });
+        try {
+          const { data: allReviews, error: revError } = await supabase
+            .from('reviews')
+            .select('product_rating, interactions!inner(product_id)')
+            .eq('interactions.status', 'published')
+            .not('interactions.product_id', 'is', null);
+            
+          if (allReviews && !revError) {
+            allReviews.forEach((r: any) => {
+              const pId = r.interactions?.product_id;
+              if (pId && r.product_rating) {
+                if (!ratingsMap[pId]) ratingsMap[pId] = { sum: 0, count: 0 };
+                ratingsMap[pId].sum += r.product_rating;
+                ratingsMap[pId].count += 1;
+              }
+            });
+          }
+        } catch (e) {
+          console.warn('Could not fetch reviews rating', e);
         }
 
         // Fallback al perfil guardado localmente si es el mismo usuario
