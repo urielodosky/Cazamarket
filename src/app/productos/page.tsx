@@ -53,6 +53,18 @@ function ProductosContent() {
       
       const { data, error } = await query;
       if (data && !error) {
+        const { data: allReviews } = await supabase.from('reviews').select('product_id, product_rating').eq('is_published', true).not('product_id', 'is', null);
+        const ratingsMap: Record<number, { sum: number, count: number }> = {};
+        if (allReviews) {
+          allReviews.forEach((r: any) => {
+            if (r.product_id && r.product_rating) {
+              if (!ratingsMap[r.product_id]) ratingsMap[r.product_id] = { sum: 0, count: 0 };
+              ratingsMap[r.product_id].sum += r.product_rating;
+              ratingsMap[r.product_id].count += 1;
+            }
+          });
+        }
+
         // Fallback al perfil guardado localmente si es el mismo usuario
         const localProf = localStorage.getItem('cazamarket_profile');
         let parsedProf: any = null;
@@ -65,11 +77,15 @@ function ProductosContent() {
           const fallbackStore = isOwn && parsedProf ? (parsedProf.storeName || parsedProf.username || parsedProf.firstName) : 'Usuario Anónimo';
           const fallbackAvatar = isOwn && parsedProf?.avatar ? parsedProf.avatar : 'https://images.unsplash.com/photo-1511497584788-876760111969?q=80&w=200&auto=format&fit=crop';
           
+          const ratingData = ratingsMap[p.id];
+          const averageRating = ratingData ? (ratingData.sum / ratingData.count).toFixed(1) : null;
+
           return {
             ...p,
             store: p.profiles?.store_name || p.profiles?.full_name || fallbackStore || `${p.profiles?.first_name || ''} ${p.profiles?.last_name || ''}`.trim() || 'Usuario Anónimo',
             avatar: p.profiles?.avatar_url || fallbackAvatar,
-            branches: p.profiles?.branches || (isOwn && parsedProf?.branches ? parsedProf.branches : [])
+            branches: p.profiles?.branches || (isOwn && parsedProf?.branches ? parsedProf.branches : []),
+            calculatedRating: averageRating
           };
         });
         setLocalProducts(formattedData);
@@ -280,10 +296,12 @@ function ProductosContent() {
             </div>
             <div className="aspect-image-4-3" style={{ backgroundImage: `url(${producto.image})`, borderTopLeftRadius: 'var(--radius-lg)', borderTopRightRadius: 'var(--radius-lg)', position: 'relative' }}>
               {/* Product Rating Top Right */}
-              <div style={{ position: 'absolute', top: '10px', right: '10px', background: 'rgba(0,0,0,0.65)', backdropFilter: 'blur(4px)', padding: '4px 8px', borderRadius: '12px', display: 'flex', alignItems: 'center', gap: '4px', zIndex: 5 }}>
-                <svg width="12" height="12" viewBox="0 0 24 24" fill="#FFD700" stroke="#FFD700" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"></polygon></svg>
-                <span style={{ color: '#fff', fontSize: '0.8rem', fontWeight: 'bold' }}>4.8</span>
-              </div>
+              {(producto.calculatedRating || producto.rating) ? (
+                <div style={{ position: 'absolute', top: '10px', right: '10px', background: 'rgba(0,0,0,0.65)', backdropFilter: 'blur(4px)', padding: '4px 8px', borderRadius: '12px', display: 'flex', alignItems: 'center', gap: '4px', zIndex: 5 }}>
+                  <svg width="12" height="12" viewBox="0 0 24 24" fill="#FFD700" stroke="#FFD700" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"></polygon></svg>
+                  <span style={{ color: '#fff', fontSize: '0.8rem', fontWeight: 'bold' }}>{producto.calculatedRating || producto.rating}</span>
+                </div>
+              ) : null}
             </div>
             <div className="card-content-fluid" style={{ display: 'flex', flexDirection: 'column', flex: 1, borderBottomLeftRadius: 'var(--radius-lg)', borderBottomRightRadius: 'var(--radius-lg)' }}>
               {/* Foto de perfil + Username */}

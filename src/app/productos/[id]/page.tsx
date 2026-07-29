@@ -124,6 +124,52 @@ export default function ProductoDetailPage({ params }: { params: Promise<{ id: s
         if (data && !error) {
           const sellerProfile = data.profiles || {};
           
+          let productRating = 0;
+          let productReviewsCount = 0;
+          let sellerRating = 0;
+          let sellerReviewsCount = 0;
+
+          const { data: prodRevs } = await supabase.from('reviews')
+            .select('id, product_rating, comment, created_at, interactions!inner(buyer_id)')
+            .eq('product_id', productId)
+            .eq('is_published', true)
+            .not('product_rating', 'is', null)
+            .order('created_at', { ascending: false });
+
+          let productReviewsList: any[] = [];
+          if (prodRevs && prodRevs.length > 0) {
+            productReviewsCount = prodRevs.length;
+            const sum = prodRevs.reduce((acc, r: any) => acc + (r.product_rating || 0), 0);
+            productRating = parseFloat((sum / productReviewsCount).toFixed(1));
+
+            const buyerIds = prodRevs.map((r: any) => r.interactions?.buyer_id).filter(Boolean);
+            const { data: profiles } = await supabase.from('profiles').select('id, first_name, last_name, avatar_url').in('id', buyerIds);
+            const profileMap = new Map((profiles || []).map((p: any) => [p.id, p]));
+            
+            productReviewsList = prodRevs.map((r: any) => {
+              const buyer = profileMap.get(r.interactions?.buyer_id) || {};
+              return {
+                id: r.id,
+                rating: r.product_rating,
+                comment: r.comment,
+                date: r.created_at,
+                buyerName: buyer.first_name ? `${buyer.first_name} ${buyer.last_name || ''}`.trim() : 'Usuario',
+                buyerAvatar: buyer.avatar_url || null
+              };
+            });
+          }
+
+          const { data: sellRevs } = await supabase.from('reviews')
+            .select('seller_rating, interactions!inner(seller_id)')
+            .eq('interactions.seller_id', data.user_id)
+            .eq('is_published', true)
+            .not('seller_rating', 'is', null);
+          if (sellRevs && sellRevs.length > 0) {
+            sellerReviewsCount = sellRevs.length;
+            const sum = sellRevs.reduce((acc, r: any) => acc + (r.seller_rating || 0), 0);
+            sellerRating = parseFloat((sum / sellerReviewsCount).toFixed(1));
+          }
+
           setProduct({
             id: data.id,
             name: data.name,
@@ -143,13 +189,18 @@ export default function ProductoDetailPage({ params }: { params: Promise<{ id: s
               ? (parseFloat(String(data.price).replace(/[^0-9.]/g, '')) / (1 - (parseFloat(data.discount_value) / 100))) 
               : undefined,
             discount: data.has_discount ? { name: data.discount_name, type: data.discount_type, value: data.discount_value } : undefined,
+            rating: productRating,
+            reviewsCount: productReviewsCount,
+            reviewsList: productReviewsList,
             seller: {
               id: data.user_id,
               name: sellerProfile.store_name || sellerProfile.full_name || 'Mi Negocio',
               avatar: sellerProfile.avatar_url || '',
               phone: sellerProfile.phone || '',
               shippingCost: data.shipping_cost,
-              branches: data.pickup_branches || []
+              branches: data.pickup_branches || [],
+              rating: sellerRating,
+              reviewsCount: sellerReviewsCount
             }
           });
           setIsLoading(false);
@@ -368,10 +419,12 @@ export default function ProductoDetailPage({ params }: { params: Promise<{ id: s
               <img src={product.seller?.avatar || 'https://images.unsplash.com/photo-1511497584788-876760111969?q=80&w=200&auto=format&fit=crop'} alt={product.seller?.name} style={{ width: '40px', height: '40px', borderRadius: '50%', objectFit: 'cover', border: '1px solid var(--color-border)' }} />
               <div style={{ display: 'flex', flexDirection: 'column' }}>
                 <span style={{ color: 'var(--color-primary)', fontSize: '0.9rem', textTransform: 'uppercase', fontWeight: 'bold' }}>{product.seller?.name || 'Vendedor'}</span>
-                <span style={{ display: 'flex', alignItems: 'center', gap: '4px', fontSize: '0.85rem', color: '#FFD700', marginTop: '2px' }}>
-                  <svg width="14" height="14" viewBox="0 0 24 24" fill="#FFD700" stroke="#FFD700" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"></polygon></svg>
-                  4.8
-                </span>
+                {product.seller?.rating > 0 && (
+                  <span style={{ display: 'flex', alignItems: 'center', gap: '4px', fontSize: '0.85rem', color: '#FFD700', marginTop: '2px' }} title={`${product.seller.reviewsCount || 0} reseña${product.seller.reviewsCount !== 1 ? 's' : ''}`}>
+                    <svg width="14" height="14" viewBox="0 0 24 24" fill="#FFD700" stroke="#FFD700" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"></polygon></svg>
+                    {product.seller.rating}
+                  </span>
+                )}
               </div>
             </div>
             <div style={{ display: 'flex', gap: '8px', flexWrap: 'wrap', marginBottom: '12px' }}>
@@ -388,10 +441,12 @@ export default function ProductoDetailPage({ params }: { params: Promise<{ id: s
               <h1 style={{ fontSize: '2.2rem', color: 'var(--color-text-main)', margin: '0', lineHeight: 1.2, fontWeight: 700, letterSpacing: '-0.3px' }}>
                 {product.name}
               </h1>
-              <span style={{ display: 'flex', alignItems: 'center', gap: '6px', fontSize: '1.2rem', color: '#FFD700', flexShrink: 0, marginTop: '4px' }}>
-                <svg width="20" height="20" viewBox="0 0 24 24" fill="#FFD700" stroke="#FFD700" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"></polygon></svg>
-                4.8
-              </span>
+              {product.rating > 0 && (
+                <span style={{ display: 'flex', alignItems: 'center', gap: '6px', fontSize: '1.2rem', color: '#FFD700', flexShrink: 0, marginTop: '4px' }} title={`${product.reviewsCount || 0} reseña${product.reviewsCount !== 1 ? 's' : ''}`}>
+                  <svg width="20" height="20" viewBox="0 0 24 24" fill="#FFD700" stroke="#FFD700" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"></polygon></svg>
+                  {product.rating}
+                </span>
+              )}
             </div>
 
             {/* ID, Condición y Stock */}
@@ -724,36 +779,51 @@ export default function ProductoDetailPage({ params }: { params: Promise<{ id: s
           <div style={{ marginTop: '48px', borderTop: '1px solid var(--color-border)', paddingTop: '32px' }}>
             <h3 style={{ fontSize: '1.4rem', marginBottom: '8px', color: 'var(--color-text-main)', display: 'flex', alignItems: 'center', gap: '12px' }}>
               Reseñas del Producto
-              <span style={{ display: 'flex', alignItems: 'center', gap: '4px', background: 'rgba(255,215,0,0.1)', color: '#FFD700', padding: '4px 12px', borderRadius: 'var(--radius-full)', fontSize: '1.1rem' }}>
-                <svg width="20" height="20" viewBox="0 0 24 24" fill="#FFD700" stroke="#FFD700" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"></polygon></svg>
-                4.8
-              </span>
+              {product.rating > 0 && (
+                <span style={{ display: 'flex', alignItems: 'center', gap: '4px', background: 'rgba(255,215,0,0.1)', color: '#FFD700', padding: '4px 12px', borderRadius: 'var(--radius-full)', fontSize: '1.1rem' }}>
+                  <svg width="20" height="20" viewBox="0 0 24 24" fill="#FFD700" stroke="#FFD700" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"></polygon></svg>
+                  {product.rating}
+                </span>
+              )}
             </h3>
             <p style={{ color: 'var(--color-text-muted)', margin: '0 0 24px 0', fontSize: '0.95rem' }}>Lo que dicen los clientes que compraron este producto.</p>
             
             <div style={{ display: 'flex', flexDirection: 'column', gap: '16px' }}>
-              {/* Mock Product Review */}
-              <div style={{ padding: '24px', borderRadius: 'var(--radius-lg)', background: 'rgba(255,255,255,0.03)', border: '1px solid var(--color-border)' }}>
-                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: '12px' }}>
-                  <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
-                    <div style={{ width: '40px', height: '40px', borderRadius: '50%', background: 'var(--color-primary)', display: 'flex', alignItems: 'center', justifyContent: 'center', color: '#fff', fontWeight: 'bold' }}>
-                      C
+              {product.reviewsList && product.reviewsList.length > 0 ? (
+                product.reviewsList.map((review: any) => (
+                  <div key={review.id} style={{ padding: '24px', borderRadius: 'var(--radius-lg)', background: 'rgba(255,255,255,0.03)', border: '1px solid var(--color-border)' }}>
+                    <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: '12px' }}>
+                      <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
+                        {review.buyerAvatar ? (
+                          <img src={review.buyerAvatar} alt={review.buyerName} style={{ width: '40px', height: '40px', borderRadius: '50%', objectFit: 'cover' }} />
+                        ) : (
+                          <div style={{ width: '40px', height: '40px', borderRadius: '50%', background: 'var(--color-primary)', display: 'flex', alignItems: 'center', justifyContent: 'center', color: '#fff', fontWeight: 'bold' }}>
+                            {review.buyerName.charAt(0).toUpperCase()}
+                          </div>
+                        )}
+                        <div>
+                          <h4 style={{ margin: '0 0 2px 0', color: 'var(--color-text-main)', fontSize: '1.1rem' }}>{review.buyerName}</h4>
+                          <span style={{ color: 'var(--color-text-muted)', fontSize: '0.85rem' }}>
+                            {new Date(review.date).toLocaleDateString('es-AR', { year: 'numeric', month: 'short', day: 'numeric' })}
+                          </span>
+                        </div>
+                      </div>
+                      <div style={{ display: 'flex', gap: '4px' }}>
+                        {[1, 2, 3, 4, 5].map(star => (
+                          <svg key={star} width="16" height="16" viewBox="0 0 24 24" fill={star <= (review.rating || 0) ? "#FFD700" : "none"} stroke="#FFD700" strokeWidth="2"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"></polygon></svg>
+                        ))}
+                      </div>
                     </div>
-                    <div>
-                      <h4 style={{ margin: '0 0 2px 0', color: 'var(--color-text-main)', fontSize: '1.1rem' }}>Carlos M.</h4>
-                      <span style={{ color: 'var(--color-text-muted)', fontSize: '0.85rem' }}>Hace 1 mes</span>
-                    </div>
+                    <p style={{ margin: 0, color: 'var(--color-text-muted)', lineHeight: 1.6, fontSize: '1rem' }}>
+                      "{review.comment}"
+                    </p>
                   </div>
-                  <div style={{ display: 'flex', gap: '4px' }}>
-                    {[1,2,3,4,5].map(star => (
-                      <svg key={star} width="16" height="16" viewBox="0 0 24 24" fill={star <= 5 ? "#FFD700" : "none"} stroke="#FFD700" strokeWidth="2"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"></polygon></svg>
-                    ))}
-                  </div>
+                ))
+              ) : (
+                <div style={{ textAlign: 'center', padding: '40px', color: 'var(--color-text-muted)' }}>
+                  No hay reseñas para este producto todavía.
                 </div>
-                <p style={{ margin: 0, color: 'var(--color-text-muted)', lineHeight: 1.6, fontSize: '1rem' }}>
-                  "La verdad que superó mis expectativas. La calidad de los materiales es excelente y llegó súper bien embalado. Recomendado."
-                </p>
-              </div>
+              )}
             </div>
           </div>
         </div>
