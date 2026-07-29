@@ -15,6 +15,7 @@ type AuthContextType = {
   birthDate: string;
   cuit: string;
   phone: string;
+  phoneVerified: boolean;
   contactEmail: string;
   firstName: string;
   lastName: string;
@@ -27,11 +28,12 @@ type AuthContextType = {
   socialMedia: any[];
   branches: any[];
   schedules: any[];
+  trustScore: number;
   logout: () => Promise<void>;
   updateUser: (data: { 
     username?: string, avatar?: string, personType?: string, birthDate?: string, cuit?: string, phone?: string, contactEmail?: string,
     firstName?: string, lastName?: string, storeName?: string, storeDescription?: string, street?: string, streetNumber?: string, province?: string, locality?: string,
-    socialMedia?: any[], branches?: any[], schedules?: any[], role?: string
+    socialMedia?: any[], branches?: any[], schedules?: any[], role?: string, phone_verified?: boolean
   }) => Promise<void>;
   toggleVendorMode: () => void;
   upgradeToVendor: () => Promise<void>;
@@ -50,6 +52,7 @@ const AuthContext = createContext<AuthContextType>({
   birthDate: '',
   cuit: '',
   phone: '',
+  phoneVerified: false,
   contactEmail: '',
   firstName: '',
   lastName: '',
@@ -62,6 +65,7 @@ const AuthContext = createContext<AuthContextType>({
   socialMedia: [],
   branches: [],
   schedules: [],
+  trustScore: 100,
   logout: async () => {},
   updateUser: async () => {},
   toggleVendorMode: () => {},
@@ -82,6 +86,7 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
   const [birthDate, setBirthDate] = useState('');
   const [cuit, setCuit] = useState('');
   const [phone, setPhone] = useState('');
+  const [phoneVerified, setPhoneVerified] = useState(false);
   const [contactEmail, setContactEmail] = useState('');
   const [firstName, setFirstName] = useState('');
   const [lastName, setLastName] = useState('');
@@ -94,6 +99,7 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
   const [socialMedia, setSocialMedia] = useState<any[]>([]);
   const [branches, setBranches] = useState<any[]>([]);
   const [schedules, setSchedules] = useState<any[]>([]);
+  const [trustScore, setTrustScore] = useState(100);
   const [supabaseUser, setSupabaseUser] = useState<any>(null);
 
   useEffect(() => {
@@ -157,6 +163,8 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
         
         setCuit(profile.cuit || '');
         setPhone(profile.phone || '');
+        setPhoneVerified(profile.phone_verified || false);
+        setTrustScore(profile.trust_score ?? 100);
         setContactEmail(profile.contact_email || user.email || '');
         setFirstName(profile.first_name || '');
         setLastName(profile.last_name || '');
@@ -227,6 +235,7 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
       }
       if (data.cuit !== undefined) updates.cuit = data.cuit;
       if (data.phone !== undefined) updates.phone = data.phone;
+      if (data.phone_verified !== undefined) updates.phone_verified = data.phone_verified;
       if (data.contactEmail !== undefined) updates.contact_email = data.contactEmail;
       if (data.firstName !== undefined) updates.first_name = data.firstName;
       if (data.lastName !== undefined) updates.last_name = data.lastName;
@@ -252,6 +261,7 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
       if (data.birthDate !== undefined) setBirthDate(data.birthDate);
       if (data.cuit !== undefined) setCuit(data.cuit);
       if (data.phone !== undefined) setPhone(data.phone);
+      if (data.phone_verified !== undefined) setPhoneVerified(data.phone_verified);
       if (data.contactEmail !== undefined) setContactEmail(data.contactEmail);
       if (data.firstName !== undefined) setFirstName(data.firstName);
       if (data.lastName !== undefined) setLastName(data.lastName);
@@ -297,10 +307,12 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
     <AuthContext.Provider value={{ 
       isLoggedIn, username, email, avatar, 
       isVendor, isVendorModeActive, isMounted: mounted, 
-      personType, birthDate, cuit, phone, contactEmail,
+      personType, birthDate, cuit, phone, phoneVerified, contactEmail,
       firstName, lastName, storeName, storeDescription, street, streetNumber, province, locality,
       socialMedia, branches, schedules,
-      logout, updateUser, toggleVendorMode, upgradeToVendor,
+      trustScore,
+      logout,
+      updateUser, toggleVendorMode, upgradeToVendor,
       supabaseUser 
     }}>
       {children}
