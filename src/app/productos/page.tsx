@@ -296,22 +296,14 @@ function ProductosContent() {
                     </span>
                   )}
                 </div>
-                <div style={{ display: 'flex', flexDirection: 'column' }}>
+                <div style={{ display: 'flex', flexDirection: 'column', justifyContent: 'center' }}>
                   <span style={{ color: 'var(--color-primary)', fontSize: '0.8rem', textTransform: 'uppercase', fontWeight: 'bold', lineHeight: 1.1 }}>{producto.store}</span>
-                  <span style={{ display: 'flex', alignItems: 'center', gap: '2px', fontSize: '0.75rem', color: '#FFD700', marginTop: '2px' }}>
-                    <svg width="10" height="10" viewBox="0 0 24 24" fill="#FFD700" stroke="#FFD700" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"></polygon></svg>
-                    4.8
-                  </span>
                 </div>
               </div>
 
               {/* Nombre del producto */}
-              <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: '2px' }}>
+              <div style={{ marginBottom: '2px' }}>
                 <h3 style={{ fontSize: '1rem', color: 'var(--color-text-main)', margin: '0' }}>{producto.name}</h3>
-                <span style={{ display: 'flex', alignItems: 'center', gap: '2px', fontSize: '0.8rem', color: '#FFD700', flexShrink: 0, marginTop: '2px' }}>
-                  <svg width="12" height="12" viewBox="0 0 24 24" fill="#FFD700" stroke="#FFD700" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"></polygon></svg>
-                  4.8
-                </span>
               </div>
               
               {/* Descripcion (max 3 lineas) */}

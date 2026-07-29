@@ -551,12 +551,8 @@ export default function NegocioDetailPage({ params }: { params: Promise<{ id: st
                                        </div>
                                     </div>
                                     <div style={{ padding: '16px' }}>
-                                      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: '8px' }}>
+                                      <div style={{ marginBottom: '8px' }}>
                                         <h4 style={{ margin: '0', fontSize: '1rem', color: 'var(--color-text-main)', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>{name}</h4>
-                                        <span style={{ display: 'flex', alignItems: 'center', gap: '2px', fontSize: '0.8rem', color: '#FFD700', flexShrink: 0 }}>
-                                          <svg width="12" height="12" viewBox="0 0 24 24" fill="#FFD700" stroke="#FFD700" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"></polygon></svg>
-                                          4.8
-                                        </span>
                                       </div>
                                       <div style={{ color: 'var(--color-text-muted)', fontSize: '0.8rem', marginBottom: '12px' }}>{section.name}</div>
                                       <p style={{ color: 'var(--color-primary)', fontWeight: 'bold', margin: 0, fontSize: '1.2rem' }}>{priceStr}</p>
@@ -596,12 +592,8 @@ export default function NegocioDetailPage({ params }: { params: Promise<{ id: st
                                </div>
                             </div>
                             <div style={{ padding: '16px' }}>
-                              <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: '8px' }}>
-                                <h4 style={{ margin: '0', fontSize: '1rem', color: 'var(--color-text-main)', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>{name}</h4>
-                                <span style={{ display: 'flex', alignItems: 'center', gap: '2px', fontSize: '0.8rem', color: '#FFD700', flexShrink: 0 }}>
-                                  <svg width="12" height="12" viewBox="0 0 24 24" fill="#FFD700" stroke="#FFD700" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"></polygon></svg>
-                                  4.8
-                                </span>
+                              <div style={{ marginBottom: '8px' }}>
+                                        <h4 style={{ margin: '0', fontSize: '1rem', color: 'var(--color-text-main)', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>{name}</h4>
                               </div>
                               <div style={{ color: 'var(--color-text-muted)', fontSize: '0.8rem', marginBottom: '12px' }}>Categoría General</div>
                               <p style={{ color: 'var(--color-primary)', fontWeight: 'bold', margin: 0, fontSize: '1.2rem' }}>{priceStr}</p>
