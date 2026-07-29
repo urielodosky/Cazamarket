@@ -12,6 +12,8 @@ export interface PlanPermissions {
   maxServicios: number;
   // Categorías permitidas para el negocio
   maxCategorias: number;
+  // Límite de sucursales adicionales
+  maxSucursales: number;
   // Features comunes
   tiendaVirtual: boolean;
   insigniaVerificada: boolean;
@@ -36,35 +38,35 @@ export interface PlanPermissions {
 
 const PRODUCT_PERMISSIONS: Record<PlanTier, PlanPermissions> = {
   gratis: {
-    maxProductos: 3, maxServicios: 0, maxCategorias: 3,
+    maxProductos: 3, maxServicios: 0, maxCategorias: 3, maxSucursales: 1,
     tiendaVirtual: false, insigniaVerificada: false, banner: false, categorias: false,
     whatsappBtn: true, carritoWhatsApp: false, chatInterno: false, botAsesor: false,
     coloresPersonalizados: false, contactoBasico: true,
     mapasTerritorio: false, googleMaps: false, calendario: false, promociones: false,
   },
   basico: {
-    maxProductos: 15, maxServicios: 0, maxCategorias: 3,
+    maxProductos: 15, maxServicios: 0, maxCategorias: 3, maxSucursales: 1,
     tiendaVirtual: true, insigniaVerificada: true, banner: false, categorias: false,
     whatsappBtn: true, carritoWhatsApp: true, chatInterno: false, botAsesor: false,
     coloresPersonalizados: false, contactoBasico: true,
     mapasTerritorio: false, googleMaps: false, calendario: false, promociones: false,
   },
   emprendedor: {
-    maxProductos: 40, maxServicios: 0, maxCategorias: 4,
+    maxProductos: 40, maxServicios: 0, maxCategorias: 4, maxSucursales: 2,
     tiendaVirtual: true, insigniaVerificada: true, banner: true, categorias: true,
     whatsappBtn: true, carritoWhatsApp: true, chatInterno: false, botAsesor: false,
     coloresPersonalizados: false, contactoBasico: true,
     mapasTerritorio: false, googleMaps: false, calendario: false, promociones: false,
   },
   comercial: {
-    maxProductos: 100, maxServicios: 0, maxCategorias: 5,
+    maxProductos: 100, maxServicios: 0, maxCategorias: 5, maxSucursales: 5,
     tiendaVirtual: true, insigniaVerificada: true, banner: true, categorias: true,
     whatsappBtn: true, carritoWhatsApp: true, chatInterno: true, botAsesor: false,
     coloresPersonalizados: false, contactoBasico: true,
     mapasTerritorio: false, googleMaps: false, calendario: false, promociones: false,
   },
   empresarial: {
-    maxProductos: Infinity, maxServicios: 0, maxCategorias: 7,
+    maxProductos: Infinity, maxServicios: 0, maxCategorias: 7, maxSucursales: 10,
     tiendaVirtual: true, insigniaVerificada: true, banner: true, categorias: true,
     whatsappBtn: true, carritoWhatsApp: true, chatInterno: true, botAsesor: true,
     coloresPersonalizados: true, contactoBasico: true,
@@ -74,31 +76,31 @@ const PRODUCT_PERMISSIONS: Record<PlanTier, PlanPermissions> = {
 
 const SERVICE_PERMISSIONS: Record<Exclude<PlanTier, 'gratis'>, PlanPermissions> = {
   basico: {
-    maxProductos: 0, maxServicios: 2, maxCategorias: 3,
+    maxProductos: 0, maxServicios: 2, maxCategorias: 3, maxSucursales: 5,
     tiendaVirtual: true, insigniaVerificada: true, banner: false, categorias: false,
     whatsappBtn: true, carritoWhatsApp: true, chatInterno: false, botAsesor: false,
     coloresPersonalizados: false, contactoBasico: true,
     mapasTerritorio: false, googleMaps: false, calendario: false, promociones: false,
   },
   emprendedor: {
-    maxProductos: 0, maxServicios: 5, maxCategorias: 4,
+    maxProductos: 0, maxServicios: 5, maxCategorias: 4, maxSucursales: 5,
     tiendaVirtual: true, insigniaVerificada: true, banner: true, categorias: true,
     whatsappBtn: true, carritoWhatsApp: true, chatInterno: false, botAsesor: false,
     coloresPersonalizados: false, contactoBasico: true,
     mapasTerritorio: false, googleMaps: false, calendario: false, promociones: false,
   },
   comercial: {
-    maxProductos: 0, maxServicios: 10, maxCategorias: 5,
+    maxProductos: 0, maxServicios: 10, maxCategorias: 5, maxSucursales: 5,
     tiendaVirtual: true, insigniaVerificada: true, banner: true, categorias: true,
     whatsappBtn: true, carritoWhatsApp: true, chatInterno: false, botAsesor: false,
     coloresPersonalizados: false, contactoBasico: true,
     mapasTerritorio: true, googleMaps: true, calendario: false, promociones: false,
   },
   empresarial: {
-    maxProductos: 0, maxServicios: 20, maxCategorias: 7,
+    maxProductos: 0, maxServicios: 20, maxCategorias: 7, maxSucursales: 15,
     tiendaVirtual: true, insigniaVerificada: true, banner: true, categorias: true,
     whatsappBtn: true, carritoWhatsApp: true, chatInterno: true, botAsesor: false,
-    coloresPersonalizados: false, contactoBasico: true,
+    coloresPersonalizados: true, contactoBasico: true,
     mapasTerritorio: true, googleMaps: true, calendario: true, promociones: true,
   },
 };
@@ -111,6 +113,7 @@ function mergeMixedPermissions(prodTier: PlanTier, servTier: Exclude<PlanTier, '
     maxProductos: p.maxProductos,
     maxServicios: s.maxServicios,
     maxCategorias: Math.max(p.maxCategorias, s.maxCategorias) + 2,
+    maxSucursales: Math.max(p.maxSucursales, s.maxSucursales),
     tiendaVirtual: p.tiendaVirtual || s.tiendaVirtual,
     insigniaVerificada: p.insigniaVerificada || s.insigniaVerificada,
     banner: p.banner || s.banner,
@@ -173,6 +176,7 @@ export const PRODUCT_PLANS: PlanCardData[] = [
     features: [
       { text: 'Hasta 3 publicaciones de productos', included: true },
       { text: 'Hasta 3 categorías para tu negocio', included: true },
+      { text: 'Hasta 1 sucursal adicional', included: true },
       { text: 'Botón directo a WhatsApp', included: true },
       { text: 'Carrito a WhatsApp integrado', included: false },
       { text: 'Tienda virtual propia', included: false },
@@ -192,6 +196,7 @@ export const PRODUCT_PLANS: PlanCardData[] = [
     features: [
       { text: 'Hasta 15 productos publicados', included: true },
       { text: 'Hasta 3 categorías para tu negocio', included: true },
+      { text: 'Hasta 1 sucursal adicional', included: true },
       { text: 'Tienda virtual en la plataforma', included: true },
       { text: 'Insignia de tienda verificada', included: true },
       { text: 'Contacto y carrito a WhatsApp', included: true },
@@ -210,6 +215,7 @@ export const PRODUCT_PLANS: PlanCardData[] = [
     features: [
       { text: 'Hasta 40 productos publicados', included: true },
       { text: 'Hasta 4 categorías para tu negocio', included: true },
+      { text: 'Hasta 2 sucursales adicionales', included: true },
       { text: 'Todo lo del plan Básico', included: true },
       { text: 'Banner propio de tienda', included: true },
       { text: 'Chat privado interno', included: false },
@@ -226,6 +232,7 @@ export const PRODUCT_PLANS: PlanCardData[] = [
     features: [
       { text: 'Hasta 100 productos publicados', included: true },
       { text: 'Hasta 5 categorías para tu negocio', included: true },
+      { text: 'Hasta 5 sucursales adicionales', included: true },
       { text: 'Todo lo del plan Emprendedor', included: true },
       { text: 'Chat privado con clientes', included: true },
       { text: 'Bot asesor automático', included: false },
@@ -241,6 +248,7 @@ export const PRODUCT_PLANS: PlanCardData[] = [
     features: [
       { text: 'Productos ilimitados', included: true },
       { text: 'Hasta 7 categorías para tu negocio', included: true },
+      { text: 'Hasta 10 sucursales adicionales', included: true },
       { text: 'Todo lo del plan Comercial', included: true },
       { text: 'Bot asesor con respuestas preconfiguradas', included: true },
       { text: 'Colores personalizados de tienda', included: true },
@@ -258,6 +266,7 @@ export const SERVICE_PLANS: PlanCardData[] = [
     recommended: false,
     features: [
       { text: 'Hasta 2 servicios publicados', included: true },
+      { text: 'Hasta 5 sucursales adicionales', included: true },
       { text: 'Tienda virtual en la plataforma', included: true },
       { text: 'Insignia de cuenta verificada', included: true },
       { text: 'Contacto y carrito a WhatsApp', included: true },
@@ -275,6 +284,7 @@ export const SERVICE_PLANS: PlanCardData[] = [
     recommended: false,
     features: [
       { text: 'Hasta 5 servicios publicados', included: true },
+      { text: 'Hasta 5 sucursales adicionales', included: true },
       { text: 'Todo lo del plan Básico', included: true },
       { text: 'Banner propio de tienda', included: true },
       { text: 'Mapas de territorio / Google Maps', included: false },
@@ -290,6 +300,7 @@ export const SERVICE_PLANS: PlanCardData[] = [
     recommended: true,
     features: [
       { text: 'Hasta 10 servicios publicados', included: true },
+      { text: 'Hasta 5 sucursales adicionales', included: true },
       { text: 'Todo lo del plan Emprendedor', included: true },
       { text: 'Mapa de territorio (hectáreas)', included: true },
       { text: 'Ubicación en Google Maps', included: true },
@@ -305,6 +316,7 @@ export const SERVICE_PLANS: PlanCardData[] = [
     recommended: false,
     features: [
       { text: 'Hasta 20 servicios publicados', included: true },
+      { text: 'Hasta 15 sucursales adicionales', included: true },
       { text: 'Todo lo del plan Comercial', included: true },
       { text: 'Chat privado con clientes', included: true },
       { text: 'Calendario interactivo de disponibilidad', included: true },
@@ -323,6 +335,7 @@ export const MIXED_PLANS: PlanCardData[] = [
     recommended: false,
     features: [
       { text: '15 Productos + 2 Servicios', included: true },
+      { text: 'Hasta 5 sucursales adicionales', included: true },
       { text: 'Tienda virtual en la plataforma', included: true },
       { text: 'Insignia de cuenta verificada', included: true },
       { text: 'Contacto y carrito a WhatsApp', included: true },
@@ -342,6 +355,7 @@ export const MIXED_PLANS: PlanCardData[] = [
     recommended: false,
     features: [
       { text: '40 Productos + 5 Servicios', included: true },
+      { text: 'Hasta 5 sucursales adicionales', included: true },
       { text: 'Todo lo del Básico Mixto', included: true },
       { text: 'Banner propio de tienda', included: true },
       { text: 'Mapas de territorio y Google Maps', included: false },
@@ -359,6 +373,7 @@ export const MIXED_PLANS: PlanCardData[] = [
     recommended: true,
     features: [
       { text: '100 Productos + 10 Servicios', included: true },
+      { text: 'Hasta 5 sucursales adicionales', included: true },
       { text: 'Todo lo del Emprendedor Mixto', included: true },
       { text: 'Chat privado con clientes', included: true },
       { text: 'Mapas de territorio + Google Maps', included: true },
@@ -376,6 +391,7 @@ export const MIXED_PLANS: PlanCardData[] = [
     features: [
       { text: 'Prods ilimitados + 20 Servicios', included: true },
       { text: 'Hasta 9 categorías para tu negocio', included: true },
+      { text: 'Hasta 15 sucursales adicionales', included: true },
       { text: 'Todo lo del Comercial Mixto', included: true },
       { text: 'Bot asesor automático', included: true },
       { text: 'Calendario interactivo', included: true },

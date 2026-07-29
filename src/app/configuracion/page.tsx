@@ -82,7 +82,7 @@ export default function ConfiguracionPage() {
     firstName, lastName, storeName, storeDescription, street, streetNumber, province, locality,
     socialMedia, branches, schedules 
   } = useAuth();
-  const { planDisplayName, isPaidPlan, productPlanTier, servicePlanTier } = usePlan();
+  const { planDisplayName, isPaidPlan, productPlanTier, servicePlanTier, permissions } = usePlan();
   const fileInputRef = useRef<HTMLInputElement>(null);
   const [isUploading, setIsUploading] = useState(false);
 
@@ -868,9 +868,15 @@ export default function ConfiguracionPage() {
                 onRemove={() => setSucursales(prev => prev.filter((_, i) => i !== index))}
               />
             ))}
-            <button type="button" onClick={() => setSucursales([...sucursales, { provincia: '', localidad: '', calle: '', numero: '' }])} style={{ background: 'rgba(255,115,0,0.1)', color: 'var(--color-primary)', border: '1px solid rgba(255,115,0,0.3)', padding: '8px 16px', borderRadius: 'var(--radius-full)', cursor: 'pointer', fontSize: '0.9rem', fontWeight: 500 }}>
-              + Añadir otra ubicación
-            </button>
+            {sucursales.length < permissions.maxSucursales ? (
+              <button type="button" onClick={() => setSucursales([...sucursales, { provincia: '', localidad: '', calle: '', numero: '' }])} style={{ background: 'rgba(255,115,0,0.1)', color: 'var(--color-primary)', border: '1px solid rgba(255,115,0,0.3)', padding: '8px 16px', borderRadius: 'var(--radius-full)', cursor: 'pointer', fontSize: '0.9rem', fontWeight: 500 }}>
+                + Añadir otra ubicación
+              </button>
+            ) : (
+              <div style={{ padding: '12px', background: 'rgba(255,115,0,0.05)', borderRadius: 'var(--radius-md)', color: 'var(--color-text-muted)', fontSize: '0.9rem', border: '1px solid rgba(255,115,0,0.2)' }}>
+                Has alcanzado el límite de <strong>{permissions.maxSucursales} sucursal{permissions.maxSucursales !== 1 && 'es'}</strong> de tu plan actual.
+              </div>
+            )}
           </div>
         </details>
 
