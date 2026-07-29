@@ -824,7 +824,12 @@ export default function ConfiguracionPage() {
             Ubicación 
             <svg className="accordion-icon" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><polyline points="6 9 12 15 18 9"></polyline></svg>
           </summary>
-          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(250px, 1fr))', gap: '24px', marginTop: '24px' }}>
+          {permissions.maxSucursales === 0 && (
+            <div style={{ marginTop: '24px', padding: '12px', background: 'rgba(255,115,0,0.05)', borderRadius: 'var(--radius-md)', color: 'var(--color-text-muted)', fontSize: '0.9rem', border: '1px solid rgba(255,115,0,0.2)' }}>
+              Tu plan actual no permite registrar ubicaciones físicas o sucursales.
+            </div>
+          )}
+          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(250px, 1fr))', gap: '24px', marginTop: '24px', opacity: permissions.maxSucursales === 0 ? 0.5 : 1, pointerEvents: permissions.maxSucursales === 0 ? 'none' : 'auto' }}>
             <div className="form-group-config">
               <label>Provincia Principal</label>
               <CustomSelect
@@ -833,6 +838,7 @@ export default function ConfiguracionPage() {
                 value={selectedProvincia}
                 onChange={setSelectedProvincia}
                 placeholder="Seleccione una provincia"
+                disabled={permissions.maxSucursales === 0}
               />
             </div>
             <div className="form-group-config">
@@ -858,24 +864,32 @@ export default function ConfiguracionPage() {
 
           <div style={{ marginTop: '24px', borderTop: '1px dashed var(--color-border)', paddingTop: '24px' }}>
             <h4 style={{ margin: '0 0 16px', color: 'var(--color-text-main)' }}>Otras Sucursales</h4>
-            {sucursales.map((suc, index) => (
-              <SucursalEditor 
-                key={index}
-                index={index}
-                sucursal={suc}
-                provincias={provincias}
-                onChange={(updated) => { const newS = [...sucursales]; newS[index] = updated; setSucursales(newS); }}
-                onRemove={() => setSucursales(prev => prev.filter((_, i) => i !== index))}
-              />
-            ))}
-            {sucursales.length < permissions.maxSucursales ? (
-              <button type="button" onClick={() => setSucursales([...sucursales, { provincia: '', localidad: '', calle: '', numero: '' }])} style={{ background: 'rgba(255,115,0,0.1)', color: 'var(--color-primary)', border: '1px solid rgba(255,115,0,0.3)', padding: '8px 16px', borderRadius: 'var(--radius-full)', cursor: 'pointer', fontSize: '0.9rem', fontWeight: 500 }}>
-                + Añadir otra ubicación
-              </button>
-            ) : (
-              <div style={{ padding: '12px', background: 'rgba(255,115,0,0.05)', borderRadius: 'var(--radius-md)', color: 'var(--color-text-muted)', fontSize: '0.9rem', border: '1px solid rgba(255,115,0,0.2)' }}>
-                Has alcanzado el límite de <strong>{permissions.maxSucursales} sucursal{permissions.maxSucursales !== 1 && 'es'}</strong> de tu plan actual.
+            {permissions.maxSucursales <= 1 ? (
+              <div style={{ padding: '12px', background: 'rgba(255,255,255,0.02)', borderRadius: 'var(--radius-md)', color: 'var(--color-text-muted)', fontSize: '0.9rem', border: '1px solid var(--color-border)' }}>
+                Tu plan no permite añadir sucursales adicionales a la principal.
               </div>
+            ) : (
+              <>
+                {sucursales.map((suc, index) => (
+                  <SucursalEditor 
+                    key={index}
+                    index={index}
+                    sucursal={suc}
+                    provincias={provincias}
+                    onChange={(updated) => { const newS = [...sucursales]; newS[index] = updated; setSucursales(newS); }}
+                    onRemove={() => setSucursales(prev => prev.filter((_, i) => i !== index))}
+                  />
+                ))}
+                {sucursales.length < permissions.maxSucursales - 1 ? (
+                  <button type="button" onClick={() => setSucursales([...sucursales, { provincia: '', localidad: '', calle: '', numero: '' }])} style={{ background: 'rgba(255,115,0,0.1)', color: 'var(--color-primary)', border: '1px solid rgba(255,115,0,0.3)', padding: '8px 16px', borderRadius: 'var(--radius-full)', cursor: 'pointer', fontSize: '0.9rem', fontWeight: 500 }}>
+                    + Añadir otra ubicación
+                  </button>
+                ) : (
+                  <div style={{ padding: '12px', background: 'rgba(255,115,0,0.05)', borderRadius: 'var(--radius-md)', color: 'var(--color-text-muted)', fontSize: '0.9rem', border: '1px solid rgba(255,115,0,0.2)' }}>
+                    Has alcanzado el límite de <strong>{permissions.maxSucursales} ubicaciones en total</strong> (Sede principal + {permissions.maxSucursales - 1} sucursales).
+                  </div>
+                )}
+              </>
             )}
           </div>
         </details>
