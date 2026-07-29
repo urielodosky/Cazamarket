@@ -627,3 +627,23 @@
     margin: 0 !important;
   }
 }
+
+@media (max-width: 768px) {
+  .navbar-logo-img {
+    transform: scale(1) translate(0, 0) !important;
+    height: 40px !important;
+    width: auto !important;
+    min-width: 50px;
+  }
+}
+
+@media (max-width: 768px) {
+  .navbar-center .search-bar-animated {
+    box-sizing: border-box !important;
+    min-width: 0 !important;
+  }
+  .navbar-center .search-bar-animated input {
+    min-width: 0 !important;
+    width: 100% !important;
+  }
+}

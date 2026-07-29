@@ -174,10 +174,9 @@ export default function Navbar() {
 
         <div className="navbar-logo">
           <Link href="/">
-            <Image 
-              src={logoPng}
+            <img 
+              src={logoPng.src}
               alt="CazaMarket Logo" 
-              height={70}
               className="navbar-logo-img"
             />
           </Link>

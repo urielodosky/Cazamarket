@@ -15,7 +15,9 @@ import './MobileNav.css';
 
 export default function MobileNav() {
   const pathname = usePathname();
-  const { isLoggedIn } = useAuth();
+  const { isLoggedIn, isMounted } = useAuth();
+
+  if (!isMounted) return null;
 
   const navItems = [
     { href: '/', icon: <HomeIcon className="mobile-nav-icon-svg" />, label: 'Inicio' },
