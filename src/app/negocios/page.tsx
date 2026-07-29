@@ -249,9 +249,15 @@ export default function NegociosPage() {
                   justifyContent: 'center',
                   flex: 1
                 }}>
-                  <h3 style={{ fontSize: '1.25rem', color: 'var(--color-text-main)', margin: '0 0 6px 0', lineHeight: 1.2 }}>
-                    {negocio.name}
-                  </h3>
+                  <div style={{ display: 'flex', alignItems: 'center', gap: '8px', marginBottom: '6px' }}>
+                    <h3 style={{ fontSize: '1.25rem', color: 'var(--color-text-main)', margin: '0', lineHeight: 1.2 }}>
+                      {negocio.name}
+                    </h3>
+                    <span style={{ display: 'flex', alignItems: 'center', gap: '4px', fontSize: '0.9rem', color: '#FFD700', flexShrink: 0 }}>
+                      <svg width="14" height="14" viewBox="0 0 24 24" fill="#FFD700" stroke="#FFD700" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"></polygon></svg>
+                      4.8
+                    </span>
+                  </div>
                   
                   {/* Location moved below name */}
                   {negocio.locations && negocio.locations.length > 0 && (
