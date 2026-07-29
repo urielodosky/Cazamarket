@@ -391,3 +391,9 @@
     align-items: center;
   }
 }
+
+@media (max-width: 768px) {
+  .home-container {
+    padding-top: 100px;
+  }
+}

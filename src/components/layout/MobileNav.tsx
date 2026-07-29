@@ -7,12 +7,15 @@ import {
   BuildingStorefrontIcon, 
   ShoppingBagIcon, 
   ChatBubbleLeftEllipsisIcon, 
-  StarIcon 
+  StarIcon,
+  UserCircleIcon
 } from '@heroicons/react/24/outline';
+import { useAuth } from '@/contexts/AuthContext';
 import './MobileNav.css';
 
 export default function MobileNav() {
   const pathname = usePathname();
+  const { isLoggedIn } = useAuth();
 
   const navItems = [
     { href: '/', icon: <HomeIcon className="mobile-nav-icon-svg" />, label: 'Inicio' },
@@ -20,6 +23,7 @@ export default function MobileNav() {
     { href: '/productos', icon: <ShoppingBagIcon className="mobile-nav-icon-svg" />, label: 'Productos' },
     { href: '/comunidad', icon: <ChatBubbleLeftEllipsisIcon className="mobile-nav-icon-svg" />, label: 'Comunidad' },
     { href: '/planes', icon: <StarIcon className="mobile-nav-icon-svg" />, label: 'Planes' },
+    { href: isLoggedIn ? '/configuracion' : '/login', icon: <UserCircleIcon className="mobile-nav-icon-svg" />, label: isLoggedIn ? 'Perfil' : 'Ingresar' },
   ];
 
   return (

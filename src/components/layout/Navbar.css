@@ -600,3 +600,30 @@
     height: 40px !important;
   }
 }
+
+@media (max-width: 768px) {
+  .navbar-actions {
+    display: none !important;
+  }
+  .navbar-container {
+    display: flex;
+    flex-wrap: nowrap !important;
+    align-items: center;
+    gap: 8px;
+  }
+  .navbar-logo {
+    flex: 0 0 auto !important;
+  }
+  .navbar-middle-area {
+    display: flex !important;
+    flex: 1 !important;
+  }
+  .navbar-center {
+    display: flex !important;
+    flex: 1 !important;
+  }
+  .navbar-center .search-bar-animated {
+    width: 100% !important;
+    margin: 0 !important;
+  }
+}
