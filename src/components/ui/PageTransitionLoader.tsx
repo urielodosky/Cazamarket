@@ -20,5 +20,9 @@ export default function PageTransitionLoader() {
 
   if (!loading) return null;
 
-  return <LoadingScreen message="Cargando CazaMarket..." />;
+  return (
+    <div className="desktop-only-loader">
+      <LoadingScreen message="Cargando CazaMarket..." />
+    </div>
+  );
 }
