@@ -53,8 +53,8 @@
 }
 
 .tab-btn {
-  background: transparent;
-  border: none;
+  background: rgba(255, 255, 255, 0.04);
+  border: 1px solid rgba(255, 255, 255, 0.08);
   color: var(--color-text-main);
   padding: 10px 24px;
   font-size: 1rem;
@@ -68,11 +68,13 @@
 }
 
 .tab-btn:hover {
-  background: rgba(255, 255, 255, 0.05);
+  background: rgba(255, 255, 255, 0.08);
+  border-color: rgba(255, 255, 255, 0.15);
 }
 
 .tab-btn.active {
   background-color: var(--color-primary);
+  border-color: var(--color-primary);
   color: #fff;
   box-shadow: 0 4px 12px rgba(255, 115, 0, 0.3);
 }
