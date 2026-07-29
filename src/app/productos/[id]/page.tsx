@@ -11,7 +11,6 @@ import { usePlan } from '@/contexts/PlanContext';
 import { PRODUCTOS_DATA } from '@/data/mock';
 import { useThemeColors } from '@/hooks/useThemeColors';
 import { getPlanPermissions } from '@/types/planTypes';
-import WhatsAppVerificationModal from '@/components/WhatsAppVerificationModal';
 function getSocialUrl(platform: string, handle: string) {
   if (handle.startsWith('http') || handle.startsWith('www')) {
     return handle.startsWith('www') ? `https://${handle}` : handle;
@@ -43,10 +42,9 @@ export default function ProductoDetailPage({ params }: { params: Promise<{ id: s
   const [isLoading, setIsLoading] = useState(true);
   const { cart, addToCart, canAddToCart } = useCart();
   const { hasFeature } = usePlan();
-  const { username, isLoggedIn, phoneVerified, supabaseUser } = useAuth();
+  const { username, isLoggedIn, supabaseUser } = useAuth();
   const themeColors = useThemeColors();
   const supabase = createClient();
-  const [isWhatsAppModalOpen, setIsWhatsAppModalOpen] = useState(false);
 
   const isInCart = cart.some(item => item.id === `producto-${product?.id}`);
 
@@ -433,10 +431,6 @@ export default function ProductoDetailPage({ params }: { params: Promise<{ id: s
                     showToast('Debes iniciar sesión para contactar al vendedor', 'error');
                     return;
                   }
-                  if (!phoneVerified) {
-                    setIsWhatsAppModalOpen(true);
-                    return;
-                  }
                   setIsContactMenuOpen(!isContactMenuOpen);
                 }}
                 style={{ 
@@ -692,14 +686,6 @@ export default function ProductoDetailPage({ params }: { params: Promise<{ id: s
         </div>
         </div>
       </div>
-      <WhatsAppVerificationModal 
-        isOpen={isWhatsAppModalOpen} 
-        onClose={() => setIsWhatsAppModalOpen(false)} 
-        onSuccess={() => {
-          setIsWhatsAppModalOpen(false);
-          setIsContactMenuOpen(true);
-        }} 
-      />
     </div>
   );
 }
