@@ -302,9 +302,28 @@ function ProductosContent() {
                   {producto.category}
                 </span>
                 {producto.subcategory && (
-                  <span style={{ background: 'rgba(255, 115, 0, 0.1)', color: 'var(--color-primary)', fontSize: '0.65rem', padding: '2px 6px', borderRadius: 'var(--radius-full)', border: '1px solid rgba(255, 115, 0, 0.2)' }}>
-                    {producto.subcategory}
-                  </span>
+                  <div 
+                    style={{ position: 'relative', display: 'inline-block' }}
+                    onMouseEnter={(e) => { 
+                      const tooltip = e.currentTarget.querySelector('.custom-tooltip') as HTMLElement;
+                      if (tooltip) { tooltip.style.opacity = '1'; tooltip.style.visibility = 'visible'; tooltip.style.transform = 'translateX(-50%) translateY(0)'; }
+                    }}
+                    onMouseLeave={(e) => { 
+                      const tooltip = e.currentTarget.querySelector('.custom-tooltip') as HTMLElement;
+                      if (tooltip) { tooltip.style.opacity = '0'; tooltip.style.visibility = 'hidden'; tooltip.style.transform = 'translateX(-50%) translateY(4px)'; }
+                    }}
+                  >
+                    <span style={{ background: 'rgba(255, 115, 0, 0.1)', color: 'var(--color-primary)', fontSize: '0.65rem', padding: '2px 6px', borderRadius: 'var(--radius-full)', border: '1px solid rgba(255, 115, 0, 0.2)', cursor: 'default' }}>
+                      +1
+                    </span>
+                    <div 
+                      className="custom-tooltip"
+                      style={{ position: 'absolute', bottom: 'calc(100% + 6px)', left: '50%', transform: 'translateX(-50%) translateY(4px)', background: '#1f241a', color: 'var(--color-text-main)', fontSize: '0.7rem', padding: '4px 8px', borderRadius: 'var(--radius-sm)', whiteSpace: 'nowrap', opacity: 0, visibility: 'hidden', transition: 'all 0.2s ease', boxShadow: '0 4px 12px rgba(0,0,0,0.5)', pointerEvents: 'none', zIndex: 50, border: '1px solid var(--color-border)' }}
+                    >
+                      {producto.subcategory}
+                      <div style={{ position: 'absolute', top: '100%', left: '50%', transform: 'translateX(-50%)', borderWidth: '4px', borderStyle: 'solid', borderColor: '#1f241a transparent transparent transparent' }} />
+                    </div>
+                  </div>
                 )}
               </div>
               
@@ -367,9 +386,29 @@ function ProductosContent() {
                             <TruckIcon />
                             <span>{shippingText}</span>
                             {hasPickup && (
-                              <span title={`Retiro en sucursal: ${branchesTooltip}`} style={{ background: 'rgba(255, 115, 0, 0.1)', color: 'var(--color-primary)', padding: '2px 4px', borderRadius: 'var(--radius-full)', border: '1px solid rgba(255,115,0,0.2)', cursor: 'help', fontWeight: 600 }}>
-                                +{branchesCount > 0 ? branchesCount : 1}
-                              </span>
+                              <div 
+                                style={{ position: 'relative', display: 'inline-block' }}
+                                onMouseEnter={(e) => { 
+                                  const tooltip = e.currentTarget.querySelector('.branches-tooltip') as HTMLElement;
+                                  if (tooltip) { tooltip.style.opacity = '1'; tooltip.style.visibility = 'visible'; tooltip.style.transform = 'translateX(-50%) translateY(0)'; }
+                                }}
+                                onMouseLeave={(e) => { 
+                                  const tooltip = e.currentTarget.querySelector('.branches-tooltip') as HTMLElement;
+                                  if (tooltip) { tooltip.style.opacity = '0'; tooltip.style.visibility = 'hidden'; tooltip.style.transform = 'translateX(-50%) translateY(4px)'; }
+                                }}
+                              >
+                                <span style={{ background: 'rgba(255, 115, 0, 0.1)', color: 'var(--color-primary)', padding: '2px 4px', borderRadius: 'var(--radius-full)', border: '1px solid rgba(255,115,0,0.2)', cursor: 'default', fontWeight: 600 }}>
+                                  +{branchesCount > 0 ? branchesCount : 1}
+                                </span>
+                                <div 
+                                  className="branches-tooltip"
+                                  style={{ position: 'absolute', bottom: 'calc(100% + 6px)', left: '50%', transform: 'translateX(-50%) translateY(4px)', background: '#1f241a', color: 'var(--color-text-main)', fontSize: '0.7rem', padding: '6px 10px', borderRadius: 'var(--radius-sm)', whiteSpace: 'nowrap', opacity: 0, visibility: 'hidden', transition: 'all 0.2s ease', boxShadow: '0 4px 12px rgba(0,0,0,0.5)', pointerEvents: 'none', zIndex: 50, border: '1px solid var(--color-border)', minWidth: '120px', textAlign: 'center' }}
+                                >
+                                  <div style={{ color: 'var(--color-primary)', fontWeight: 'bold', marginBottom: '2px' }}>Retiro en sucursal</div>
+                                  <div style={{ color: 'var(--color-text-muted)' }}>{branchesTooltip}</div>
+                                  <div style={{ position: 'absolute', top: '100%', left: '50%', transform: 'translateX(-50%)', borderWidth: '4px', borderStyle: 'solid', borderColor: '#1f241a transparent transparent transparent' }} />
+                                </div>
+                              </div>
                             )}
                           </>
                         );
@@ -379,9 +418,29 @@ function ProductosContent() {
                             <StoreIcon />
                             <span>Retiro en sucursal</span>
                             {branchesCount > 0 && (
-                              <span title={branchesTooltip} style={{ background: 'rgba(255, 115, 0, 0.1)', color: 'var(--color-primary)', padding: '2px 4px', borderRadius: 'var(--radius-full)', border: '1px solid rgba(255,115,0,0.2)', cursor: 'help', fontWeight: 600 }}>
-                                +{branchesCount}
-                              </span>
+                              <div 
+                                style={{ position: 'relative', display: 'inline-block' }}
+                                onMouseEnter={(e) => { 
+                                  const tooltip = e.currentTarget.querySelector('.branches-tooltip') as HTMLElement;
+                                  if (tooltip) { tooltip.style.opacity = '1'; tooltip.style.visibility = 'visible'; tooltip.style.transform = 'translateX(-50%) translateY(0)'; }
+                                }}
+                                onMouseLeave={(e) => { 
+                                  const tooltip = e.currentTarget.querySelector('.branches-tooltip') as HTMLElement;
+                                  if (tooltip) { tooltip.style.opacity = '0'; tooltip.style.visibility = 'hidden'; tooltip.style.transform = 'translateX(-50%) translateY(4px)'; }
+                                }}
+                              >
+                                <span style={{ background: 'rgba(255, 115, 0, 0.1)', color: 'var(--color-primary)', padding: '2px 4px', borderRadius: 'var(--radius-full)', border: '1px solid rgba(255,115,0,0.2)', cursor: 'default', fontWeight: 600 }}>
+                                  +{branchesCount}
+                                </span>
+                                <div 
+                                  className="branches-tooltip"
+                                  style={{ position: 'absolute', bottom: 'calc(100% + 6px)', left: '50%', transform: 'translateX(-50%) translateY(4px)', background: '#1f241a', color: 'var(--color-text-main)', fontSize: '0.7rem', padding: '6px 10px', borderRadius: 'var(--radius-sm)', whiteSpace: 'nowrap', opacity: 0, visibility: 'hidden', transition: 'all 0.2s ease', boxShadow: '0 4px 12px rgba(0,0,0,0.5)', pointerEvents: 'none', zIndex: 50, border: '1px solid var(--color-border)', minWidth: '120px', textAlign: 'center' }}
+                                >
+                                  <div style={{ color: 'var(--color-primary)', fontWeight: 'bold', marginBottom: '2px' }}>Sucursales disponibles</div>
+                                  <div style={{ color: 'var(--color-text-muted)' }}>{branchesTooltip}</div>
+                                  <div style={{ position: 'absolute', top: '100%', left: '50%', transform: 'translateX(-50%)', borderWidth: '4px', borderStyle: 'solid', borderColor: '#1f241a transparent transparent transparent' }} />
+                                </div>
+                              </div>
                             )}
                           </>
                         );
