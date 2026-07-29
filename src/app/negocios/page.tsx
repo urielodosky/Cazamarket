@@ -10,10 +10,10 @@ import { PlanTier, isAtLeast } from '@/types/planTypes';
 
 import { NEGOCIOS_DATA } from '@/data/mock';
 import { useThemeColors } from '@/hooks/useThemeColors';
-
-import { supabase } from '@/lib/supabaseClient';
+import { createClient } from '@/lib/supabase/client';
 
 export default function NegociosPage() {
+  const supabase = createClient();
   const router = useRouter();
   const { isFavorite, toggleFavorite } = useFavorites();
   const { isVendorModeActive, supabaseUser } = useAuth();
