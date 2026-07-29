@@ -72,14 +72,28 @@ export default function ProductoDetailPage({ params }: { params: Promise<{ id: s
   const handleContactIntent = async () => {
     if (supabaseUser && product?.seller?.id) {
       try {
+        const sellerId = product.seller.id || '00000000-0000-0000-0000-000000000000';
+        // Insert product interaction
         await supabase.from('interactions').insert({
           buyer_id: supabaseUser.id,
-          seller_id: product.seller.id || '00000000-0000-0000-0000-000000000000',
+          seller_id: sellerId,
           product_id: product.id,
           status: 'pending_time'
         });
       } catch(err) {
-        console.error("Error al registrar interacción", err);
+        // Silently ignore constraint violations
+      }
+
+      try {
+        // Insert business interaction (product_id = null)
+        await supabase.from('interactions').insert({
+          buyer_id: supabaseUser.id,
+          seller_id: product.seller.id || '00000000-0000-0000-0000-000000000000',
+          product_id: null,
+          status: 'pending_time'
+        });
+      } catch(err) {
+        // Silently ignore constraint violations
       }
     }
   };

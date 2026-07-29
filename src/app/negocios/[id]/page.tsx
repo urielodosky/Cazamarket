@@ -389,7 +389,7 @@ export default function NegocioDetailPage({ params }: { params: Promise<{ id: st
 
           {/* Tabs Navigation */}
           <div style={{ display: 'flex', borderBottom: '1px solid var(--color-border)', marginBottom: '32px' }}>
-            {['productos', 'servicios', 'informacion'].map(tab => (
+            {['productos', 'servicios', 'informacion', 'reseñas'].map(tab => (
               <button 
                 key={tab}
                 onClick={() => setActiveTab(tab)}
@@ -539,11 +539,22 @@ export default function NegocioDetailPage({ params }: { params: Promise<{ id: st
                                        onClick={() => router.push(`/productos/${id}`)}
                                        onMouseEnter={(e) => e.currentTarget.style.transform = 'translateY(-4px)'}
                                        onMouseLeave={(e) => e.currentTarget.style.transform = 'none'}>
-                                    <div style={{ height: '180px', background: image ? `url(${image}) center/cover` : 'rgba(255,255,255,0.03)', display: 'flex', alignItems: 'center', justifyContent: 'center', borderBottom: '1px solid var(--color-border)' }}>
+                                    <div style={{ position: 'relative', height: '180px', background: image ? `url(${image}) center/cover` : 'rgba(255,255,255,0.03)', display: 'flex', alignItems: 'center', justifyContent: 'center', borderBottom: '1px solid var(--color-border)' }}>
                                        {!image && <span style={{ opacity: 0.3, fontSize: '0.9rem' }}>Foto del Producto</span>}
+                                       {/* Product Rating Top Right */}
+                                       <div style={{ position: 'absolute', top: '10px', right: '10px', background: 'rgba(0,0,0,0.65)', backdropFilter: 'blur(4px)', padding: '4px 8px', borderRadius: '12px', display: 'flex', alignItems: 'center', gap: '4px', zIndex: 5 }}>
+                                         <svg width="12" height="12" viewBox="0 0 24 24" fill="#FFD700" stroke="#FFD700" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"></polygon></svg>
+                                         <span style={{ color: '#fff', fontSize: '0.8rem', fontWeight: 'bold' }}>4.8</span>
+                                       </div>
                                     </div>
                                     <div style={{ padding: '16px' }}>
-                                      <h4 style={{ margin: '0 0 8px 0', fontSize: '1rem', color: 'var(--color-text-main)', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>{name}</h4>
+                                      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: '8px' }}>
+                                        <h4 style={{ margin: '0', fontSize: '1rem', color: 'var(--color-text-main)', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>{name}</h4>
+                                        <span style={{ display: 'flex', alignItems: 'center', gap: '2px', fontSize: '0.8rem', color: '#FFD700', flexShrink: 0 }}>
+                                          <svg width="12" height="12" viewBox="0 0 24 24" fill="#FFD700" stroke="#FFD700" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"></polygon></svg>
+                                          4.8
+                                        </span>
+                                      </div>
                                       <div style={{ color: 'var(--color-text-muted)', fontSize: '0.8rem', marginBottom: '12px' }}>{section.name}</div>
                                       <p style={{ color: 'var(--color-primary)', fontWeight: 'bold', margin: 0, fontSize: '1.2rem' }}>{priceStr}</p>
                                     </div>
@@ -573,11 +584,22 @@ export default function NegocioDetailPage({ params }: { params: Promise<{ id: st
                                onClick={() => router.push(`/productos/${id}`)}
                                onMouseEnter={(e) => e.currentTarget.style.transform = 'translateY(-4px)'}
                                onMouseLeave={(e) => e.currentTarget.style.transform = 'none'}>
-                            <div style={{ height: '180px', background: image ? `url(${image}) center/cover` : 'rgba(255,255,255,0.03)', display: 'flex', alignItems: 'center', justifyContent: 'center', borderBottom: '1px solid var(--color-border)' }}>
+                            <div style={{ position: 'relative', height: '180px', background: image ? `url(${image}) center/cover` : 'rgba(255,255,255,0.03)', display: 'flex', alignItems: 'center', justifyContent: 'center', borderBottom: '1px solid var(--color-border)' }}>
                                {!image && <span style={{ opacity: 0.3, fontSize: '0.9rem' }}>Foto del Producto</span>}
+                               {/* Product Rating Top Right */}
+                               <div style={{ position: 'absolute', top: '10px', right: '10px', background: 'rgba(0,0,0,0.65)', backdropFilter: 'blur(4px)', padding: '4px 8px', borderRadius: '12px', display: 'flex', alignItems: 'center', gap: '4px', zIndex: 5 }}>
+                                 <svg width="12" height="12" viewBox="0 0 24 24" fill="#FFD700" stroke="#FFD700" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"></polygon></svg>
+                                 <span style={{ color: '#fff', fontSize: '0.8rem', fontWeight: 'bold' }}>4.8</span>
+                               </div>
                             </div>
                             <div style={{ padding: '16px' }}>
-                              <h4 style={{ margin: '0 0 8px 0', fontSize: '1rem', color: 'var(--color-text-main)', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>{name}</h4>
+                              <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: '8px' }}>
+                                <h4 style={{ margin: '0', fontSize: '1rem', color: 'var(--color-text-main)', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>{name}</h4>
+                                <span style={{ display: 'flex', alignItems: 'center', gap: '2px', fontSize: '0.8rem', color: '#FFD700', flexShrink: 0 }}>
+                                  <svg width="12" height="12" viewBox="0 0 24 24" fill="#FFD700" stroke="#FFD700" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"></polygon></svg>
+                                  4.8
+                                </span>
+                              </div>
                               <div style={{ color: 'var(--color-text-muted)', fontSize: '0.8rem', marginBottom: '12px' }}>Categoría General</div>
                               <p style={{ color: 'var(--color-primary)', fontWeight: 'bold', margin: 0, fontSize: '1.2rem' }}>{priceStr}</p>
                             </div>
@@ -904,6 +926,69 @@ export default function NegocioDetailPage({ params }: { params: Promise<{ id: st
                        </div>
                      </div>
                    )}
+                </div>
+              </div>
+            )}
+            
+            {/* RESEÑAS TAB */}
+            {activeTab === 'reseñas' && (
+              <div style={{ display: 'flex', flexDirection: 'column', gap: '32px' }}>
+                <div>
+                  <h3 style={{ margin: '0 0 8px 0', fontSize: '1.5rem', display: 'flex', alignItems: 'center', gap: '12px' }}>
+                    Reseñas del Negocio
+                    <span style={{ display: 'flex', alignItems: 'center', gap: '4px', background: 'rgba(255,215,0,0.1)', color: '#FFD700', padding: '4px 12px', borderRadius: 'var(--radius-full)', fontSize: '1.1rem' }}>
+                      <svg width="20" height="20" viewBox="0 0 24 24" fill="#FFD700" stroke="#FFD700" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"></polygon></svg>
+                      4.8
+                    </span>
+                  </h3>
+                  <p style={{ color: 'var(--color-text-muted)', margin: 0 }}>Valoración general basada en las opiniones de los compradores.</p>
+                </div>
+                
+                <div style={{ display: 'flex', flexDirection: 'column', gap: '16px' }}>
+                  {/* Mock Review */}
+                  <div style={{ padding: '24px', borderRadius: 'var(--radius-lg)', background: 'rgba(255,255,255,0.03)', border: '1px solid var(--color-border)' }}>
+                    <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: '12px' }}>
+                      <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
+                        <div style={{ width: '40px', height: '40px', borderRadius: '50%', background: 'var(--color-primary)', display: 'flex', alignItems: 'center', justifyContent: 'center', color: '#fff', fontWeight: 'bold' }}>
+                          M
+                        </div>
+                        <div>
+                          <h4 style={{ margin: '0 0 2px 0', color: 'var(--color-text-main)', fontSize: '1.1rem' }}>Martín G.</h4>
+                          <span style={{ color: 'var(--color-text-muted)', fontSize: '0.85rem' }}>Hace 2 días</span>
+                        </div>
+                      </div>
+                      <div style={{ display: 'flex', gap: '4px' }}>
+                        {[1,2,3,4,5].map(star => (
+                          <svg key={star} width="16" height="16" viewBox="0 0 24 24" fill={star <= 5 ? "#FFD700" : "none"} stroke="#FFD700" strokeWidth="2"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"></polygon></svg>
+                        ))}
+                      </div>
+                    </div>
+                    <p style={{ margin: 0, color: 'var(--color-text-muted)', lineHeight: 1.6, fontSize: '1rem' }}>
+                      "Excelente atención. Me asesoraron perfecto con lo que necesitaba y el envío fue rapidísimo. Muy recomendables."
+                    </p>
+                  </div>
+
+                  <div style={{ padding: '24px', borderRadius: 'var(--radius-lg)', background: 'rgba(255,255,255,0.03)', border: '1px solid var(--color-border)' }}>
+                    <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: '12px' }}>
+                      <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
+                        <div style={{ width: '40px', height: '40px', borderRadius: '50%', background: '#4a5568', display: 'flex', alignItems: 'center', justifyContent: 'center', color: '#fff', fontWeight: 'bold' }}>
+                          A
+                        </div>
+                        <div>
+                          <h4 style={{ margin: '0 0 2px 0', color: 'var(--color-text-main)', fontSize: '1.1rem' }}>Agustín P.</h4>
+                          <span style={{ color: 'var(--color-text-muted)', fontSize: '0.85rem' }}>Hace 1 semana</span>
+                        </div>
+                      </div>
+                      <div style={{ display: 'flex', gap: '4px' }}>
+                        {[1,2,3,4,5].map(star => (
+                          <svg key={star} width="16" height="16" viewBox="0 0 24 24" fill={star <= 4 ? "#FFD700" : "none"} stroke="#FFD700" strokeWidth="2"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"></polygon></svg>
+                        ))}
+                      </div>
+                    </div>
+                    <p style={{ margin: 0, color: 'var(--color-text-muted)', lineHeight: 1.6, fontSize: '1rem' }}>
+                      "Buenos productos, aunque demoraron un poco más de lo acordado en despachar."
+                    </p>
+                  </div>
                 </div>
               </div>
             )}
