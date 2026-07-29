@@ -363,6 +363,17 @@ export default function ProductoDetailPage({ params }: { params: Promise<{ id: s
         <div style={{ display: 'flex', flexDirection: 'column', gap: '20px' }}>
 
           <div>
+            {/* Store Avatar + Name + Rating */}
+            <div style={{ display: 'flex', alignItems: 'center', gap: '12px', marginBottom: '16px', cursor: 'pointer' }} onClick={() => { if (product.seller?.id) router.push(`/negocios/${product.seller.id}`); }}>
+              <img src={product.seller?.avatar || 'https://images.unsplash.com/photo-1511497584788-876760111969?q=80&w=200&auto=format&fit=crop'} alt={product.seller?.name} style={{ width: '40px', height: '40px', borderRadius: '50%', objectFit: 'cover', border: '1px solid var(--color-border)' }} />
+              <div style={{ display: 'flex', flexDirection: 'column' }}>
+                <span style={{ color: 'var(--color-primary)', fontSize: '0.9rem', textTransform: 'uppercase', fontWeight: 'bold' }}>{product.seller?.name || 'Vendedor'}</span>
+                <span style={{ display: 'flex', alignItems: 'center', gap: '4px', fontSize: '0.85rem', color: '#FFD700', marginTop: '2px' }}>
+                  <svg width="14" height="14" viewBox="0 0 24 24" fill="#FFD700" stroke="#FFD700" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"></polygon></svg>
+                  4.8
+                </span>
+              </div>
+            </div>
             <div style={{ display: 'flex', gap: '8px', flexWrap: 'wrap', marginBottom: '12px' }}>
               <span style={{ background: 'transparent', color: 'var(--color-primary)', border: '1px solid var(--color-primary)', padding: '4px 12px', borderRadius: '12px', fontSize: '0.8rem', fontWeight: 600, display: 'inline-block' }}>
                 {product.category}
@@ -373,9 +384,15 @@ export default function ProductoDetailPage({ params }: { params: Promise<{ id: s
                 </span>
               )}
             </div>
-            <h1 style={{ fontSize: '2.2rem', color: 'var(--color-text-main)', margin: '0 0 12px 0', lineHeight: 1.2, fontWeight: 700, letterSpacing: '-0.3px' }}>
-              {product.name}
-            </h1>
+            <div style={{ display: 'flex', alignItems: 'flex-start', justifyContent: 'space-between', gap: '16px', marginBottom: '12px' }}>
+              <h1 style={{ fontSize: '2.2rem', color: 'var(--color-text-main)', margin: '0', lineHeight: 1.2, fontWeight: 700, letterSpacing: '-0.3px' }}>
+                {product.name}
+              </h1>
+              <span style={{ display: 'flex', alignItems: 'center', gap: '6px', fontSize: '1.2rem', color: '#FFD700', flexShrink: 0, marginTop: '4px' }}>
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="#FFD700" stroke="#FFD700" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"></polygon></svg>
+                4.8
+              </span>
+            </div>
 
             {/* ID, Condición y Stock */}
             <div style={{ display: 'flex', alignItems: 'center', gap: '12px', marginBottom: '24px', flexWrap: 'wrap' }}>
