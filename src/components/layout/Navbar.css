@@ -647,3 +647,15 @@
     width: 100% !important;
   }
 }
+
+@media (max-width: 768px) {
+  .navbar-container {
+    overflow: hidden !important;
+  }
+  .navbar-middle-area {
+    min-width: 0 !important;
+  }
+  .navbar-center {
+    min-width: 0 !important;
+  }
+}
