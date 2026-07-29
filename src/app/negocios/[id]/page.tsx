@@ -69,7 +69,7 @@ const BLANK_NEGOCIO = {
   reviews: 0,
   image: 'https://images.unsplash.com/photo-1503614472-8c93d56e92ce?q=80&w=1200&auto=format&fit=crop',
   avatar: 'https://ui-avatars.com/api/?name=Mi+Negocio&background=ff7300&color=fff',
-  planTier: 'comercial' as PlanTier,
+  planTier: 'basico' as PlanTier,
   description: 'Bienvenido a mi tienda oficial en CazaMarket.',
   businessType: 'Tienda',
   categories: [],
