@@ -6,11 +6,13 @@ import { useRouter } from 'next/navigation';
 import { useAuth } from '@/contexts/AuthContext';
 import { useCart, CartItem } from '@/contexts/CartContext';
 import { NEGOCIOS_DATA } from '@/data/mock';
+import { createClient } from '@/lib/supabase/client';
 
 export default function CarritoPage() {
   const router = useRouter();
   const { cart, removeFromCart, updateQuantity } = useCart();
-  const { username } = useAuth();
+  const { username, supabaseUser } = useAuth();
+  const supabase = createClient();
 
   const parsePrice = (priceStr: string) => {
     return parseFloat(priceStr.replace(/[^0-9.]/g, ''));
@@ -83,6 +85,26 @@ export default function CarritoPage() {
     message += `\n*Total estimado: $${total.toFixed(2)}*\n\n¿Tienen disponibilidad y cómo sería el envío/pago?`;
     
     return `https://wa.me/${phone}?text=${encodeURIComponent(message)}`;
+  };
+
+  const handleCartCheckout = async (items: CartItem[]) => {
+    if (!supabaseUser) return;
+    
+    try {
+      // Registrar interacción por cada producto distinto en el carrito para esa tienda
+      const uniqueProductIds = Array.from(new Set(items.map(i => i.id.replace('producto-', ''))));
+      
+      const inserts = uniqueProductIds.map(productId => ({
+        buyer_id: supabaseUser.id,
+        seller_id: items[0].storeId,
+        product_id: parseInt(productId) || null, // Asumimos que id numérico es producto, sino null si es negocio
+        status: 'pending_time'
+      }));
+
+      await supabase.from('interactions').insert(inserts);
+    } catch (err) {
+      console.error('Error recording cart interactions', err);
+    }
   };
 
   return (
@@ -194,6 +216,7 @@ export default function CarritoPage() {
                     href={generateWhatsAppLink(storeId, items, storeTotal)}
                     target="_blank"
                     rel="noopener noreferrer"
+                    onClick={() => handleCartCheckout(items)}
                     style={{ textDecoration: 'none', marginTop: 'auto' }}
                   >
                     <button style={{ width: '100%', padding: '14px', borderRadius: 'var(--radius-full)', fontSize: '1.1rem', fontWeight: 'bold', display: 'flex', justifyContent: 'center', alignItems: 'center', gap: '8px', background: '#25D366', color: '#fff', border: 'none', cursor: 'pointer', transition: 'transform 0.2s', boxShadow: '0 4px 14px rgba(37, 211, 102, 0.4)' }}
