@@ -192,28 +192,10 @@ export default function Navbar() {
           }}
         >
           <div className={`navbar-center glass-panel ${navbarModeClass}`}>
-              <form 
-                className="search-bar-animated"
-                style={{ 
-                  display: 'flex', 
-                  alignItems: 'center', 
-                  background: isFocused ? themeColors.bgSubtle : 'transparent',
-                  padding: '4px 6px',
-                  borderRadius: 'var(--radius-full)',
-                  border: isFocused ? `1px solid ${themeColors.primary}` : `1px solid ${themeColors.borderSubtle3}`,
-                  transition: 'all 0.3s ease',
-                  flex: 1,
-                  boxShadow: isFocused ? `0 0 0 2px ${themeColors.primary}33` : 'none'
-                }}
-                onSubmit={(e) => {
-                  e.preventDefault();
-                  executeSearch();
-                }}
-              >
+            <div className="search-bar-animated" style={{ zIndex: 10 }}>
                 <button 
-                  suppressHydrationWarning
-                  type="submit"
                   className="search-icon-btn" 
+                  onClick={() => executeSearch()} 
                   title="Buscar"
                   style={{ 
                     background: 'var(--color-primary)', 
@@ -242,11 +224,9 @@ export default function Navbar() {
                   type="text" 
                   value={searchQuery}
                   onChange={(e) => setSearchQuery(e.target.value)}
-                  onFocus={() => setIsFocused(true)}
-                  onBlur={() => setIsFocused(false)}
                   placeholder={searchPlaceholder} 
                   onKeyDown={(e) => { if (e.key === 'Enter') executeSearch(); }}
-                  style={{ marginLeft: '12px', color: themeColors.textWhite, minWidth: 0, width: '100%', background: 'transparent', border: 'none', outline: 'none' }}
+                  style={{ marginLeft: '12px', color: themeColors.textWhite }}
                 />
                 {isFilterablePage && <button 
                   suppressHydrationWarning
@@ -267,9 +247,15 @@ export default function Navbar() {
                     padding: '8px 18px',
                     background: isFiltersOpen ? 'var(--color-primary)' : themeColors.bgSubtle3,
                     border: isFiltersOpen ? '1px solid var(--color-primary)' : `1px solid ${themeColors.borderSubtle3}`,
-                    color: themeColors.textWhite,
-                    marginLeft: '8px',
+                    color: isFiltersOpen ? 'white' : themeColors.textWhite,
                     cursor: 'pointer',
+                    pointerEvents: 'auto',
+                    transition: 'all 0.4s cubic-bezier(0.4, 0, 0.2, 1)',
+                    backdropFilter: 'blur(10px)'
+                  }}
+                  onMouseEnter={(e) => {
+                    if (isFiltersOpen) return;
+                    e.currentTarget.style.background = themeColors.bgSubtle4;
                     e.currentTarget.style.borderColor = themeColors.borderSubtle;
                     e.currentTarget.style.transform = 'translateY(-1px)';
                   }}
@@ -304,8 +290,6 @@ export default function Navbar() {
                   Filtros
                 </button>}
               </div>
-            )}
-            
             {!isHome && <div className="divider-vertical-animated" style={{ display: 'none' }}></div>}
   
             <div className={`links-wrapper ${isMobileMenuOpen ? 'mobile-open' : ''}`}>
