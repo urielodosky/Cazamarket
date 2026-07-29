@@ -53,13 +53,25 @@ function ProductosContent() {
       
       const { data, error } = await query;
       if (data && !error) {
-        // Formatear los productos de Supabase para que coincidan con la UI si es necesario
-        const formattedData = data.map(p => ({
-          ...p,
-          store: p.profiles?.store_name || `${p.profiles?.first_name || ''} ${p.profiles?.last_name || ''}`.trim() || 'Usuario Anónimo',
-          avatar: p.profiles?.avatar_url || 'https://images.unsplash.com/photo-1511497584788-876760111969?q=80&w=200&auto=format&fit=crop',
-          branches: p.profiles?.branches || []
-        }));
+        // Fallback al perfil guardado localmente si es el mismo usuario
+        const localProf = localStorage.getItem('cazamarket_profile');
+        let parsedProf: any = null;
+        if (localProf) {
+          try { parsedProf = JSON.parse(localProf); } catch (e) {}
+        }
+        
+        const formattedData = data.map(p => {
+          const isOwn = userData?.user?.id === p.user_id;
+          const fallbackStore = isOwn && parsedProf ? (parsedProf.storeName || parsedProf.username || parsedProf.firstName) : 'Usuario Anónimo';
+          const fallbackAvatar = isOwn && parsedProf?.avatar ? parsedProf.avatar : 'https://images.unsplash.com/photo-1511497584788-876760111969?q=80&w=200&auto=format&fit=crop';
+          
+          return {
+            ...p,
+            store: p.profiles?.store_name || p.profiles?.full_name || `${p.profiles?.first_name || ''} ${p.profiles?.last_name || ''}`.trim() || fallbackStore,
+            avatar: p.profiles?.avatar_url || fallbackAvatar,
+            branches: p.profiles?.branches || (isOwn && parsedProf?.branches ? parsedProf.branches : [])
+          };
+        });
         setLocalProducts(formattedData);
       }
     };
@@ -277,49 +289,54 @@ function ProductosContent() {
               </div>
 
               {/* Nombre del producto */}
-              <h3 style={{ fontSize: '1.1rem', color: 'var(--color-text-main)', margin: '0 0 var(--spacing-2) 0' }}>{producto.name}</h3>
+              <h3 style={{ fontSize: '1rem', color: 'var(--color-text-main)', margin: '0 0 2px 0' }}>{producto.name}</h3>
               
               {/* Descripcion (max 3 lineas) */}
-              <p style={{ color: 'var(--color-text-muted)', fontSize: '0.85rem', lineHeight: 1.4, margin: '0 0 var(--spacing-4) 0', display: '-webkit-box', WebkitLineClamp: 3, WebkitBoxOrient: 'vertical', overflow: 'hidden' }}>
+              <p style={{ color: 'var(--color-text-muted)', fontSize: '0.8rem', lineHeight: 1.3, margin: '0 0 8px 0', display: '-webkit-box', WebkitLineClamp: 3, WebkitBoxOrient: 'vertical', overflow: 'hidden' }}>
                 {producto.description}
               </p>
 
-              {/* Categoria + +1 */}
+              {/* Categoria + Subcategoria */}
               <div style={{ display: 'flex', gap: '4px', flexWrap: 'wrap', marginBottom: 'auto' }}>
-                <span style={{ background: 'rgba(255,255,255,0.05)', color: 'var(--color-text-muted)', fontSize: '0.7rem', padding: '2px 8px', borderRadius: 'var(--radius-full)' }}>
+                <span style={{ background: 'rgba(255,255,255,0.05)', color: 'var(--color-text-muted)', fontSize: '0.65rem', padding: '2px 6px', borderRadius: 'var(--radius-full)' }}>
                   {producto.category}
                 </span>
                 {producto.subcategory && (
-                  <span title={producto.subcategory} style={{ background: 'rgba(255, 115, 0, 0.1)', color: 'var(--color-primary)', fontSize: '0.7rem', padding: '2px 8px', borderRadius: 'var(--radius-full)', border: '1px solid rgba(255, 115, 0, 0.2)', cursor: 'help' }}>
-                    +1
+                  <span style={{ background: 'rgba(255, 115, 0, 0.1)', color: 'var(--color-primary)', fontSize: '0.65rem', padding: '2px 6px', borderRadius: 'var(--radius-full)', border: '1px solid rgba(255, 115, 0, 0.2)' }}>
+                    {producto.subcategory}
                   </span>
                 )}
               </div>
               
-              <div style={{ marginTop: '12px' }}>
+              <div style={{ marginTop: '8px' }}>
                 {/* Price + Stock */}
-                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'baseline', marginBottom: '4px' }}>
+                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'baseline', marginBottom: '6px' }}>
                   <div style={{ display: 'flex', alignItems: 'baseline', gap: '4px' }}>
                     {producto.price?.includes && producto.price.includes(' ') ? (
                       <>
-                        <span style={{ fontSize: '1.2rem', fontWeight: 'bold', color: '#a8b87c' }}>{producto.price.split(' ').slice(1).join(' ')}</span>
-                        <span style={{ fontSize: '0.8rem', fontWeight: 'bold', color: '#a8b87c' }}>{producto.price.split(' ')[0]}</span>
+                        <span style={{ fontSize: '1.1rem', fontWeight: 'bold', color: '#a8b87c' }}>{producto.price.split(' ').slice(1).join(' ')}</span>
+                        <span style={{ fontSize: '0.75rem', fontWeight: 'bold', color: '#a8b87c' }}>{producto.price.split(' ')[0]}</span>
                       </>
                     ) : (
-                      <span style={{ fontSize: '1.2rem', fontWeight: 'bold', color: '#a8b87c' }}>{typeof producto.price === 'number' ? '$ ' + producto.price.toLocaleString('es-AR') : producto.price}</span>
+                      <span style={{ fontSize: '1.1rem', fontWeight: 'bold', color: '#a8b87c' }}>{typeof producto.price === 'number' ? '$ ' + producto.price.toLocaleString('es-AR') : producto.price}</span>
                     )}
                   </div>
                   {((producto.stock_mode === 'definido' || producto.stockMode === 'definido') && producto.stock !== null && producto.stock !== undefined) && (
-                    <span style={{ fontSize: '0.75rem', color: 'var(--color-text-muted)' }}>Stock: {producto.stock}</span>
+                    <span style={{ fontSize: '0.7rem', color: 'var(--color-text-muted)' }}>Stock: {producto.stock}</span>
                   )}
                 </div>
                 
                 {/* Shipping / Retiro */}
                 <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-                  <div style={{ fontSize: '0.75rem', color: 'color-mix(in srgb, var(--color-text-main) 60%, transparent)', display: 'flex', alignItems: 'center', gap: '6px' }}>
+                  <div style={{ fontSize: '0.7rem', color: 'color-mix(in srgb, var(--color-text-main) 60%, transparent)', display: 'flex', alignItems: 'center', gap: '4px' }}>
                     {(() => {
                       const hasShipping = producto.shipping_mode === 'gratis' || producto.shipping_mode === 'costo_extra' || typeof producto.seller?.shippingCost === 'number' || typeof producto.shippingCost === 'number';
-                      const shippingText = producto.shipping_mode === 'gratis' || producto.seller?.shippingCost === 0 || producto.shippingCost === 0 ? 'Envío gratis' : 'Envío con costo';
+                      let shippingText = producto.shipping_mode === 'gratis' || producto.seller?.shippingCost === 0 || producto.shippingCost === 0 ? 'Envío gratis' : 'Envío con costo';
+                      // Mostrar el costo real si está en producto.shipping_cost
+                      if (producto.shipping_mode === 'costo_extra' && producto.shipping_cost) {
+                        shippingText = producto.shipping_cost;
+                      }
+                      
                       const hasPickup = producto.pickup_available === 'si' || (producto.seller?.branches && producto.seller.branches.length > 0);
                       const branches = producto.branches || producto.seller?.branches || [];
                       const branchesCount = branches.length;
@@ -328,12 +345,29 @@ function ProductosContent() {
                         ? branches.map((b: any) => `${b.calle || ''} ${b.numero || ''}, ${b.localidad || ''}`.trim().replace(/^,/, '').trim()).join(' | ') 
                         : 'Ver sucursales';
 
+                      const TruckIcon = () => (
+                        <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                          <rect x="1" y="3" width="15" height="13"></rect>
+                          <polygon points="16 8 20 8 23 11 23 16 16 16 16 8"></polygon>
+                          <circle cx="5.5" cy="18.5" r="2.5"></circle>
+                          <circle cx="18.5" cy="18.5" r="2.5"></circle>
+                        </svg>
+                      );
+
+                      const StoreIcon = () => (
+                        <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                          <path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"></path>
+                          <polyline points="9 22 9 12 15 12 15 22"></polyline>
+                        </svg>
+                      );
+
                       if (hasShipping) {
                         return (
                           <>
+                            <TruckIcon />
                             <span>{shippingText}</span>
                             {hasPickup && (
-                              <span title={`Retiro en sucursal: ${branchesTooltip}`} style={{ background: 'rgba(255, 115, 0, 0.1)', color: 'var(--color-primary)', padding: '2px 6px', borderRadius: 'var(--radius-full)', border: '1px solid rgba(255,115,0,0.2)', cursor: 'help', fontWeight: 600 }}>
+                              <span title={`Retiro en sucursal: ${branchesTooltip}`} style={{ background: 'rgba(255, 115, 0, 0.1)', color: 'var(--color-primary)', padding: '2px 4px', borderRadius: 'var(--radius-full)', border: '1px solid rgba(255,115,0,0.2)', cursor: 'help', fontWeight: 600 }}>
                                 +{branchesCount > 0 ? branchesCount : 1}
                               </span>
                             )}
@@ -342,27 +376,27 @@ function ProductosContent() {
                       } else if (hasPickup) {
                         return (
                           <>
+                            <StoreIcon />
                             <span>Retiro en sucursal</span>
                             {branchesCount > 0 && (
-                              <span title={branchesTooltip} style={{ background: 'rgba(255, 115, 0, 0.1)', color: 'var(--color-primary)', padding: '2px 6px', borderRadius: 'var(--radius-full)', border: '1px solid rgba(255,115,0,0.2)', cursor: 'help', fontWeight: 600 }}>
+                              <span title={branchesTooltip} style={{ background: 'rgba(255, 115, 0, 0.1)', color: 'var(--color-primary)', padding: '2px 4px', borderRadius: 'var(--radius-full)', border: '1px solid rgba(255,115,0,0.2)', cursor: 'help', fontWeight: 600 }}>
                                 +{branchesCount}
                               </span>
                             )}
                           </>
                         );
                       }
-                      return null;
+                      return <span>A acordar</span>;
                     })()}
                   </div>
                   <button 
                     onClick={(e) => { e.stopPropagation(); router.push(`/productos/${producto.id}`); }}
                     style={{ 
-                      padding: '8px 16px', 
+                      padding: '4px 12px', 
                       borderRadius: 'var(--radius-full)', 
                       color: 'var(--color-primary)', 
-                      fontSize: '0.85rem',
+                      fontSize: '0.8rem',
                       fontWeight: 600,
-                      whiteSpace: 'nowrap',
                       background: 'transparent',
                       border: '1px solid var(--color-primary)',
                       cursor: 'pointer'
