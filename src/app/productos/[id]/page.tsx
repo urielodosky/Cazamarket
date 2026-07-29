@@ -419,12 +419,10 @@ export default function ProductoDetailPage({ params }: { params: Promise<{ id: s
               <img src={product.seller?.avatar || 'https://images.unsplash.com/photo-1511497584788-876760111969?q=80&w=200&auto=format&fit=crop'} alt={product.seller?.name} style={{ width: '40px', height: '40px', borderRadius: '50%', objectFit: 'cover', border: '1px solid var(--color-border)' }} />
               <div style={{ display: 'flex', flexDirection: 'column' }}>
                 <span style={{ color: 'var(--color-primary)', fontSize: '0.9rem', textTransform: 'uppercase', fontWeight: 'bold' }}>{product.seller?.name || 'Vendedor'}</span>
-                {product.seller?.rating > 0 && (
-                  <span style={{ display: 'flex', alignItems: 'center', gap: '4px', fontSize: '0.85rem', color: '#FFD700', marginTop: '2px' }} title={`${product.seller.reviewsCount || 0} reseña${product.seller.reviewsCount !== 1 ? 's' : ''}`}>
-                    <svg width="14" height="14" viewBox="0 0 24 24" fill="#FFD700" stroke="#FFD700" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"></polygon></svg>
-                    {product.seller.rating}
-                  </span>
-                )}
+                <span style={{ display: 'flex', alignItems: 'center', gap: '4px', fontSize: '0.85rem', color: (product.seller?.rating || 0) > 0 ? '#FFD700' : 'var(--color-text-muted)', marginTop: '2px' }} title={`${product.seller?.reviewsCount || 0} reseña${product.seller?.reviewsCount !== 1 ? 's' : ''}`}>
+                  <svg width="14" height="14" viewBox="0 0 24 24" fill={(product.seller?.rating || 0) > 0 ? '#FFD700' : 'currentColor'} stroke={(product.seller?.rating || 0) > 0 ? '#FFD700' : 'currentColor'} strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"></polygon></svg>
+                  {(product.seller?.rating || 0) > 0 ? product.seller.rating.toFixed(1) : '0.0 (Nuevo)'}
+                </span>
               </div>
             </div>
             <div style={{ display: 'flex', gap: '8px', flexWrap: 'wrap', marginBottom: '12px' }}>
@@ -441,12 +439,10 @@ export default function ProductoDetailPage({ params }: { params: Promise<{ id: s
               <h1 style={{ fontSize: '2.2rem', color: 'var(--color-text-main)', margin: '0', lineHeight: 1.2, fontWeight: 700, letterSpacing: '-0.3px' }}>
                 {product.name}
               </h1>
-              {product.rating > 0 && (
-                <span style={{ display: 'flex', alignItems: 'center', gap: '6px', fontSize: '1.2rem', color: '#FFD700', flexShrink: 0, marginTop: '4px' }} title={`${product.reviewsCount || 0} reseña${product.reviewsCount !== 1 ? 's' : ''}`}>
-                  <svg width="20" height="20" viewBox="0 0 24 24" fill="#FFD700" stroke="#FFD700" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"></polygon></svg>
-                  {product.rating}
-                </span>
-              )}
+              <span style={{ display: 'flex', alignItems: 'center', gap: '6px', fontSize: '1.2rem', color: (product.rating || 0) > 0 ? '#FFD700' : 'var(--color-text-muted)', flexShrink: 0, marginTop: '4px' }} title={`${product.reviewsCount || 0} reseña${product.reviewsCount !== 1 ? 's' : ''}`}>
+                <svg width="20" height="20" viewBox="0 0 24 24" fill={(product.rating || 0) > 0 ? '#FFD700' : 'currentColor'} stroke={(product.rating || 0) > 0 ? '#FFD700' : 'currentColor'} strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"></polygon></svg>
+                {(product.rating || 0) > 0 ? product.rating.toFixed(1) : '0.0 (Nuevo)'}
+              </span>
             </div>
 
             {/* ID, Condición y Stock */}
