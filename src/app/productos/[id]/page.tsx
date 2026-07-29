@@ -180,14 +180,17 @@ export default function ProductoDetailPage({ params }: { params: Promise<{ id: s
             .limit(4);
 
           if (relProds && relProds.length > 0) {
-            relatedList = relProds.map(p => ({
-              id: p.id,
-              name: p.name,
-              price: p.price,
-              category: p.category,
-              image: p.image || (p.media && p.media[0]?.url) || 'https://images.unsplash.com/photo-1542673898-7c85854b73b2?q=80&w=300&auto=format&fit=crop',
-              seller: { id: p.user_id, name: p.profiles?.store_name || p.profiles?.full_name || 'Mi Negocio' }
-            }));
+            relatedList = relProds.map(p => {
+              const prof: any = Array.isArray(p.profiles) ? p.profiles[0] : p.profiles;
+              return {
+                id: p.id,
+                name: p.name,
+                price: p.price,
+                category: p.category,
+                image: p.image || (p.media && p.media[0]?.url) || 'https://images.unsplash.com/photo-1542673898-7c85854b73b2?q=80&w=300&auto=format&fit=crop',
+                seller: { id: p.user_id, name: prof?.store_name || prof?.full_name || 'Mi Negocio' }
+              };
+            });
           }
 
           setProduct({
