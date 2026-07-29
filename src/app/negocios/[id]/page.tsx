@@ -7,6 +7,7 @@ import CustomSelect from '@/components/ui/CustomSelect';
 import LoadingScreen from '@/components/ui/LoadingScreen';
 import { PlanTier, isAtLeast } from '@/types/planTypes';
 import { usePlan } from '@/contexts/PlanContext';
+import { useAuth } from '@/contexts/AuthContext';
 import { NEGOCIOS_DATA, PRODUCTOS_DATA } from '@/data/mock';
 import { useThemeColors } from '@/hooks/useThemeColors';
 import { createClient } from '@/lib/supabase/client';
@@ -100,7 +101,10 @@ export default function NegocioDetailPage({ params }: { params: Promise<{ id: st
   const router = useRouter();
   const searchParams = useSearchParams();
   const { hasFeature, permissions } = usePlan();
+  const { supabaseUser } = useAuth();
   const themeColors = useThemeColors();
+  
+  const isOwnProfile = negocioId === 1 || unwrappedParams.id === supabaseUser?.id;
 
   useEffect(() => {
     const tab = searchParams.get('tab');
@@ -362,7 +366,7 @@ export default function NegocioDetailPage({ params }: { params: Promise<{ id: st
     return <LoadingScreen message="Cargando negocio..." />;
   }
 
-  if (negocioId === 1 && !hasFeature('tiendaVirtual')) {
+  if (isOwnProfile && !hasFeature('tiendaVirtual')) {
     return (
       <div className="container-page" style={{ paddingTop: '80px', paddingBottom: '40px', minHeight: '60vh', display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', textAlign: 'center' }}>
         <div className="glass-panel" style={{ padding: '60px 40px', borderRadius: 'var(--radius-lg)', maxWidth: '500px' }}>
@@ -379,7 +383,7 @@ export default function NegocioDetailPage({ params }: { params: Promise<{ id: st
     );
   }
 
-  const isCustomColorsAllowed = negocioId === 1 ? hasFeature('coloresPersonalizados') : isAtLeast(negocio.planTier, 'empresarial');
+  const isCustomColorsAllowed = isOwnProfile ? hasFeature('coloresPersonalizados') : isAtLeast(negocio.planTier, 'empresarial');
   const customStyles: React.CSSProperties = {
     paddingTop: '40px', 
     paddingBottom: '40px',
@@ -400,7 +404,7 @@ export default function NegocioDetailPage({ params }: { params: Promise<{ id: st
       <div className="container-page" style={customStyles}>
       <div ref={panelRef} className="glass-panel" style={{ borderRadius: 'var(--radius-lg)', padding: 0, position: 'relative' }}>
         {/* Banner */}
-        {(negocioId === 1 ? hasFeature('banner') : isAtLeast(negocio.planTier, 'emprendedor')) ? (
+        {(isOwnProfile ? hasFeature('banner') : isAtLeast(negocio.planTier, 'emprendedor')) ? (
           <div style={{ 
             height: '280px', 
             backgroundImage: `url(${negocio.image})`, 
@@ -423,7 +427,7 @@ export default function NegocioDetailPage({ params }: { params: Promise<{ id: st
             display: 'flex', 
             gap: '32px', 
             alignItems: 'flex-end',
-            marginTop: (negocioId === 1 ? hasFeature('banner') : isAtLeast(negocio.planTier, 'emprendedor')) ? '-60px' : '-40px',
+            marginTop: (isOwnProfile ? hasFeature('banner') : isAtLeast(negocio.planTier, 'emprendedor')) ? '-60px' : '-40px',
             marginBottom: '32px',
             position: 'relative',
             zIndex: 10
@@ -442,7 +446,7 @@ export default function NegocioDetailPage({ params }: { params: Promise<{ id: st
               flexShrink: 0,
               position: 'relative'
             }}>
-              {(negocioId === 1 ? hasFeature('insigniaVerificada') : negocio.verified) && (
+              {(isOwnProfile ? hasFeature('insigniaVerificada') : negocio.verified) && (
                 <span title="Negocio Verificado" style={{ position: 'absolute', bottom: '2px', right: '2px', width: '36px', height: '36px', borderRadius: '50%', background: 'var(--color-primary)', display: 'flex', alignItems: 'center', justifyContent: 'center', border: '4px solid var(--color-bg-surface)', boxShadow: '0 4px 10px rgba(0,0,0,0.4)' }}>
                   <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#fff" strokeWidth="4" strokeLinecap="round" strokeLinejoin="round"><polyline points="20 6 9 17 4 12"></polyline></svg>
                 </span>
@@ -628,7 +632,7 @@ export default function NegocioDetailPage({ params }: { params: Promise<{ id: st
                 </div>
                 
                 {(() => {
-                  const hasCategories = negocioId === 1 ? hasFeature('categorias') : isAtLeast(negocio.planTier, 'emprendedor');
+                  const hasCategories = isOwnProfile ? hasFeature('categorias') : isAtLeast(negocio.planTier, 'emprendedor');
                   const hasSections = negocio.productSections && negocio.productSections.length > 0;
                   
                   if (!hasSections) {
