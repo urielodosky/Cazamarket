@@ -11,7 +11,7 @@ import { usePlan } from '@/contexts/PlanContext';
 import { PRODUCTOS_DATA } from '@/data/mock';
 import { useThemeColors } from '@/hooks/useThemeColors';
 import { getPlanPermissions } from '@/types/planTypes';
-import './producto.css';
+import '../producto.css';
 function getSocialUrl(platform: string, handle: string) {
   if (handle.startsWith('http') || handle.startsWith('www')) {
     return handle.startsWith('www') ? `https://${handle}` : handle;
