@@ -455,12 +455,10 @@ export default function NegocioDetailPage({ params }: { params: Promise<{ id: st
                 <div>
                   <h1 style={{ fontSize: '2.5rem', margin: '0 0 12px 0', color: 'var(--color-text-main)', lineHeight: 1.1, textShadow: themeColors.isLight ? '0 0 4px #ffffff, 0 0 8px #ffffff' : '0 0 4px rgba(0,0,0,0.5), 0 0 8px rgba(0,0,0,0.5)' }}>{negocio.name}</h1>
                   <div style={{ display: 'flex', alignItems: 'center', gap: '24px', color: 'var(--color-text-muted)', fontSize: '1rem' }}>
-                    {negocio.rating > 0 && (
-                      <span style={{ display: 'flex', alignItems: 'center', gap: '6px', color: '#FFD700', fontWeight: 'bold' }} title={`${negocio.reviews} reseña${negocio.reviews !== 1 ? 's' : ''}`}>
-                        <svg width="18" height="18" viewBox="0 0 24 24" fill="#FFD700" stroke="#FFD700" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"></polygon></svg>
-                        {negocio.rating}
-                      </span>
-                    )}
+                    <div style={{ display: 'flex', alignItems: 'center', gap: '6px', color: negocio.rating > 0 ? '#FFD700' : 'var(--color-text-muted)', fontWeight: 'bold' }} title={`${negocio.reviews} reseña${negocio.reviews !== 1 ? 's' : ''}`}>
+                      <svg width="18" height="18" viewBox="0 0 24 24" fill={negocio.rating > 0 ? '#FFD700' : 'none'} stroke={negocio.rating > 0 ? '#FFD700' : 'currentColor'} strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"></polygon></svg>
+                      {negocio.rating > 0 ? (Number.isInteger(negocio.rating) ? negocio.rating.toFixed(1) : negocio.rating) : '0.0 (Nuevo)'}
+                    </div>
                     {negocio.locations && negocio.locations.length > 0 && (
                       <div style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
                         <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
