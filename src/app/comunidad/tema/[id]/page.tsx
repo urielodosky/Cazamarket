@@ -36,7 +36,7 @@ export default function TemaPage({ params }: { params: Promise<{ id: string }> }
 
   const replyInputRef = useRef<HTMLTextAreaElement>(null);
   const inlineInputRef = useRef<HTMLTextAreaElement>(null);
-  const { username, avatar } = useAuth();
+  const { username, avatar, isVendor, supabaseUser } = useAuth();
   const themeColors = useThemeColors();
 
   const showToast = (text: string, type: 'success' | 'info' = 'info') => {
@@ -318,8 +318,16 @@ export default function TemaPage({ params }: { params: Promise<{ id: string }> }
   }
 
   const postAuthorAvatar = getAuthorAvatar(post.author, post.authorAvatar);
-  const postAuthorBiz = getUserBusinessInfo(post.author);
+  let postAuthorBiz = getUserBusinessInfo(post.author);
   const isOwnerOfPost = isAuthor(post.author);
+  
+  if (isOwnerOfPost && isVendor) {
+    postAuthorBiz = {
+      isBusiness: true,
+      storeUrl: `/negocios/${supabaseUser?.id || '1'}`,
+      badgeLabel: 'Negocio'
+    };
+  }
   const totalRepliesCount = countTotalReplies(post.replies);
 
   const filteredReplies = (post.replies || []).filter(reply => {
@@ -702,9 +710,17 @@ export default function TemaPage({ params }: { params: Promise<{ id: string }> }
           <div style={{ display: 'flex', flexDirection: 'column', gap: '20px' }}>
             {filteredReplies.map(reply => {
               const replyAvatar = getAuthorAvatar(reply.author, reply.authorAvatar);
-              const replyBiz = getUserBusinessInfo(reply.author);
+              let replyBiz = getUserBusinessInfo(reply.author);
               const isReported = reportedIds[reply.id];
               const isOwnerOfReply = isAuthor(reply.author);
+              
+              if (isOwnerOfReply && isVendor) {
+                replyBiz = {
+                  isBusiness: true,
+                  storeUrl: `/negocios/${supabaseUser?.id || '1'}`,
+                  badgeLabel: 'Negocio'
+                };
+              }
               const isReplyingToThis = activeInlineReplyId === reply.id;
 
               return (
@@ -923,9 +939,17 @@ export default function TemaPage({ params }: { params: Promise<{ id: string }> }
                     <div style={{ marginLeft: '36px', borderLeft: '2px solid rgba(255, 115, 0, 0.35)', paddingLeft: '16px', display: 'flex', flexDirection: 'column', gap: '12px' }}>
                       {reply.subReplies.map(sub => {
                         const subAvatar = getAuthorAvatar(sub.author, sub.authorAvatar);
-                        const subBiz = getUserBusinessInfo(sub.author);
+                        let subBiz = getUserBusinessInfo(sub.author);
                         const isSubReported = reportedIds[sub.id];
                         const isOwnerOfSub = isAuthor(sub.author);
+                        
+                        if (isOwnerOfSub && isVendor) {
+                          subBiz = {
+                            isBusiness: true,
+                            storeUrl: `/negocios/${supabaseUser?.id || '1'}`,
+                            badgeLabel: 'Negocio'
+                          };
+                        }
 
                         return (
                           <div 
