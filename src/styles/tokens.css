@@ -1,30 +1,38 @@
 :root {
   /* Colors - Dark Mode Premium (Hunter Style) */
-  --color-bg-base: #11130d; /* Very dark earthy green/black */
-  --color-bg-surface: #1a1e16; /* Slightly lighter for cards */
-  --color-bg-surface-elevated: #252a1f; /* Elevated elements */
-  
-  --color-primary: #ff7300; /* Vibrant Hunter Orange */
+  --color-bg-base: #11130d;
+  /* Very dark earthy green/black */
+  --color-bg-surface: #1a1e16;
+  /* Slightly lighter for cards */
+  --color-bg-surface-elevated: #252a1f;
+  /* Elevated elements */
+
+  --color-primary: #ff7300;
+  /* Vibrant Hunter Orange */
   --color-primary-hover: #ff8c33;
   --color-primary-active: #cc5c00;
-  
-  --color-secondary: #4b5320; /* Military Green */
+
+  --color-secondary: #4b5320;
+  /* Military Green */
   --color-secondary-hover: #5d6628;
   --color-secondary-light: #7b8542;
-  
-  --color-text-main: #f4f4f0; /* Off-white for readability */
-  --color-text-muted: #a3a69a; /* Muted text */
-  --color-border: #323829; /* Subtle borders */
-  
+
+  --color-text-main: #f4f4f0;
+  /* Off-white for readability */
+  --color-text-muted: #a3a69a;
+  /* Muted text */
+  --color-border: #323829;
+  /* Subtle borders */
+
   /* Typography */
   --font-family-base: var(--font-inter), sans-serif;
-  
+
   /* Radii */
   --radius-sm: 2px;
   --radius-md: 4px;
   --radius-lg: 8px;
   --radius-full: 9999px;
-  
+
   /* Spacing */
   --spacing-1: 4px;
   --spacing-2: 8px;
@@ -33,17 +41,17 @@
   --spacing-5: 32px;
   --spacing-6: 48px;
   --spacing-8: 64px;
-  
+
   /* Shadows */
   --shadow-sm: 0 1px 2px rgba(0, 0, 0, 0.3);
   --shadow-md: 0 4px 6px rgba(0, 0, 0, 0.4);
   --shadow-lg: 0 10px 15px -3px rgba(0, 0, 0, 0.5);
-  
+
   /* Z-index */
   --z-header: 100;
   --z-dropdown: 200;
   --z-modal: 300;
-  
+
   /* Transitions */
   --transition-fast: 0.15s ease-in-out;
   --transition-normal: 0.3s ease;
@@ -60,22 +68,30 @@
    LIGHT MODE
    ========================================== */
 [data-theme="light"] {
-  --color-bg-base: #f5f3ee;        /* Warm off-white, like canvas */
-  --color-bg-surface: #ffffff;      /* Clean white cards */
-  --color-bg-surface-elevated: #f0ede6; /* Slightly tinted for depth */
-  
-  --color-primary: #e06800;         /* Slightly deeper orange for contrast on white */
+  --color-bg-base: #f5f3ee;
+  /* Warm off-white, like canvas */
+  --color-bg-surface: #ffffff;
+  /* Clean white cards */
+  --color-bg-surface-elevated: #f0ede6;
+  /* Slightly tinted for depth */
+
+  --color-primary: #e06800;
+  /* Slightly deeper orange for contrast on white */
   --color-primary-hover: #ff8c33;
   --color-primary-active: #cc5c00;
-  
-  --color-secondary: #5a6630;       /* Olive / military green, brighter */
+
+  --color-secondary: #5a6630;
+  /* Olive / military green, brighter */
   --color-secondary-hover: #6b7a38;
   --color-secondary-light: #8ba050;
-  
-  --color-text-main: #1a1c18;       /* Near-black earthy text */
-  --color-text-muted: #5c5f56;      /* Medium grey-green muted */
-  --color-border: #d6d3ca;          /* Soft warm border */
-  
+
+  --color-text-main: #1a1c18;
+  /* Near-black earthy text */
+  --color-text-muted: #5c5f56;
+  /* Medium grey-green muted */
+  --color-border: #d6d3ca;
+  /* Soft warm border */
+
   /* Adjusted shadows for light mode */
   --shadow-sm: 0 1px 3px rgba(0, 0, 0, 0.08);
   --shadow-md: 0 4px 8px rgba(0, 0, 0, 0.1);
@@ -109,7 +125,10 @@ a {
   text-decoration: none;
 }
 
-button, input, textarea, select {
+button,
+input,
+textarea,
+select {
   font-family: var(--font-family-base) !important;
 }
 
