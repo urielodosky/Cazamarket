@@ -140,7 +140,23 @@ export default function ResenasPage() {
                   <p style={{ color: 'var(--color-text-muted)' }}>No hay valoraciones pendientes de validar (Próximamente)</p>
                 )}
                 {activeSubTabMisResenas === 'recibidas' && (
-                  <p style={{ color: 'var(--color-text-muted)' }}>No tenés reseñas publicadas todavía.</p>
+                  <div style={{ width: '100%', display: 'flex', flexDirection: 'column', gap: '16px' }}>
+                    {/* Mock Review Card */}
+                    <div style={{ padding: '20px', borderRadius: '16px', background: 'rgba(255,255,255,0.03)', border: `1px solid ${themeColors.borderSubtle3}` }}>
+                      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: '12px' }}>
+                        <div>
+                          <h4 style={{ margin: '0 0 4px', color: 'var(--color-text-main)', fontSize: '1.1rem' }}>Juan Pérez</h4>
+                          <span style={{ color: 'var(--color-text-muted)', fontSize: '0.85rem' }}>Compra: Rifle de Aire Comprimido</span>
+                        </div>
+                        <div style={{ display: 'flex', gap: '4px' }}>
+                          {[1,2,3,4,5].map(star => (
+                            <svg key={star} width="16" height="16" viewBox="0 0 24 24" fill={star <= 4 ? "#FFD700" : "none"} stroke="#FFD700" strokeWidth="2"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"></polygon></svg>
+                          ))}
+                        </div>
+                      </div>
+                      <p style={{ margin: 0, color: 'var(--color-text-muted)', lineHeight: 1.6 }}>"Excelente vendedor, el producto llegó en perfectas condiciones y fue súper amable para coordinar el envío."</p>
+                    </div>
+                  </div>
                 )}
                 {activeSubTabMisResenas === 'canceladas' && (
                   <p style={{ color: 'var(--color-text-muted)' }}>No hay reseñas canceladas.</p>
@@ -197,10 +213,40 @@ export default function ResenasPage() {
                   <p style={{ color: 'var(--color-text-muted)' }}>No tenés negocios contactados para evaluar (Próximamente)</p>
                 )}
                 {activeSubTabResenasDadas === 'dadas' && (
-                  <p style={{ color: 'var(--color-text-muted)' }}>Aún no enviaste ninguna reseña.</p>
+                  <div style={{ width: '100%', display: 'flex', flexDirection: 'column', gap: '16px' }}>
+                    {/* Mock Review Card Given */}
+                    <div style={{ padding: '20px', borderRadius: '16px', background: 'rgba(255,255,255,0.03)', border: `1px solid ${themeColors.borderSubtle3}` }}>
+                      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: '12px' }}>
+                        <div>
+                          <h4 style={{ margin: '0 0 4px', color: 'var(--color-text-main)', fontSize: '1.1rem' }}>Armería El Cazador</h4>
+                          <span style={{ color: 'var(--color-text-muted)', fontSize: '0.85rem' }}>Producto: Kit de limpieza</span>
+                        </div>
+                        <div style={{ display: 'flex', gap: '4px' }}>
+                          {[1,2,3,4,5].map(star => (
+                            <svg key={star} width="16" height="16" viewBox="0 0 24 24" fill={star <= 5 ? "#FFD700" : "none"} stroke="#FFD700" strokeWidth="2"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"></polygon></svg>
+                          ))}
+                        </div>
+                      </div>
+                      <p style={{ margin: 0, color: 'var(--color-text-muted)', lineHeight: 1.6 }}>"Muy buena atención."</p>
+                    </div>
+                  </div>
                 )}
                 {activeSubTabResenasDadas === 'canceladas' && (
-                  <p style={{ color: 'var(--color-text-muted)' }}>No tenés reseñas canceladas o rechazadas.</p>
+                  <div style={{ width: '100%', display: 'flex', flexDirection: 'column', gap: '16px' }}>
+                    {/* Mock Rejected Review Card */}
+                    <div style={{ padding: '20px', borderRadius: '16px', background: 'rgba(255,0,0,0.03)', border: '1px solid rgba(255,0,0,0.2)' }}>
+                      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: '12px' }}>
+                        <div>
+                          <h4 style={{ margin: '0 0 4px', color: 'var(--color-text-main)', fontSize: '1.1rem' }}>Tienda Outdoor</h4>
+                          <span style={{ color: 'var(--color-text-muted)', fontSize: '0.85rem' }}>Reseña rechazada por el vendedor</span>
+                        </div>
+                      </div>
+                      <p style={{ margin: '0 0 16px 0', color: 'var(--color-text-muted)', lineHeight: 1.6 }}>Tu calificación de 2 estrellas fue rechazada por el negocio.</p>
+                      <button style={{ padding: '8px 16px', background: 'transparent', border: '1px solid var(--color-primary)', color: 'var(--color-primary)', borderRadius: '8px', cursor: 'pointer', fontWeight: 600, fontSize: '0.9rem' }}>
+                        ¿Querés apelar el rechazo?
+                      </button>
+                    </div>
+                  </div>
                 )}
               </div>
             </>
