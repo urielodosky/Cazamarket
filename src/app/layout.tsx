@@ -3,6 +3,7 @@ import { Inter } from "next/font/google";
 import Navbar from "@/components/layout/Navbar";
 import Providers from "@/components/Providers";
 import PageTransitionLoader from "@/components/ui/PageTransitionLoader";
+import MobileNav from "@/components/layout/MobileNav";
 import { Suspense } from 'react';
 import "./globals.css";
 
@@ -40,6 +41,7 @@ export default function RootLayout({
           <Suspense fallback={null}>
             <PageTransitionLoader />
             <Navbar />
+            <MobileNav />
           </Suspense>
           <main>{children}</main>
         </Providers>

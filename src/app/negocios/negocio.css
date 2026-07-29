@@ -1,0 +1,27 @@
+/* Business Profile Mobile Styles */
+@media (max-width: 768px) {
+  .business-tabs {
+    overflow-x: auto;
+    white-space: nowrap;
+    -webkit-overflow-scrolling: touch;
+  }
+
+  .business-search-bar {
+    flex-direction: column;
+    align-items: stretch !important;
+    max-width: 100% !important;
+  }
+
+  .business-search-bar input {
+    width: 100%;
+  }
+
+  .business-filters-panel {
+    grid-template-columns: 1fr !important;
+  }
+
+  .business-product-grid {
+    grid-template-columns: repeat(2, 1fr) !important;
+    gap: 12px !important;
+  }
+}

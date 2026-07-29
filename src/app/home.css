@@ -353,3 +353,41 @@
   color: var(--color-text-muted);
   font-size: 0.85rem;
 }
+/* Mobile Responsiveness */
+@media (max-width: 768px) {
+  .home-container {
+    padding: var(--spacing-2);
+  }
+
+  .hero-title {
+    font-size: 2.5rem;
+  }
+
+  .hero-subtitle {
+    font-size: 1rem;
+  }
+
+  .hero-actions {
+    flex-direction: column;
+    width: 100%;
+    padding: 0 16px;
+  }
+
+  .hero-actions .btn {
+    width: 100%;
+  }
+
+  .trending-grid, .categories-grid {
+    grid-template-columns: repeat(2, 1fr) !important;
+    gap: var(--spacing-2);
+  }
+
+  .trending-item {
+    flex-direction: column;
+    text-align: center;
+  }
+
+  .item-info {
+    align-items: center;
+  }
+}

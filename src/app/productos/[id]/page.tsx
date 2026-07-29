@@ -11,6 +11,7 @@ import { usePlan } from '@/contexts/PlanContext';
 import { PRODUCTOS_DATA } from '@/data/mock';
 import { useThemeColors } from '@/hooks/useThemeColors';
 import { getPlanPermissions } from '@/types/planTypes';
+import './producto.css';
 function getSocialUrl(platform: string, handle: string) {
   if (handle.startsWith('http') || handle.startsWith('www')) {
     return handle.startsWith('www') ? `https://${handle}` : handle;
@@ -349,12 +350,12 @@ export default function ProductoDetailPage({ params }: { params: Promise<{ id: s
         </div>
       )}
 
-      <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '48px', alignItems: 'start', marginBottom: '64px' }}>
+      <div className="product-layout-grid" style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '48px', alignItems: 'start', marginBottom: '64px' }}>
 
         {/* Galería de Imágenes */}
         <div style={{ display: 'flex', flexDirection: 'column', gap: '16px' }}>
           <div
-            className="glass-panel"
+            className="glass-panel product-image-container"
             style={{ position: 'relative', padding: 0, borderRadius: 'var(--radius-lg)', overflow: 'hidden', height: '500px', display: 'flex', alignItems: 'center', justifyContent: 'center' }}
             onMouseEnter={() => setIsHoveringImage(true)}
             onMouseLeave={() => setIsHoveringImage(false)}

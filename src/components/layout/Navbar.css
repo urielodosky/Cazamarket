@@ -326,6 +326,21 @@
 
 /* Mobile Responsiveness */
 @media (max-width: 768px) {
+  .mobile-menu-btn {
+    display: none !important;
+  }
+
+  /* Ajuste de los filtros en mobile */
+  .filters-container {
+    top: calc(100% + 10px);
+    width: 100vw;
+    left: -16px; /* Compensar padding de navbar-container */
+    padding: var(--spacing-4);
+    border-radius: 0;
+    max-height: calc(100vh - 150px);
+    overflow-y: auto;
+  }
+
   .navbar-container {
     display: flex;
     flex-wrap: wrap;
@@ -337,27 +352,23 @@
 
   .navbar-logo {
     display: flex;
-    order: 2;
+    order: 1;
     flex: 1;
-    justify-content: center;
+    justify-content: flex-start;
     margin: 0;
   }
 
   .navbar-logo a {
     font-size: 1.3rem;
-    /* Slightly smaller for mobile header */
   }
 
+  /* Ocultar menú de hamburguesa nativo viejo y enlaces en móvil */
   .mobile-menu-btn {
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    background: transparent;
-    border: none;
-    color: var(--color-text-main);
-    padding: 4px;
-    cursor: pointer;
-    order: 1;
+    display: none !important;
+  }
+  
+  .navbar-links, .mobile-links-container {
+    display: none !important;
   }
 
   .navbar-actions {

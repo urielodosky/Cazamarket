@@ -34,12 +34,12 @@ function SucursalEditor({ index, sucursal, provincias, onChange, onRemove }: { i
   }, [sucursal.provincia]);
 
   return (
-    <div style={{ background: 'rgba(0,0,0,0.2)', padding: '16px', borderRadius: 'var(--radius-md)', marginBottom: '16px' }}>
+    <div className="config-main-box" style={{ background: 'rgba(0,0,0,0.2)', padding: '16px', borderRadius: 'var(--radius-md)', marginBottom: '16px' }}>
       <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '12px' }}>
         <span style={{ fontWeight: 'bold' }}>Sucursal {index + 1}</span>
         <button type="button" onClick={onRemove} style={{ background: 'none', border: 'none', color: '#ef4444', cursor: 'pointer', fontSize: '0.9rem' }}>Eliminar</button>
       </div>
-      <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(200px, 1fr))', gap: '16px' }}>
+      <div className="config-split-grid" style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(200px, 1fr))', gap: '16px' }}>
         <div className="form-group-config">
           <label>Provincia</label>
           <CustomSelect
@@ -566,7 +566,7 @@ export default function ConfiguracionPage() {
         </div>
 
         {/* Caja Principal: Foto y Nombres */}
-        <div style={{ display: 'flex', flexWrap: 'wrap', gap: '32px', alignItems: 'flex-start', background: 'rgba(255,255,255,0.03)', padding: '32px', borderRadius: 'var(--radius-lg)', border: '1px solid var(--color-border)' }}>
+        <div className="config-main-box" style={{ display: 'flex', flexWrap: 'wrap', gap: '32px', alignItems: 'flex-start', background: 'rgba(255,255,255,0.03)', padding: '32px', borderRadius: 'var(--radius-lg)', border: '1px solid var(--color-border)' }}>
           <div className="avatar-cell" style={{ flexShrink: 0 }}>
             <div className="avatar-upload-circle" onClick={() => fileInputRef.current?.click()} title="Subir nueva foto" style={{ overflow: 'hidden', width: '120px', height: '120px', borderRadius: '50%', background: 'rgba(0,0,0,0.5)', position: 'relative', cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
               {isUploading ? (
@@ -596,7 +596,7 @@ export default function ConfiguracionPage() {
               <label htmlFor="username">Nombre de Perfil</label>
               <input type="text" id="username" value={formData.username || ''} onChange={handleInputChange} required />
             </div>
-            <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '24px' }}>
+            <div className="config-split-grid" style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '24px' }}>
               <div className="form-group-config">
                 <label htmlFor="nombre">Nombre Real</label>
                 <input type="text" id="nombre" value={formData.nombre || ''} onChange={handleInputChange} required />

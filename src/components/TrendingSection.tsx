@@ -94,7 +94,7 @@ export default function TrendingSection() {
         <p style={{ color: 'var(--text-secondary)', margin: 0 }}>Descubre lo más visitado y buscado por la comunidad esta semana.</p>
       </div>
       
-      <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(320px, 1fr))', gap: '30px' }}>
+      <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(280px, 1fr))', gap: '30px' }}>
         {renderList("Top Negocios", <BuildingStorefrontIcon style={{ width: '24px' }} />, TOP_NEGOCIOS, showAllBusinesses, setShowAllBusinesses, 'negocios')}
         {renderList("Top Servicios", <MapIcon style={{ width: '24px' }} />, TOP_SERVICIOS, showAllServices, setShowAllServices, 'servicios')}
         {renderList("Top Productos", <ShoppingBagIcon style={{ width: '24px' }} />, TOP_PRODUCTOS, showAllProducts, setShowAllProducts, 'productos')}

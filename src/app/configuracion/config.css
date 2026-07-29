@@ -481,3 +481,25 @@
 [data-theme="light"] .config-accordion {
   border-color: rgba(0, 0, 0, 0.06) !important;
 }
+
+@media (max-width: 768px) {
+  .config-split-grid {
+    grid-template-columns: 1fr !important;
+    gap: 16px !important;
+  }
+
+  .config-card {
+    padding: 16px !important;
+  }
+
+  .config-main-box {
+    padding: 16px !important;
+    gap: 16px !important;
+  }
+
+  .avatar-cell {
+    width: 100%;
+    display: flex;
+    justify-content: center;
+  }
+}

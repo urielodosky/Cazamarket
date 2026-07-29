@@ -557,7 +557,7 @@ export default function NegocioDetailPage({ params }: { params: Promise<{ id: st
           </div>
 
           {/* Tabs Navigation */}
-          <div style={{ display: 'flex', borderBottom: '1px solid var(--color-border)', marginBottom: '32px' }}>
+          <div className="business-tabs" style={{ display: 'flex', borderBottom: '1px solid var(--color-border)', marginBottom: '32px' }}>
             {['productos', 'servicios', 'informacion', 'reseñas'].map(tab => (
               <button 
                 key={tab}
@@ -590,7 +590,7 @@ export default function NegocioDetailPage({ params }: { params: Promise<{ id: st
               <div>
                 <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '24px', flexWrap: 'wrap', gap: '16px' }}>
                   <h3 style={{ margin: 0, fontSize: '1.5rem' }}>Catálogo de Productos</h3>
-                  <div style={{ display: 'flex', gap: '12px', flex: '1', maxWidth: '500px', justifyContent: 'flex-end' }}>
+                  <div className="business-search-bar" style={{ display: 'flex', gap: '12px', flex: '1', maxWidth: '500px', justifyContent: 'flex-end', flexWrap: 'wrap' }}>
                     <div style={{ position: 'relative', flex: '1', minWidth: '200px' }}>
                       <span style={{ position: 'absolute', left: '12px', top: '50%', transform: 'translateY(-50%)', color: 'var(--color-text-muted)' }}>
                         <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><circle cx="11" cy="11" r="8"></circle><line x1="21" y1="21" x2="16.65" y2="16.65"></line></svg>
@@ -736,7 +736,7 @@ export default function NegocioDetailPage({ params }: { params: Promise<{ id: st
                   // Flat list for basic plan without "categorias" feature
                   const flatProducts = negocio.productSections.flatMap((s: any) => s.products);
                   return (
-                    <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(220px, 1fr))', gap: '24px' }}>
+                    <div className="business-product-grid" style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(220px, 1fr))', gap: '24px' }}>
                       {flatProducts.map((p: any, index: number) => {
                         const isObj = typeof p === 'object';
                         const id = isObj ? p.id : p;
@@ -776,10 +776,10 @@ export default function NegocioDetailPage({ params }: { params: Promise<{ id: st
             {/* SERVICIOS TAB */}
             {activeTab === 'servicios' && (
               <div>
-                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '24px', flexWrap: 'wrap', gap: '16px' }}>
+                <div className="business-section-header" style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '24px', flexWrap: 'wrap', gap: '16px' }}>
                   <h3 style={{ margin: 0, fontSize: '1.5rem' }}>Catálogo de Servicios</h3>
                   {negocio.servicesCount > 0 && (
-                    <div style={{ display: 'flex', gap: '12px', flex: '1', maxWidth: '500px', justifyContent: 'flex-end' }}>
+                    <div className="business-search-bar" style={{ display: 'flex', gap: '12px', flex: '1', maxWidth: '500px', justifyContent: 'flex-end' }}>
                       <div style={{ position: 'relative', flex: '1', minWidth: '200px' }}>
                         <span style={{ position: 'absolute', left: '12px', top: '50%', transform: 'translateY(-50%)', color: 'var(--color-text-muted)' }}>
                           <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><circle cx="11" cy="11" r="8"></circle><line x1="21" y1="21" x2="16.65" y2="16.65"></line></svg>
@@ -793,7 +793,7 @@ export default function NegocioDetailPage({ params }: { params: Promise<{ id: st
                       <button className="btn btn-primary" style={{ padding: '10px 24px', fontSize: '0.95rem', fontWeight: 600, borderRadius: 'var(--radius-full)', flexShrink: 0, background: 'var(--color-primary)', color: '#fff', border: 'none' }}>
                         Buscar
                       </button>
-                      <button onClick={() => setIsFiltersOpen(!isFiltersOpen)} style={{ display: 'flex', alignItems: 'center', gap: '8px', padding: '10px 20px', fontSize: '0.95rem', fontWeight: 600, borderRadius: 'var(--radius-full)', border: '1px solid rgba(255, 255, 255, 0.15)', background: 'rgba(255, 255, 255, 0.08)', color: 'var(--color-text-main)', flexShrink: 0, cursor: 'pointer', transition: 'all 0.2s' }}
+                      <button className="business-filter-btn" onClick={() => setIsFiltersOpen(!isFiltersOpen)} style={{ display: 'flex', alignItems: 'center', gap: '8px', padding: '10px 20px', fontSize: '0.95rem', fontWeight: 600, borderRadius: 'var(--radius-full)', border: '1px solid rgba(255, 255, 255, 0.15)', background: 'rgba(255, 255, 255, 0.08)', color: 'var(--color-text-main)', flexShrink: 0, cursor: 'pointer', transition: 'all 0.2s' }}
                               onMouseEnter={(e) => { e.currentTarget.style.background = 'rgba(255, 255, 255, 0.12)'; }}
                               onMouseLeave={(e) => { e.currentTarget.style.background = 'rgba(255, 255, 255, 0.08)'; }}>
                         <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="var(--color-primary)" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
@@ -814,7 +814,7 @@ export default function NegocioDetailPage({ params }: { params: Promise<{ id: st
                 </div>
 
                 {/* Filtros Panel (Servicios) */}
-                <div style={{
+                <div className="business-filters-panel" style={{
                   height: isFiltersOpen ? 'auto' : '0px',
                   opacity: isFiltersOpen ? 1 : 0,
                   visibility: isFiltersOpen ? 'visible' : 'hidden',
@@ -879,7 +879,7 @@ export default function NegocioDetailPage({ params }: { params: Promise<{ id: st
                         <h4 style={{ margin: '0 0 16px 0', fontSize: '1.2rem', color: 'var(--color-primary)', borderBottom: '1px solid var(--color-border)', paddingBottom: '8px' }}>
                           {section.name}
                         </h4>
-                        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(220px, 1fr))', gap: '24px' }}>
+                        <div className="business-product-grid" style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(220px, 1fr))', gap: '24px' }}>
                           {section.services.map((servicio: any, idx: number) => {
                             const isRealObject = typeof servicio === 'object' && servicio !== null;
                             const servId = isRealObject ? servicio.id : servicio;
