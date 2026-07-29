@@ -377,6 +377,10 @@
     padding-top: 0;
   }
 
+  .navbar-middle-area {
+    display: contents !important;
+  }
+
   .navbar-center {
     display: contents;
     /* Allow children to flow into navbar-container */

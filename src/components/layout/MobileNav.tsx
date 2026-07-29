@@ -31,6 +31,7 @@ export default function MobileNav() {
             key={item.href}
             href={item.href}
             className={`mobile-nav-item ${isActive ? 'active' : ''}`}
+            prefetch={false}
           >
             <span className="mobile-nav-icon">{item.icon}</span>
             <span className="mobile-nav-label">{item.label}</span>
