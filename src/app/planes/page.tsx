@@ -336,9 +336,10 @@ export default function PlanesPage() {
                   >
                     <div style={{
                       width: '44px', height: '44px', borderRadius: '10px', background: '#009ee3',
-                      display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0
+                      display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0,
+                      overflow: 'hidden', padding: '6px'
                     }}>
-                      <span style={{ color: 'white', fontWeight: 900, fontSize: '1.1rem' }}>MP</span>
+                      <img src="https://http2.mlstatic.com/frontend-assets/ui-navigation/5.19.1/mercadopago/logo__small@2x.png" alt="Mercado Pago" style={{ width: '100%', height: '100%', objectFit: 'contain' }} />
                     </div>
                     <div style={{ flex: 1 }}>
                       <p style={{ margin: 0, color: 'white', fontWeight: 600, fontSize: '0.95rem' }}>Mercado Pago</p>
@@ -393,7 +394,7 @@ export default function PlanesPage() {
                       <line x1="12" y1="16" x2="12.01" y2="16"></line>
                     </svg>
                     <p style={{ margin: 0, color: '#cca700', fontSize: '0.78rem', lineHeight: 1.4 }}>
-                      Simulación de pago. Los cobros reales se activarán próximamente con Mercado Pago.
+                      <strong>Importante:</strong> El cambio de plan se aplicará a partir de tu <strong>próximo ciclo de facturación</strong>. No se realizarán cobros extra este mes.
                     </p>
                   </div>
 
@@ -445,10 +446,10 @@ export default function PlanesPage() {
                     </svg>
                   </div>
                   <p style={{ color: 'white', fontSize: '1.1rem', fontWeight: 600, margin: '0 0 8px' }}>
-                    Pago confirmado
+                    Cambio de plan programado
                   </p>
                   <p style={{ color: '#888', fontSize: '0.9rem', margin: '0 0 4px' }}>
-                    Plan <strong style={{ color: 'var(--color-primary)' }}>{paymentModal.plan.name}</strong> activado
+                    El plan <strong style={{ color: 'var(--color-primary)' }}>{paymentModal.plan.name}</strong> se activará en tu próximo cobro.
                   </p>
                   <p style={{ color: '#666', fontSize: '0.8rem', margin: 0 }}>
                     Redirigiendo a tu configuración...
