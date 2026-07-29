@@ -278,7 +278,12 @@ function ProductosContent() {
                 <svg width="18" height="18" viewBox="0 0 24 24" fill={isFavorite('productos', producto.id.toString()) ? '#ff4d4d' : 'none'} stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"></path></svg>
               </button>
             </div>
-            <div className="aspect-image-4-3" style={{ backgroundImage: `url(${producto.image})`, borderTopLeftRadius: 'var(--radius-lg)', borderTopRightRadius: 'var(--radius-lg)' }}>
+            <div className="aspect-image-4-3" style={{ backgroundImage: `url(${producto.image})`, borderTopLeftRadius: 'var(--radius-lg)', borderTopRightRadius: 'var(--radius-lg)', position: 'relative' }}>
+              {/* Product Rating Top Right */}
+              <div style={{ position: 'absolute', top: '10px', right: '10px', background: 'rgba(0,0,0,0.65)', backdropFilter: 'blur(4px)', padding: '4px 8px', borderRadius: '12px', display: 'flex', alignItems: 'center', gap: '4px', zIndex: 5 }}>
+                <svg width="12" height="12" viewBox="0 0 24 24" fill="#FFD700" stroke="#FFD700" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"></polygon></svg>
+                <span style={{ color: '#fff', fontSize: '0.8rem', fontWeight: 'bold' }}>4.8</span>
+              </div>
             </div>
             <div className="card-content-fluid" style={{ display: 'flex', flexDirection: 'column', flex: 1, borderBottomLeftRadius: 'var(--radius-lg)', borderBottomRightRadius: 'var(--radius-lg)' }}>
               {/* Foto de perfil + Username */}
@@ -291,11 +296,23 @@ function ProductosContent() {
                     </span>
                   )}
                 </div>
-                <span style={{ color: 'var(--color-primary)', fontSize: '0.8rem', textTransform: 'uppercase', fontWeight: 'bold' }}>{producto.store}</span>
+                <div style={{ display: 'flex', flexDirection: 'column' }}>
+                  <span style={{ color: 'var(--color-primary)', fontSize: '0.8rem', textTransform: 'uppercase', fontWeight: 'bold', lineHeight: 1.1 }}>{producto.store}</span>
+                  <span style={{ display: 'flex', alignItems: 'center', gap: '2px', fontSize: '0.75rem', color: '#FFD700', marginTop: '2px' }}>
+                    <svg width="10" height="10" viewBox="0 0 24 24" fill="#FFD700" stroke="#FFD700" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"></polygon></svg>
+                    4.8
+                  </span>
+                </div>
               </div>
 
               {/* Nombre del producto */}
-              <h3 style={{ fontSize: '1rem', color: 'var(--color-text-main)', margin: '0 0 2px 0' }}>{producto.name}</h3>
+              <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: '2px' }}>
+                <h3 style={{ fontSize: '1rem', color: 'var(--color-text-main)', margin: '0' }}>{producto.name}</h3>
+                <span style={{ display: 'flex', alignItems: 'center', gap: '2px', fontSize: '0.8rem', color: '#FFD700', flexShrink: 0, marginTop: '2px' }}>
+                  <svg width="12" height="12" viewBox="0 0 24 24" fill="#FFD700" stroke="#FFD700" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"></polygon></svg>
+                  4.8
+                </span>
+              </div>
               
               {/* Descripcion (max 3 lineas) */}
               <p style={{ color: 'var(--color-text-muted)', fontSize: '0.8rem', lineHeight: 1.3, margin: '0 0 8px 0', display: '-webkit-box', WebkitLineClamp: 3, WebkitBoxOrient: 'vertical', overflow: 'hidden' }}>
