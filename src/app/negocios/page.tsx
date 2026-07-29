@@ -11,85 +11,97 @@ import { PlanTier, isAtLeast } from '@/types/planTypes';
 import { NEGOCIOS_DATA } from '@/data/mock';
 import { useThemeColors } from '@/hooks/useThemeColors';
 
+import { supabase } from '@/lib/supabaseClient';
+
 export default function NegociosPage() {
   const router = useRouter();
   const { isFavorite, toggleFavorite } = useFavorites();
-  const { isVendorModeActive } = useAuth();
+  const { isVendorModeActive, supabaseUser } = useAuth();
   const { permissions, planTier } = usePlan();
   const searchParams = useSearchParams();
   const themeColors = useThemeColors();
   const [negocios, setNegocios] = useState<any[]>(NEGOCIOS_DATA);
 
   useEffect(() => {
-    const savedProfile = localStorage.getItem('cazamarket_profile');
-    if (savedProfile) {
-      const parsed = JSON.parse(savedProfile);
-      
-      let prods: any[] = [];
-      let servs: any[] = [];
-
-      try {
-        const savedProductsStr = localStorage.getItem('cazamarket_my_products');
-        if (savedProductsStr) prods = JSON.parse(savedProductsStr) || [];
-      } catch (e) {}
-
-      try {
-        const savedServicesStr = localStorage.getItem('cazamarket_my_services');
-        if (savedServicesStr) servs = JSON.parse(savedServicesStr) || [];
-      } catch (e) {}
-
-      // Auto-migrar servicios guardados por error en la lista de productos
-      if (Array.isArray(prods) && prods.length > 0) {
-        const misplacedServices = prods.filter((p: any) => p.usesCalendar || p.serviceLocation || p.pricePeriod);
-        if (misplacedServices.length > 0) {
-          servs = [...misplacedServices, ...servs];
-          prods = prods.filter((p: any) => !(p.usesCalendar || p.serviceLocation || p.pricePeriod));
-          localStorage.setItem('cazamarket_my_services', JSON.stringify(servs));
-          localStorage.setItem('cazamarket_my_products', JSON.stringify(prods));
-        }
-      }
-
-      const pCount = Array.isArray(prods) ? prods.slice(0, permissions.maxProductos).length : 0;
-      const sCount = Array.isArray(servs) ? servs.slice(0, permissions.maxServicios).length : 0;
-
-      const parsedLocations: any[] = [];
-      if (parsed.provincia || parsed.localidad) {
-        parsedLocations.push({ province: parsed.provincia || '', city: parsed.localidad || '' });
-      }
-      if (parsed.sucursales && Array.isArray(parsed.sucursales)) {
-        parsed.sucursales.forEach((suc: any) => {
-          if (suc.provincia || suc.localidad) {
-            parsedLocations.push({ province: suc.provincia || '', city: suc.localidad || '' });
+    const loadUserStore = async () => {
+      const savedProfile = localStorage.getItem('cazamarket_profile');
+      if (savedProfile) {
+        const parsed = JSON.parse(savedProfile);
+        
+        let pCount = 0;
+        let sCount = 0;
+        
+        // Fetch real counts from Supabase if user is logged in
+        if (supabaseUser) {
+          try {
+            const { data: prods } = await supabase.from('products').select('id').eq('user_id', supabaseUser.id);
+            const { data: servs } = await supabase.from('services').select('id').eq('user_id', supabaseUser.id);
+            
+            pCount = prods ? Math.min(prods.length, permissions.maxProductos) : 0;
+            sCount = servs ? Math.min(servs.length, permissions.maxServicios) : 0;
+          } catch (e) {
+            console.error('Error fetching counts from Supabase', e);
           }
-        });
-      }
+        } else {
+          // Fallback to localStorage if not logged in
+          try {
+            const savedProductsStr = localStorage.getItem('cazamarket_my_products');
+            if (savedProductsStr) {
+              const prods = JSON.parse(savedProductsStr) || [];
+              pCount = Array.isArray(prods) ? Math.min(prods.length, permissions.maxProductos) : 0;
+            }
+          } catch (e) {}
 
-      const userNegocio = {
-        id: 1,
-        name: parsed.storeName || parsed.username || parsed.nombre || 'Mi Negocio',
-        rating: 5.0,
-        reviews: 0,
-        image: 'https://images.unsplash.com/photo-1503614472-8c93d56e92ce?q=80&w=1200&auto=format&fit=crop',
-        avatar: parsed.avatar || 'https://ui-avatars.com/api/?name=Mi+Negocio&background=ff7300&color=fff',
-        planTier: planTier,
-        description: parsed.storeDescription || 'Bienvenido a mi tienda oficial en CazaMarket.',
-        businessType: parsed.businessType || 'Tienda',
-        categories: parsed.categories ? (Array.isArray(parsed.categories) ? parsed.categories : [parsed.categories]) : [],
-        locations: parsedLocations,
-        productsCount: pCount,
-        servicesCount: sCount,
-        theme: parsed.theme || null,
-      };
+          try {
+            const savedServicesStr = localStorage.getItem('cazamarket_my_services');
+            if (savedServicesStr) {
+              const servs = JSON.parse(savedServicesStr) || [];
+              sCount = Array.isArray(servs) ? Math.min(servs.length, permissions.maxServicios) : 0;
+            }
+          } catch (e) {}
+        }
 
-      if (permissions.tiendaVirtual) {
-        setNegocios([userNegocio, ...NEGOCIOS_DATA]);
+        const parsedLocations: any[] = [];
+        if (parsed.provincia || parsed.localidad) {
+          parsedLocations.push({ province: parsed.provincia || '', city: parsed.localidad || '' });
+        }
+        if (parsed.sucursales && Array.isArray(parsed.sucursales)) {
+          parsed.sucursales.forEach((suc: any) => {
+            if (suc.provincia || suc.localidad) {
+              parsedLocations.push({ province: suc.provincia || '', city: suc.localidad || '' });
+            }
+          });
+        }
+
+        const userNegocio = {
+          id: 1,
+          name: parsed.storeName || parsed.username || parsed.nombre || 'Mi Negocio',
+          rating: 4.8,
+          reviews: 0,
+          image: 'https://images.unsplash.com/photo-1503614472-8c93d56e92ce?q=80&w=1200&auto=format&fit=crop',
+          avatar: parsed.avatar || 'https://ui-avatars.com/api/?name=Mi+Negocio&background=ff7300&color=fff',
+          planTier: planTier,
+          description: parsed.storeDescription || 'Bienvenido a mi tienda oficial en CazaMarket.',
+          businessType: parsed.businessType || 'Tienda',
+          categories: parsed.categories ? (Array.isArray(parsed.categories) ? parsed.categories : [parsed.categories]) : [],
+          locations: parsedLocations,
+          productsCount: pCount,
+          servicesCount: sCount,
+          theme: parsed.theme || null,
+        };
+
+        if (permissions.tiendaVirtual) {
+          setNegocios([userNegocio, ...NEGOCIOS_DATA]);
+        } else {
+          setNegocios(NEGOCIOS_DATA);
+        }
       } else {
         setNegocios(NEGOCIOS_DATA);
       }
-    } else {
-      setNegocios(NEGOCIOS_DATA);
-    }
-  }, [planTier, permissions.tiendaVirtual]);
+    };
+    
+    loadUserStore();
+  }, [planTier, permissions.tiendaVirtual, permissions.maxProductos, permissions.maxServicios, supabaseUser]);
 
   const q = searchParams?.get('q')?.toLowerCase() || '';
   const filterCategoria = searchParams?.get('categoria') || '';
