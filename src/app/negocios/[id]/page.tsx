@@ -719,6 +719,7 @@ export default function NegocioDetailPage({ params }: { params: Promise<{ id: st
                                   const image = isObj && p.image ? p.image : '';
                                   
                                   const ratingStr = isObj && (p.calculatedRating || p.rating) ? (p.calculatedRating || p.rating) : null;
+                                  const category = isObj && p.category ? p.category : section.name;
                                   
                                   return (
                                     <div key={id || index} className="glass-panel" style={{ padding: 0, overflow: 'hidden', borderRadius: 'var(--radius-lg)', display: 'flex', flexDirection: 'column', height: '100%', transition: 'transform 0.2s', cursor: 'pointer' }}
@@ -807,6 +808,7 @@ export default function NegocioDetailPage({ params }: { params: Promise<{ id: st
                         const image = isObj && p.image ? p.image : '';
 
                                   const ratingStr = isObj && (p.calculatedRating || p.rating) ? (p.calculatedRating || p.rating) : null;
+                                  const category = isObj && p.category ? p.category : 'General';
                                   
                                   return (
                                     <div key={id || index} className="glass-panel" style={{ padding: 0, overflow: 'hidden', borderRadius: 'var(--radius-lg)', display: 'flex', flexDirection: 'column', height: '100%', transition: 'transform 0.2s', cursor: 'pointer' }}
