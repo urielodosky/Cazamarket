@@ -11,7 +11,7 @@ export interface CartItem {
   price: string; // formatted string like "$120.00"
   image: string;
   store: string;
-  storeId: number;
+  storeId: number | string;
   quantity: number;
   type: 'producto' | 'servicio';
   baseDiscount?: { type: string, value: string };
@@ -27,7 +27,7 @@ interface CartContextType {
   removeFromCart: (id: string) => void;
   updateQuantity: (id: string, delta: number) => void;
   clearCart: () => void;
-  canAddToCart: (storeId: number) => boolean;
+  canAddToCart: (storeId: number | string) => boolean;
 }
 
 const CartContext = createContext<CartContextType | undefined>(undefined);
@@ -55,12 +55,16 @@ export function CartProvider({ children }: { children: React.ReactNode }) {
     }
   }, [cart, isLoaded]);
 
-  const canAddToCart = (storeId: number) => {
-    if (storeId === 1) {
+  const canAddToCart = (storeId: number | string) => {
+    if (storeId === 1 || storeId === '1') {
       return hasFeature('carritoWhatsApp');
     }
     const store = NEGOCIOS_DATA.find(n => n.id === storeId);
-    return store ? store.planTier !== 'gratis' : false;
+    if (store) {
+      return store.planTier !== 'gratis';
+    }
+    // If store is not found in mock data, it's a DB product. Allow by default since paid plans have cart.
+    return true;
   };
 
   const addToCart = (newItem: Omit<CartItem, 'quantity'>) => {
