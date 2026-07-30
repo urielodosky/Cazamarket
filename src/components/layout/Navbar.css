@@ -34,8 +34,7 @@
 }
 
 .navbar-logo-img {
-  height: 120px;
-  transform: scale(2);
+  height: 70px;
   transform-origin: left center;
 }
 
@@ -367,8 +366,7 @@
   }
 
   .navbar-logo-img {
-    height: 80px !important;
-    transform: scale(1.5);
+    height: 50px !important;
     transform-origin: left center;
   }
 
