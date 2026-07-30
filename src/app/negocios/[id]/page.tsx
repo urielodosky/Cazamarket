@@ -103,7 +103,7 @@ export default function NegocioDetailPage({ params }: { params: Promise<{ id: st
   const router = useRouter();
   const searchParams = useSearchParams();
   const { hasFeature, permissions } = usePlan();
-  const { supabaseUser } = useAuth();
+  const { supabaseUser, isFavorite, toggleFavorite } = useAuth();
   const themeColors = useThemeColors();
   
   const isOwnProfile = negocioId === 1 || unwrappedParams.id === supabaseUser?.id;
@@ -728,6 +728,22 @@ export default function NegocioDetailPage({ params }: { params: Promise<{ id: st
                                          onMouseLeave={(e) => { e.currentTarget.style.transform = 'none'; e.currentTarget.style.zIndex = '1'; }}>
                                       <div style={{ position: 'relative', height: '180px', background: image ? `url(${image}) center/cover` : 'rgba(255,255,255,0.03)', borderTopLeftRadius: 'var(--radius-lg)', borderTopRightRadius: 'var(--radius-lg)', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
                                          {!image && <span style={{ opacity: 0.3, fontSize: '0.9rem' }}>Foto del Producto</span>}
+                                         {/* Favoritos */}
+                                         <div style={{ position: 'absolute', top: '15px', left: '15px', zIndex: 10 }}>
+                                           <button 
+                                             onClick={(e) => { e.stopPropagation(); toggleFavorite('productos', id.toString()); }}
+                                             style={{ 
+                                               background: 'rgba(0,0,0,0.5)', border: 'none', borderRadius: '50%', width: '32px', height: '32px', 
+                                               display: 'flex', alignItems: 'center', justifyContent: 'center', cursor: 'pointer',
+                                               color: isFavorite('productos', id.toString()) ? '#ff4d4d' : 'rgba(255,255,255,0.7)', transition: 'all 0.2s', backdropFilter: 'blur(4px)'
+                                             }}
+                                             onMouseEnter={(e) => { e.currentTarget.style.color = '#ff4d4d'; e.currentTarget.style.transform = 'scale(1.1)'; }}
+                                             onMouseLeave={(e) => { e.currentTarget.style.color = isFavorite('productos', id.toString()) ? '#ff4d4d' : 'rgba(255,255,255,0.7)'; e.currentTarget.style.transform = 'scale(1)'; }}
+                                             title={isFavorite('productos', id.toString()) ? "Quitar de favoritos" : "Añadir a favoritos"}
+                                           >
+                                             <svg width="18" height="18" viewBox="0 0 24 24" fill={isFavorite('productos', id.toString()) ? '#ff4d4d' : 'none'} stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"></path></svg>
+                                           </button>
+                                         </div>
                                          {/* Product Rating Top Right */}
                                          {ratingStr && (
                                            <div style={{ position: 'absolute', top: '10px', right: '10px', background: 'rgba(0,0,0,0.65)', backdropFilter: 'blur(4px)', padding: '4px 8px', borderRadius: '12px', display: 'flex', alignItems: 'center', gap: '4px', zIndex: 5 }}>
@@ -764,7 +780,7 @@ export default function NegocioDetailPage({ params }: { params: Promise<{ id: st
                                         </div>
                                         
                                         <div style={{ marginTop: '8px' }}>
-                                          {/* Price */}
+                                          {/* Price + Stock */}
                                           <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'baseline', marginBottom: '6px' }}>
                                             <div style={{ display: 'flex', alignItems: 'baseline', gap: '4px' }}>
                                               {typeof priceStr === 'string' && priceStr.includes(' ') && !priceStr.startsWith('$') ? (
@@ -776,6 +792,65 @@ export default function NegocioDetailPage({ params }: { params: Promise<{ id: st
                                                 <span style={{ fontSize: '1.1rem', fontWeight: 'bold', color: '#a8b87c' }}>{priceStr}</span>
                                               )}
                                             </div>
+                                            {(((isObj && (p.stock_mode === 'definido' || p.stockMode === 'definido')) && p.stock !== null && p.stock !== undefined) || id === 2) && (
+                                              <span style={{ fontSize: '0.7rem', color: 'var(--color-text-muted)' }}>Stock: {p.stock !== null && p.stock !== undefined ? p.stock : 5}</span>
+                                            )}
+                                          </div>
+                                          
+                                          {/* Shipping / Retiro */}
+                                          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                                            <div style={{ fontSize: '0.7rem', color: 'color-mix(in srgb, var(--color-text-main) 60%, transparent)', display: 'flex', alignItems: 'center', gap: '4px' }}>
+                                              {(() => {
+                                                if (!isObj) return <span>A acordar</span>;
+                                                const hasShipping = p.shipping_mode === 'gratis' || p.shipping_mode === 'costo_extra' || typeof p.seller?.shippingCost === 'number' || typeof p.shippingCost === 'number';
+                                                let shippingText = p.shipping_mode === 'gratis' || p.seller?.shippingCost === 0 || p.shippingCost === 0 ? 'Envío gratis' : 'Envío con costo';
+                                                if (p.shipping_mode === 'costo_extra' && p.shipping_cost) {
+                                                  shippingText = p.shipping_cost.toLowerCase().includes('envío') || p.shipping_cost.toLowerCase().includes('envio') 
+                                                    ? p.shipping_cost : `Envío: ${p.shipping_cost}`;
+                                                }
+                                                const hasPickup = p.pickup_available === 'si' || (p.seller?.branches && p.seller.branches.length > 0);
+                                                
+                                                const TruckIcon = () => (
+                                                  <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                                                    <rect x="1" y="3" width="15" height="13"></rect>
+                                                    <polygon points="16 8 20 8 23 11 23 16 16 16 16 8"></polygon>
+                                                    <circle cx="5.5" cy="18.5" r="2.5"></circle>
+                                                    <circle cx="18.5" cy="18.5" r="2.5"></circle>
+                                                  </svg>
+                                                );
+                                                const StoreIcon = () => (
+                                                  <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                                                    <path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"></path>
+                                                    <polyline points="9 22 9 12 15 12 15 22"></polyline>
+                                                  </svg>
+                                                );
+
+                                                if (hasShipping) {
+                                                  return <><TruckIcon /><span>{shippingText}</span></>;
+                                                } else if (hasPickup) {
+                                                  return <><StoreIcon /><span>Retiro en sucursal</span></>;
+                                                }
+                                                return <span>A acordar</span>;
+                                              })()}
+                                            </div>
+                                            <button 
+                                              onClick={(e) => { e.stopPropagation(); router.push(`/productos/${id}`); }}
+                                              style={{ 
+                                                padding: '4px 12px', 
+                                                borderRadius: 'var(--radius-full)', 
+                                                color: 'var(--color-primary)', 
+                                                fontSize: '0.8rem',
+                                                fontWeight: 600,
+                                                background: 'transparent',
+                                                border: '1px solid var(--color-primary)',
+                                                cursor: 'pointer',
+                                                transition: 'all 0.2s'
+                                              }}
+                                              onMouseEnter={(e) => { e.currentTarget.style.background = 'rgba(255,115,0,0.1)'; }}
+                                              onMouseLeave={(e) => { e.currentTarget.style.background = 'transparent'; }}
+                                            >
+                                              Ver
+                                            </button>
                                           </div>
                                         </div>
                                       </div>
@@ -817,6 +892,22 @@ export default function NegocioDetailPage({ params }: { params: Promise<{ id: st
                                          onMouseLeave={(e) => { e.currentTarget.style.transform = 'none'; e.currentTarget.style.zIndex = '1'; }}>
                                       <div style={{ position: 'relative', height: '180px', background: image ? `url(${image}) center/cover` : 'rgba(255,255,255,0.03)', borderTopLeftRadius: 'var(--radius-lg)', borderTopRightRadius: 'var(--radius-lg)', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
                                          {!image && <span style={{ opacity: 0.3, fontSize: '0.9rem' }}>Foto del Producto</span>}
+                                         {/* Favoritos */}
+                                         <div style={{ position: 'absolute', top: '15px', left: '15px', zIndex: 10 }}>
+                                           <button 
+                                             onClick={(e) => { e.stopPropagation(); toggleFavorite('productos', id.toString()); }}
+                                             style={{ 
+                                               background: 'rgba(0,0,0,0.5)', border: 'none', borderRadius: '50%', width: '32px', height: '32px', 
+                                               display: 'flex', alignItems: 'center', justifyContent: 'center', cursor: 'pointer',
+                                               color: isFavorite('productos', id.toString()) ? '#ff4d4d' : 'rgba(255,255,255,0.7)', transition: 'all 0.2s', backdropFilter: 'blur(4px)'
+                                             }}
+                                             onMouseEnter={(e) => { e.currentTarget.style.color = '#ff4d4d'; e.currentTarget.style.transform = 'scale(1.1)'; }}
+                                             onMouseLeave={(e) => { e.currentTarget.style.color = isFavorite('productos', id.toString()) ? '#ff4d4d' : 'rgba(255,255,255,0.7)'; e.currentTarget.style.transform = 'scale(1)'; }}
+                                             title={isFavorite('productos', id.toString()) ? "Quitar de favoritos" : "Añadir a favoritos"}
+                                           >
+                                             <svg width="18" height="18" viewBox="0 0 24 24" fill={isFavorite('productos', id.toString()) ? '#ff4d4d' : 'none'} stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"></path></svg>
+                                           </button>
+                                         </div>
                                          {/* Product Rating Top Right */}
                                          {ratingStr && (
                                            <div style={{ position: 'absolute', top: '10px', right: '10px', background: 'rgba(0,0,0,0.65)', backdropFilter: 'blur(4px)', padding: '4px 8px', borderRadius: '12px', display: 'flex', alignItems: 'center', gap: '4px', zIndex: 5 }}>
@@ -853,7 +944,7 @@ export default function NegocioDetailPage({ params }: { params: Promise<{ id: st
                                         </div>
                                         
                                         <div style={{ marginTop: '8px' }}>
-                                          {/* Price */}
+                                          {/* Price + Stock */}
                                           <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'baseline', marginBottom: '6px' }}>
                                             <div style={{ display: 'flex', alignItems: 'baseline', gap: '4px' }}>
                                               {typeof priceStr === 'string' && priceStr.includes(' ') && !priceStr.startsWith('$') ? (
@@ -865,6 +956,65 @@ export default function NegocioDetailPage({ params }: { params: Promise<{ id: st
                                                 <span style={{ fontSize: '1.1rem', fontWeight: 'bold', color: '#a8b87c' }}>{priceStr}</span>
                                               )}
                                             </div>
+                                            {(((isObj && (p.stock_mode === 'definido' || p.stockMode === 'definido')) && p.stock !== null && p.stock !== undefined) || id === 2) && (
+                                              <span style={{ fontSize: '0.7rem', color: 'var(--color-text-muted)' }}>Stock: {p.stock !== null && p.stock !== undefined ? p.stock : 5}</span>
+                                            )}
+                                          </div>
+                                          
+                                          {/* Shipping / Retiro */}
+                                          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                                            <div style={{ fontSize: '0.7rem', color: 'color-mix(in srgb, var(--color-text-main) 60%, transparent)', display: 'flex', alignItems: 'center', gap: '4px' }}>
+                                              {(() => {
+                                                if (!isObj) return <span>A acordar</span>;
+                                                const hasShipping = p.shipping_mode === 'gratis' || p.shipping_mode === 'costo_extra' || typeof p.seller?.shippingCost === 'number' || typeof p.shippingCost === 'number';
+                                                let shippingText = p.shipping_mode === 'gratis' || p.seller?.shippingCost === 0 || p.shippingCost === 0 ? 'Envío gratis' : 'Envío con costo';
+                                                if (p.shipping_mode === 'costo_extra' && p.shipping_cost) {
+                                                  shippingText = p.shipping_cost.toLowerCase().includes('envío') || p.shipping_cost.toLowerCase().includes('envio') 
+                                                    ? p.shipping_cost : `Envío: ${p.shipping_cost}`;
+                                                }
+                                                const hasPickup = p.pickup_available === 'si' || (p.seller?.branches && p.seller.branches.length > 0);
+                                                
+                                                const TruckIcon = () => (
+                                                  <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                                                    <rect x="1" y="3" width="15" height="13"></rect>
+                                                    <polygon points="16 8 20 8 23 11 23 16 16 16 16 8"></polygon>
+                                                    <circle cx="5.5" cy="18.5" r="2.5"></circle>
+                                                    <circle cx="18.5" cy="18.5" r="2.5"></circle>
+                                                  </svg>
+                                                );
+                                                const StoreIcon = () => (
+                                                  <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                                                    <path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"></path>
+                                                    <polyline points="9 22 9 12 15 12 15 22"></polyline>
+                                                  </svg>
+                                                );
+
+                                                if (hasShipping) {
+                                                  return <><TruckIcon /><span>{shippingText}</span></>;
+                                                } else if (hasPickup) {
+                                                  return <><StoreIcon /><span>Retiro en sucursal</span></>;
+                                                }
+                                                return <span>A acordar</span>;
+                                              })()}
+                                            </div>
+                                            <button 
+                                              onClick={(e) => { e.stopPropagation(); router.push(`/productos/${id}`); }}
+                                              style={{ 
+                                                padding: '4px 12px', 
+                                                borderRadius: 'var(--radius-full)', 
+                                                color: 'var(--color-primary)', 
+                                                fontSize: '0.8rem',
+                                                fontWeight: 600,
+                                                background: 'transparent',
+                                                border: '1px solid var(--color-primary)',
+                                                cursor: 'pointer',
+                                                transition: 'all 0.2s'
+                                              }}
+                                              onMouseEnter={(e) => { e.currentTarget.style.background = 'rgba(255,115,0,0.1)'; }}
+                                              onMouseLeave={(e) => { e.currentTarget.style.background = 'transparent'; }}
+                                            >
+                                              Ver
+                                            </button>
                                           </div>
                                         </div>
                                       </div>
@@ -1009,6 +1159,22 @@ export default function NegocioDetailPage({ params }: { params: Promise<{ id: st
                                    onMouseLeave={(e) => { e.currentTarget.style.transform = 'none'; e.currentTarget.style.zIndex = '1'; }}>
                                 <div style={{ position: 'relative', height: '180px', background: servImage ? `url(${servImage}) center/cover` : 'rgba(255,255,255,0.03)', borderTopLeftRadius: 'var(--radius-lg)', borderTopRightRadius: 'var(--radius-lg)', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
                                    {!servImage && <span style={{ opacity: 0.3, fontSize: '0.9rem' }}>Foto del Servicio</span>}
+                                   {/* Favoritos */}
+                                   <div style={{ position: 'absolute', top: '15px', left: '15px', zIndex: 10 }}>
+                                     <button 
+                                       onClick={(e) => { e.stopPropagation(); toggleFavorite('servicios', servId.toString()); }}
+                                       style={{ 
+                                         background: 'rgba(0,0,0,0.5)', border: 'none', borderRadius: '50%', width: '32px', height: '32px', 
+                                         display: 'flex', alignItems: 'center', justifyContent: 'center', cursor: 'pointer',
+                                         color: isFavorite('servicios', servId.toString()) ? '#ff4d4d' : 'rgba(255,255,255,0.7)', transition: 'all 0.2s', backdropFilter: 'blur(4px)'
+                                       }}
+                                       onMouseEnter={(e) => { e.currentTarget.style.color = '#ff4d4d'; e.currentTarget.style.transform = 'scale(1.1)'; }}
+                                       onMouseLeave={(e) => { e.currentTarget.style.color = isFavorite('servicios', servId.toString()) ? '#ff4d4d' : 'rgba(255,255,255,0.7)'; e.currentTarget.style.transform = 'scale(1)'; }}
+                                       title={isFavorite('servicios', servId.toString()) ? "Quitar de favoritos" : "Añadir a favoritos"}
+                                     >
+                                       <svg width="18" height="18" viewBox="0 0 24 24" fill={isFavorite('servicios', servId.toString()) ? '#ff4d4d' : 'none'} stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"></path></svg>
+                                     </button>
+                                   </div>
                                    {/* Service Rating Top Right */}
                                    {ratingStr && (
                                      <div style={{ position: 'absolute', top: '10px', right: '10px', background: 'rgba(0,0,0,0.65)', backdropFilter: 'blur(4px)', padding: '4px 8px', borderRadius: '12px', display: 'flex', alignItems: 'center', gap: '4px', zIndex: 5 }}>
@@ -1056,6 +1222,28 @@ export default function NegocioDetailPage({ params }: { params: Promise<{ id: st
                                         ) : (
                                           <span style={{ fontSize: '1.1rem', fontWeight: 'bold', color: '#a8b87c' }}>{servPrice}</span>
                                         )}
+                                      </div>
+                                      
+                                      {/* Ver Button */}
+                                      <div style={{ display: 'flex', justifyContent: 'flex-end', marginTop: '4px' }}>
+                                        <button 
+                                          onClick={(e) => { e.stopPropagation(); router.push(`/servicios/${servId}`); }}
+                                          style={{ 
+                                            padding: '4px 12px', 
+                                            borderRadius: 'var(--radius-full)', 
+                                            color: 'var(--color-primary)', 
+                                            fontSize: '0.8rem',
+                                            fontWeight: 600,
+                                            background: 'transparent',
+                                            border: '1px solid var(--color-primary)',
+                                            cursor: 'pointer',
+                                            transition: 'all 0.2s'
+                                          }}
+                                          onMouseEnter={(e) => { e.currentTarget.style.background = 'rgba(255,115,0,0.1)'; }}
+                                          onMouseLeave={(e) => { e.currentTarget.style.background = 'transparent'; }}
+                                        >
+                                          Ver
+                                        </button>
                                       </div>
                                     </div>
                                   </div>
