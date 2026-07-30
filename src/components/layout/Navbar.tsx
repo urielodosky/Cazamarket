@@ -159,7 +159,7 @@ export default function Navbar() {
 
   return (
     <header className="navbar-header" suppressHydrationWarning>
-      <div className="navbar-container">
+      <div className={`navbar-container ${isHome ? 'is-home-mobile' : ''}`}>
         <button 
           className="mobile-menu-btn" 
           onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}

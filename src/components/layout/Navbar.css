@@ -367,8 +367,14 @@
     margin-bottom: 4px;
   }
 
+  .is-home-mobile .navbar-logo {
+    flex: 1 1 auto; /* Take available space next to profile */
+    justify-content: flex-start;
+    margin-bottom: 0;
+  }
+
   .navbar-logo-img {
-    height: 36px !important;
+    height: 48px !important; /* Make it bigger */
   }
 
   /* Ocultar menú de hamburguesa nativo viejo y enlaces en móvil */
@@ -391,6 +397,10 @@
     flex: 1 1 auto !important;
     order: 1 !important;
     width: auto;
+  }
+
+  .is-home-mobile .navbar-middle-area {
+    display: none !important; /* Hide search bar on home page mobile */
   }
 
   .navbar-center {
