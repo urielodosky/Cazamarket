@@ -94,6 +94,8 @@ export default function NegocioDetailPage({ params }: { params: Promise<{ id: st
   const [envio, setEnvio] = useState('');
   const [duracion, setDuracion] = useState('');
   const [extras, setExtras] = useState<any>('');
+  const [productSearch, setProductSearch] = useState('');
+  const [serviceSearch, setServiceSearch] = useState('');
   
   const negocioId = parseInt(unwrappedParams.id);
   const [negocio, setNegocio] = useState<any>(BLANK_NEGOCIO);
@@ -597,6 +599,8 @@ export default function NegocioDetailPage({ params }: { params: Promise<{ id: st
                       </span>
                       <input 
                         type="text" 
+                        value={productSearch}
+                        onChange={(e) => setProductSearch(e.target.value)}
                         placeholder="Buscar productos..." 
                         style={{ width: '100%', padding: '10px 16px 10px 40px', borderRadius: 'var(--radius-full)', border: '1px solid var(--color-border)', background: 'var(--color-bg-base)', color: 'var(--color-text-main)', fontSize: '0.95rem' }} 
                       />
@@ -690,51 +694,69 @@ export default function NegocioDetailPage({ params }: { params: Promise<{ id: st
                   if (hasCategories) {
                     return (
                       <div style={{ display: 'flex', flexDirection: 'column', gap: '40px' }}>
-                        {negocio.productSections.map((section: any, idx: number) => (
-                          <div key={idx}>
-                            <h4 style={{ margin: '0 0 16px 0', fontSize: '1.2rem', color: 'var(--color-primary)', borderBottom: '1px solid var(--color-border)', paddingBottom: '8px' }}>
-                              {section.name}
-                            </h4>
-                            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(220px, 1fr))', gap: '24px' }}>
-                              {section.products.map((p: any, index: number) => {
-                                const isObj = typeof p === 'object';
-                                const id = isObj ? p.id : p;
-                                const name = isObj ? p.name : `Producto ${p}`;
-                                const priceStr = isObj ? (typeof p.price === 'number' ? `$ ${p.price.toLocaleString('es-AR')}` : p.price) : `$ ${(p * 24500).toLocaleString('es-AR')}`;
-                                const image = isObj && p.image ? p.image : '';
-                                
-                                return (
-                                  <div key={id || index} className="glass-panel" style={{ padding: 0, overflow: 'hidden', borderRadius: 'var(--radius-md)', transition: 'transform 0.2s', cursor: 'pointer' }}
-                                       onClick={() => router.push(`/productos/${id}`)}
-                                       onMouseEnter={(e) => e.currentTarget.style.transform = 'translateY(-4px)'}
-                                       onMouseLeave={(e) => e.currentTarget.style.transform = 'none'}>
-                                    <div style={{ position: 'relative', height: '180px', background: image ? `url(${image}) center/cover` : 'rgba(255,255,255,0.03)', display: 'flex', alignItems: 'center', justifyContent: 'center', borderBottom: '1px solid var(--color-border)' }}>
-                                       {!image && <span style={{ opacity: 0.3, fontSize: '0.9rem' }}>Foto del Producto</span>}
-                                       {/* Product Rating Top Right */}
-                                       <div style={{ position: 'absolute', top: '10px', right: '10px', background: 'rgba(0,0,0,0.65)', backdropFilter: 'blur(4px)', padding: '4px 8px', borderRadius: '12px', display: 'flex', alignItems: 'center', gap: '4px', zIndex: 5 }}>
-                                         <svg width="12" height="12" viewBox="0 0 24 24" fill="#FFD700" stroke="#FFD700" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"></polygon></svg>
-                                         <span style={{ color: '#fff', fontSize: '0.8rem', fontWeight: 'bold' }}>4.8</span>
-                                       </div>
-                                    </div>
-                                    <div style={{ padding: '16px' }}>
-                                      <div style={{ marginBottom: '8px' }}>
-                                        <h4 style={{ margin: '0', fontSize: '1rem', color: 'var(--color-text-main)', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>{name}</h4>
+                        {negocio.productSections.map((section: any, idx: number) => {
+                          const filteredProducts = section.products.filter((p: any) => {
+                            const isObj = typeof p === 'object';
+                            const name = isObj ? p.name : `Producto ${p}`;
+                            if (productSearch && !name.toLowerCase().includes(productSearch.toLowerCase())) return false;
+                            if (categoria && isObj && p.category && !p.category.toLowerCase().includes(categoria.toLowerCase())) return false;
+                            return true;
+                          });
+                          
+                          if (filteredProducts.length === 0) return null;
+                          
+                          return (
+                            <div key={idx}>
+                              <h4 style={{ margin: '0 0 16px 0', fontSize: '1.2rem', color: 'var(--color-primary)', borderBottom: '1px solid var(--color-border)', paddingBottom: '8px' }}>
+                                {section.name}
+                              </h4>
+                              <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(220px, 1fr))', gap: '24px' }}>
+                                {filteredProducts.map((p: any, index: number) => {
+                                  const isObj = typeof p === 'object';
+                                  const id = isObj ? p.id : p;
+                                  const name = isObj ? p.name : `Producto ${p}`;
+                                  const priceStr = isObj ? (typeof p.price === 'number' ? `$ ${p.price.toLocaleString('es-AR')}` : p.price) : `$ ${(p * 24500).toLocaleString('es-AR')}`;
+                                  const image = isObj && p.image ? p.image : '';
+                                  
+                                  return (
+                                    <div key={id || index} className="glass-panel" style={{ padding: 0, overflow: 'hidden', borderRadius: 'var(--radius-md)', transition: 'transform 0.2s', cursor: 'pointer' }}
+                                         onClick={() => router.push(`/productos/${id}`)}
+                                         onMouseEnter={(e) => e.currentTarget.style.transform = 'translateY(-4px)'}
+                                         onMouseLeave={(e) => e.currentTarget.style.transform = 'none'}>
+                                      <div style={{ position: 'relative', height: '180px', background: image ? `url(${image}) center/cover` : 'rgba(255,255,255,0.03)', display: 'flex', alignItems: 'center', justifyContent: 'center', borderBottom: '1px solid var(--color-border)' }}>
+                                         {!image && <span style={{ opacity: 0.3, fontSize: '0.9rem' }}>Foto del Producto</span>}
+                                         {/* Product Rating Top Right */}
+                                         <div style={{ position: 'absolute', top: '10px', right: '10px', background: 'rgba(0,0,0,0.65)', backdropFilter: 'blur(4px)', padding: '4px 8px', borderRadius: '12px', display: 'flex', alignItems: 'center', gap: '4px', zIndex: 5 }}>
+                                           <svg width="12" height="12" viewBox="0 0 24 24" fill="#FFD700" stroke="#FFD700" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"></polygon></svg>
+                                           <span style={{ color: '#fff', fontSize: '0.8rem', fontWeight: 'bold' }}>4.8</span>
+                                         </div>
                                       </div>
-                                      <div style={{ color: 'var(--color-text-muted)', fontSize: '0.8rem', marginBottom: '12px' }}>{section.name}</div>
-                                      <p style={{ color: 'var(--color-primary)', fontWeight: 'bold', margin: 0, fontSize: '1.2rem' }}>{priceStr}</p>
+                                      <div style={{ padding: '16px' }}>
+                                        <div style={{ marginBottom: '8px' }}>
+                                          <h4 style={{ margin: '0', fontSize: '1rem', color: 'var(--color-text-main)', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>{name}</h4>
+                                        </div>
+                                        <div style={{ color: 'var(--color-text-muted)', fontSize: '0.8rem', marginBottom: '12px' }}>{section.name}</div>
+                                        <p style={{ color: 'var(--color-primary)', fontWeight: 'bold', margin: 0, fontSize: '1.2rem' }}>{priceStr}</p>
+                                      </div>
                                     </div>
-                                  </div>
-                                );
-                              })}
+                                  );
+                                })}
+                              </div>
                             </div>
-                          </div>
-                        ))}
+                          );
+                        })}
                       </div>
                     );
                   }
 
                   // Flat list for basic plan without "categorias" feature
-                  const flatProducts = negocio.productSections.flatMap((s: any) => s.products);
+                  const flatProducts = negocio.productSections.flatMap((s: any) => s.products).filter((p: any) => {
+                    const isObj = typeof p === 'object';
+                    const name = isObj ? p.name : `Producto ${p}`;
+                    if (productSearch && !name.toLowerCase().includes(productSearch.toLowerCase())) return false;
+                    if (categoria && isObj && p.category && !p.category.toLowerCase().includes(categoria.toLowerCase())) return false;
+                    return true;
+                  });
                   return (
                     <div className="business-product-grid" style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(220px, 1fr))', gap: '24px' }}>
                       {flatProducts.map((p: any, index: number) => {
@@ -786,6 +808,8 @@ export default function NegocioDetailPage({ params }: { params: Promise<{ id: st
                         </span>
                         <input 
                           type="text" 
+                          value={serviceSearch}
+                          onChange={(e) => setServiceSearch(e.target.value)}
                           placeholder="Buscar servicios..." 
                           style={{ width: '100%', padding: '10px 16px 10px 40px', borderRadius: 'var(--radius-full)', border: '1px solid var(--color-border)', background: 'var(--color-bg-base)', color: 'var(--color-text-main)', fontSize: '0.95rem' }} 
                         />
@@ -880,7 +904,13 @@ export default function NegocioDetailPage({ params }: { params: Promise<{ id: st
                           {section.name}
                         </h4>
                         <div className="business-product-grid" style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(220px, 1fr))', gap: '24px' }}>
-                          {section.services.map((servicio: any, idx: number) => {
+                          {section.services.filter((servicio: any) => {
+                            const isRealObject = typeof servicio === 'object' && servicio !== null;
+                            const servName = isRealObject ? servicio.name : `Servicio ${servicio}`;
+                            if (serviceSearch && !servName.toLowerCase().includes(serviceSearch.toLowerCase())) return false;
+                            if (categoria && isRealObject && servicio.category && !servicio.category.toLowerCase().includes(categoria.toLowerCase())) return false;
+                            return true;
+                          }).map((servicio: any, idx: number) => {
                             const isRealObject = typeof servicio === 'object' && servicio !== null;
                             const servId = isRealObject ? servicio.id : servicio;
                             const servName = isRealObject ? servicio.name : `Servicio ${servicio}`;
