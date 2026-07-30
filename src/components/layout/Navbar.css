@@ -393,10 +393,6 @@
     margin-top: 8px;
   }
 
-  .is-home-mobile .navbar-middle-area {
-    display: none !important;
-  }
-
   .navbar-center {
     display: flex !important;
     width: 100% !important;

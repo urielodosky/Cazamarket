@@ -154,7 +154,7 @@ export default function Navbar() {
   else if (pathname?.includes('/planes')) searchPlaceholder = "Buscar planes...";
   else if (pathname?.includes('/comunidad')) searchPlaceholder = "Buscar en comunidad...";
 
-  let navbarModeClass = isHome || isBusinessProfile ? 'business-mode' : 'expanded-mode';
+  let navbarModeClass = isBusinessProfile ? 'business-mode' : 'expanded-mode';
 
   return (
     <header className="navbar-header" suppressHydrationWarning>
