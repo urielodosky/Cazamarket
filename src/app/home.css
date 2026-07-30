@@ -11,7 +11,7 @@
 @media (max-width: 768px) {
   .home-container {
     justify-content: flex-start;
-    padding-top: var(--spacing-6);
+    padding-top: 0;
   }
 }
 
@@ -402,5 +402,11 @@
 @media (max-width: 768px) {
   .home-container {
     padding-top: 100px;
+  }
+}
+
+@media (max-width: 768px) {
+  .main-slider-section {
+    margin-top: 0 !important;
   }
 }
