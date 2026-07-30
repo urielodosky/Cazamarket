@@ -33,6 +33,12 @@
   font-size: 1.8rem;
 }
 
+.navbar-logo-img {
+  height: 100px;
+  transform: scale(1.5);
+  transform-origin: left center;
+}
+
 /* Sliding Navbar Animation */
 .navbar-center {
   position: relative;
