@@ -715,7 +715,7 @@ export default function NegocioDetailPage({ params }: { params: Promise<{ id: st
                                   const isObj = typeof p === 'object';
                                   const id = isObj ? p.id : p;
                                   const name = isObj ? p.name : `Producto ${p}`;
-                                  const priceStr = isObj ? (typeof p.price === 'number' ? `$ ${p.price.toLocaleString('es-AR')}` : p.price) : `$ ${(p * 24500).toLocaleString('es-AR')}`;
+                                  const priceStr = isObj ? (typeof p.price === 'number' ? `$ ${p.price.toLocaleString('es-AR')}` : (p.price || 'Consultar')) : `$ ${(p * 24500).toLocaleString('es-AR')}`;
                                   const image = isObj && p.image ? p.image : '';
                                   
                                   const ratingStr = isObj && (p.calculatedRating || p.rating) ? (p.calculatedRating || p.rating) : null;
@@ -767,7 +767,7 @@ export default function NegocioDetailPage({ params }: { params: Promise<{ id: st
                                           {/* Price */}
                                           <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'baseline', marginBottom: '6px' }}>
                                             <div style={{ display: 'flex', alignItems: 'baseline', gap: '4px' }}>
-                                              {priceStr.includes(' ') && !priceStr.startsWith('$') ? (
+                                              {typeof priceStr === 'string' && priceStr.includes(' ') && !priceStr.startsWith('$') ? (
                                                 <>
                                                   <span style={{ fontSize: '1.1rem', fontWeight: 'bold', color: '#a8b87c' }}>{priceStr.split(' ').slice(1).join(' ')}</span>
                                                   <span style={{ fontSize: '0.75rem', fontWeight: 'bold', color: '#a8b87c' }}>{priceStr.split(' ')[0]}</span>
@@ -804,7 +804,7 @@ export default function NegocioDetailPage({ params }: { params: Promise<{ id: st
                         const isObj = typeof p === 'object';
                         const id = isObj ? p.id : p;
                         const name = isObj ? p.name : `Producto ${p}`;
-                        const priceStr = isObj ? (typeof p.price === 'number' ? `$ ${p.price.toLocaleString('es-AR')}` : p.price) : `$ ${(p * 24500).toLocaleString('es-AR')}`;
+                        const priceStr = isObj ? (typeof p.price === 'number' ? `$ ${p.price.toLocaleString('es-AR')}` : (p.price || 'Consultar')) : `$ ${(p * 24500).toLocaleString('es-AR')}`;
                         const image = isObj && p.image ? p.image : '';
 
                                   const ratingStr = isObj && (p.calculatedRating || p.rating) ? (p.calculatedRating || p.rating) : null;
@@ -856,7 +856,7 @@ export default function NegocioDetailPage({ params }: { params: Promise<{ id: st
                                           {/* Price */}
                                           <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'baseline', marginBottom: '6px' }}>
                                             <div style={{ display: 'flex', alignItems: 'baseline', gap: '4px' }}>
-                                              {priceStr.includes(' ') && !priceStr.startsWith('$') ? (
+                                              {typeof priceStr === 'string' && priceStr.includes(' ') && !priceStr.startsWith('$') ? (
                                                 <>
                                                   <span style={{ fontSize: '1.1rem', fontWeight: 'bold', color: '#a8b87c' }}>{priceStr.split(' ').slice(1).join(' ')}</span>
                                                   <span style={{ fontSize: '0.75rem', fontWeight: 'bold', color: '#a8b87c' }}>{priceStr.split(' ')[0]}</span>
@@ -996,7 +996,7 @@ export default function NegocioDetailPage({ params }: { params: Promise<{ id: st
                             const isRealObject = typeof servicio === 'object' && servicio !== null;
                             const servId = isRealObject ? servicio.id : servicio;
                             const servName = isRealObject ? servicio.name : `Servicio ${servicio}`;
-                            const servPrice = isRealObject ? (typeof servicio.price === 'string' ? servicio.price : `$${servicio.price?.toLocaleString('es-AR')}`) : `$ ${(servicio * 50000).toLocaleString('es-AR')}`;
+                            const servPrice = isRealObject ? (typeof servicio.price === 'string' ? servicio.price : (servicio.price ? `$${servicio.price.toLocaleString('es-AR')}` : 'Consultar')) : `$ ${(servicio * 50000).toLocaleString('es-AR')}`;
                             const servImage = isRealObject ? (servicio.media && servicio.media.length > 0 ? servicio.media[0].url : servicio.image) : '';
                             
                             const ratingStr = isRealObject && (servicio.calculatedRating || servicio.rating) ? (servicio.calculatedRating || servicio.rating) : null;
@@ -1048,7 +1048,7 @@ export default function NegocioDetailPage({ params }: { params: Promise<{ id: st
                                     {/* Price */}
                                     <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'baseline', marginBottom: '6px' }}>
                                       <div style={{ display: 'flex', alignItems: 'baseline', gap: '4px' }}>
-                                        {servPrice.includes(' ') && !servPrice.startsWith('$') ? (
+                                        {typeof servPrice === 'string' && servPrice.includes(' ') && !servPrice.startsWith('$') ? (
                                           <>
                                             <span style={{ fontSize: '1.1rem', fontWeight: 'bold', color: '#a8b87c' }}>{servPrice.split(' ').slice(1).join(' ')}</span>
                                             <span style={{ fontSize: '0.75rem', fontWeight: 'bold', color: '#a8b87c' }}>{servPrice.split(' ')[0]}</span>
