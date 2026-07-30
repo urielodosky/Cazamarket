@@ -696,9 +696,9 @@ export default function NegocioDetailPage({ params }: { params: Promise<{ id: st
                       <div style={{ display: 'flex', flexDirection: 'column', gap: '40px' }}>
                         {negocio.productSections.map((section: any, idx: number) => {
                           const filteredProducts = section.products.filter((p: any) => {
-                            const isObj = typeof p === 'object';
-                            const name = isObj ? p.name : `Producto ${p}`;
-                            if (productSearch && !name.toLowerCase().includes(productSearch.toLowerCase())) return false;
+                            const isObj = typeof p === 'object' && p !== null;
+                            const name = isObj && p.name ? p.name : (isObj && p.id ? `Producto ${p.id}` : (p !== null && p !== undefined ? `Producto ${p}` : ''));
+                            if (productSearch && name && !name.toLowerCase().includes(productSearch.toLowerCase())) return false;
                             if (categoria && isObj && p.category && !p.category.toLowerCase().includes(categoria.toLowerCase())) return false;
                             return true;
                           });
@@ -712,9 +712,9 @@ export default function NegocioDetailPage({ params }: { params: Promise<{ id: st
                               </h4>
                               <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(220px, 1fr))', gap: '24px' }}>
                                 {filteredProducts.map((p: any, index: number) => {
-                                  const isObj = typeof p === 'object';
+                                  const isObj = typeof p === 'object' && p !== null;
                                   const id = isObj ? p.id : p;
-                                  const name = isObj ? p.name : `Producto ${p}`;
+                                  const name = isObj && p.name ? p.name : (isObj && p.id ? `Producto ${p.id}` : `Producto ${p}`);
                                   const priceStr = isObj ? (typeof p.price === 'number' ? `$ ${p.price.toLocaleString('es-AR')}` : (p.price || 'Consultar')) : `$ ${(p * 24500).toLocaleString('es-AR')}`;
                                   const image = isObj && p.image ? p.image : '';
                                   
@@ -792,18 +792,18 @@ export default function NegocioDetailPage({ params }: { params: Promise<{ id: st
 
                   // Flat list for basic plan without "categorias" feature
                   const flatProducts = negocio.productSections.flatMap((s: any) => s.products).filter((p: any) => {
-                    const isObj = typeof p === 'object';
-                    const name = isObj ? p.name : `Producto ${p}`;
-                    if (productSearch && !name.toLowerCase().includes(productSearch.toLowerCase())) return false;
+                    const isObj = typeof p === 'object' && p !== null;
+                    const name = isObj && p.name ? p.name : (isObj && p.id ? `Producto ${p.id}` : `Producto ${p}`);
+                    if (productSearch && name && !name.toLowerCase().includes(productSearch.toLowerCase())) return false;
                     if (categoria && isObj && p.category && !p.category.toLowerCase().includes(categoria.toLowerCase())) return false;
                     return true;
                   });
                   return (
                     <div className="business-product-grid" style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(220px, 1fr))', gap: '24px' }}>
                       {flatProducts.map((p: any, index: number) => {
-                        const isObj = typeof p === 'object';
+                        const isObj = typeof p === 'object' && p !== null;
                         const id = isObj ? p.id : p;
-                        const name = isObj ? p.name : `Producto ${p}`;
+                        const name = isObj && p.name ? p.name : (isObj && p.id ? `Producto ${p.id}` : `Producto ${p}`);
                         const priceStr = isObj ? (typeof p.price === 'number' ? `$ ${p.price.toLocaleString('es-AR')}` : (p.price || 'Consultar')) : `$ ${(p * 24500).toLocaleString('es-AR')}`;
                         const image = isObj && p.image ? p.image : '';
 
@@ -988,14 +988,14 @@ export default function NegocioDetailPage({ params }: { params: Promise<{ id: st
                         <div className="business-product-grid" style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(220px, 1fr))', gap: '24px' }}>
                           {section.services.filter((servicio: any) => {
                             const isRealObject = typeof servicio === 'object' && servicio !== null;
-                            const servName = isRealObject ? servicio.name : `Servicio ${servicio}`;
-                            if (serviceSearch && !servName.toLowerCase().includes(serviceSearch.toLowerCase())) return false;
+                            const servName = isRealObject && servicio.name ? servicio.name : (isRealObject && servicio.id ? `Servicio ${servicio.id}` : `Servicio ${servicio}`);
+                            if (serviceSearch && servName && !servName.toLowerCase().includes(serviceSearch.toLowerCase())) return false;
                             if (categoria && isRealObject && servicio.category && !servicio.category.toLowerCase().includes(categoria.toLowerCase())) return false;
                             return true;
                           }).map((servicio: any, idx: number) => {
                             const isRealObject = typeof servicio === 'object' && servicio !== null;
                             const servId = isRealObject ? servicio.id : servicio;
-                            const servName = isRealObject ? servicio.name : `Servicio ${servicio}`;
+                            const servName = isRealObject && servicio.name ? servicio.name : (isRealObject && servicio.id ? `Servicio ${servicio.id}` : `Servicio ${servicio}`);
                             const servPrice = isRealObject ? (typeof servicio.price === 'string' ? servicio.price : (servicio.price ? `$${servicio.price.toLocaleString('es-AR')}` : 'Consultar')) : `$ ${(servicio * 50000).toLocaleString('es-AR')}`;
                             const servImage = isRealObject ? (servicio.media && servicio.media.length > 0 ? servicio.media[0].url : servicio.image) : '';
                             
