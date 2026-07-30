@@ -154,11 +154,11 @@ export default function Navbar() {
   else if (pathname?.includes('/planes')) searchPlaceholder = "Buscar planes...";
   else if (pathname?.includes('/comunidad')) searchPlaceholder = "Buscar en comunidad...";
 
-  let navbarModeClass = isBusinessProfile ? 'business-mode' : 'expanded-mode';
+  let navbarModeClass = isHome || isBusinessProfile ? 'business-mode' : 'expanded-mode';
 
   return (
     <header className="navbar-header" suppressHydrationWarning>
-      <div className="navbar-container">
+      <div className={`navbar-container ${isHome ? 'is-home-mobile' : ''}`}>
         <button 
           className="mobile-menu-btn" 
           onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
