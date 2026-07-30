@@ -718,25 +718,65 @@ export default function NegocioDetailPage({ params }: { params: Promise<{ id: st
                                   const priceStr = isObj ? (typeof p.price === 'number' ? `$ ${p.price.toLocaleString('es-AR')}` : p.price) : `$ ${(p * 24500).toLocaleString('es-AR')}`;
                                   const image = isObj && p.image ? p.image : '';
                                   
+                                  const ratingStr = isObj && (p.calculatedRating || p.rating) ? (p.calculatedRating || p.rating) : null;
+                                  
                                   return (
-                                    <div key={id || index} className="glass-panel" style={{ padding: 0, overflow: 'hidden', borderRadius: 'var(--radius-md)', transition: 'transform 0.2s', cursor: 'pointer' }}
+                                    <div key={id || index} className="glass-panel" style={{ padding: 0, overflow: 'hidden', borderRadius: 'var(--radius-lg)', display: 'flex', flexDirection: 'column', height: '100%', transition: 'transform 0.2s', cursor: 'pointer' }}
                                          onClick={() => router.push(`/productos/${id}`)}
-                                         onMouseEnter={(e) => e.currentTarget.style.transform = 'translateY(-4px)'}
-                                         onMouseLeave={(e) => e.currentTarget.style.transform = 'none'}>
-                                      <div style={{ position: 'relative', height: '180px', background: image ? `url(${image}) center/cover` : 'rgba(255,255,255,0.03)', display: 'flex', alignItems: 'center', justifyContent: 'center', borderBottom: '1px solid var(--color-border)' }}>
+                                         onMouseEnter={(e) => { e.currentTarget.style.transform = 'translateY(-5px)'; e.currentTarget.style.zIndex = '100'; }}
+                                         onMouseLeave={(e) => { e.currentTarget.style.transform = 'none'; e.currentTarget.style.zIndex = '1'; }}>
+                                      <div style={{ position: 'relative', height: '180px', background: image ? `url(${image}) center/cover` : 'rgba(255,255,255,0.03)', borderTopLeftRadius: 'var(--radius-lg)', borderTopRightRadius: 'var(--radius-lg)', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
                                          {!image && <span style={{ opacity: 0.3, fontSize: '0.9rem' }}>Foto del Producto</span>}
                                          {/* Product Rating Top Right */}
-                                         <div style={{ position: 'absolute', top: '10px', right: '10px', background: 'rgba(0,0,0,0.65)', backdropFilter: 'blur(4px)', padding: '4px 8px', borderRadius: '12px', display: 'flex', alignItems: 'center', gap: '4px', zIndex: 5 }}>
-                                           <svg width="12" height="12" viewBox="0 0 24 24" fill="#FFD700" stroke="#FFD700" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"></polygon></svg>
-                                           <span style={{ color: '#fff', fontSize: '0.8rem', fontWeight: 'bold' }}>4.8</span>
-                                         </div>
+                                         {ratingStr && (
+                                           <div style={{ position: 'absolute', top: '10px', right: '10px', background: 'rgba(0,0,0,0.65)', backdropFilter: 'blur(4px)', padding: '4px 8px', borderRadius: '12px', display: 'flex', alignItems: 'center', gap: '4px', zIndex: 5 }}>
+                                             <svg width="12" height="12" viewBox="0 0 24 24" fill="#FFD700" stroke="#FFD700" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"></polygon></svg>
+                                             <span style={{ color: '#fff', fontSize: '0.8rem', fontWeight: 'bold' }}>{ratingStr}</span>
+                                           </div>
+                                         )}
                                       </div>
-                                      <div style={{ padding: '16px' }}>
-                                        <div style={{ marginBottom: '8px' }}>
-                                          <h4 style={{ margin: '0', fontSize: '1rem', color: 'var(--color-text-main)', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>{name}</h4>
+                                      <div className="card-content-fluid" style={{ display: 'flex', flexDirection: 'column', flex: 1, padding: '16px', borderBottomLeftRadius: 'var(--radius-lg)', borderBottomRightRadius: 'var(--radius-lg)' }}>
+                                        {/* Nombre del producto */}
+                                        <div style={{ marginBottom: '2px' }}>
+                                          <h3 style={{ fontSize: '1rem', color: 'var(--color-text-main)', margin: '0' }}>{name}</h3>
                                         </div>
-                                        <div style={{ color: 'var(--color-text-muted)', fontSize: '0.8rem', marginBottom: '12px' }}>{section.name}</div>
-                                        <p style={{ color: 'var(--color-primary)', fontWeight: 'bold', margin: 0, fontSize: '1.2rem' }}>{priceStr}</p>
+                                        
+                                        {/* Descripcion (max 3 lineas) */}
+                                        {isObj && p.description && (
+                                          <p style={{ color: 'var(--color-text-muted)', fontSize: '0.8rem', lineHeight: 1.3, margin: '4px 0 8px 0', display: '-webkit-box', WebkitLineClamp: 3, WebkitBoxOrient: 'vertical', overflow: 'hidden' }}>
+                                            {p.description}
+                                          </p>
+                                        )}
+
+                                        {/* Categoria + Subcategoria */}
+                                        <div style={{ display: 'flex', gap: '4px', flexWrap: 'wrap', marginTop: 'auto', marginBottom: '8px' }}>
+                                          <span style={{ background: 'rgba(255,255,255,0.05)', color: 'var(--color-text-muted)', fontSize: '0.65rem', padding: '2px 6px', borderRadius: 'var(--radius-full)' }}>
+                                            {category}
+                                          </span>
+                                          {isObj && p.subcategory && (
+                                            <div style={{ position: 'relative', display: 'inline-block' }}>
+                                              <span style={{ background: 'rgba(255, 115, 0, 0.1)', color: 'var(--color-primary)', fontSize: '0.65rem', padding: '2px 6px', borderRadius: 'var(--radius-full)', border: '1px solid rgba(255, 115, 0, 0.2)', cursor: 'default' }}>
+                                                +1
+                                              </span>
+                                            </div>
+                                          )}
+                                        </div>
+                                        
+                                        <div style={{ marginTop: '8px' }}>
+                                          {/* Price */}
+                                          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'baseline', marginBottom: '6px' }}>
+                                            <div style={{ display: 'flex', alignItems: 'baseline', gap: '4px' }}>
+                                              {priceStr.includes(' ') && !priceStr.startsWith('$') ? (
+                                                <>
+                                                  <span style={{ fontSize: '1.1rem', fontWeight: 'bold', color: '#a8b87c' }}>{priceStr.split(' ').slice(1).join(' ')}</span>
+                                                  <span style={{ fontSize: '0.75rem', fontWeight: 'bold', color: '#a8b87c' }}>{priceStr.split(' ')[0]}</span>
+                                                </>
+                                              ) : (
+                                                <span style={{ fontSize: '1.1rem', fontWeight: 'bold', color: '#a8b87c' }}>{priceStr}</span>
+                                              )}
+                                            </div>
+                                          </div>
+                                        </div>
                                       </div>
                                     </div>
                                   );
@@ -766,27 +806,67 @@ export default function NegocioDetailPage({ params }: { params: Promise<{ id: st
                         const priceStr = isObj ? (typeof p.price === 'number' ? `$ ${p.price.toLocaleString('es-AR')}` : p.price) : `$ ${(p * 24500).toLocaleString('es-AR')}`;
                         const image = isObj && p.image ? p.image : '';
 
-                        return (
-                          <div key={id || index} className="glass-panel" style={{ padding: 0, overflow: 'hidden', borderRadius: 'var(--radius-md)', transition: 'transform 0.2s', cursor: 'pointer' }}
-                               onClick={() => router.push(`/productos/${id}`)}
-                               onMouseEnter={(e) => e.currentTarget.style.transform = 'translateY(-4px)'}
-                               onMouseLeave={(e) => e.currentTarget.style.transform = 'none'}>
-                            <div style={{ position: 'relative', height: '180px', background: image ? `url(${image}) center/cover` : 'rgba(255,255,255,0.03)', display: 'flex', alignItems: 'center', justifyContent: 'center', borderBottom: '1px solid var(--color-border)' }}>
-                               {!image && <span style={{ opacity: 0.3, fontSize: '0.9rem' }}>Foto del Producto</span>}
-                               {/* Product Rating Top Right */}
-                               <div style={{ position: 'absolute', top: '10px', right: '10px', background: 'rgba(0,0,0,0.65)', backdropFilter: 'blur(4px)', padding: '4px 8px', borderRadius: '12px', display: 'flex', alignItems: 'center', gap: '4px', zIndex: 5 }}>
-                                 <svg width="12" height="12" viewBox="0 0 24 24" fill="#FFD700" stroke="#FFD700" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"></polygon></svg>
-                                 <span style={{ color: '#fff', fontSize: '0.8rem', fontWeight: 'bold' }}>4.8</span>
-                               </div>
-                            </div>
-                            <div style={{ padding: '16px' }}>
-                              <div style={{ marginBottom: '8px' }}>
-                                        <h4 style={{ margin: '0', fontSize: '1rem', color: 'var(--color-text-main)', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>{name}</h4>
-                              </div>
-                              <div style={{ color: 'var(--color-text-muted)', fontSize: '0.8rem', marginBottom: '12px' }}>Categoría General</div>
-                              <p style={{ color: 'var(--color-primary)', fontWeight: 'bold', margin: 0, fontSize: '1.2rem' }}>{priceStr}</p>
-                            </div>
-                          </div>
+                                  const ratingStr = isObj && (p.calculatedRating || p.rating) ? (p.calculatedRating || p.rating) : null;
+                                  
+                                  return (
+                                    <div key={id || index} className="glass-panel" style={{ padding: 0, overflow: 'hidden', borderRadius: 'var(--radius-lg)', display: 'flex', flexDirection: 'column', height: '100%', transition: 'transform 0.2s', cursor: 'pointer' }}
+                                         onClick={() => router.push(`/productos/${id}`)}
+                                         onMouseEnter={(e) => { e.currentTarget.style.transform = 'translateY(-5px)'; e.currentTarget.style.zIndex = '100'; }}
+                                         onMouseLeave={(e) => { e.currentTarget.style.transform = 'none'; e.currentTarget.style.zIndex = '1'; }}>
+                                      <div style={{ position: 'relative', height: '180px', background: image ? `url(${image}) center/cover` : 'rgba(255,255,255,0.03)', borderTopLeftRadius: 'var(--radius-lg)', borderTopRightRadius: 'var(--radius-lg)', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+                                         {!image && <span style={{ opacity: 0.3, fontSize: '0.9rem' }}>Foto del Producto</span>}
+                                         {/* Product Rating Top Right */}
+                                         {ratingStr && (
+                                           <div style={{ position: 'absolute', top: '10px', right: '10px', background: 'rgba(0,0,0,0.65)', backdropFilter: 'blur(4px)', padding: '4px 8px', borderRadius: '12px', display: 'flex', alignItems: 'center', gap: '4px', zIndex: 5 }}>
+                                             <svg width="12" height="12" viewBox="0 0 24 24" fill="#FFD700" stroke="#FFD700" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"></polygon></svg>
+                                             <span style={{ color: '#fff', fontSize: '0.8rem', fontWeight: 'bold' }}>{ratingStr}</span>
+                                           </div>
+                                         )}
+                                      </div>
+                                      <div className="card-content-fluid" style={{ display: 'flex', flexDirection: 'column', flex: 1, padding: '16px', borderBottomLeftRadius: 'var(--radius-lg)', borderBottomRightRadius: 'var(--radius-lg)' }}>
+                                        {/* Nombre del producto */}
+                                        <div style={{ marginBottom: '2px' }}>
+                                          <h3 style={{ fontSize: '1rem', color: 'var(--color-text-main)', margin: '0' }}>{name}</h3>
+                                        </div>
+                                        
+                                        {/* Descripcion (max 3 lineas) */}
+                                        {isObj && p.description && (
+                                          <p style={{ color: 'var(--color-text-muted)', fontSize: '0.8rem', lineHeight: 1.3, margin: '4px 0 8px 0', display: '-webkit-box', WebkitLineClamp: 3, WebkitBoxOrient: 'vertical', overflow: 'hidden' }}>
+                                            {p.description}
+                                          </p>
+                                        )}
+
+                                        {/* Categoria + Subcategoria */}
+                                        <div style={{ display: 'flex', gap: '4px', flexWrap: 'wrap', marginTop: 'auto', marginBottom: '8px' }}>
+                                          <span style={{ background: 'rgba(255,255,255,0.05)', color: 'var(--color-text-muted)', fontSize: '0.65rem', padding: '2px 6px', borderRadius: 'var(--radius-full)' }}>
+                                            {category}
+                                          </span>
+                                          {isObj && p.subcategory && (
+                                            <div style={{ position: 'relative', display: 'inline-block' }}>
+                                              <span style={{ background: 'rgba(255, 115, 0, 0.1)', color: 'var(--color-primary)', fontSize: '0.65rem', padding: '2px 6px', borderRadius: 'var(--radius-full)', border: '1px solid rgba(255, 115, 0, 0.2)', cursor: 'default' }}>
+                                                +1
+                                              </span>
+                                            </div>
+                                          )}
+                                        </div>
+                                        
+                                        <div style={{ marginTop: '8px' }}>
+                                          {/* Price */}
+                                          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'baseline', marginBottom: '6px' }}>
+                                            <div style={{ display: 'flex', alignItems: 'baseline', gap: '4px' }}>
+                                              {priceStr.includes(' ') && !priceStr.startsWith('$') ? (
+                                                <>
+                                                  <span style={{ fontSize: '1.1rem', fontWeight: 'bold', color: '#a8b87c' }}>{priceStr.split(' ').slice(1).join(' ')}</span>
+                                                  <span style={{ fontSize: '0.75rem', fontWeight: 'bold', color: '#a8b87c' }}>{priceStr.split(' ')[0]}</span>
+                                                </>
+                                              ) : (
+                                                <span style={{ fontSize: '1.1rem', fontWeight: 'bold', color: '#a8b87c' }}>{priceStr}</span>
+                                              )}
+                                            </div>
+                                          </div>
+                                        </div>
+                                      </div>
+                                    </div>
                         );
                       })}
                     </div>
@@ -917,25 +997,65 @@ export default function NegocioDetailPage({ params }: { params: Promise<{ id: st
                             const servPrice = isRealObject ? (typeof servicio.price === 'string' ? servicio.price : `$${servicio.price?.toLocaleString('es-AR')}`) : `$ ${(servicio * 50000).toLocaleString('es-AR')}`;
                             const servImage = isRealObject ? (servicio.media && servicio.media.length > 0 ? servicio.media[0].url : servicio.image) : '';
                             
+                            const ratingStr = isRealObject && (servicio.calculatedRating || servicio.rating) ? (servicio.calculatedRating || servicio.rating) : null;
+                            const category = isRealObject ? (servicio.category || section.name) : section.name;
+                            
                             return (
-                              <div key={servId || idx} className="glass-panel" 
+                              <div key={servId || idx} className="glass-panel" style={{ padding: 0, overflow: 'hidden', borderRadius: 'var(--radius-lg)', display: 'flex', flexDirection: 'column', height: '100%', transition: 'transform 0.2s', cursor: 'pointer' }}
                                    onClick={() => router.push(`/servicios/${servId}`)}
-                                   style={{ padding: 0, overflow: 'hidden', borderRadius: 'var(--radius-md)', cursor: 'pointer', transition: 'transform 0.2s', display: 'flex', flexDirection: 'column' }}
-                                   onMouseEnter={(e) => e.currentTarget.style.transform = 'translateY(-4px)'}
-                                   onMouseLeave={(e) => e.currentTarget.style.transform = 'none'}>
-                                
-                                <div style={{ height: '180px', background: 'rgba(255,255,255,0.03)', display: 'flex', alignItems: 'center', justifyContent: 'center', borderBottom: '1px solid var(--color-border)', position: 'relative' }}>
-                                  {servImage ? (
-                                    <img src={servImage} alt={servName} style={{ width: '100%', height: '100%', objectFit: 'cover' }} onError={(e) => { e.currentTarget.src = 'https://images.unsplash.com/photo-1542673898-7c85854b73b2?q=80&w=1200&auto=format&fit=crop'; }} />
-                                  ) : (
-                                    <span style={{ opacity: 0.3 }}>Sin Imagen</span>
-                                  )}
+                                   onMouseEnter={(e) => { e.currentTarget.style.transform = 'translateY(-5px)'; e.currentTarget.style.zIndex = '100'; }}
+                                   onMouseLeave={(e) => { e.currentTarget.style.transform = 'none'; e.currentTarget.style.zIndex = '1'; }}>
+                                <div style={{ position: 'relative', height: '180px', background: servImage ? `url(${servImage}) center/cover` : 'rgba(255,255,255,0.03)', borderTopLeftRadius: 'var(--radius-lg)', borderTopRightRadius: 'var(--radius-lg)', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+                                   {!servImage && <span style={{ opacity: 0.3, fontSize: '0.9rem' }}>Foto del Servicio</span>}
+                                   {/* Service Rating Top Right */}
+                                   {ratingStr && (
+                                     <div style={{ position: 'absolute', top: '10px', right: '10px', background: 'rgba(0,0,0,0.65)', backdropFilter: 'blur(4px)', padding: '4px 8px', borderRadius: '12px', display: 'flex', alignItems: 'center', gap: '4px', zIndex: 5 }}>
+                                       <svg width="12" height="12" viewBox="0 0 24 24" fill="#FFD700" stroke="#FFD700" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"></polygon></svg>
+                                       <span style={{ color: '#fff', fontSize: '0.8rem', fontWeight: 'bold' }}>{ratingStr}</span>
+                                     </div>
+                                   )}
                                 </div>
-                                <div style={{ padding: '16px', flex: 1, display: 'flex', flexDirection: 'column' }}>
-                                  <h4 style={{ margin: '0 0 8px 0', fontSize: '1rem', color: 'var(--color-text-main)' }}>{servName}</h4>
-                                  <div style={{ color: 'var(--color-text-muted)', fontSize: '0.8rem', marginBottom: '12px' }}>{isRealObject ? (servicio.category || section.name) : section.name}</div>
-                                  <div style={{ marginTop: 'auto' }}>
-                                    <p style={{ color: 'var(--color-primary)', fontWeight: 'bold', margin: 0 }}>{servPrice}</p>
+                                <div className="card-content-fluid" style={{ display: 'flex', flexDirection: 'column', flex: 1, padding: '16px', borderBottomLeftRadius: 'var(--radius-lg)', borderBottomRightRadius: 'var(--radius-lg)' }}>
+                                  {/* Nombre del servicio */}
+                                  <div style={{ marginBottom: '2px' }}>
+                                    <h3 style={{ fontSize: '1rem', color: 'var(--color-text-main)', margin: '0' }}>{servName}</h3>
+                                  </div>
+                                  
+                                  {/* Descripcion (max 3 lineas) */}
+                                  {isRealObject && servicio.description && (
+                                    <p style={{ color: 'var(--color-text-muted)', fontSize: '0.8rem', lineHeight: 1.3, margin: '4px 0 8px 0', display: '-webkit-box', WebkitLineClamp: 3, WebkitBoxOrient: 'vertical', overflow: 'hidden' }}>
+                                      {servicio.description}
+                                    </p>
+                                  )}
+
+                                  {/* Categoria + Subcategoria */}
+                                  <div style={{ display: 'flex', gap: '4px', flexWrap: 'wrap', marginTop: 'auto', marginBottom: '8px' }}>
+                                    <span style={{ background: 'rgba(255,255,255,0.05)', color: 'var(--color-text-muted)', fontSize: '0.65rem', padding: '2px 6px', borderRadius: 'var(--radius-full)' }}>
+                                      {category}
+                                    </span>
+                                    {isRealObject && servicio.subcategory && (
+                                      <div style={{ position: 'relative', display: 'inline-block' }}>
+                                        <span style={{ background: 'rgba(255, 115, 0, 0.1)', color: 'var(--color-primary)', fontSize: '0.65rem', padding: '2px 6px', borderRadius: 'var(--radius-full)', border: '1px solid rgba(255, 115, 0, 0.2)', cursor: 'default' }}>
+                                          +1
+                                        </span>
+                                      </div>
+                                    )}
+                                  </div>
+                                  
+                                  <div style={{ marginTop: '8px' }}>
+                                    {/* Price */}
+                                    <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'baseline', marginBottom: '6px' }}>
+                                      <div style={{ display: 'flex', alignItems: 'baseline', gap: '4px' }}>
+                                        {servPrice.includes(' ') && !servPrice.startsWith('$') ? (
+                                          <>
+                                            <span style={{ fontSize: '1.1rem', fontWeight: 'bold', color: '#a8b87c' }}>{servPrice.split(' ').slice(1).join(' ')}</span>
+                                            <span style={{ fontSize: '0.75rem', fontWeight: 'bold', color: '#a8b87c' }}>{servPrice.split(' ')[0]}</span>
+                                          </>
+                                        ) : (
+                                          <span style={{ fontSize: '1.1rem', fontWeight: 'bold', color: '#a8b87c' }}>{servPrice}</span>
+                                        )}
+                                      </div>
+                                    </div>
                                   </div>
                                 </div>
                               </div>
