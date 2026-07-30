@@ -154,12 +154,11 @@ export default function Navbar() {
   else if (pathname?.includes('/planes')) searchPlaceholder = "Buscar planes...";
   else if (pathname?.includes('/comunidad')) searchPlaceholder = "Buscar en comunidad...";
 
-  // Simplify: The navbar is always in a stable mode to prevent flickering on hover/navigation.
-  let navbarModeClass = isHome || isBusinessProfile ? 'business-mode' : 'expanded-mode';
+  let navbarModeClass = isBusinessProfile ? 'business-mode' : 'expanded-mode';
 
   return (
     <header className="navbar-header" suppressHydrationWarning>
-      <div className={`navbar-container ${isHome ? 'is-home-mobile' : ''}`}>
+      <div className="navbar-container">
         <button 
           className="mobile-menu-btn" 
           onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}

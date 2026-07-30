@@ -361,23 +361,14 @@
 
   .navbar-logo {
     display: flex !important;
-    flex: 0 0 100%;
-    justify-content: center;
-    order: 0 !important;
-    margin-bottom: 4px;
-  }
-
-  .is-home-mobile .navbar-logo {
-    flex: 1 1 auto; /* Take available space next to profile */
+    flex: 1 1 auto;
     justify-content: flex-start;
+    order: 0 !important;
     margin-bottom: 0;
   }
 
   .navbar-logo-img {
     height: 80px !important;
-  }
-  
-  .is-home-mobile .navbar-logo-img {
     transform: scale(1.5);
     transform-origin: left center;
   }
@@ -392,20 +383,17 @@
   }
 
   .navbar-actions {
-    order: 2 !important;
+    order: 1 !important;
     flex-shrink: 0;
     padding-top: 0;
   }
 
   .navbar-middle-area {
     display: flex !important;
-    flex: 1 1 auto !important;
-    order: 1 !important;
-    width: auto;
-  }
-
-  .is-home-mobile .navbar-middle-area {
-    display: none !important; /* Hide search bar on home page mobile */
+    flex: 0 0 100% !important;
+    width: 100% !important;
+    order: 2 !important;
+    margin-top: 8px;
   }
 
   .navbar-center {
