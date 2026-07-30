@@ -976,7 +976,11 @@ export default function NegocioDetailPage({ params }: { params: Promise<{ id: st
                           </div>
                         );
                       })() : (
-                        <strong style={{ paddingLeft: '26px' }}>{negocio.horarios || negocio.hours}</strong>
+                        <strong style={{ paddingLeft: '26px' }}>
+                          {typeof negocio.horarios === 'string' ? negocio.horarios : 
+                           (negocio.horarios && typeof negocio.horarios === 'object') ? 'Horarios no disponibles' :
+                           (typeof negocio.hours === 'string' ? negocio.hours : 'No especificado')}
+                        </strong>
                       )}
                     </div>
 
