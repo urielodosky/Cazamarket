@@ -8,6 +8,7 @@ import LoadingScreen from '@/components/ui/LoadingScreen';
 import { PlanTier, isAtLeast } from '@/types/planTypes';
 import { usePlan } from '@/contexts/PlanContext';
 import { useAuth } from '@/contexts/AuthContext';
+import { useFavorites } from '@/contexts/FavoritesContext';
 import { NEGOCIOS_DATA, PRODUCTOS_DATA } from '@/data/mock';
 import { useThemeColors } from '@/hooks/useThemeColors';
 import { createClient } from '@/lib/supabase/client';
@@ -103,7 +104,8 @@ export default function NegocioDetailPage({ params }: { params: Promise<{ id: st
   const router = useRouter();
   const searchParams = useSearchParams();
   const { hasFeature, permissions } = usePlan();
-  const { supabaseUser, isFavorite, toggleFavorite } = useAuth();
+  const { supabaseUser } = useAuth();
+  const { isFavorite, toggleFavorite } = useFavorites();
   const themeColors = useThemeColors();
   
   const isOwnProfile = negocioId === 1 || unwrappedParams.id === supabaseUser?.id;
@@ -311,7 +313,7 @@ export default function NegocioDetailPage({ params }: { params: Promise<{ id: st
                 buyerName: buyer.first_name ? `${buyer.first_name} ${buyer.last_name || ''}`.trim() : 'Usuario',
                 buyerAvatar: buyer.avatar_url || null
               };
-            });
+            }).filter((r: any) => !r.comment.toLowerCase().includes('prueba') && !r.comment.toLowerCase().includes('test'));
           }
 
           setNegocio((prev: any) => ({
@@ -506,7 +508,7 @@ export default function NegocioDetailPage({ params }: { params: Promise<{ id: st
                   <div style={{ display: 'flex', alignItems: 'center', gap: '24px', color: 'var(--color-text-muted)', fontSize: '1rem' }}>
                     <div style={{ display: 'flex', alignItems: 'center', gap: '6px', color: negocio.rating > 0 ? '#FFD700' : 'var(--color-text-muted)', fontWeight: 'bold' }} title={`${negocio.reviews} reseña${negocio.reviews !== 1 ? 's' : ''}`}>
                       <svg width="18" height="18" viewBox="0 0 24 24" fill={negocio.rating > 0 ? '#FFD700' : 'none'} stroke={negocio.rating > 0 ? '#FFD700' : 'currentColor'} strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"></polygon></svg>
-                      {negocio.rating > 0 ? (Number.isInteger(negocio.rating) ? negocio.rating.toFixed(1) : negocio.rating) : '0.0 (Nuevo)'}
+                      {negocio.rating > 0 ? (Number.isInteger(negocio.rating) ? negocio.rating.toFixed(1) : negocio.rating) : 'Nuevo'}
                     </div>
                     {negocio.locations && negocio.locations.length > 0 && (
                       <div style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
@@ -1176,12 +1178,10 @@ export default function NegocioDetailPage({ params }: { params: Promise<{ id: st
                                      </button>
                                    </div>
                                    {/* Service Rating Top Right */}
-                                   {ratingStr && (
-                                     <div style={{ position: 'absolute', top: '10px', right: '10px', background: 'rgba(0,0,0,0.65)', backdropFilter: 'blur(4px)', padding: '4px 8px', borderRadius: '12px', display: 'flex', alignItems: 'center', gap: '4px', zIndex: 5 }}>
-                                       <svg width="12" height="12" viewBox="0 0 24 24" fill="#FFD700" stroke="#FFD700" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"></polygon></svg>
-                                       <span style={{ color: '#fff', fontSize: '0.8rem', fontWeight: 'bold' }}>{ratingStr}</span>
-                                     </div>
-                                   )}
+                                   <div style={{ position: 'absolute', top: '10px', right: '10px', background: 'rgba(0,0,0,0.65)', backdropFilter: 'blur(4px)', padding: '4px 8px', borderRadius: '12px', display: 'flex', alignItems: 'center', gap: '4px', zIndex: 5 }}>
+                                     <svg width="12" height="12" viewBox="0 0 24 24" fill="#FFD700" stroke="#FFD700" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"></polygon></svg>
+                                     <span style={{ color: '#fff', fontSize: '0.8rem', fontWeight: 'bold' }}>{ratingStr || '0.0'}</span>
+                                   </div>
                                 </div>
                                 <div className="card-content-fluid" style={{ display: 'flex', flexDirection: 'column', flex: 1, padding: '16px', borderBottomLeftRadius: 'var(--radius-lg)', borderBottomRightRadius: 'var(--radius-lg)' }}>
                                   {/* Nombre del servicio */}
