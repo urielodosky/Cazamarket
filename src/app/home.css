@@ -8,6 +8,13 @@
   background: radial-gradient(circle at center, rgba(75, 83, 32, 0.15) 0%, transparent 60%);
 }
 
+@media (max-width: 768px) {
+  .home-container {
+    justify-content: flex-start;
+    padding-top: var(--spacing-6);
+  }
+}
+
 .hero-section {
   text-align: center;
   max-width: 800px;
