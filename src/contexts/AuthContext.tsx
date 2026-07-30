@@ -144,7 +144,6 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
         .single();
 
       if (profile) {
-        console.log("PROFILE FETCHED FROM SUPABASE:", profile);
         setUsername(profile.full_name || user.email?.split('@')[0] || '');
         setAvatar(profile.avatar_url || '');
         setIsVendor(profile.role === 'negocio');
