@@ -374,7 +374,7 @@
   }
 
   .navbar-logo-img {
-    height: 48px !important; /* Make it bigger */
+    height: 60px !important; /* Make it bigger */
   }
 
   /* Ocultar menú de hamburguesa nativo viejo y enlaces en móvil */
