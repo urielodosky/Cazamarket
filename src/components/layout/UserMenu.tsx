@@ -45,6 +45,10 @@ export default function UserMenu() {
 
         {isOpen && (
           <div className="user-dropdown-menu">
+            {/* Logo en móvil (agregado al dropdown según pedido) */}
+            <div className="mobile-only-logo">
+              <img src="/logo.png" alt="CazaMarket Logo" />
+            </div>
             {/* Header del Perfil */}
             <div className="user-dropdown-header">
               <div className="user-header-avatar">

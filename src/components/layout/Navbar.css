@@ -360,23 +360,7 @@
   }
 
   .navbar-logo {
-    display: flex;
-    order: 1;
-    flex: 1;
-    justify-content: flex-start;
-    margin: 0;
-  }
-
-  .navbar-logo a {
-    font-size: 1.3rem;
-  }
-
-  .navbar-logo-img {
-    transform: scale(1) translate(0, 0) !important;
-    height: 40px !important;
-    width: auto !important;
-    object-fit: contain;
-    min-width: 50px;
+    display: none !important;
   }
 
   /* Ocultar menú de hamburguesa nativo viejo y enlaces en móvil */
@@ -404,7 +388,7 @@
   }
 
   .navbar-center .search-bar-animated {
-    display: flex;
+    display: flex !important;
     flex: 0 0 100%;
     /* Force full width on new row */
     order: 4;
