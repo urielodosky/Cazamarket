@@ -1,5 +1,4 @@
 import Link from 'next/link';
-import PlaneSubscriptionButton from '@/components/PlaneSubscriptionButton';
 import PromoSlider from '@/components/PromoSlider';
 import TrendingSection from '@/components/TrendingSection';
 import PlanesPreview from '@/components/PlanesPreview';
