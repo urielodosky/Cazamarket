@@ -34,7 +34,7 @@ export function useThemeColors() {
     shadowLg: isLight ? '0 8px 24px rgba(0,0,0,0.1)' : '0 8px 24px rgba(0,0,0,0.6)',
     shadowHeavy: isLight ? '0 12px 36px rgba(0,0,0,0.12)' : '0 15px 35px rgba(0,0,0,0.85)',
     // Glass
-    glassBg: isLight ? 'rgba(255,255,255,0.92)' : 'rgba(30,30,30,0.7)',
+    glassBg: isLight ? 'rgba(255,255,255,0.92)' : 'rgba(26,30,22,0.7)',
     // Hover backgrounds
     hoverBg: isLight ? 'rgba(0,0,0,0.04)' : 'rgba(255,255,255,0.06)',
     hoverBg2: isLight ? 'rgba(0,0,0,0.08)' : 'rgba(255,255,255,0.12)',

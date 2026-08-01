@@ -187,42 +187,19 @@ export default function Navbar() {
             display: 'flex', 
             gap: '12px', 
             transition: 'all 0.5s cubic-bezier(0.4, 0, 0.2, 1)', 
-            alignItems: 'stretch',
-            flex: 1,
-            justifyContent: 'center',
-            minHeight: '48px',
-            position: 'relative'
+            alignItems: 'stretch'
           }}
         >
-          <div 
-            className={`navbar-center glass-panel ${navbarModeClass}`} 
-            style={{ 
-              display: 'flex', 
-              flexDirection: 'column', 
-              alignItems: 'center', 
-              justifyContent: 'center', 
-              background: 'rgba(255,255,255,0.05)', 
-              borderRadius: '24px', 
-              padding: isFilterablePage ? '12px 24px 72px 24px' : '4px 24px',
-              border: '1px solid rgba(255,255,255,0.1)',
-              position: 'relative',
-              width: '100%',
-              maxWidth: '600px'
-            }}
-          >
+          <div className={`navbar-center glass-panel ${navbarModeClass}`}>
             <div className="search-bar-animated" style={{ 
               zIndex: 10, 
-              position: 'absolute', 
-              bottom: '12px', 
-              left: '50%', 
-              transform: 'translateX(-50%)', 
-              width: 'calc(100% - 48px)',
-              maxWidth: '500px',
               display: isFilterablePage ? 'flex' : 'none',
-              background: 'rgba(255,255,255,0.08)',
+              background: themeColors.bgSubtle3,
               borderRadius: '100px',
-              padding: '4px 8px 4px 16px',
-              alignItems: 'center'
+              padding: '6px 8px',
+              alignItems: 'center',
+              width: '100%',
+              border: `1px solid ${themeColors.borderSubtle3}`
             }}>
                 <button 
                   className="search-icon-btn" 
@@ -257,7 +234,7 @@ export default function Navbar() {
                   onChange={(e) => setSearchQuery(e.target.value)}
                   placeholder={searchPlaceholder} 
                   onKeyDown={(e) => { if (e.key === 'Enter') executeSearch(); }}
-                  style={{ marginLeft: '12px', color: themeColors.textWhite }}
+                  style={{ marginLeft: '12px', color: themeColors.textWhite, width: '100%', background: 'transparent', border: 'none', outline: 'none' }}
                 />
                 {isFilterablePage && <button 
                   suppressHydrationWarning
@@ -269,7 +246,7 @@ export default function Navbar() {
                     setIsFiltersOpen(!isFiltersOpen);
                   }}
                   style={{ 
-                    borderRadius: 'var(--radius-full)', 
+                    borderRadius: '100px', 
                     fontSize: '0.9rem', 
                     fontWeight: 600,
                     display: 'flex', 
@@ -281,8 +258,7 @@ export default function Navbar() {
                     color: isFiltersOpen ? 'white' : themeColors.textWhite,
                     cursor: 'pointer',
                     pointerEvents: 'auto',
-                    transition: 'all 0.4s cubic-bezier(0.4, 0, 0.2, 1)',
-                    backdropFilter: 'blur(10px)'
+                    transition: 'all 0.4s cubic-bezier(0.4, 0, 0.2, 1)'
                   }}
                   onMouseEnter={(e) => {
                     if (isFiltersOpen) return;
@@ -501,7 +477,7 @@ export default function Navbar() {
           ) : isLoggedIn ? (
             <UserMenu />
           ) : (
-            <Link href="/registro" className="primary-btn" style={{ padding: '8px 24px', fontSize: '0.95rem', borderRadius: '100px', display: 'flex', alignItems: 'center', height: '40px', background: 'var(--color-primary)', color: 'white', fontWeight: 600 }}>
+            <Link href="/registro" className="btn btn-primary" style={{ padding: '8px 24px', fontSize: '0.95rem' }}>
               Empezar ahora
             </Link>
           )}

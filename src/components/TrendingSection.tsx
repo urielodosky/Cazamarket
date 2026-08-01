@@ -34,8 +34,8 @@ export default function TrendingSection() {
   return (
     <section className="trending-section" style={{ width: '100%', padding: '0 var(--spacing-3)' }}>
       <div style={{ textAlign: 'center', marginBottom: 'var(--spacing-5)' }}>
-        <h2 style={{ fontSize: '2rem', fontWeight: 'bold', margin: '0 0 var(--spacing-2) 0' }}>Los Más Populares</h2>
-        <p style={{ color: 'var(--color-text-muted)', margin: 0 }}>Descubre lo más visitado y buscado por la comunidad esta semana.</p>
+        <h2 style={{ fontSize: '2rem', fontWeight: 'bold', margin: '0 0 var(--spacing-2) 0' }}>Empieza a explorar</h2>
+        <p style={{ color: 'var(--color-text-muted)', margin: 0 }}>Empieza a explorar sobre el nicho cacería, pesca, outdoor en las siguientes secciones</p>
       </div>
       
       <div style={{ display: 'flex', justifyContent: 'center', gap: 'var(--spacing-2)', marginBottom: 'var(--spacing-6)', flexWrap: 'wrap' }}>
