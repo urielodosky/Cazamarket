@@ -180,6 +180,7 @@ export default function Navbar() {
             />
           </Link>
         </div>
+
         
         <div 
           className="navbar-middle-area" 
@@ -194,12 +195,12 @@ export default function Navbar() {
             <div className="search-bar-animated" style={{ 
               zIndex: 10, 
               display: isFilterablePage ? 'flex' : 'none',
-              background: themeColors.bgSubtle3,
+              background: 'rgba(0, 0, 0, 0.15)',
               borderRadius: '100px',
               padding: '6px 8px',
               alignItems: 'center',
               width: '100%',
-              border: `1px solid ${themeColors.borderSubtle3}`
+              border: '1px solid rgba(255,255,255,0.05)'
             }}>
                 <button 
                   className="search-icon-btn" 
@@ -253,8 +254,8 @@ export default function Navbar() {
                     alignItems: 'center', 
                     gap: '8px', 
                     padding: '8px 18px',
-                    background: isFiltersOpen ? 'var(--color-primary)' : themeColors.bgSubtle3,
-                    border: isFiltersOpen ? '1px solid var(--color-primary)' : `1px solid ${themeColors.borderSubtle3}`,
+                    background: isFiltersOpen ? 'var(--color-primary)' : 'rgba(255,255,255,0.08)',
+                    border: isFiltersOpen ? '1px solid var(--color-primary)' : '1px solid rgba(255,255,255,0.1)',
                     color: isFiltersOpen ? 'white' : themeColors.textWhite,
                     cursor: 'pointer',
                     pointerEvents: 'auto',
@@ -477,7 +478,7 @@ export default function Navbar() {
           ) : isLoggedIn ? (
             <UserMenu />
           ) : (
-            <Link href="/registro" className="btn btn-primary" style={{ padding: '8px 24px', fontSize: '0.95rem' }}>
+            <Link href="/registro" style={{ padding: '8px 24px', fontSize: '0.95rem', borderRadius: '100px', display: 'flex', alignItems: 'center', height: '40px', background: 'var(--color-primary)', color: 'white', fontWeight: 600, textDecoration: 'none' }}>
               Empezar ahora
             </Link>
           )}
