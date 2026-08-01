@@ -19,12 +19,10 @@
 }
 
 .user-avatar-trigger {
-  width: 48px;
-  height: 48px;
+  width: 44px;
+  height: 44px;
   border-radius: 50%;
-  background: linear-gradient(135deg, var(--color-primary), #ff9900);
-  padding: 2px;
-  box-shadow: 0 4px 10px rgba(255, 115, 0, 0.25);
+  border: 2px solid var(--color-primary);
   display: flex;
   align-items: center;
   justify-content: center;
@@ -33,7 +31,8 @@
 }
 
 .user-avatar-trigger:hover {
-  box-shadow: 0 5px 14px rgba(255, 115, 0, 0.45);
+  transform: scale(1.05);
+  box-shadow: 0 0 10px rgba(255, 115, 0, 0.4);
 }
 
 .user-avatar-trigger img {

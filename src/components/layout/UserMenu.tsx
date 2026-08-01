@@ -64,10 +64,6 @@ export default function UserMenu() {
               <div className="user-header-info">
                 <p className="user-name" style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
                   {username || 'Usuario'}
-                  <span style={{ display: 'flex', alignItems: 'center', gap: '2px', fontSize: '0.85rem', color: '#FFD700' }}>
-                    <svg width="14" height="14" viewBox="0 0 24 24" fill="#FFD700" stroke="#FFD700" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"></polygon></svg>
-                    4.8
-                  </span>
                 </p>
                 <p className="user-email">{email || 'usuario@correo.com'}</p>
                 <span className={`user-role-badge ${isVendorModeActive ? 'vendor' : 'buyer'}`}>
