@@ -14,7 +14,7 @@ export default function PromoSlider() {
   }, []);
 
   return (
-    <div className="ad-banner-container" style={{ margin: '20px auto', padding: '0 20px', maxWidth: '1200px' }}>
+    <div className="ad-banner-container" style={{ margin: '32px auto 80px', padding: '0 16px', maxWidth: '1200px' }}>
       
       {/* Banner Único con Imagen de Fondo */}
       <div style={{
@@ -24,18 +24,18 @@ export default function PromoSlider() {
         backgroundImage: 'url(https://picsum.photos/id/1018/1200/400)',
         backgroundSize: 'cover',
         backgroundPosition: 'center',
-        minHeight: '400px',
+        minHeight: '60vh', /* Ensure it takes up a good portion of screen but keeps CTA visible */
         boxShadow: 'var(--shadow-md)',
         display: 'flex',
         flexDirection: 'column',
         justifyContent: 'flex-end',
-        padding: '40px'
+        padding: '32px'
       }}>
         {/* Overlay oscuro para legibilidad */}
         <div style={{
           position: 'absolute',
           top: 0, left: 0, right: 0, bottom: 0,
-          background: 'linear-gradient(to top, rgba(0,0,0,0.9) 0%, rgba(0,0,0,0.4) 50%, rgba(0,0,0,0.1) 100%)',
+          background: 'linear-gradient(to top, rgba(0,0,0,0.9) 0%, rgba(0,0,0,0.5) 50%, rgba(0,0,0,0.1) 100%)',
           zIndex: 1
         }} />
         
@@ -43,32 +43,36 @@ export default function PromoSlider() {
         <div style={{ position: 'relative', zIndex: 2 }}>
           <span style={{ 
             display: 'inline-block',
-            background: 'var(--primary-color)', 
+            background: 'var(--color-primary)', 
             color: 'white', 
-            padding: '6px 14px', 
+            padding: '8px 16px', 
             borderRadius: 'var(--radius-full)', 
-            fontSize: '0.8rem', 
+            fontSize: '0.875rem', 
             fontWeight: 'bold',
             letterSpacing: '1px',
-            marginBottom: '15px'
+            marginBottom: '16px'
           }}>
             ANUNCIA AQUÍ
           </span>
-          <h2 style={{ margin: '0 0 15px 0', color: 'white', fontSize: '2.5rem', fontWeight: 'bold' }}>Destaca tu Negocio</h2>
-          <p style={{ margin: '0 0 25px 0', color: '#e0e0e0', fontSize: '1.2rem', maxWidth: '700px' }}>
-            Paga para tener más publicidad y conseguir un anuncio personalizado visible para miles de cazadores y pescadores todos los días.
+          <h1 style={{ margin: '0 0 16px 0', color: '#FFFFFF', fontSize: '3rem', fontWeight: 'bold', lineHeight: '1.2' }}>Haz crecer tu negocio</h1>
+          <p style={{ margin: '0 0 32px 0', color: '#F3F4F6', fontSize: '1.25rem', maxWidth: '600px', lineHeight: '1.5' }}>
+            Llega a miles de pescadores y cazadores cada día. Destaca tu marca con nuestros anuncios personalizados y aumenta tus ventas.
           </p>
           <button 
             onClick={() => setIsModalOpen(true)}
             className="btn btn-primary"
             style={{
-              display: 'inline-block',
-              padding: '12px 28px',
+              display: 'inline-flex',
+              alignItems: 'center',
+              justifyContent: 'center',
+              padding: '16px 32px',
               borderRadius: 'var(--radius-full)',
               fontWeight: 'bold',
-              fontSize: '1.1rem',
+              fontSize: '1.125rem',
               boxShadow: '0 4px 15px rgba(220,100,0,0.4)',
-              cursor: 'pointer'
+              cursor: 'pointer',
+              minHeight: '44px',
+              minWidth: '44px'
             }}
           >
             Ver Planes de Publicidad

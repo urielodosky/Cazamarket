@@ -76,7 +76,7 @@ export default function NegociosPage() {
         const userNegocio = {
           id: 1,
           name: parsed.storeName || parsed.username || parsed.nombre || 'Mi Negocio',
-          rating: 4.8,
+          rating: 0,
           reviews: 0,
           image: 'https://images.unsplash.com/photo-1503614472-8c93d56e92ce?q=80&w=1200&auto=format&fit=crop',
           avatar: parsed.avatar || 'https://ui-avatars.com/api/?name=Mi+Negocio&background=ff7300&color=fff',
