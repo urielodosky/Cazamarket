@@ -1,5 +1,6 @@
 'use client';
 
+import { useState, useEffect } from 'react';
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 import { 
@@ -16,9 +17,13 @@ import './MobileNav.css';
 
 export default function MobileNav() {
   const pathname = usePathname();
-  const { isLoggedIn, isMounted } = useAuth();
+  const [mounted, setMounted] = useState(false);
 
-  if (!isMounted) return null;
+  useEffect(() => {
+    setMounted(true);
+  }, []);
+
+  if (!mounted) return null;
 
   const navItems = [
     { href: '/', icon: <HomeIcon className="mobile-nav-icon-svg" />, label: 'Inicio' },

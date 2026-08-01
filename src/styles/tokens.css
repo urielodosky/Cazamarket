@@ -1,10 +1,10 @@
 :root {
-  /* Colors - Dark Mode Premium (Hunter Style) */
+  /* Colors - Dark Mode Premium */
   --color-bg-base: #1A1A1A;
-  /* Very dark earthy green/black */
-  --color-bg-surface: #1a1e16;
+  /* Sleek dark gray base */
+  --color-bg-surface: #222222;
   /* Slightly lighter for cards */
-  --color-bg-surface-elevated: #252a1f;
+  --color-bg-surface-elevated: #2A2A2A;
   /* Elevated elements */
 
   --color-primary: #ff7300;
@@ -12,16 +12,16 @@
   --color-primary-hover: #ff8c33;
   --color-primary-active: #cc5c00;
 
-  --color-secondary: #4b5320;
-  /* Military Green */
-  --color-secondary-hover: #5d6628;
-  --color-secondary-light: #7b8542;
+  --color-secondary: #ff7300;
+  /* Match primary for sleekness */
+  --color-secondary-hover: #ff8c33;
+  --color-secondary-light: #ffaa66;
 
   --color-text-main: #FFFFFF;
   /* Off-white for readability */
-  --color-text-muted: #a3a69a;
+  --color-text-muted: #a0a0a0;
   /* Muted text */
-  --color-border: #323829;
+  --color-border: #333333;
   /* Subtle borders */
 
   /* Typography */
@@ -59,7 +59,7 @@
   --transition-normal: 0.3s ease;
 
   /* Glass / overlay opacities (used in inline styles too) */
-  --glass-bg: rgba(26, 30, 22, 0.7);
+  --glass-bg: rgba(30, 30, 30, 0.7);
   --glass-border: rgba(255, 255, 255, 0.08);
   --overlay-light: rgba(255, 255, 255, 0.03);
   --overlay-medium: rgba(255, 255, 255, 0.06);

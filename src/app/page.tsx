@@ -9,11 +9,13 @@ export default function Home() {
   return (
     <div className="home-container">
 
-      <section className="main-slider-section" style={{ width: '100%', maxWidth: '1200px', marginTop: 'var(--spacing-4)', animation: 'fadeIn 1s ease-out 0.2s both' }}>
+      <div style={{ marginTop: 'var(--spacing-4)', marginBottom: '-var(--spacing-8)' }}>
+        <CategoryExplorer />
+      </div>
+
+      <section className="main-slider-section" style={{ width: '100%', maxWidth: '1200px', animation: 'fadeIn 1s ease-out 0.2s both' }}>
         <PromoSlider />
       </section>
-
-      <CategoryExplorer />
 
       <TrendingSection />
       
