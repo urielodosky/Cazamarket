@@ -14,7 +14,7 @@ export default function PromoSlider() {
   }, []);
 
   return (
-    <div className="ad-banner-container" style={{ margin: '32px auto 80px', padding: '0 16px', maxWidth: '1200px' }}>
+    <div className="ad-banner-container" style={{ padding: '0 var(--spacing-4)', width: '100%' }}>
       
       {/* Banner Único con Imagen de Fondo */}
       <div style={{

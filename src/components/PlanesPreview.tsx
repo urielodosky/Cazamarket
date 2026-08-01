@@ -27,7 +27,7 @@ const PREVIEW_PLANS = [
 
 export default function PlanesPreview() {
   return (
-    <section className="planes-preview-section" style={{ width: '100%', maxWidth: '1200px', marginTop: 'var(--spacing-4)', marginBottom: 'var(--spacing-8)', padding: 'var(--spacing-2) 0' }}>
+    <section className="planes-preview-section" style={{ width: '100%', padding: '0 var(--spacing-4)' }}>
       <h2 className="section-title">Nuestros Planes</h2>
       <p style={{ textAlign: 'center', color: 'var(--color-text-muted)', marginBottom: 'var(--spacing-6)' }}>Comienza gratis o elige un plan diseñado para impulsar tu negocio.</p>
       <div className="plans-grid preview-grid">
