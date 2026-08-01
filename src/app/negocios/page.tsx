@@ -189,7 +189,7 @@ export default function NegociosPage() {
                onMouseLeave={(e) => e.currentTarget.style.transform = 'none'}>
             
             {/* Favoritos */}
-            <div style={{ position: 'absolute', top: '15px', left: '15px', zIndex: 10 }}>
+            <div style={{ position: 'absolute', top: '15px', right: '15px', zIndex: 30 }}>
               <button 
                 onClick={(e) => { e.stopPropagation(); toggleFavorite('negocios', negocio.id.toString()); }}
                 style={{ 
