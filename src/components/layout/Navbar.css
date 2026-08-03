@@ -428,8 +428,9 @@
     margin-left: 6px;
   }
 
-  /* Hide filter button completely on mobile */
-  .filter-btn-premium {
+  /* Hide filter button and panel completely on mobile */
+  .filter-btn-premium,
+  .filters-panel {
     display: none !important;
   }
 
