@@ -402,6 +402,9 @@
     width: 100% !important;
     height: 48px !important;
     padding: 0 !important;
+    background: transparent !important;
+    border: none !important;
+    box-shadow: none !important;
   }
 
   .navbar-center .search-bar-animated {
