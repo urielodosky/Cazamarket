@@ -12,6 +12,7 @@ import { useFavorites } from '@/contexts/FavoritesContext';
 import { NEGOCIOS_DATA, PRODUCTOS_DATA } from '@/data/mock';
 import { useThemeColors } from '@/hooks/useThemeColors';
 import { createClient } from '@/lib/supabase/client';
+import './negocio.css';
 
 const PROVINCES_MAP: Record<string, string> = {
   "02": "Ciudad Autónoma de Buenos Aires",
@@ -470,7 +471,7 @@ export default function NegocioDetailPage({ params }: { params: Promise<{ id: st
         <div style={{ padding: '0 var(--spacing-5) var(--spacing-5) var(--spacing-5)', position: 'relative' }}>
           
           {/* Header Info (Avatar & Title) */}
-          <div style={{ 
+          <div className="business-header-info" style={{ 
             display: 'flex', 
             gap: '32px', 
             alignItems: 'flex-end',
@@ -479,8 +480,7 @@ export default function NegocioDetailPage({ params }: { params: Promise<{ id: st
             position: 'relative',
             zIndex: 10
           }}>
-            {/* Avatar */}
-            <div style={{ 
+            <div className="business-avatar-container" style={{ 
               width: '140px', 
               height: '140px', 
               borderRadius: '50%',
@@ -501,11 +501,11 @@ export default function NegocioDetailPage({ params }: { params: Promise<{ id: st
             </div>
 
             {/* Title & Key Stats */}
-            <div style={{ flex: 1, paddingBottom: '16px' }}>
+            <div className="business-title-container" style={{ flex: 1, paddingBottom: '16px' }}>
               <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start' }}>
-                <div>
-                  <h1 style={{ fontSize: '2.5rem', margin: '0 0 12px 0', color: 'var(--color-text-main)', lineHeight: 1.1, textShadow: themeColors.isLight ? '0 0 4px #ffffff, 0 0 8px #ffffff' : '0 0 4px rgba(0,0,0,0.5), 0 0 8px rgba(0,0,0,0.5)' }}>{negocio.name}</h1>
-                  <div style={{ display: 'flex', alignItems: 'center', gap: '24px', color: 'var(--color-text-muted)', fontSize: '1rem' }}>
+                <div style={{ width: '100%' }}>
+                  <h1 className="business-title" style={{ fontSize: '2.5rem', margin: '0 0 12px 0', color: 'var(--color-text-main)', lineHeight: 1.1, textShadow: themeColors.isLight ? '0 0 4px #ffffff, 0 0 8px #ffffff' : '0 0 4px rgba(0,0,0,0.5), 0 0 8px rgba(0,0,0,0.5)' }}>{negocio.name}</h1>
+                  <div className="business-stats-row" style={{ display: 'flex', alignItems: 'center', gap: '24px', color: 'var(--color-text-muted)', fontSize: '1rem' }}>
                     <div style={{ display: 'flex', alignItems: 'center', gap: '6px', color: negocio.rating > 0 ? '#FFD700' : 'var(--color-text-muted)', fontWeight: 'bold' }} title={`${negocio.reviews} reseña${negocio.reviews !== 1 ? 's' : ''}`}>
                       <svg width="18" height="18" viewBox="0 0 24 24" fill={negocio.rating > 0 ? '#FFD700' : 'none'} stroke={negocio.rating > 0 ? '#FFD700' : 'currentColor'} strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"></polygon></svg>
                       {negocio.rating > 0 ? (Number.isInteger(negocio.rating) ? negocio.rating.toFixed(1) : negocio.rating) : 'Nuevo'}
@@ -542,8 +542,8 @@ export default function NegocioDetailPage({ params }: { params: Promise<{ id: st
           </div>
 
           {/* Description & Tags */}
-          <div style={{ display: 'flex', flexDirection: 'column', gap: '20px', marginBottom: '40px' }}>
-            <div style={{ display: 'flex', gap: '12px', alignItems: 'center', flexWrap: 'wrap' }}>
+          <div className="business-tags-desc" style={{ display: 'flex', flexDirection: 'column', gap: '20px', marginBottom: '40px' }}>
+            <div className="business-tags-row" style={{ display: 'flex', gap: '12px', alignItems: 'center', flexWrap: 'wrap' }}>
               <span style={{ background: 'color-mix(in srgb, var(--color-primary) 10%, transparent)', color: 'var(--color-primary)', padding: '6px 16px', borderRadius: 'var(--radius-full)', fontSize: '0.9rem', border: '1px solid var(--color-primary)', fontWeight: 600 }}>
                 {negocio.businessType}
               </span>
@@ -570,6 +570,7 @@ export default function NegocioDetailPage({ params }: { params: Promise<{ id: st
                   padding: '16px 32px', 
                   fontSize: '1.05rem', 
                   fontWeight: 600,
+                  flexShrink: 0,
                   color: activeTab === tab ? 'var(--color-primary)' : 'var(--color-text-muted)',
                   borderBottom: activeTab === tab ? '3px solid var(--color-primary)' : '3px solid transparent',
                   background: 'none',

@@ -484,7 +484,7 @@ export default function Navbar() {
       </div>
 
       {/* Mobile Filters Scroll View (debajo del navbar) */}
-      {isFilterablePage && (
+      {(isFilterablePage && !isBusinessProfile) && (
         <div className="mobile-filters-panel">
           {renderFiltersContent()}
         </div>

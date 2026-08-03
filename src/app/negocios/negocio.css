@@ -24,4 +24,42 @@
     grid-template-columns: repeat(2, 1fr) !important;
     gap: 12px !important;
   }
+
+  /* Header Info Responsive overrides */
+  .business-header-info {
+    flex-direction: column !important;
+    align-items: center !important;
+    text-align: center !important;
+    gap: 16px !important;
+    margin-top: -60px !important;
+  }
+
+  .business-avatar-container {
+    width: 100px !important;
+    height: 100px !important;
+    margin: 0 auto;
+  }
+
+  .business-title-container {
+    padding-bottom: 0 !important;
+  }
+
+  .business-title {
+    font-size: 1.8rem !important;
+  }
+
+  .business-stats-row {
+    justify-content: center !important;
+    flex-wrap: wrap !important;
+    gap: 12px !important;
+  }
+
+  .business-tags-desc {
+    align-items: center !important;
+    text-align: center !important;
+  }
+  
+  .business-tags-row {
+    justify-content: center !important;
+  }
 }
