@@ -11,6 +11,7 @@ import { usePlan } from '@/contexts/PlanContext';
 import VirtualAdvisorModal from '@/components/chat/VirtualAdvisorModal';
 import BookingCalendar from '@/components/ui/BookingCalendar';
 import { SERVICE_MAIN_CATEGORIES, getSubcategoriesForCategory } from '@/constants/categoriesData';
+import { LightBulbIcon } from '@heroicons/react/24/outline';
 
 const LocationMap = dynamic(() => import('@/components/ui/LocationMap'), { ssr: false, loading: () => <div style={{height: '100%', display: 'flex', alignItems: 'center', justifyContent: 'center', color: 'var(--color-primary)'}}>Cargando satélite...</div> });
 const AreaMap = dynamic(() => import('@/components/ui/AreaMap'), { ssr: false, loading: () => <div style={{height: '100%', display: 'flex', alignItems: 'center', justifyContent: 'center', color: 'var(--color-primary)'}}>Cargando mapa de cobertura...</div> });
@@ -1074,8 +1075,9 @@ function NuevoServicioContent() {
           )}
 
           {canUseBot && !editId && currentStep === 3 && (
-            <div style={{ marginTop: '24px', padding: '24px', background: 'rgba(255,255,255,0.02)', borderRadius: 'var(--radius-lg)', border: '1px solid var(--color-border)' }}>
-              <p style={{ margin: 0, color: 'var(--color-text-muted)', fontSize: '0.95rem' }}>💡 Podrás configurar el Asesor Virtual Personalizado para este producto una vez que lo hayas guardado.</p>
+            <div style={{ marginTop: '24px', padding: '16px', background: 'rgba(255,255,255,0.03)', borderRadius: 'var(--radius-md)', border: '1px solid rgba(255,255,255,0.1)', display: 'flex', alignItems: 'center', gap: '12px' }}>
+              <LightBulbIcon style={{ width: '24px', height: '24px', color: 'var(--color-primary)' }} />
+              <p style={{ margin: 0, color: 'var(--color-text-muted)', fontSize: '0.95rem' }}>Podrás configurar el Asesor Virtual Personalizado para este producto una vez que lo hayas guardado.</p>
             </div>
           )}
 
