@@ -1,21 +1,76 @@
 'use client';
 
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useFavorites } from '@/contexts/FavoritesContext';
-import { NEGOCIOS_DATA } from '@/data/mock';
-import { PRODUCTOS_DATA } from '@/data/mock';
-import { SERVICIOS_DATA } from '@/data/mock';
 import { useRouter } from 'next/navigation';
 import { isAtLeast } from '@/types/planTypes';
+import { createClient } from '@/lib/supabase/client';
+import { usePlan } from '@/contexts/PlanContext';
 
 export default function FavoritosPage() {
   const { favorites, toggleFavorite, isFavorite } = useFavorites();
   const [activeTab, setActiveTab] = useState<'negocios' | 'productos' | 'servicios'>('negocios');
   const router = useRouter();
+  const { permissions, planTier } = usePlan();
 
-  const savedNegocios = NEGOCIOS_DATA.filter(n => favorites.negocios.includes(n.id.toString()));
-  const savedProductos = PRODUCTOS_DATA.filter(p => favorites.productos.includes(p.id.toString()));
-  const savedServicios = SERVICIOS_DATA.filter(s => favorites.servicios.includes(s.id.toString()));
+  const [savedNegocios, setSavedNegocios] = useState<any[]>([]);
+  const [savedProductos, setSavedProductos] = useState<any[]>([]);
+  const [savedServicios, setSavedServicios] = useState<any[]>([]);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    const fetchFavorites = async () => {
+      setLoading(true);
+      const supabase = createClient();
+
+      // Fetch Productos
+      if (favorites.productos.length > 0) {
+        const { data } = await supabase.from('products').select('*, profiles(first_name, last_name, full_name, avatar_url, store_name, branches)').in('id', favorites.productos);
+        if (data) setSavedProductos(data);
+      } else {
+        setSavedProductos([]);
+      }
+
+      // Fetch Servicios
+      if (favorites.servicios.length > 0) {
+        const { data } = await supabase.from('services').select('*, profiles(first_name, last_name, full_name, avatar_url, store_name, branches)').in('id', favorites.servicios);
+        if (data) setSavedServicios(data);
+      } else {
+        setSavedServicios([]);
+      }
+
+      // Fetch Negocios
+      const loadedNegocios: any[] = [];
+      if (favorites.negocios.includes('1')) {
+        // Fallback for mock 'Mi Negocio'
+        const savedProfile = localStorage.getItem('cazamarket_profile');
+        if (savedProfile) {
+          const parsed = JSON.parse(savedProfile);
+          loadedNegocios.push({
+            id: '1',
+            name: parsed.storeName || parsed.username || parsed.nombre || 'Mi Negocio',
+            rating: 0,
+            reviews: 0,
+            image: 'https://images.unsplash.com/photo-1503614472-8c93d56e92ce?q=80&w=1200&auto=format&fit=crop',
+            avatar: parsed.avatar || 'https://ui-avatars.com/api/?name=Mi+Negocio&background=ff7300&color=fff',
+            planTier: planTier,
+            description: parsed.storeDescription || 'Bienvenido a mi tienda oficial en CazaMarket.',
+            businessType: parsed.businessType || 'Tienda',
+            categories: parsed.categories ? (Array.isArray(parsed.categories) ? parsed.categories : [parsed.categories]) : [],
+            locations: [],
+            productsCount: 0,
+            servicesCount: 0,
+          });
+        }
+      }
+      // Optional: fetch real businesses from 'profiles' if they have real uuids in the future
+      
+      setSavedNegocios(loadedNegocios);
+      setLoading(false);
+    };
+
+    fetchFavorites();
+  }, [favorites, planTier]);
 
   const renderHeart = (type: 'negocios'|'productos'|'servicios', id: string) => (
     <div style={{ position: 'absolute', top: '15px', left: '15px', zIndex: 10 }}>

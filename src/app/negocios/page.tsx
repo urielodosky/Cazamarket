@@ -397,7 +397,7 @@ export default function NegociosPage() {
                   <span><strong>{negocio.productsCount}</strong> prods</span>
                   <span><strong>{negocio.servicesCount}</strong> servs</span>
                 </div>
-                <div className="btn btn-outline" style={{ padding: '6px 16px', fontSize: '0.9rem', borderRadius: 'var(--radius-full)', color: themeColors.textWhite, borderColor: themeColors.borderSubtle3 }}>
+                <div className="btn btn-outline" style={{ display: 'inline-flex', alignItems: 'center', justifyContent: 'center', padding: '6px 16px', fontSize: '0.9rem', borderRadius: 'var(--radius-full)', color: themeColors.textWhite, borderColor: themeColors.borderSubtle3 }}>
                   Visitar Tienda
                 </div>
               </div>
