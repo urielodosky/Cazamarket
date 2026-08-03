@@ -183,7 +183,7 @@ export default function Navbar() {
 
         
         <div 
-          className="navbar-middle-area" 
+          className={`navbar-middle-area ${!(isFilterablePage && !isHome && !isBusinessProfile) ? 'mobile-hidden' : ''}`}
           style={{ 
             display: 'flex', 
             gap: '12px', 
