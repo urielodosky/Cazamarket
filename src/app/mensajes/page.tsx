@@ -5,6 +5,7 @@ import { useAuth } from '@/contexts/AuthContext';
 import { usePlan } from '@/contexts/PlanContext';
 import VirtualAdvisorModal from '@/components/chat/VirtualAdvisorModal';
 import { useThemeColors } from '@/hooks/useThemeColors';
+import './mensajes.css';
 
 // --- INITIAL MOCK DATA ---
 const INITIAL_CHATS: any[] = [];
@@ -29,7 +30,11 @@ export default function MensajesPage() {
   // Auto-select first chat when switching tabs
   useEffect(() => {
     if (currentChats.length > 0) {
-      setActiveChatId(currentChats[0].id);
+      if (typeof window !== 'undefined' && window.innerWidth > 768) {
+        setActiveChatId(currentChats[0].id);
+      } else {
+        setActiveChatId(null);
+      }
     } else {
       setActiveChatId(null);
     }
@@ -176,11 +181,24 @@ export default function MensajesPage() {
   return (
     <div style={{ maxWidth: '1400px', margin: '0 auto', height: 'calc(100vh - 140px)', minHeight: '600px', padding: 'var(--spacing-6)' }}>
       
-      <div className="glass-panel" style={{ display: 'flex', height: '100%', borderRadius: 'var(--radius-lg)', overflow: 'hidden' }}>
+      <div className="glass-panel messages-container" style={{ 
+        display: 'flex', 
+        height: '75vh', 
+        minHeight: '600px', 
+        borderRadius: 'var(--radius-xl)', 
+        overflow: 'hidden',
+        border: '1px solid var(--color-border)',
+        boxShadow: '0 10px 30px rgba(0,0,0,0.05)'
+      }}>
         
-        {/* --- LEFT SIDEBAR (CHATS LIST) --- */}
-        <div style={{ width: '350px', display: 'flex', flexDirection: 'column', borderRight: '1px solid var(--color-border)', background: themeColors.bgSubtle2 }}>
-          
+        {/* --- LEFT AREA (CHAT LIST) --- */}
+        <div className={`messages-sidebar ${activeChatId ? 'hidden-on-mobile' : ''}`} style={{ 
+          width: '320px', 
+          borderRight: '1px solid var(--color-border)', 
+          display: 'flex', 
+          flexDirection: 'column', 
+          background: themeColors.bgSubtle2 
+        }}>  
           {/* Header & Tabs */}
           <div style={{ padding: '20px', borderBottom: '1px solid var(--color-border)' }}>
             <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '16px' }}>
@@ -293,12 +311,19 @@ export default function MensajesPage() {
         </div>
 
         {/* --- RIGHT AREA (ACTIVE CHAT) --- */}
-        <div style={{ flex: 1, display: 'flex', flexDirection: 'column', background: themeColors.bgSubtle }}>
+        <div className={`messages-chat-area ${!activeChatId ? 'hidden-on-mobile' : ''}`} style={{ flex: 1, display: 'flex', flexDirection: 'column', background: themeColors.bgSubtle }}>
           {activeChat ? (
             <>
               {/* Chat Header */}
               <div style={{ padding: '16px 24px', borderBottom: '1px solid var(--color-border)', display: 'flex', alignItems: 'center', justifyContent: 'space-between', background: themeColors.bgSubtle }}>
                 <div style={{ display: 'flex', alignItems: 'center', gap: '16px' }}>
+                  <button 
+                    className="mobile-back-btn"
+                    onClick={() => setActiveChatId(null)}
+                    style={{ background: 'transparent', border: 'none', color: 'var(--color-primary)', cursor: 'pointer', padding: '0 8px 0 0' }}
+                  >
+                    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><polyline points="15 18 9 12 15 6"></polyline></svg>
+                  </button>
                   <img src={activeChat.avatar} alt={activeChat.name} style={{ width: '40px', height: '40px', borderRadius: '50%', objectFit: 'cover' }} />
                   <div>
                     <h3 style={{ margin: '0 0 2px 0', fontSize: '1.1rem', color: 'var(--color-text-main)' }}>{activeChat.name}</h3>
