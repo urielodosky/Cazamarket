@@ -4,14 +4,21 @@ import { NextResponse } from 'next/server';
 
 export async function POST(request: Request) {
   try {
-    const { email, password, username, person_type, birth_date, cuit, phone, contact_email } = await request.json();
+    const rawInput = await request.json();
+    let { email, password, username, person_type, birth_date, cuit, phone, contact_email } = rawInput;
 
     if (!email || !password || !username) {
       return NextResponse.json(
-        { error: 'Faltan datos obligatorios (email, password o username)' },
+        { error: 'Faltan datos obligatorios' },
         { status: 400 }
       );
     }
+
+    // 5. Validación y Sanitización
+    username = typeof username === 'string' ? username.trim().replace(/[<>]/g, '') : '';
+    phone = typeof phone === 'string' ? phone.trim().replace(/[<>]/g, '') : '';
+    cuit = typeof cuit === 'string' ? cuit.trim().replace(/[<>]/g, '') : '';
+    person_type = typeof person_type === 'string' ? person_type.trim().replace(/[<>]/g, '') : '';
 
     const supabase = await createServerClient();
     
@@ -94,7 +101,8 @@ export async function POST(request: Request) {
             });
             
             if (retry.error) {
-              return NextResponse.json({ error: retry.error.message }, { status: 400 });
+              console.error(`[SECURITY LOG] Error DB registro (Email: ${email}):`, retry.error.message);
+              return NextResponse.json({ error: 'Error al procesar el registro (Intento fallido)' }, { status: 400 });
             }
             return NextResponse.json({ success: true, data: retry.data });
           }
@@ -105,14 +113,15 @@ export async function POST(request: Request) {
           { status: 400 }
         );
       }
-      return NextResponse.json({ error: error.message }, { status: 400 });
+      console.error(`[SECURITY LOG] Error DB registro (Email: ${email}):`, error.message);
+      return NextResponse.json({ error: 'Error al procesar el registro' }, { status: 400 });
     }
 
     // Respuesta exitosa
     return NextResponse.json({ success: true, data });
 
   } catch (error: any) {
-    console.error('Error en /api/auth/register:', error?.message || 'Unknown error');
+    console.error('[SECURITY LOG] Error crítico en /api/auth/register:', error?.message || 'Unknown error');
     return NextResponse.json(
       { error: 'Ocurrió un error inesperado al procesar el registro.' },
       { status: 500 }

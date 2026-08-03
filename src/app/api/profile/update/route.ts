@@ -11,7 +11,27 @@ export async function POST(request: Request) {
       return NextResponse.json({ error: 'No autorizado' }, { status: 401 });
     }
 
-    const updates = await request.json();
+    const rawUpdates = await request.json();
+
+    // 5. Validación y Sanitización (Evitar Mass Assignment y XSS)
+    const allowedFields = ['full_name', 'phone', 'avatar_url'];
+    const safeUpdates: Record<string, string> = {};
+
+    for (const key of allowedFields) {
+      if (rawUpdates[key] !== undefined) {
+        // Importante: No importamos sanitize aquí directamente si no es necesario para strings simples,
+        // pero validamos que sean strings.
+        if (typeof rawUpdates[key] === 'string') {
+           // Basic string sanitization for profile fields
+           safeUpdates[key] = rawUpdates[key].trim().replace(/[<>]/g, ''); 
+        }
+      }
+    }
+
+    // Asegurarse de que no esté vacío
+    if (Object.keys(safeUpdates).length === 0) {
+      return NextResponse.json({ error: 'No valid fields provided' }, { status: 400 });
+    }
 
     // Crear cliente admin para bypasear RLS
     const supabaseAdmin = createAdminClient(
@@ -21,17 +41,19 @@ export async function POST(request: Request) {
 
     const { error } = await supabaseAdmin
       .from('profiles')
-      .update(updates)
+      .update(safeUpdates)
       .eq('id', user.id);
 
     if (error) {
-      console.error("Error actualizando perfil en Supabase Admin:", error.message || 'Unknown error');
-      return NextResponse.json({ error: error.message }, { status: 500 });
+      // 8. Sistema de Logs de Seguridad: Loguear el error real internamente
+      console.error(`[SECURITY LOG] Error DB actualizando perfil (User: ${user.id}):`, error.message);
+      // 7. Manejo de Errores Seguro: Devolver un error genérico al cliente
+      return NextResponse.json({ error: 'Error interno al actualizar el perfil' }, { status: 500 });
     }
 
     return NextResponse.json({ success: true });
   } catch (err: any) {
-    console.error("Excepción en API de update profile:", err?.message || 'Unknown error');
-    return NextResponse.json({ error: err.message }, { status: 500 });
+    console.error(`[SECURITY LOG] Excepción en API de update profile:`, err?.message || 'Unknown error');
+    return NextResponse.json({ error: 'Error interno del servidor' }, { status: 500 });
   }
 }

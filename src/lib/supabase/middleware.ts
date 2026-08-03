@@ -35,5 +35,20 @@ export async function updateSession(request: NextRequest) {
     data: { user },
   } = await supabase.auth.getUser()
 
+  // 6. Autenticación en Rutas
+  // Rutas que requieren autenticación estricta
+  const protectedRoutes = ['/configuracion', '/mis-tiendas', '/favoritos', '/mensajes'];
+  const isProtectedRoute = protectedRoutes.some(route => request.nextUrl.pathname.startsWith(route));
+
+  if (isProtectedRoute && !user) {
+    // 8. Log de Seguridad: Intento de acceso a ruta protegida
+    console.warn(`[SECURITY LOG] Intento de acceso no autorizado a ${request.nextUrl.pathname} (IP: ${request.headers.get('x-forwarded-for')})`);
+    
+    // Redirigir al inicio o login
+    const url = request.nextUrl.clone()
+    url.pathname = '/'
+    return NextResponse.redirect(url)
+  }
+
   return supabaseResponse
 }

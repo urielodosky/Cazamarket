@@ -13,11 +13,10 @@ export async function GET(request: Request) {
   const apiKey = process.env.APICUIT_KEY;
 
   if (!apiKey) {
-    // Si no hay API Key configurada, no fallamos, pero devolvemos un mensaje de error controlado
-    // para que el frontend lo sepa y permita al usuario ingresar la razón social a mano.
+    console.error('[SECURITY LOG] Falta configurar API Key de CUIT en el servidor.');
     return NextResponse.json({ 
       error: 'API_KEY_MISSING',
-      message: 'Falta configurar la API Key de apicuit.com en el archivo .env.local' 
+      message: 'Servicio de validación temporalmente inactivo.' 
     }, { status: 503 });
   }
 
@@ -31,28 +30,24 @@ export async function GET(request: Request) {
 
     if (!response.ok) {
       if (response.status === 404) {
-        return NextResponse.json({ error: 'NOT_FOUND', message: 'El CUIT no existe en AFIP' }, { status: 404 });
+        return NextResponse.json({ error: 'NOT_FOUND', message: 'El CUIT no existe o no es válido' }, { status: 404 });
       }
-      return NextResponse.json({ error: 'API_ERROR', message: 'Error al consultar la API de CUIT' }, { status: response.status });
+      console.error(`[SECURITY LOG] Error remoto API CUIT (Status: ${response.status})`);
+      return NextResponse.json({ error: 'API_ERROR', message: 'Error al consultar validación' }, { status: response.status });
     }
 
     const data = await response.json();
-    
-    // Apicuit.com usually returns: { success: true, data: { denominacion: "...", ... } }
-    // We will extract the business name (Razón social)
-    
-    // In case the API format changes, we check multiple common fields:
     const razonSocial = data.nombre || data.denominacion || (data.data && data.data.denominacion) || (data.data && data.data.nombre);
     const tipo = data.tipoPersona || (data.data && data.data.tipoPersona);
 
     return NextResponse.json({
       success: true,
-      razonSocial: razonSocial || '',
-      tipo: tipo || ''
+      razonSocial: typeof razonSocial === 'string' ? razonSocial.replace(/[<>]/g, '') : '',
+      tipo: typeof tipo === 'string' ? tipo.replace(/[<>]/g, '') : ''
     });
 
-  } catch (error) {
-    console.error('Error fetching CUIT API:', error);
+  } catch (error: any) {
+    console.error('[SECURITY LOG] Error interno consultando CUIT:', error?.message || 'Unknown error');
     return NextResponse.json({ error: 'INTERNAL_ERROR', message: 'Error interno del servidor' }, { status: 500 });
   }
 }
