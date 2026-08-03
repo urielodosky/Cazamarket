@@ -404,7 +404,6 @@
   }
 
   .navbar-center .search-bar-animated {
-    display: flex !important;
     flex: 1 1 auto !important;
     position: relative !important;
     left: 0 !important;
