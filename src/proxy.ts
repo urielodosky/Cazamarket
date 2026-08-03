@@ -13,6 +13,32 @@ export default async function proxy(request: NextRequest) {
     return NextResponse.redirect(httpsUrl, 301);
   }
 
+  // 1.5 Strict CORS Configuration for API Routes
+  if (request.nextUrl.pathname.startsWith('/api/')) {
+    const allowedOrigins = ['https://cazamarket.com', 'https://www.cazamarket.com'];
+    if (process.env.NEXT_PUBLIC_SITE_URL) allowedOrigins.push(process.env.NEXT_PUBLIC_SITE_URL);
+    
+    const origin = request.headers.get('origin');
+    
+    // Si la petición proviene de un navegador (tiene Origin) y no está en nuestra lista blanca
+    if (origin && !allowedOrigins.includes(origin) && process.env.NODE_ENV === 'production') {
+      console.warn(`[SECURITY LOG] Petición CORS bloqueada desde origen no autorizado: ${origin}`);
+      return new NextResponse(
+        JSON.stringify({ error: 'CORS policy violation: Origin not allowed' }),
+        { status: 403, headers: { 'Content-Type': 'application/json' } }
+      );
+    }
+    
+    // Si es un preflight request (OPTIONS), le respondemos inmediatamente con éxito
+    if (request.method === 'OPTIONS') {
+      const response = new NextResponse(null, { status: 200 });
+      response.headers.set('Access-Control-Allow-Origin', origin || allowedOrigins[0]);
+      response.headers.set('Access-Control-Allow-Methods', 'GET, POST, PUT, DELETE, OPTIONS');
+      response.headers.set('Access-Control-Allow-Headers', 'Content-Type, Authorization, x-signature, x-request-id');
+      return response;
+    }
+  }
+
   // 2. Rate Limiting for API routes
   if (request.nextUrl.pathname.startsWith('/api/')) {
     const ip = request.headers.get('x-forwarded-for') || '127.0.0.1';
