@@ -34,6 +34,11 @@ export default function RegistroPage() {
   const [resendCount, setResendCount] = useState(0);
   const [resendTimer, setResendTimer] = useState(0);
 
+  // MFA
+  const [isAwaitingMFA, setIsAwaitingMFA] = useState(false);
+  const [mfaFactorId, setMfaFactorId] = useState('');
+  const [mfaCode, setMfaCode] = useState('');
+
   useEffect(() => {
     let timer: NodeJS.Timeout;
     if (resendTimer > 0) {
@@ -160,6 +165,31 @@ export default function RegistroPage() {
     }
   };
 
+  const handleVerifyMFA = async (e: React.FormEvent) => {
+    e.preventDefault();
+    setIsLoading(true);
+    setErrorMsg('');
+    
+    try {
+      const challenge = await supabase.auth.mfa.challenge({ factorId: mfaFactorId });
+      if (challenge.error) throw challenge.error;
+      
+      const verify = await supabase.auth.mfa.verify({
+        factorId: mfaFactorId,
+        challengeId: challenge.data.id,
+        code: mfaCode,
+      });
+      
+      if (verify.error) throw verify.error;
+      
+      router.push('/');
+    } catch (err: any) {
+      setErrorMsg(err.message || 'Código incorrecto. Intenta nuevamente.');
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setIsLoading(true);
@@ -168,7 +198,7 @@ export default function RegistroPage() {
 
     try {
       if (isLoginView) {
-        const { error } = await supabase.auth.signInWithPassword({
+        const { error, data } = await supabase.auth.signInWithPassword({
           email,
           password,
         });
@@ -176,6 +206,18 @@ export default function RegistroPage() {
         if (error) {
           setErrorMsg(error.message);
         } else {
+          // 3. MFA Check: Evaluamos el Authenticator Assurance Level
+          const mfa = await supabase.auth.mfa.getAuthenticatorAssuranceLevel();
+          if (mfa.data && mfa.data.nextLevel === 'aal2' && mfa.data.currentLevel === 'aal1') {
+            const factors = await supabase.auth.mfa.listFactors();
+            const totpFactor = factors.data?.totp.find(f => f.status === 'verified');
+            
+            if (totpFactor) {
+              setMfaFactorId(totpFactor.id);
+              setIsAwaitingMFA(true);
+              return; // Detenemos el flujo aquí para pedir el código
+            }
+          }
           router.push('/');
         }
       } else {
@@ -264,10 +306,12 @@ export default function RegistroPage() {
                 </svg>
               </button>
             )}
-            <h1 style={{ margin: 0, fontSize: '1.4rem' }}>{isAwaitingOTP || isAwaitingPasswordResetOTP ? 'Verificación' : isForgotPasswordView ? 'Recuperar Contraseña' : isLoginView ? 'Inicia sesión' : 'Crea tu cuenta'}</h1>
+            <h1 style={{ margin: 0, fontSize: '1.4rem' }}>{isAwaitingMFA ? 'Seguridad 2FA' : isAwaitingOTP || isAwaitingPasswordResetOTP ? 'Verificación' : isForgotPasswordView ? 'Recuperar Contraseña' : isLoginView ? 'Inicia sesión' : 'Crea tu cuenta'}</h1>
           </div>
           <p>
-            {isAwaitingOTP || isAwaitingPasswordResetOTP
+            {isAwaitingMFA 
+              ? 'Ingresa el código de 6 dígitos de tu app autenticadora.'
+              : isAwaitingOTP || isAwaitingPasswordResetOTP
               ? 'Ingresa el código de 6 dígitos que te enviamos.'
               : isForgotPasswordView
               ? 'Ingresa tu correo para recibir un código de recuperación.'
@@ -289,8 +333,21 @@ export default function RegistroPage() {
           </div>
         )}
 
-        <form className="auth-form" onSubmit={isAwaitingOTP ? handleVerifyOTP : (isAwaitingPasswordResetOTP ? handleVerifyResetOTP : (isForgotPasswordView ? handleResetPasswordSubmit : handleSubmit))}>
-          {isAwaitingOTP || isAwaitingPasswordResetOTP ? (
+        <form className="auth-form" onSubmit={isAwaitingMFA ? handleVerifyMFA : isAwaitingOTP ? handleVerifyOTP : (isAwaitingPasswordResetOTP ? handleVerifyResetOTP : (isForgotPasswordView ? handleResetPasswordSubmit : handleSubmit))}>
+          {isAwaitingMFA ? (
+            <div className="form-group">
+              <label htmlFor="mfaCode">Código Autenticador (2FA)</label>
+              <input 
+                type="text" 
+                id="mfaCode" 
+                placeholder="Ej: 123456" 
+                value={mfaCode}
+                onChange={(e) => setMfaCode(e.target.value.replace(/\D/g, '').slice(0, 6))}
+                required 
+                style={{ textAlign: 'center', letterSpacing: '5px', fontSize: '1.2rem', fontFamily: 'monospace' }}
+              />
+            </div>
+          ) : isAwaitingOTP || isAwaitingPasswordResetOTP ? (
             <>
             <div className="form-group">
               <label htmlFor="otpCode">Código de verificación</label>
@@ -495,8 +552,12 @@ export default function RegistroPage() {
           </>
         )}
 
-          <button type="submit" className="auth-submit" disabled={isLoading}>
-            {isLoading ? 'Cargando...' : (isAwaitingPasswordResetOTP ? 'Verificar y Cambiar' : isAwaitingOTP ? 'Verificar y Entrar' : isForgotPasswordView ? 'Enviar código' : isLoginView ? 'Iniciar Sesión' : 'Crear Cuenta')}
+          <button type="submit" className="submit-btn" disabled={isLoading || (isAwaitingOTP && otpCode.length < 6) || (isAwaitingPasswordResetOTP && otpCode.length < 6) || (isAwaitingMFA && mfaCode.length < 6)}>
+            {isLoading ? (
+              <div className="btn-loader"></div>
+            ) : (
+              isAwaitingMFA ? 'Verificar y Entrar' : isAwaitingOTP || isAwaitingPasswordResetOTP ? 'Verificar código' : isForgotPasswordView ? (isAwaitingPasswordResetOTP ? 'Restablecer Contraseña' : 'Enviar Código') : isLoginView ? 'Ingresar' : 'Crear cuenta'
+            )}
           </button>
           
           {isAwaitingOTP && (
