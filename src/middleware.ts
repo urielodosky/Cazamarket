@@ -15,7 +15,7 @@ export function middleware(req: NextRequest) {
 
   // 2. Rate Limiting for API routes
   if (req.nextUrl.pathname.startsWith('/api/')) {
-    const ip = req.headers.get('x-forwarded-for') || req.ip || '127.0.0.1';
+    const ip = req.headers.get('x-forwarded-for') || '127.0.0.1';
     const limit = 60; // 60 requests per minute
     const windowMs = 60 * 1000;
 
