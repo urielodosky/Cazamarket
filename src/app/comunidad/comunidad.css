@@ -47,4 +47,24 @@
     min-width: 0 !important;
     gap: 32px !important; /* more space between Respuestas and Visitas */
   }
+
+  /* Tema Detail Page Mobile Styles */
+  .tema-post-card {
+    padding: 20px 16px !important;
+  }
+
+  .tema-post-header {
+    flex-direction: column !important;
+    align-items: flex-start !important;
+    gap: 16px !important;
+  }
+  
+  .tema-post-header > div:last-child {
+    width: 100%;
+    justify-content: flex-start;
+  }
+  
+  .tema-post-title {
+    font-size: 1.4rem !important;
+  }
 }

@@ -8,6 +8,7 @@ import { ForumPost, ForumReply } from '../../page';
 import { formatTimeAgo } from '@/utils/formatTime';
 import { getUserBusinessInfo } from '@/utils/userBusiness';
 import { useThemeColors } from '@/hooks/useThemeColors';
+import '../../comunidad.css';
 
 const INITIAL_POSTS: ForumPost[] = [];
 
@@ -341,7 +342,7 @@ export default function TemaPage({ params }: { params: Promise<{ id: string }> }
   });
 
   return (
-    <div style={{ padding: '120px var(--spacing-4) var(--spacing-8) var(--spacing-4)', maxWidth: '920px', margin: '0 auto', minHeight: '80vh' }}>
+    <div className="container-page" style={{ maxWidth: '920px', margin: '0 auto', minHeight: '80vh' }}>
       
       {/* Modal de Confirmación Estilizado dentro de la Página */}
       {confirmModal && (
@@ -443,10 +444,10 @@ export default function TemaPage({ params }: { params: Promise<{ id: string }> }
         </Link>
       </div>
 
-      {/* Main Post Panel Unified Card (Publicación + Cuadro de Respuesta Integrado) */}
-      <div className="glass-panel" style={{ 
-        padding: '28px 32px', 
-        borderRadius: '20px', 
+      {/* Main Post Section */}
+      <div className="glass-panel tema-post-card" style={{ 
+        padding: '36px 40px', 
+        borderRadius: 'var(--radius-xl)', 
         marginBottom: '36px',
         border: `1px solid ${themeColors.borderSubtle2}`,
         boxShadow: '0 10px 30px rgba(0,0,0,0.05)',
@@ -454,7 +455,7 @@ export default function TemaPage({ params }: { params: Promise<{ id: string }> }
       }}>
         
         {/* 1. Datos del Autor (Arriba) */}
-        <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '22px', paddingBottom: '18px', borderBottom: `1px solid ${themeColors.borderSubtle2}` }}>
+        <div className="tema-post-header" style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '22px', paddingBottom: '18px', borderBottom: `1px solid ${themeColors.borderSubtle2}` }}>
           <div style={{ display: 'flex', alignItems: 'center', gap: '14px' }}>
             <div style={{ width: '48px', height: '48px', borderRadius: '50%', overflow: 'hidden', background: 'linear-gradient(135deg, var(--color-primary), #ff9900)', padding: '2px', boxShadow: '0 4px 14px rgba(255,115,0,0.35)', flexShrink: 0, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
               {postAuthorAvatar ? (
@@ -548,7 +549,7 @@ export default function TemaPage({ params }: { params: Promise<{ id: string }> }
         </div>
 
         {/* 2. Título (Debajo de quien lo publicó) */}
-        <h1 style={{ fontSize: '1.85rem', color: themeColors.textWhite, margin: '0 0 16px 0', lineHeight: 1.3, fontWeight: 700, letterSpacing: '-0.3px' }}>
+        <h1 className="tema-post-title" style={{ fontSize: '1.85rem', color: 'var(--color-text-main)', margin: '0 0 16px 0', lineHeight: 1.3, fontWeight: 700, letterSpacing: '-0.3px' }}>
           {post.title}
         </h1>
 
