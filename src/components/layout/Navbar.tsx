@@ -197,32 +197,6 @@ export default function Navbar() {
               display: (isFilterablePage && !isHome && !isBusinessProfile) ? 'flex' : 'none',
               background: '#1A1D17'
             }}>
-                <button 
-                  className="search-icon-btn" 
-                  onClick={() => executeSearch()} 
-                  title="Buscar"
-                  style={{ 
-                    background: 'var(--color-primary)', 
-                    color: 'white',
-                    border: 'none', 
-                    width: '32px',
-                    height: '32px',
-                    borderRadius: '50%',
-                    cursor: 'pointer', 
-                    display: 'flex', 
-                    alignItems: 'center',
-                    justifyContent: 'center',
-                    flexShrink: 0,
-                    transition: 'transform 0.2s, background-color 0.2s'
-                  }}
-                  onMouseEnter={(e) => e.currentTarget.style.transform = 'scale(1.05)'}
-                  onMouseLeave={(e) => e.currentTarget.style.transform = 'scale(1)'}
-                >
-                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" style={{ width: '16px', height: '16px' }}>
-                    <circle cx="11" cy="11" r="8"></circle>
-                    <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
-                  </svg>
-                </button>
                 <input 
                   suppressHydrationWarning
                   type="text" 
@@ -232,6 +206,33 @@ export default function Navbar() {
                   onKeyDown={(e) => { if (e.key === 'Enter') executeSearch(); }}
                   style={{ marginLeft: '12px', color: themeColors.textWhite, width: '100%', background: 'transparent', border: 'none', outline: 'none' }}
                 />
+                <button 
+                  className="search-icon-btn" 
+                  onClick={() => executeSearch()} 
+                  title="Buscar"
+                  style={{ 
+                    background: 'var(--color-primary)', 
+                    color: 'white',
+                    border: 'none', 
+                    width: '28px',
+                    height: '28px',
+                    borderRadius: '50%',
+                    cursor: 'pointer', 
+                    display: 'flex', 
+                    alignItems: 'center',
+                    justifyContent: 'center',
+                    flexShrink: 0,
+                    marginRight: '4px',
+                    transition: 'transform 0.2s, background-color 0.2s'
+                  }}
+                  onMouseEnter={(e) => e.currentTarget.style.transform = 'scale(1.05)'}
+                  onMouseLeave={(e) => e.currentTarget.style.transform = 'scale(1)'}
+                >
+                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" style={{ width: '14px', height: '14px' }}>
+                    <circle cx="11" cy="11" r="8"></circle>
+                    <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
+                  </svg>
+                </button>
                 {isFilterablePage && <button 
                   suppressHydrationWarning
                   type="button"
