@@ -12,7 +12,7 @@ import { useFavorites } from '@/contexts/FavoritesContext';
 import { NEGOCIOS_DATA, PRODUCTOS_DATA } from '@/data/mock';
 import { useThemeColors } from '@/hooks/useThemeColors';
 import { createClient } from '@/lib/supabase/client';
-import './negocio.css';
+import '../negocio.css';
 
 const PROVINCES_MAP: Record<string, string> = {
   "02": "Ciudad Autónoma de Buenos Aires",
