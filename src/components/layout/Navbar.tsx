@@ -292,7 +292,7 @@ export default function Navbar() {
                     <line x1="18" y1="3" x2="18" y2="13"></line>
                     <line x1="18" y1="19" x2="18" y2="21"></line>
                   </svg>
-                  Filtros
+                  <span className="filter-text-mobile">Filtros</span>
                 </button>}
               </div>
             {!isHome && <div className="divider-vertical-animated" style={{ display: 'none' }}></div>}

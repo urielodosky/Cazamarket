@@ -394,4 +394,14 @@
     height: 40px;
     object-fit: contain;
   }
+  
+  .user-avatar-trigger {
+    width: 36px;
+    height: 36px;
+  }
+  
+  .user-avatar-trigger svg {
+    width: 20px;
+    height: 20px;
+  }
 }
