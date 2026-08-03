@@ -27,7 +27,7 @@ export default function Navbar() {
   const isHome = pathname === '/';
   // Solo mostrar filtros en las páginas donde tiene sentido buscar/filtrar
   const FILTERABLE_PAGES = ['/productos', '/servicios', '/negocios', '/comunidad'];
-  const isFilterablePage = isHome || FILTERABLE_PAGES.some(p => pathname.startsWith(p));
+  const isFilterablePage = FILTERABLE_PAGES.some(p => pathname.startsWith(p));
   const router = useRouter();
   const searchParams = useSearchParams();
   const { mode, toggleMode } = useTheme();
