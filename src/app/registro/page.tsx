@@ -18,6 +18,11 @@ export default function RegistroPage() {
   const [successMsg, setSuccessMsg] = useState('');
   const [termsAccepted, setTermsAccepted] = useState(false);
   
+  // Recuperar contraseña
+  const [isForgotPasswordView, setIsForgotPasswordView] = useState(false);
+  const [isAwaitingPasswordResetOTP, setIsAwaitingPasswordResetOTP] = useState(false);
+  const [newPassword, setNewPassword] = useState('');
+  
   // Nombres y OTP
   const [username, setUsername] = useState('');
   const [personType, setPersonType] = useState('Física');
@@ -92,6 +97,64 @@ export default function RegistroPage() {
       }
     } catch (err: any) {
       setErrorMsg(err.message || 'Error inesperado al verificar');
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  const handleResetPasswordSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    setIsLoading(true);
+    setErrorMsg('');
+    setSuccessMsg('');
+
+    try {
+      const { error } = await supabase.auth.resetPasswordForEmail(email);
+      if (error) {
+        setErrorMsg(error.message);
+      } else {
+        setSuccessMsg('Código de recuperación enviado. Revisa tu correo electrónico.');
+        setIsAwaitingPasswordResetOTP(true);
+      }
+    } catch (err: any) {
+      setErrorMsg(err.message || 'Error inesperado');
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  const handleVerifyResetOTP = async (e: React.FormEvent) => {
+    e.preventDefault();
+    setIsLoading(true);
+    setErrorMsg('');
+
+    try {
+      const { error: verifyError } = await supabase.auth.verifyOtp({
+        email,
+        token: otpCode,
+        type: 'recovery'
+      });
+
+      if (verifyError) {
+        setErrorMsg(verifyError.message);
+        setIsLoading(false);
+        return;
+      }
+
+      const { error: updateError } = await supabase.auth.updateUser({
+        password: newPassword
+      });
+
+      if (updateError) {
+        setErrorMsg(updateError.message);
+      } else {
+        setSuccessMsg('¡Contraseña actualizada exitosamente! Iniciando sesión...');
+        setTimeout(() => {
+          router.push('/');
+        }, 1500);
+      }
+    } catch (err: any) {
+      setErrorMsg(err.message || 'Error al restablecer la contraseña');
     } finally {
       setIsLoading(false);
     }
@@ -201,11 +264,13 @@ export default function RegistroPage() {
                 </svg>
               </button>
             )}
-            <h1 style={{ margin: 0, fontSize: '1.4rem' }}>{isAwaitingOTP ? 'Verificación' : isLoginView ? 'Inicia sesión' : 'Crea tu cuenta'}</h1>
+            <h1 style={{ margin: 0, fontSize: '1.4rem' }}>{isAwaitingOTP || isAwaitingPasswordResetOTP ? 'Verificación' : isForgotPasswordView ? 'Recuperar Contraseña' : isLoginView ? 'Inicia sesión' : 'Crea tu cuenta'}</h1>
           </div>
           <p>
-            {isAwaitingOTP 
+            {isAwaitingOTP || isAwaitingPasswordResetOTP
               ? 'Ingresa el código de 6 dígitos que te enviamos.'
+              : isForgotPasswordView
+              ? 'Ingresa tu correo para recibir un código de recuperación.'
               : isLoginView 
               ? 'Bienvenido de nuevo cazador. Ingresa a tu cuenta.' 
               : 'Únete a la comunidad más grande de caza y pesca.'}
@@ -224,8 +289,9 @@ export default function RegistroPage() {
           </div>
         )}
 
-        <form className="auth-form" onSubmit={isAwaitingOTP ? handleVerifyOTP : handleSubmit}>
-          {isAwaitingOTP ? (
+        <form className="auth-form" onSubmit={isAwaitingOTP ? handleVerifyOTP : (isAwaitingPasswordResetOTP ? handleVerifyResetOTP : (isForgotPasswordView ? handleResetPasswordSubmit : handleSubmit))}>
+          {isAwaitingOTP || isAwaitingPasswordResetOTP ? (
+            <>
             <div className="form-group">
               <label htmlFor="otpCode">Código de verificación</label>
               <input 
@@ -239,9 +305,22 @@ export default function RegistroPage() {
                 style={{ textAlign: 'center', fontSize: '1.2rem', letterSpacing: '4px' }}
               />
             </div>
+            {isAwaitingPasswordResetOTP && (
+              <div className="form-group">
+                <label htmlFor="newPassword">Nueva contraseña</label>
+                <input 
+                  type="password" 
+                  id="newPassword" 
+                  value={newPassword}
+                  onChange={(e) => setNewPassword(e.target.value)}
+                  required 
+                />
+              </div>
+            )}
+            </>
           ) : (
             <>
-              {!isLoginView && (
+              {!isLoginView && !isForgotPasswordView && (
                 <>
                   <div className="form-group">
                     <label htmlFor="username">Nombre de usuario</label>
@@ -338,49 +417,51 @@ export default function RegistroPage() {
             />
           </div>
           
-          <div className="form-group">
-            <label htmlFor="password">Contraseña</label>
-            <div style={{ position: 'relative', display: 'flex', alignItems: 'center' }}>
-              <input 
-                type={showPassword ? 'text' : 'password'} 
-                id="password" 
-                placeholder="••••••••" 
-                value={password}
-                onChange={(e) => setPassword(e.target.value)}
-                required 
-                style={{ paddingRight: '40px' }}
-              />
-              <button 
-                type="button" 
-                onClick={() => setShowPassword(!showPassword)}
-                style={{ 
-                  position: 'absolute', 
-                  right: '10px', 
-                  background: 'none', 
-                  border: 'none', 
-                  color: 'var(--color-text-muted)',
-                  cursor: 'pointer',
-                  display: 'flex',
-                  alignItems: 'center',
-                  justifyContent: 'center',
-                  padding: '4px'
-                }}
-              >
-                {showPassword ? (
-                  <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M17.94 17.94A10.07 10.07 0 0 1 12 20c-7 0-11-8-11-8a18.45 18.45 0 0 1 5.06-5.94M9.9 4.24A9.12 9.12 0 0 1 12 4c7 0 11 8 11 8a18.5 18.5 0 0 1-2.16 3.19m-6.72-1.07a3 3 0 1 1-4.24-4.24"></path><line x1="1" y1="1" x2="23" y2="23"></line></svg>
-                ) : (
-                  <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"></path><circle cx="12" cy="12" r="3"></circle></svg>
-                )}
-              </button>
-            </div>
-            {isLoginView && (
-              <div style={{ textAlign: 'right', marginTop: '8px' }}>
-                <button type="button" onClick={() => alert('Función en construcción')} className="auth-link" style={{ fontSize: '0.85rem', background: 'transparent', border: 'none', padding: 0, cursor: 'pointer' }}>¿Olvidaste tu contraseña?</button>
+          {!isForgotPasswordView && (
+            <div className="form-group">
+              <label htmlFor="password">Contraseña</label>
+              <div style={{ position: 'relative', display: 'flex', alignItems: 'center' }}>
+                <input 
+                  type={showPassword ? 'text' : 'password'} 
+                  id="password" 
+                  placeholder="••••••••" 
+                  value={password}
+                  onChange={(e) => setPassword(e.target.value)}
+                  required 
+                  style={{ paddingRight: '40px' }}
+                />
+                <button 
+                  type="button" 
+                  onClick={() => setShowPassword(!showPassword)}
+                  style={{ 
+                    position: 'absolute', 
+                    right: '10px', 
+                    background: 'none', 
+                    border: 'none', 
+                    color: 'var(--color-text-muted)',
+                    cursor: 'pointer',
+                    display: 'flex',
+                    alignItems: 'center',
+                    justifyContent: 'center',
+                    padding: '4px'
+                  }}
+                >
+                  {showPassword ? (
+                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M17.94 17.94A10.07 10.07 0 0 1 12 20c-7 0-11-8-11-8a18.45 18.45 0 0 1 5.06-5.94M9.9 4.24A9.12 9.12 0 0 1 12 4c7 0 11 8 11 8a18.5 18.5 0 0 1-2.16 3.19m-6.72-1.07a3 3 0 1 1-4.24-4.24"></path><line x1="1" y1="1" x2="23" y2="23"></line></svg>
+                  ) : (
+                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"></path><circle cx="12" cy="12" r="3"></circle></svg>
+                  )}
+                </button>
               </div>
-            )}
-          </div>
+              {isLoginView && (
+                <div style={{ textAlign: 'right', marginTop: '8px' }}>
+                  <button type="button" onClick={() => { setIsForgotPasswordView(true); setIsLoginView(false); setErrorMsg(''); setSuccessMsg(''); }} className="auth-link" style={{ fontSize: '0.85rem', background: 'transparent', border: 'none', padding: 0, cursor: 'pointer' }}>¿Olvidaste tu contraseña?</button>
+                </div>
+              )}
+            </div>
+          )}
           
-          {!isLoginView && (
+          {!isLoginView && !isForgotPasswordView && (
             <div className="form-group" style={{ flexDirection: 'row', alignItems: 'flex-start', gap: '12px', marginBottom: '24px' }}>
               <div 
                 className="custom-checkbox-wrapper" 
@@ -415,7 +496,7 @@ export default function RegistroPage() {
         )}
 
           <button type="submit" className="auth-submit" disabled={isLoading}>
-            {isLoading ? 'Cargando...' : (isAwaitingOTP ? 'Verificar y Entrar' : isLoginView ? 'Iniciar Sesión' : 'Crear Cuenta')}
+            {isLoading ? 'Cargando...' : (isAwaitingPasswordResetOTP ? 'Verificar y Cambiar' : isAwaitingOTP ? 'Verificar y Entrar' : isForgotPasswordView ? 'Enviar código' : isLoginView ? 'Iniciar Sesión' : 'Crear Cuenta')}
           </button>
           
           {isAwaitingOTP && (
@@ -438,19 +519,36 @@ export default function RegistroPage() {
         </form>
 
         <div className="auth-footer">
-          <p>
-            {isLoginView ? '¿No tienes una cuenta?' : '¿Ya tienes una cuenta?'}{' '}
-            <button 
-              className="auth-link" 
-              onClick={() => {
-                setIsLoginView(!isLoginView);
-                setErrorMsg('');
-                setSuccessMsg('');
-              }}
-            >
-              {isLoginView ? 'Regístrate aquí' : 'Inicia sesión'}
-            </button>
-          </p>
+          {!isForgotPasswordView ? (
+            <p>
+              {isLoginView ? '¿No tienes una cuenta?' : '¿Ya tienes una cuenta?'}{' '}
+              <button 
+                className="auth-link" 
+                onClick={() => {
+                  setIsLoginView(!isLoginView);
+                  setErrorMsg('');
+                  setSuccessMsg('');
+                }}
+              >
+                {isLoginView ? 'Regístrate aquí' : 'Inicia sesión'}
+              </button>
+            </p>
+          ) : (
+            <p>
+              <button 
+                className="auth-link" 
+                onClick={() => {
+                  setIsForgotPasswordView(false);
+                  setIsLoginView(true);
+                  setIsAwaitingPasswordResetOTP(false);
+                  setErrorMsg('');
+                  setSuccessMsg('');
+                }}
+              >
+                Volver a Iniciar Sesión
+              </button>
+            </p>
+          )}
         </div>
       </div>
     </div>
