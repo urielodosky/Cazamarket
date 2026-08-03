@@ -6,6 +6,7 @@ import { useAuth } from '@/contexts/AuthContext';
 import { formatTimeAgo } from '@/utils/formatTime';
 import { getUserBusinessInfo } from '@/utils/userBusiness';
 import { useThemeColors } from '@/hooks/useThemeColors';
+import './comunidad.css';
 
 export interface ForumReply {
   id: string;
@@ -212,7 +213,7 @@ export default function ComunidadPage() {
               <div 
                 key={post.id} 
                 onClick={() => router.push(`/comunidad/tema/${post.id}`)} 
-                className="glass-panel" 
+                className="glass-panel forum-post-card" 
                 style={{ 
                   padding: '20px 24px', 
                   borderRadius: 'var(--radius-lg)', 
@@ -229,7 +230,7 @@ export default function ComunidadPage() {
                 <div style={{ flex: 1, paddingRight: '20px' }}>
                   
                   {/* 1. FILA SUPERIOR: Foto + Autor + Insignia + Última Actividad + Categoría / Subcategoría AL LADO */}
-                  <div style={{ display: 'flex', alignItems: 'center', gap: '8px', fontSize: '0.85rem', color: 'var(--color-text-muted)', flexWrap: 'wrap', marginBottom: '10px' }}>
+                  <div className="forum-post-meta" style={{ display: 'flex', alignItems: 'center', gap: '8px', fontSize: '0.85rem', color: 'var(--color-text-muted)', flexWrap: 'wrap', marginBottom: '10px' }}>
                     {authorImg ? (
                       <img src={authorImg} alt={post.author} style={{ width: '26px', height: '26px', borderRadius: '50%', objectFit: 'cover' }} />
                     ) : (
@@ -270,14 +271,14 @@ export default function ComunidadPage() {
 
                     {/* Categoría y Subcategoría AL LADO de la información del usuario */}
                     {(post.category || post.subcategory) && (
-                      <div style={{ display: 'inline-flex', gap: '6px', marginLeft: '6px', alignItems: 'center' }}>
+                      <div className="forum-post-tags" style={{ display: 'inline-flex', gap: '6px', marginLeft: '6px', alignItems: 'center' }}>
                         {post.category && (
-                          <span style={{ background: 'rgba(255, 115, 0, 0.15)', color: 'var(--color-primary)', border: '1px solid rgba(255, 115, 0, 0.3)', padding: '2px 8px', borderRadius: '10px', fontSize: '0.72rem', fontWeight: 600 }}>
+                          <span className="forum-post-tag category-tag" style={{ background: 'rgba(255, 115, 0, 0.15)', color: 'var(--color-primary)', border: '1px solid rgba(255, 115, 0, 0.3)', padding: '2px 8px', borderRadius: '10px', fontSize: '0.72rem', fontWeight: 600 }}>
                             {post.category}
                           </span>
                         )}
                         {post.subcategory && (
-                          <span style={{ background: themeColors.bgSubtle3, color: themeColors.textMuted90, border: `1px solid ${themeColors.borderSubtle2}`, padding: '2px 8px', borderRadius: '10px', fontSize: '0.72rem', fontWeight: 500 }}>
+                          <span className="forum-post-tag subcategory-tag" style={{ background: themeColors.bgSubtle3, color: themeColors.textMuted90, border: `1px solid ${themeColors.borderSubtle2}`, padding: '2px 8px', borderRadius: '10px', fontSize: '0.72rem', fontWeight: 500 }}>
                             {post.subcategory}
                           </span>
                         )}
@@ -293,7 +294,7 @@ export default function ComunidadPage() {
                 </div>
 
                 {/* Right Side: Stats */}
-                <div style={{ display: 'flex', gap: '20px', textAlign: 'center', minWidth: '130px' }}>
+                <div className="forum-post-stats" style={{ display: 'flex', gap: '20px', textAlign: 'center', minWidth: '130px' }}>
                   <div>
                     <span style={{ display: 'block', fontSize: '1.15rem', fontWeight: 'bold', color: themeColors.textWhite }}>{post.repliesCount ?? post.replies?.length ?? 0}</span>
                     <span style={{ fontSize: '0.72rem', color: 'var(--color-text-muted)' }}>Respuestas</span>

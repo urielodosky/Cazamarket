@@ -1,0 +1,50 @@
+/* Comunidad Responsive Styles */
+
+@media (max-width: 768px) {
+  .forum-post-card {
+    flex-direction: column !important;
+    align-items: flex-start !important;
+    padding: 16px !important;
+    gap: 16px !important;
+  }
+
+  /* Left side container (Meta + Title) */
+  .forum-post-card > div:first-child {
+    padding-right: 0 !important;
+    width: 100%;
+  }
+
+  .forum-post-meta {
+    gap: 6px !important;
+    margin-bottom: 12px !important;
+  }
+
+  /* Tags container */
+  .forum-post-tags {
+    margin-left: 0 !important;
+    display: flex !important;
+    flex-wrap: wrap !important;
+    gap: 6px !important;
+    margin-top: 4px;
+    width: 100%;
+  }
+
+  /* Individual Tag Pill */
+  .forum-post-tag {
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    max-width: 100%;
+    display: inline-block;
+  }
+
+  /* Right side container (Stats) */
+  .forum-post-stats {
+    width: 100% !important;
+    justify-content: flex-start !important;
+    border-top: 1px solid rgba(255, 255, 255, 0.08);
+    padding-top: 12px !important;
+    min-width: 0 !important;
+    gap: 32px !important; /* more space between Respuestas and Visitas */
+  }
+}
