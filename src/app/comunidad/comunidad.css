@@ -1,4 +1,7 @@
 /* Comunidad Responsive Styles */
+.tema-page-container {
+  padding: 120px var(--spacing-4) var(--spacing-8) var(--spacing-4);
+}
 
 @media (max-width: 768px) {
   .forum-post-card {
@@ -49,6 +52,10 @@
   }
 
   /* Tema Detail Page Mobile Styles */
+  .tema-page-container {
+    padding: 80px 12px 40px 12px;
+  }
+
   .tema-post-card {
     padding: 20px 16px !important;
   }

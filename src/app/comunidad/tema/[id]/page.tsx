@@ -342,7 +342,7 @@ export default function TemaPage({ params }: { params: Promise<{ id: string }> }
   });
 
   return (
-    <div className="container-page" style={{ maxWidth: '920px', margin: '0 auto', minHeight: '80vh' }}>
+    <div className="tema-page-container" style={{ maxWidth: '920px', margin: '0 auto', minHeight: '80vh' }}>
       
       {/* Modal de Confirmación Estilizado dentro de la Página */}
       {confirmModal && (
