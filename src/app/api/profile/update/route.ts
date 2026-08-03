@@ -25,13 +25,13 @@ export async function POST(request: Request) {
       .eq('id', user.id);
 
     if (error) {
-      console.error("Error actualizando perfil en Supabase Admin:", error);
+      console.error("Error actualizando perfil en Supabase Admin:", error.message || 'Unknown error');
       return NextResponse.json({ error: error.message }, { status: 500 });
     }
 
     return NextResponse.json({ success: true });
   } catch (err: any) {
-    console.error("Excepción en API de update profile:", err);
+    console.error("Excepción en API de update profile:", err?.message || 'Unknown error');
     return NextResponse.json({ error: err.message }, { status: 500 });
   }
 }

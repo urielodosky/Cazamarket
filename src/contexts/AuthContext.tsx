@@ -250,7 +250,7 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
       if (data.role !== undefined) updates.role = data.role;
       const { error } = await supabase.from('profiles').update(updates).eq('id', supabaseUser.id);
       if (error) {
-        console.error("Error updating profile in Supabase:", error);
+        console.error("Error updating profile in Supabase:", error.message || 'Unknown error');
         alert("Error al guardar en base de datos: " + (error.message || JSON.stringify(error)));
       }
       
@@ -311,7 +311,7 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
     if (supabaseUser) {
       const { error } = await supabase.from('profiles').update({ role: 'negocio' }).eq('id', supabaseUser.id);
       if (error) {
-        console.error("Error upgrading to vendor in Supabase:", error);
+        console.error("Error upgrading to vendor in Supabase:", error.message || 'Unknown error');
         alert("Error al intentar actualizar el rol: " + (error.message || JSON.stringify(error)));
       }
       setIsVendor(true);

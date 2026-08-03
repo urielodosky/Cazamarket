@@ -112,7 +112,7 @@ export async function POST(request: Request) {
     return NextResponse.json({ success: true, data });
 
   } catch (error: any) {
-    console.error('Error en /api/auth/register:', error);
+    console.error('Error en /api/auth/register:', error?.message || 'Unknown error');
     return NextResponse.json(
       { error: 'Ocurrió un error inesperado al procesar el registro.' },
       { status: 500 }
