@@ -1,3 +1,8 @@
+/* Business Profile Styles */
+.business-info-grid {
+  grid-template-columns: 1fr 1fr;
+}
+
 /* Business Profile Mobile Styles */
 @media (max-width: 768px) {
   .business-tabs {
@@ -61,5 +66,10 @@
   
   .business-tags-row {
     justify-content: center !important;
+  }
+  
+  .business-info-grid {
+    grid-template-columns: 1fr !important;
+    gap: 24px !important;
   }
 }
