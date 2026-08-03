@@ -375,7 +375,7 @@ export default function RegistroPage() {
             </div>
             {isLoginView && (
               <div style={{ textAlign: 'right', marginTop: '8px' }}>
-                <a href="#" className="auth-link" style={{ fontSize: '0.85rem' }}>¿Olvidaste tu contraseña?</a>
+                <button type="button" onClick={() => alert('Función en construcción')} className="auth-link" style={{ fontSize: '0.85rem', background: 'transparent', border: 'none', padding: 0, cursor: 'pointer' }}>¿Olvidaste tu contraseña?</button>
               </div>
             )}
           </div>
