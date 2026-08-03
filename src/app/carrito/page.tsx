@@ -58,13 +58,14 @@ export default function CarritoPage() {
   };
 
   // Group items by storeId
-  const itemsByStore = cart.reduce((acc, item) => {
-    if (!acc[item.storeId]) {
-      acc[item.storeId] = [];
+  const itemsByStore = cart.reduce<{ [key: string]: CartItem[] }>((acc, item) => {
+    const key = String(item.storeId);
+    if (!acc[key]) {
+      acc[key] = [];
     }
-    acc[item.storeId].push(item);
+    acc[key].push(item);
     return acc;
-  }, {} as Record<number, CartItem[]>);
+  }, {});
 
   const getStorePhone = (storeId: number) => {
     const store = NEGOCIOS_DATA.find(n => n.id === storeId);

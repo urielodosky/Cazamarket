@@ -154,7 +154,7 @@ export default function Navbar() {
   else if (pathname?.includes('/planes')) searchPlaceholder = "Buscar planes...";
   else if (pathname?.includes('/comunidad')) searchPlaceholder = "Buscar en comunidad...";
 
-  let navbarModeClass = isBusinessProfile ? 'business-mode' : 'expanded-mode';
+  let navbarModeClass = isBusinessProfile ? 'business-mode' : isHome ? 'business-mode' : 'expanded-mode';
 
   return (
     <header className="navbar-header" suppressHydrationWarning>
@@ -194,13 +194,8 @@ export default function Navbar() {
           <div className={`navbar-center glass-panel ${navbarModeClass}`}>
             <div className="search-bar-animated" style={{ 
               zIndex: 10, 
-              display: isFilterablePage ? 'flex' : 'none',
-              background: 'rgba(0, 0, 0, 0.15)',
-              borderRadius: '100px',
-              padding: '6px 8px',
-              alignItems: 'center',
-              width: '100%',
-              border: '1px solid rgba(255,255,255,0.05)'
+              display: (isFilterablePage && !isHome) ? 'flex' : 'none',
+              background: '#1A1D17'
             }}>
                 <button 
                   className="search-icon-btn" 
@@ -253,13 +248,15 @@ export default function Navbar() {
                     display: 'flex', 
                     alignItems: 'center', 
                     gap: '8px', 
-                    padding: '8px 18px',
+                    padding: '6px 16px',
+                    marginLeft: 'auto',
                     background: isFiltersOpen ? 'var(--color-primary)' : 'rgba(255,255,255,0.08)',
                     border: isFiltersOpen ? '1px solid var(--color-primary)' : '1px solid rgba(255,255,255,0.1)',
                     color: isFiltersOpen ? 'white' : themeColors.textWhite,
                     cursor: 'pointer',
                     pointerEvents: 'auto',
-                    transition: 'all 0.4s cubic-bezier(0.4, 0, 0.2, 1)'
+                    transition: 'all 0.4s cubic-bezier(0.4, 0, 0.2, 1)',
+                    flexShrink: 0
                   }}
                   onMouseEnter={(e) => {
                     if (isFiltersOpen) return;
@@ -299,6 +296,7 @@ export default function Navbar() {
                 </button>}
               </div>
             {!isHome && <div className="divider-vertical-animated" style={{ display: 'none' }}></div>}
+  
   
             <div className={`links-wrapper ${isMobileMenuOpen ? 'mobile-open' : ''}`}>
               <NavLinks />
