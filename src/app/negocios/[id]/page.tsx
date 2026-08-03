@@ -921,20 +921,20 @@ export default function NegocioDetailPage({ params }: { params: Promise<{ id: st
                                       </div>
                                       <div className="card-content-fluid" style={{ display: 'flex', flexDirection: 'column', flex: 1, padding: '16px', borderBottomLeftRadius: 'var(--radius-lg)', borderBottomRightRadius: 'var(--radius-lg)' }}>
                                         {/* Nombre del producto */}
-                                        <div style={{ marginBottom: '2px' }}>
-                                          <h3 style={{ fontSize: '1rem', color: 'var(--color-text-main)', margin: '0' }}>{name}</h3>
+                                        <div className="product-card-title-container" style={{ marginBottom: '2px' }}>
+                                          <h3 className="product-card-title" style={{ fontSize: '1rem', color: 'var(--color-text-main)', margin: '0' }}>{name}</h3>
                                         </div>
                                         
                                         {/* Descripcion (max 3 lineas) */}
                                         {isObj && p.description && (
-                                          <p style={{ color: 'var(--color-text-muted)', fontSize: '0.8rem', lineHeight: 1.3, margin: '4px 0 8px 0', display: '-webkit-box', WebkitLineClamp: 3, WebkitBoxOrient: 'vertical', overflow: 'hidden' }}>
+                                          <p className="product-card-desc" style={{ color: 'var(--color-text-muted)', fontSize: '0.8rem', lineHeight: 1.3, margin: '4px 0 8px 0', display: '-webkit-box', WebkitLineClamp: 3, WebkitBoxOrient: 'vertical', overflow: 'hidden' }}>
                                             {p.description}
                                           </p>
                                         )}
 
                                         {/* Categoria + Subcategoria */}
-                                        <div style={{ display: 'flex', gap: '4px', flexWrap: 'wrap', marginTop: 'auto', marginBottom: '8px' }}>
-                                          <span style={{ background: 'rgba(255,255,255,0.05)', color: 'var(--color-text-muted)', fontSize: '0.65rem', padding: '2px 6px', borderRadius: 'var(--radius-full)' }}>
+                                        <div className="product-card-tags" style={{ display: 'flex', gap: '4px', flexWrap: 'wrap', marginTop: 'auto', marginBottom: '8px' }}>
+                                          <span className="product-card-tag" style={{ background: 'rgba(255,255,255,0.05)', color: 'var(--color-text-muted)', fontSize: '0.65rem', padding: '2px 6px', borderRadius: 'var(--radius-full)' }}>
                                             {category}
                                           </span>
                                           {isObj && p.subcategory && (
@@ -946,10 +946,10 @@ export default function NegocioDetailPage({ params }: { params: Promise<{ id: st
                                           )}
                                         </div>
                                         
-                                        <div style={{ marginTop: '8px' }}>
+                                        <div className="product-card-footer" style={{ marginTop: '8px' }}>
                                           {/* Price + Stock */}
-                                          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'baseline', marginBottom: '6px' }}>
-                                            <div style={{ display: 'flex', alignItems: 'baseline', gap: '4px' }}>
+                                          <div className="product-card-price-row" style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'baseline', marginBottom: '6px' }}>
+                                            <div className="product-card-price" style={{ display: 'flex', alignItems: 'baseline', gap: '4px' }}>
                                               {typeof priceStr === 'string' && priceStr.includes(' ') && !priceStr.startsWith('$') ? (
                                                 <>
                                                   <span style={{ fontSize: '1.1rem', fontWeight: 'bold', color: '#a8b87c' }}>{priceStr.split(' ').slice(1).join(' ')}</span>
@@ -960,13 +960,13 @@ export default function NegocioDetailPage({ params }: { params: Promise<{ id: st
                                               )}
                                             </div>
                                             {(((isObj && (p.stock_mode === 'definido' || p.stockMode === 'definido')) && p.stock !== null && p.stock !== undefined) || id === 2) && (
-                                              <span style={{ fontSize: '0.7rem', color: 'var(--color-text-muted)' }}>Stock: {p.stock !== null && p.stock !== undefined ? p.stock : 5}</span>
+                                              <span className="product-card-stock" style={{ fontSize: '0.7rem', color: 'var(--color-text-muted)' }}>Stock: {p.stock !== null && p.stock !== undefined ? p.stock : 5}</span>
                                             )}
                                           </div>
                                           
                                           {/* Shipping / Retiro */}
-                                          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-                                            <div style={{ fontSize: '0.7rem', color: 'color-mix(in srgb, var(--color-text-main) 60%, transparent)', display: 'flex', alignItems: 'center', gap: '4px' }}>
+                                          <div className="product-card-shipping-row" style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                                            <div className="product-card-shipping-text" style={{ fontSize: '0.7rem', color: 'color-mix(in srgb, var(--color-text-main) 60%, transparent)', display: 'flex', alignItems: 'center', gap: '4px' }}>
                                               {(() => {
                                                 if (!isObj) return <span>A acordar</span>;
                                                 const hasShipping = p.shipping_mode === 'gratis' || p.shipping_mode === 'costo_extra' || typeof p.seller?.shippingCost === 'number' || typeof p.shippingCost === 'number';
@@ -1186,20 +1186,20 @@ export default function NegocioDetailPage({ params }: { params: Promise<{ id: st
                                 </div>
                                 <div className="card-content-fluid" style={{ display: 'flex', flexDirection: 'column', flex: 1, padding: '16px', borderBottomLeftRadius: 'var(--radius-lg)', borderBottomRightRadius: 'var(--radius-lg)' }}>
                                   {/* Nombre del servicio */}
-                                  <div style={{ marginBottom: '2px' }}>
-                                    <h3 style={{ fontSize: '1rem', color: 'var(--color-text-main)', margin: '0' }}>{servName}</h3>
+                                  <div className="product-card-title-container" style={{ marginBottom: '2px' }}>
+                                    <h3 className="product-card-title" style={{ fontSize: '1rem', color: 'var(--color-text-main)', margin: '0' }}>{servName}</h3>
                                   </div>
                                   
                                   {/* Descripcion (max 3 lineas) */}
                                   {isRealObject && servicio.description && (
-                                    <p style={{ color: 'var(--color-text-muted)', fontSize: '0.8rem', lineHeight: 1.3, margin: '4px 0 8px 0', display: '-webkit-box', WebkitLineClamp: 3, WebkitBoxOrient: 'vertical', overflow: 'hidden' }}>
+                                    <p className="product-card-desc" style={{ color: 'var(--color-text-muted)', fontSize: '0.8rem', lineHeight: 1.3, margin: '4px 0 8px 0', display: '-webkit-box', WebkitLineClamp: 3, WebkitBoxOrient: 'vertical', overflow: 'hidden' }}>
                                       {servicio.description}
                                     </p>
                                   )}
 
                                   {/* Categoria + Subcategoria */}
-                                  <div style={{ display: 'flex', gap: '4px', flexWrap: 'wrap', marginTop: 'auto', marginBottom: '8px' }}>
-                                    <span style={{ background: 'rgba(255,255,255,0.05)', color: 'var(--color-text-muted)', fontSize: '0.65rem', padding: '2px 6px', borderRadius: 'var(--radius-full)' }}>
+                                  <div className="product-card-tags" style={{ display: 'flex', gap: '4px', flexWrap: 'wrap', marginTop: 'auto', marginBottom: '8px' }}>
+                                    <span className="product-card-tag" style={{ background: 'rgba(255,255,255,0.05)', color: 'var(--color-text-muted)', fontSize: '0.65rem', padding: '2px 6px', borderRadius: 'var(--radius-full)' }}>
                                       {category}
                                     </span>
                                     {isRealObject && servicio.subcategory && (
@@ -1211,10 +1211,10 @@ export default function NegocioDetailPage({ params }: { params: Promise<{ id: st
                                     )}
                                   </div>
                                   
-                                  <div style={{ marginTop: '8px' }}>
+                                  <div className="product-card-footer" style={{ marginTop: '8px' }}>
                                     {/* Price */}
-                                    <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'baseline', marginBottom: '6px' }}>
-                                      <div style={{ display: 'flex', alignItems: 'baseline', gap: '4px' }}>
+                                    <div className="product-card-price-row" style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'baseline', marginBottom: '6px' }}>
+                                      <div className="product-card-price" style={{ display: 'flex', alignItems: 'baseline', gap: '4px' }}>
                                         {typeof servPrice === 'string' && servPrice.includes(' ') && !servPrice.startsWith('$') ? (
                                           <>
                                             <span style={{ fontSize: '1.1rem', fontWeight: 'bold', color: '#a8b87c' }}>{servPrice.split(' ').slice(1).join(' ')}</span>
@@ -1226,7 +1226,7 @@ export default function NegocioDetailPage({ params }: { params: Promise<{ id: st
                                       </div>
                                       
                                       {/* Ver Button */}
-                                      <div style={{ display: 'flex', justifyContent: 'flex-end', marginTop: '4px' }}>
+                                      <div className="product-card-shipping-row" style={{ display: 'flex', justifyContent: 'flex-end', marginTop: '4px' }}>
                                         <button 
                                           onClick={(e) => { e.stopPropagation(); router.push(`/servicios/${servId}`); }}
                                           style={{ 

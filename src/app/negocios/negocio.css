@@ -72,4 +72,64 @@
     grid-template-columns: 1fr !important;
     gap: 24px !important;
   }
+
+  /* Product Card Responsive Overrides */
+  .business-product-grid .card-content-fluid {
+    padding: 12px 10px !important;
+  }
+
+  .business-product-grid .product-card-title {
+    font-size: 0.85rem !important;
+    line-height: 1.2 !important;
+    display: -webkit-box;
+    -webkit-line-clamp: 2;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+  }
+
+  .business-product-grid .product-card-desc {
+    font-size: 0.7rem !important;
+    -webkit-line-clamp: 2 !important;
+    margin: 4px 0 !important;
+  }
+
+  .business-product-grid .product-card-tag {
+    font-size: 0.6rem !important;
+    padding: 2px 4px !important;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    max-width: 90px;
+  }
+
+  .business-product-grid .product-card-price-row {
+    flex-direction: column !important;
+    align-items: flex-start !important;
+    gap: 4px !important;
+    margin-bottom: 8px !important;
+  }
+
+  .business-product-grid .product-card-price span {
+    font-size: 0.95rem !important;
+  }
+
+  .business-product-grid .product-card-stock {
+    font-size: 0.65rem !important;
+  }
+
+  .business-product-grid .product-card-shipping-row {
+    flex-direction: column !important;
+    align-items: flex-start !important;
+    gap: 8px !important;
+  }
+
+  .business-product-grid .product-card-shipping-text {
+    font-size: 0.65rem !important;
+  }
+
+  .business-product-grid .product-card-shipping-row button {
+    width: 100% !important;
+    text-align: center !important;
+    padding: 6px 12px !important;
+  }
 }
