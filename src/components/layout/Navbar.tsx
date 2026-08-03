@@ -156,6 +156,138 @@ export default function Navbar() {
 
   let navbarModeClass = (!isFilterablePage || isHome || isBusinessProfile) ? 'business-mode' : 'expanded-mode';
 
+  const renderFiltersContent = () => (
+    <>
+      {/* Categoría */}
+      <div className="filter-wrapper-item" style={{ flex: '1 1 calc(33.333% - 8px)', minWidth: '130px', zIndex: 120 }}>
+        <CustomSelect 
+          options={(() => {
+            const isProd = pathname.startsWith('/productos');
+            const isServ = pathname.startsWith('/servicios');
+            const source = isProd ? PRODUCT_MAIN_CATEGORIES : (isServ ? SERVICE_MAIN_CATEGORIES : CATEGORIES_DATA);
+            
+            const selectedMainCat = source.find(m => 
+              m.name.toLowerCase() === categoria.toLowerCase() || 
+              m.subcategories.some(s => s.toLowerCase() === categoria.toLowerCase())
+            );
+
+            const opts: SelectOption[] = [
+              { value: '', label: 'Categoría (Todas)' }
+            ];
+
+            source.forEach(mainCat => {
+              opts.push({ value: mainCat.name, label: mainCat.name });
+              
+              if (selectedMainCat && selectedMainCat.id === mainCat.id) {
+                mainCat.subcategories.forEach(sub => {
+                  opts.push({ value: sub, label: `• ${sub}` });
+                });
+              }
+            });
+
+            return opts;
+          })()} 
+          value={categoria} 
+          onChange={setCategoria} 
+          placeholder="Categoría" 
+          searchable
+        />
+      </div>
+      
+      {/* Filtros adicionales (solo para secciones fuera de comunidad) */}
+      {!pathname.startsWith('/comunidad') && (
+        <>
+          <div className="filter-wrapper-item" style={{ flex: '1 1 calc(33.333% - 8px)', minWidth: '130px', zIndex: 120 }}>
+            <CustomSelect 
+              options={
+                pathname.startsWith('/productos')
+                  ? [
+                      { value: '', label: 'Envío (Todos)' },
+                      { value: 'envio', label: 'Envío' },
+                      { value: 'envio_gratis', label: 'Envío Gratis' },
+                      { value: 'retiro', label: 'Retiro en sucursal' },
+                    ]
+                  : pathname.startsWith('/servicios')
+                  ? [
+                      { value: 'equipamiento', label: 'Equipamiento' },
+                      { value: 'transporte', label: 'Transporte' },
+                      { value: 'comida', label: 'Comida/Bebida' },
+                      { value: 'seguro', label: 'Seguro' },
+                    ]
+                  : [
+                      { value: '', label: 'Ofrece (Ambos)' },
+                      { value: 'productos', label: 'Productos' },
+                      { value: 'servicios', label: 'Servicios' },
+                    ]
+              } 
+              value={ofrece} 
+              onChange={setOfrece} 
+              placeholder={pathname.startsWith('/productos') ? "Envío" : (pathname.startsWith('/servicios') ? "Extras" : "Ofrece")} 
+              multiple={pathname.startsWith('/servicios')} 
+            />
+          </div>
+
+          <div className="filter-wrapper-item" style={{ flex: '1 1 calc(33.333% - 8px)', minWidth: '130px', zIndex: 110 }}>
+            <CustomSelect 
+              options={
+                pathname.startsWith('/productos')
+                  ? [
+                      { value: '', label: 'Condición (Todas)' },
+                      { value: 'nuevo', label: 'Nuevo' },
+                      { value: 'usado', label: 'Usado' },
+                    ]
+                  : pathname.startsWith('/servicios')
+                  ? [
+                      { value: '', label: 'Duración (Todas)' },
+                      { value: '1-4', label: '1-4 horas' },
+                      { value: '5-8', label: '5-8 hs' },
+                      { value: '9-12', label: '9-12 hs' },
+                      { value: '+12', label: '+12 horas' },
+                    ]
+                  : [
+                      { value: '', label: 'Tipo (Todos)' },
+                      { value: 'mayorista', label: 'Mayorista' },
+                      { value: 'minorista', label: 'Minorista' },
+                      { value: 'mixto', label: 'Mixto' },
+                    ]
+              } 
+              value={tipo} 
+              onChange={setTipo} 
+              placeholder={pathname.startsWith('/productos') ? "Condición" : (pathname.startsWith('/servicios') ? "Duración" : "Tipo")} 
+            />
+          </div>
+        </>
+      )}
+
+      {/* Provincia (API) */}
+      {!pathname.startsWith('/comunidad') && (
+        <div className="filter-wrapper-item" style={{ flex: '1 1 calc(50% - 6px)', minWidth: '130px', zIndex: 100 }}>
+          <CustomSelect 
+            options={provincias.length > 0 ? provincias : [{ value: '', label: 'Cargando...' }]} 
+            value={provincia} 
+            onChange={setProvincia} 
+            placeholder="Provincia" 
+            searchable={true}
+          />
+        </div>
+      )}
+      
+      {/* Localidad (API) */}
+      {!pathname.startsWith('/comunidad') && (
+        <div className="filter-wrapper-item" style={{ flex: '1 1 calc(50% - 6px)', minWidth: '130px', zIndex: 100 }}>
+          <CustomSelect 
+            options={provincia ? (localidades.length > 0 ? localidades : [{ value: '', label: 'Cargando...' }]) : []} 
+            value={localidad} 
+            onChange={setLocalidad} 
+            placeholder="Localidades" 
+            searchable={true}
+            disabled={!provincia}
+          />
+        </div>
+      )}
+    </>
+  );
+
   return (
     <header className="navbar-header" suppressHydrationWarning>
       <div className={`navbar-container ${isHome ? 'is-home-mobile' : ''}`}>
@@ -332,137 +464,7 @@ export default function Navbar() {
             opacity: isFiltersOpen ? 1 : 0, 
             transition: 'opacity 0.3s ease 0.2s' 
           }}>
-            
-            {/* Categoría */}
-            <div style={{ flex: '1 1 calc(33.333% - 8px)', minWidth: '130px', zIndex: 120 }}>
-              <CustomSelect 
-                options={(() => {
-                  const isProd = pathname.startsWith('/productos');
-                  const isServ = pathname.startsWith('/servicios');
-                  const source = isProd ? PRODUCT_MAIN_CATEGORIES : (isServ ? SERVICE_MAIN_CATEGORIES : CATEGORIES_DATA);
-                  
-                  const selectedMainCat = source.find(m => 
-                    m.name.toLowerCase() === categoria.toLowerCase() || 
-                    m.subcategories.some(s => s.toLowerCase() === categoria.toLowerCase())
-                  );
-
-                  const opts: SelectOption[] = [
-                    { value: '', label: 'Categoría (Todas)' }
-                  ];
-
-                  source.forEach(mainCat => {
-                    opts.push({ value: mainCat.name, label: mainCat.name });
-                    
-                    if (selectedMainCat && selectedMainCat.id === mainCat.id) {
-                      mainCat.subcategories.forEach(sub => {
-                        opts.push({ value: sub, label: `• ${sub}` });
-                      });
-                    }
-                  });
-
-                  return opts;
-                })()} 
-                value={categoria} 
-                onChange={setCategoria} 
-                placeholder="Categoría" 
-                searchable
-              />
-            </div>
-            
-            {/* Filtros adicionales (solo para secciones fuera de comunidad) */}
-            {!pathname.startsWith('/comunidad') && (
-              <>
-                <div style={{ flex: '1 1 calc(33.333% - 8px)', minWidth: '130px', zIndex: 120 }}>
-                  <CustomSelect 
-                    options={
-                      pathname.startsWith('/productos')
-                        ? [
-                            { value: '', label: 'Envío (Todos)' },
-                            { value: 'envio', label: 'Envío' },
-                            { value: 'envio_gratis', label: 'Envío Gratis' },
-                            { value: 'retiro', label: 'Retiro en sucursal' },
-                          ]
-                        : pathname.startsWith('/servicios')
-                        ? [
-                            { value: 'equipamiento', label: 'Equipamiento' },
-                            { value: 'transporte', label: 'Transporte' },
-                            { value: 'comida', label: 'Comida/Bebida' },
-                            { value: 'seguro', label: 'Seguro' },
-                          ]
-                        : [
-                            { value: '', label: 'Ofrece (Ambos)' },
-                            { value: 'productos', label: 'Productos' },
-                            { value: 'servicios', label: 'Servicios' },
-                          ]
-                    } 
-                    value={ofrece} 
-                    onChange={setOfrece} 
-                    placeholder={pathname.startsWith('/productos') ? "Envío" : (pathname.startsWith('/servicios') ? "Extras" : "Ofrece")} 
-                    multiple={pathname.startsWith('/servicios')} 
-                  />
-                </div>
-
-                <div style={{ flex: '1 1 calc(33.333% - 8px)', minWidth: '130px', zIndex: 110 }}>
-                  <CustomSelect 
-                    options={
-                      pathname.startsWith('/productos')
-                        ? [
-                            { value: '', label: 'Condición (Todas)' },
-                            { value: 'nuevo', label: 'Nuevo' },
-                            { value: 'usado', label: 'Usado' },
-                          ]
-                        : pathname.startsWith('/servicios')
-                        ? [
-                            { value: '', label: 'Duración (Todas)' },
-                            { value: '1-4', label: '1-4 horas' },
-                            { value: '5-8', label: '5-8 hs' },
-                            { value: '9-12', label: '9-12 hs' },
-                            { value: '+12', label: '+12 horas' },
-                          ]
-                        : [
-                            { value: '', label: 'Tipo (Todos)' },
-                            { value: 'mayorista', label: 'Mayorista' },
-                            { value: 'minorista', label: 'Minorista' },
-                            { value: 'mixto', label: 'Mixto' },
-                          ]
-                    } 
-                    value={tipo} 
-                    onChange={setTipo} 
-                    placeholder={pathname.startsWith('/productos') ? "Condición" : (pathname.startsWith('/servicios') ? "Duración" : "Tipo")} 
-                  />
-                </div>
-              </>
-            )}
-
-
-            
-            {/* Provincia (API) */}
-            {!pathname.startsWith('/comunidad') && (
-              <div style={{ flex: '1 1 calc(50% - 6px)', minWidth: '130px', zIndex: 100 }}>
-                <CustomSelect 
-                  options={provincias.length > 0 ? provincias : [{ value: '', label: 'Cargando...' }]} 
-                  value={provincia} 
-                  onChange={setProvincia} 
-                  placeholder="Provincia" 
-                  searchable={true}
-                />
-              </div>
-            )}
-            
-            {/* Localidad (API) */}
-            {!pathname.startsWith('/comunidad') && (
-              <div style={{ flex: '1 1 calc(50% - 6px)', minWidth: '130px', zIndex: 100 }}>
-                <CustomSelect 
-                  options={provincia ? (localidades.length > 0 ? localidades : [{ value: '', label: 'Cargando...' }]) : []} 
-                  value={localidad} 
-                  onChange={setLocalidad} 
-                  placeholder="Localidades" 
-                  searchable={true}
-                  disabled={!provincia}
-                />
-              </div>
-            )}
-
+            {renderFiltersContent()}
           </div>
         </div>
         )}
@@ -480,6 +482,13 @@ export default function Navbar() {
           )}
         </div>
       </div>
+
+      {/* Mobile Filters Scroll View (debajo del navbar) */}
+      {isFilterablePage && (
+        <div className="mobile-filters-panel">
+          {renderFiltersContent()}
+        </div>
+      )}
     </header>
   );
 }

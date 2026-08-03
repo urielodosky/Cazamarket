@@ -320,7 +320,8 @@
 
 /* Desktop: hide mobile elements */
 @media (min-width: 769px) {
-  .mobile-menu-btn {
+  .mobile-menu-btn,
+  .mobile-filters-panel {
     display: none !important;
   }
 }
@@ -436,10 +437,32 @@
     margin-left: 6px;
   }
 
-  /* Hide filter button and panel completely on mobile */
+  /* Hide desktop filter button and panel on mobile */
   .filter-btn-premium,
   .filters-panel {
     display: none !important;
+  }
+
+  /* Mobile Filters Panel Styles */
+  .mobile-filters-panel {
+    display: flex !important;
+    gap: 8px;
+    width: 100vw;
+    margin-left: -16px; /* Compensar padding de navbar-container */
+    padding: 10px 16px;
+    background: var(--color-bg-base, #0f0f11);
+    border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+    overflow-x: auto;
+    scrollbar-width: none; /* Firefox */
+  }
+
+  .mobile-filters-panel::-webkit-scrollbar {
+    display: none; /* Chrome/Safari */
+  }
+
+  .mobile-filters-panel .filter-wrapper-item {
+    flex: 0 0 auto !important; /* No shrink, no grow */
+    min-width: 130px !important;
   }
 
   .divider-vertical-animated {
