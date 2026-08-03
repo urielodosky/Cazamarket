@@ -7,6 +7,7 @@ import { useAuth } from '@/contexts/AuthContext';
 import { useCart, CartItem } from '@/contexts/CartContext';
 import { NEGOCIOS_DATA } from '@/data/mock';
 import { createClient } from '@/lib/supabase/client';
+import './carrito.css';
 
 export default function CarritoPage() {
   const router = useRouter();
@@ -135,7 +136,7 @@ export default function CarritoPage() {
             const storeTotal = items.reduce((acc, item) => acc + calculateItemTotal(item).finalTotal, 0);
             
             return (
-              <div key={storeId} className="glass-panel" style={{ padding: '24px', borderRadius: 'var(--radius-lg)', display: 'grid', gridTemplateColumns: '1fr 350px', gap: '32px' }}>
+              <div key={storeId} className="glass-panel carrito-grid" style={{ padding: '24px', borderRadius: 'var(--radius-lg)', display: 'grid', gridTemplateColumns: '1fr 350px', gap: '32px' }}>
                 
                 {/* Lado izquierdo: Productos de esta tienda */}
                 <div>
@@ -159,7 +160,7 @@ export default function CarritoPage() {
                             )}
                           </div>
                           
-                          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-end' }}>
+                          <div className="carrito-price-row" style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-end' }}>
                             <div style={{ display: 'flex', alignItems: 'center', background: 'rgba(0,0,0,0.2)', border: '1px solid var(--color-border)', borderRadius: 'var(--radius-full)', overflow: 'hidden' }}>
                               <button onClick={() => updateQuantity(item.id, -1)} style={{ background: 'transparent', border: 'none', color: 'var(--color-text-main)', padding: '4px 10px', cursor: 'pointer', fontSize: '1.1rem' }}>-</button>
                               <span style={{ padding: '0 8px', fontWeight: 600, color: 'var(--color-text-main)', minWidth: '30px', textAlign: 'center', fontSize: '0.9rem' }}>{item.quantity}</span>
@@ -194,7 +195,7 @@ export default function CarritoPage() {
                 </div>
 
                 {/* Lado derecho: Resumen y Botón WhatsApp */}
-                <div style={{ borderLeft: '1px solid var(--color-border)', paddingLeft: '32px', display: 'flex', flexDirection: 'column' }}>
+                <div className="carrito-summary" style={{ borderLeft: '1px solid var(--color-border)', paddingLeft: '32px', display: 'flex', flexDirection: 'column' }}>
                   <h3 style={{ margin: '0 0 16px 0', fontSize: '1.1rem', color: 'var(--color-text-muted)' }}>Resumen del pedido</h3>
                   
                   <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '12px', color: 'var(--color-text-main)' }}>

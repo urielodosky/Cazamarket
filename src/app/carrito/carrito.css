@@ -1,0 +1,23 @@
+/* Carrito Responsive Styles */
+
+@media (max-width: 768px) {
+  .carrito-grid {
+    grid-template-columns: 1fr !important;
+    gap: 16px !important;
+  }
+
+  .carrito-summary {
+    border-left: none !important;
+    padding-left: 0 !important;
+    border-top: 1px solid var(--color-border);
+    padding-top: 24px !important;
+    margin-top: 16px !important;
+  }
+
+  /* Make the quantity and price stack vertically to avoid overflow */
+  .carrito-price-row {
+    flex-direction: column !important;
+    align-items: flex-start !important;
+    gap: 12px !important;
+  }
+}
