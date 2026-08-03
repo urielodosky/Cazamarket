@@ -4,6 +4,8 @@ import React, { useState, use, useEffect } from 'react';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import LoadingScreen from '@/components/ui/LoadingScreen';
+import { HeartIcon } from '@heroicons/react/24/solid';
+import { sanitizeInput } from '@/lib/sanitize';
 import { useCart } from '@/contexts/CartContext';
 import { useFavorites } from '@/contexts/FavoritesContext';
 import { useAuth } from '@/contexts/AuthContext';
@@ -781,9 +783,10 @@ export default function ProductoDetailPage({ params }: { params: Promise<{ id: s
         <div style={{ maxWidth: '800px', margin: '0 auto' }}>
           <div style={{ marginBottom: '40px' }}>
             <h3 style={{ fontSize: '1.4rem', marginBottom: '20px', borderBottom: '1px solid var(--color-border)', paddingBottom: '12px', color: 'var(--color-text-main)' }}>Descripción del Producto</h3>
-            <p style={{ color: 'var(--color-text-muted)', lineHeight: 1.8, fontSize: '1.05rem', wordBreak: 'break-word', overflowWrap: 'anywhere' }}>
-              {product.description}
-            </p>
+            <div 
+              style={{ color: 'var(--color-text-muted)', lineHeight: 1.8, fontSize: '1.05rem', wordBreak: 'break-word', overflowWrap: 'anywhere' }}
+              dangerouslySetInnerHTML={{ __html: sanitizeInput(product.description) }}
+            />
           </div>
 
           {product.features && product.features.length > 0 && (

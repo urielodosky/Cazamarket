@@ -171,6 +171,20 @@ function NuevoProductoContent() {
 
         const isVideo = file.type.startsWith('video/');
         
+        // --- 1. Seguridad: Validación de Tipo ---
+        const validTypes = ['image/jpeg', 'image/png', 'image/webp', 'video/mp4', 'video/quicktime'];
+        if (!validTypes.includes(file.type)) {
+          errorMsg = `El tipo de archivo ${file.type} no es seguro o no está soportado.`;
+          continue;
+        }
+
+        // --- 2. Seguridad: Validación de Tamaño ---
+        const maxSize = isVideo ? 25 * 1024 * 1024 : 5 * 1024 * 1024; // 25MB video, 5MB imagen
+        if (file.size > maxSize) {
+          errorMsg = `El archivo ${file.name} excede el límite de tamaño permitido (${isVideo ? '25MB' : '5MB'}).`;
+          continue;
+        }
+        
         if (isVideo) {
           if (videoCount >= 2) {
             errorMsg = 'Máximo de 2 videos alcanzado.';
