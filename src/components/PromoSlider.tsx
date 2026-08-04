@@ -5,8 +5,24 @@ import Link from "next/link";
 import AdCampaignModal from "./AdCampaignModal";
 import { useAuth } from "@/contexts/AuthContext";
 
-// Anuncios de ejemplo (en producción vendrían de la DB)
-const DEMO_ADS: any[] = [];
+const DEMO_ADS: any[] = [
+  {
+    id: 1,
+    image: 'https://images.unsplash.com/photo-1520208422220-d12a3c588e6c?q=80&w=1200&auto=format&fit=crop',
+    badge: 'BIENVENIDO A CAZAMARKET',
+    title: 'Equípate para tu próxima gran aventura',
+    description: 'Encuentra el mejor equipamiento, armas, óptica y accesorios de las mejores tiendas de caza y pesca del país.',
+    link: '/productos'
+  },
+  {
+    id: 2,
+    image: 'https://images.unsplash.com/photo-1559825481-12a05cc00344?q=80&w=1200&auto=format&fit=crop',
+    badge: 'SERVICIOS EXCLUSIVOS',
+    title: 'Conecta con los mejores guías locales',
+    description: 'Reserva experiencias de caza mayor y pesca deportiva con profesionales verificados en los mejores cotos del territorio.',
+    link: '/servicios'
+  }
+];
 
 export default function PromoSlider() {
   const [isModalOpen, setIsModalOpen] = useState(false);

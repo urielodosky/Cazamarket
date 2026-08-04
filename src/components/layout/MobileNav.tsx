@@ -31,7 +31,6 @@ export default function MobileNav() {
     { href: '/productos', icon: <ShoppingBagIcon className="mobile-nav-icon-svg" />, label: 'Productos' },
     { href: '/servicios', icon: <MapIcon className="mobile-nav-icon-svg" />, label: 'Servicios' },
     { href: '/comunidad', icon: <ChatBubbleLeftEllipsisIcon className="mobile-nav-icon-svg" />, label: 'Comunidad' },
-    { href: '/planes', icon: <StarIcon className="mobile-nav-icon-svg" />, label: 'Planes' },
   ];
 
   return (
