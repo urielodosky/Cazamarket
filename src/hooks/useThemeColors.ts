@@ -23,8 +23,8 @@ export function useThemeColors() {
     borderSubtle3: isLight ? 'rgba(0,0,0,0.15)' : 'rgba(255,255,255,0.15)',
     // Text
     textWhite: isLight ? '#1a1c18' : '#ffffff',
-    textMuted60: isLight ? 'rgba(0,0,0,0.5)' : 'rgba(255,255,255,0.6)',
-    textMuted40: isLight ? 'rgba(0,0,0,0.35)' : 'rgba(255,255,255,0.4)',
+    textMuted60: isLight ? 'rgba(0,0,0,0.5)' : 'rgba(255,255,255,0.7)',
+    textMuted40: isLight ? 'rgba(0,0,0,0.35)' : 'rgba(255,255,255,0.5)',
     textMuted90: isLight ? 'rgba(0,0,0,0.85)' : 'rgba(255,255,255,0.9)',
     // Surfaces
     surfaceElevated: isLight ? '#ffffff' : 'var(--color-bg-surface-elevated)',
