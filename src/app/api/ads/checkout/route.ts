@@ -18,10 +18,12 @@ export async function POST(request: Request) {
     }
 
     // Capacity check: absolute max 105 active ads
+    // Previene Race Conditions contando también las reservas 'pending' vigentes
+    const nowIso = new Date().toISOString();
     const { count, error: countError } = await supabase
       .from('sponsored_ads')
       .select('*', { count: 'exact', head: true })
-      .eq('status', 'active');
+      .or(`status.eq.active,and(status.eq.pending,expires_at.gt.${nowIso})`);
 
     if (countError) throw countError;
 
@@ -47,6 +49,10 @@ export async function POST(request: Request) {
     } else {
       endDate.setDate(endDate.getDate() + 7); // 1 week
     }
+    
+    // Bloqueo temporal (Lock) de 15 minutos para la reserva
+    const expiresAt = new Date();
+    expiresAt.setMinutes(expiresAt.getMinutes() + 15);
 
     const { data: ad, error: insertError } = await supabase
       .from('sponsored_ads')
@@ -56,7 +62,8 @@ export async function POST(request: Request) {
         plan_type: planType,
         start_date: startDate.toISOString(),
         end_date: endDate.toISOString(),
-        status: 'pending_payment', // Will be activated via webhook
+        status: 'pending', 
+        expires_at: expiresAt.toISOString(),
         mp_preference_id: mockPreferenceId
       })
       .select()

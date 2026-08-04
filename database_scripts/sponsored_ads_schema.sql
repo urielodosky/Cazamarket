@@ -10,7 +10,8 @@ CREATE TABLE IF NOT EXISTS public.sponsored_ads (
     plan_type TEXT NOT NULL CHECK (plan_type IN ('weekly', 'monthly')),
     start_date TIMESTAMP WITH TIME ZONE NOT NULL DEFAULT now(),
     end_date TIMESTAMP WITH TIME ZONE NOT NULL,
-    status TEXT NOT NULL DEFAULT 'active' CHECK (status IN ('active', 'expired', 'cancelled', 'pending_payment')),
+    status TEXT NOT NULL DEFAULT 'pending' CHECK (status IN ('pending', 'active', 'expired', 'cancelled')),
+    expires_at TIMESTAMP WITH TIME ZONE, -- Reserva temporal de 15 minutos para evitar Race Conditions
     
     -- Control de visualizaciones
     shown_this_week BOOLEAN NOT NULL DEFAULT false,
