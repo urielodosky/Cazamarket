@@ -37,7 +37,7 @@ export default function TemaPage({ params }: { params: Promise<{ id: string }> }
 
   const replyInputRef = useRef<HTMLTextAreaElement>(null);
   const inlineInputRef = useRef<HTMLTextAreaElement>(null);
-  const { username, avatar, isVendor, supabaseUser } = useAuth();
+  const { username, avatar, isVendor, supabaseUser, isLoggedIn } = useAuth();
   const themeColors = useThemeColors();
 
   const showToast = (text: string, type: 'success' | 'info' = 'info') => {
