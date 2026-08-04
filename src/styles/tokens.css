@@ -1,10 +1,10 @@
 :root {
   /* Colors - Dark Mode Premium (Hunter Style) */
-  --color-bg-base: #1A1A1A;
-  /* Very dark earthy green/black */
-  --color-bg-surface: #1a1e16;
+  --color-bg-base: #161a14;
+  /* Very dark, subtle military green */
+  --color-bg-surface: #1d221a;
   /* Slightly lighter for cards */
-  --color-bg-surface-elevated: #252a1f;
+  --color-bg-surface-elevated: #252b21;
   /* Elevated elements */
 
   --color-primary: #ff7300;
@@ -59,7 +59,7 @@
   --transition-normal: 0.3s ease;
 
   /* Glass / overlay opacities (used in inline styles too) */
-  --glass-bg: rgba(26, 30, 22, 0.7);
+  --glass-bg: rgba(22, 26, 20, 0.7);
   --glass-border: rgba(255, 255, 255, 0.08);
   --overlay-light: rgba(255, 255, 255, 0.03);
   --overlay-medium: rgba(255, 255, 255, 0.06);
