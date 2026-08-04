@@ -27,9 +27,7 @@ export default function RegistroPage() {
   const [username, setUsername] = useState('');
   const [personType, setPersonType] = useState('Física');
   const [cuit, setCuit] = useState('');
-  const [bDay, setBDay] = useState('');
-  const [bMonth, setBMonth] = useState('');
-  const [bYear, setBYear] = useState('');
+  const [birthDate, setBirthDate] = useState('');
   const [phone, setPhone] = useState('');
   const [isAwaitingOTP, setIsAwaitingOTP] = useState(false);
   const [otpCode, setOtpCode] = useState('');
@@ -257,9 +255,16 @@ export default function RegistroPage() {
         
         let finalBirthDate = '';
         if (personType === 'Física') {
-          const dayNum = parseInt(bDay);
-          const monthNum = parseInt(bMonth);
-          const yearNum = parseInt(bYear);
+          // birthDate has format DD/MM/AAAA
+          const parts = birthDate.split('/');
+          if (parts.length !== 3) {
+            setErrorMsg('Por favor ingresa una fecha de nacimiento válida (DD/MM/AAAA).');
+            setIsLoading(false);
+            return;
+          }
+          const dayNum = parseInt(parts[0]);
+          const monthNum = parseInt(parts[1]);
+          const yearNum = parseInt(parts[2]);
           
           if (!dayNum || !monthNum || !yearNum || dayNum < 1 || dayNum > 31 || monthNum < 1 || monthNum > 12 || yearNum < 1900 || yearNum > new Date().getFullYear()) {
             setErrorMsg('Por favor ingresa una fecha de nacimiento válida.');
@@ -492,33 +497,21 @@ export default function RegistroPage() {
 
                   {personType === 'Física' && (
                     <div className="form-group">
-                      <label>Fecha de Nacimiento</label>
-                      <div style={{ display: 'flex', gap: '8px' }}>
-                        <input 
-                          type="text" 
-                          placeholder="DD" 
-                          value={bDay}
-                          onChange={(e) => setBDay(e.target.value.replace(/\D/g, '').slice(0, 2))}
-                          required 
-                          style={{ flex: 1, textAlign: 'center' }}
-                        />
-                        <input 
-                          type="text" 
-                          placeholder="MM" 
-                          value={bMonth}
-                          onChange={(e) => setBMonth(e.target.value.replace(/\D/g, '').slice(0, 2))}
-                          required 
-                          style={{ flex: 1, textAlign: 'center' }}
-                        />
-                        <input 
-                          type="text" 
-                          placeholder="AAAA" 
-                          value={bYear}
-                          onChange={(e) => setBYear(e.target.value.replace(/\D/g, '').slice(0, 4))}
-                          required 
-                          style={{ flex: 2, textAlign: 'center' }}
-                        />
-                      </div>
+                      <label htmlFor="birthDate">Fecha de Nacimiento</label>
+                      <input 
+                        type="text" 
+                        id="birthDate" 
+                        placeholder="DD/MM/AAAA" 
+                        value={birthDate}
+                        onChange={(e) => {
+                          let val = e.target.value.replace(/\D/g, '');
+                          if (val.length > 2) val = val.slice(0, 2) + '/' + val.slice(2);
+                          if (val.length > 5) val = val.slice(0, 5) + '/' + val.slice(5, 9);
+                          setBirthDate(val);
+                        }}
+                        maxLength={10}
+                        required 
+                      />
                     </div>
                   )}
 
