@@ -27,7 +27,9 @@ export default function RegistroPage() {
   const [username, setUsername] = useState('');
   const [personType, setPersonType] = useState('Física');
   const [cuit, setCuit] = useState('');
-  const [birthDate, setBirthDate] = useState('');
+  const [bDay, setBDay] = useState('');
+  const [bMonth, setBMonth] = useState('');
+  const [bYear, setBYear] = useState('');
   const [phone, setPhone] = useState('');
   const [isAwaitingOTP, setIsAwaitingOTP] = useState(false);
   const [otpCode, setOtpCode] = useState('');
@@ -251,6 +253,18 @@ export default function RegistroPage() {
             setIsLoading(false);
             return;
           }
+        let finalBirthDate = '';
+        if (personType === 'Física') {
+          const dayNum = parseInt(bDay);
+          const monthNum = parseInt(bMonth);
+          const yearNum = parseInt(bYear);
+          
+          if (!dayNum || !monthNum || !yearNum || dayNum < 1 || dayNum > 31 || monthNum < 1 || monthNum > 12 || yearNum < 1900 || yearNum > new Date().getFullYear()) {
+            setErrorMsg('Por favor ingresa una fecha de nacimiento válida.');
+            setIsLoading(false);
+            return;
+          }
+          finalBirthDate = `${yearNum}-${monthNum.toString().padStart(2, '0')}-${dayNum.toString().padStart(2, '0')}`;
         }
 
         const res = await fetch('/api/auth/register', {
@@ -264,7 +278,7 @@ export default function RegistroPage() {
             username,
             person_type: personType,
             cuit,
-            birth_date: birthDate,
+            birth_date: finalBirthDate,
             phone,
             contact_email: email // We'll just use the auth email initially
           })
@@ -476,25 +490,33 @@ export default function RegistroPage() {
 
                   {personType === 'Física' && (
                     <div className="form-group">
-                      <label htmlFor="birthDate">Fecha de Nacimiento</label>
-                      <input 
-                        type="date" 
-                        id="birthDate" 
-                        value={birthDate}
-                        onChange={(e) => setBirthDate(e.target.value)}
-                        required 
-                        style={{
-                          width: '100%',
-                          padding: '12px',
-                          background: 'rgba(255,255,255,0.05)',
-                          border: '1px solid rgba(255,255,255,0.1)',
-                          borderRadius: '8px',
-                          color: 'white',
-                          fontSize: '1rem',
-                          outline: 'none',
-                          colorScheme: 'dark'
-                        }}
-                      />
+                      <label>Fecha de Nacimiento</label>
+                      <div style={{ display: 'flex', gap: '8px' }}>
+                        <input 
+                          type="text" 
+                          placeholder="DD" 
+                          value={bDay}
+                          onChange={(e) => setBDay(e.target.value.replace(/\D/g, '').slice(0, 2))}
+                          required 
+                          style={{ flex: 1, textAlign: 'center' }}
+                        />
+                        <input 
+                          type="text" 
+                          placeholder="MM" 
+                          value={bMonth}
+                          onChange={(e) => setBMonth(e.target.value.replace(/\D/g, '').slice(0, 2))}
+                          required 
+                          style={{ flex: 1, textAlign: 'center' }}
+                        />
+                        <input 
+                          type="text" 
+                          placeholder="AAAA" 
+                          value={bYear}
+                          onChange={(e) => setBYear(e.target.value.replace(/\D/g, '').slice(0, 4))}
+                          required 
+                          style={{ flex: 2, textAlign: 'center' }}
+                        />
+                      </div>
                     </div>
                   )}
 
