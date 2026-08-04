@@ -420,25 +420,44 @@ export default function RegistroPage() {
                   
                   <div className="form-group">
                     <label htmlFor="personType">Tipo de Persona</label>
-                    <select 
-                      id="personType"
-                      value={personType}
-                      onChange={(e) => setPersonType(e.target.value)}
-                      required
-                      style={{
-                        width: '100%',
-                        padding: '12px',
-                        background: 'rgba(255,255,255,0.05)',
-                        border: '1px solid rgba(255,255,255,0.1)',
-                        borderRadius: '8px',
-                        color: 'white',
-                        fontSize: '1rem',
-                        outline: 'none'
-                      }}
-                    >
-                      <option value="Física">Persona Física</option>
-                      <option value="Jurídica">Persona Jurídica (Empresa)</option>
-                    </select>
+                    <div style={{ display: 'flex', gap: '8px' }}>
+                      <button 
+                        type="button"
+                        onClick={() => setPersonType('Física')}
+                        style={{
+                          flex: 1,
+                          padding: '12px',
+                          background: personType === 'Física' ? 'var(--color-primary)' : 'rgba(255,255,255,0.05)',
+                          border: `1px solid ${personType === 'Física' ? 'var(--color-primary)' : 'rgba(255,255,255,0.1)'}`,
+                          borderRadius: '8px',
+                          color: personType === 'Física' ? 'white' : 'var(--color-text-muted)',
+                          fontSize: '0.95rem',
+                          fontWeight: personType === 'Física' ? 600 : 400,
+                          cursor: 'pointer',
+                          transition: 'all 0.2s ease'
+                        }}
+                      >
+                        Persona Física
+                      </button>
+                      <button 
+                        type="button"
+                        onClick={() => setPersonType('Jurídica')}
+                        style={{
+                          flex: 1,
+                          padding: '12px',
+                          background: personType === 'Jurídica' ? 'var(--color-primary)' : 'rgba(255,255,255,0.05)',
+                          border: `1px solid ${personType === 'Jurídica' ? 'var(--color-primary)' : 'rgba(255,255,255,0.1)'}`,
+                          borderRadius: '8px',
+                          color: personType === 'Jurídica' ? 'white' : 'var(--color-text-muted)',
+                          fontSize: '0.95rem',
+                          fontWeight: personType === 'Jurídica' ? 600 : 400,
+                          cursor: 'pointer',
+                          transition: 'all 0.2s ease'
+                        }}
+                      >
+                        Empresa (Jurídica)
+                      </button>
+                    </div>
                   </div>
 
                   {personType === 'Jurídica' && (
