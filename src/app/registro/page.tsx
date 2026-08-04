@@ -253,6 +253,8 @@ export default function RegistroPage() {
             setIsLoading(false);
             return;
           }
+        } // ADDED MISSING BRACE HERE
+        
         let finalBirthDate = '';
         if (personType === 'Física') {
           const dayNum = parseInt(bDay);
