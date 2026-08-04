@@ -15,6 +15,7 @@ CREATE TABLE IF NOT EXISTS public.sponsored_ads (
     
     -- Control de visualizaciones
     shown_this_week BOOLEAN NOT NULL DEFAULT false,
+    is_today_ad BOOLEAN NOT NULL DEFAULT false,
     total_shows INTEGER NOT NULL DEFAULT 0,
     
     -- Trazabilidad de Mercado Pago
