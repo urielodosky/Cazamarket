@@ -227,6 +227,36 @@ export default function RegistroPage() {
           return;
         }
 
+        // Validación de Documento (DNI o CUIT)
+        const cleanDoc = cuit.replace(/\D/g, '');
+        if (personType === 'Jurídica' && cleanDoc.length !== 11) {
+          setErrorMsg('Para Persona Jurídica, debes ingresar un CUIT válido de 11 dígitos.');
+          setIsLoading(false);
+          return;
+        }
+        
+        if (cleanDoc.length === 11) {
+          // Modulo 11 CUIT/CUIL Validation
+          const mults = [5, 4, 3, 2, 7, 6, 5, 4, 3, 2];
+          let sum = 0;
+          for (let i = 0; i < 10; i++) {
+            sum += parseInt(cleanDoc[i]) * mults[i];
+          }
+          let mod11 = 11 - (sum % 11);
+          if (mod11 === 11) mod11 = 0;
+          if (mod11 === 10) mod11 = 9;
+          
+          if (mod11 !== parseInt(cleanDoc[10])) {
+            setErrorMsg('El CUIT/CUIL ingresado no es válido (Fallo en dígito verificador). Revisa los números.');
+            setIsLoading(false);
+            return;
+          }
+        } else if (cleanDoc.length < 7 || cleanDoc.length > 8) {
+           setErrorMsg('El DNI ingresado no es válido. Debe tener entre 7 y 8 dígitos.');
+           setIsLoading(false);
+           return;
+        }
+
         const res = await fetch('/api/auth/register', {
           method: 'POST',
           headers: {
@@ -416,7 +446,7 @@ export default function RegistroPage() {
                   </div>
 
                   <div className="form-group">
-                    <label htmlFor="cuit">{personType === 'Física' ? 'CUIT / CUIL / DNI' : 'CUIT'}</label>
+                    <label htmlFor="cuit">{personType === 'Física' ? 'DNI o CUIL' : 'CUIT'}</label>
                     <input 
                       type="text" 
                       id="cuit" 
@@ -552,7 +582,7 @@ export default function RegistroPage() {
           </>
         )}
 
-          <button type="submit" className="submit-btn" disabled={isLoading || (isAwaitingOTP && otpCode.length < 6) || (isAwaitingPasswordResetOTP && otpCode.length < 6) || (isAwaitingMFA && mfaCode.length < 6)}>
+          <button type="submit" className="auth-submit" disabled={isLoading || (isAwaitingOTP && otpCode.length < 6) || (isAwaitingPasswordResetOTP && otpCode.length < 6) || (isAwaitingMFA && mfaCode.length < 6)}>
             {isLoading ? (
               <div className="btn-loader"></div>
             ) : (
