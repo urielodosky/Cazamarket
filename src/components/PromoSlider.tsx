@@ -224,8 +224,7 @@ export default function PromoSlider() {
                   left: 0,
                   right: 0,
                   bottom: isCtaSlide ? undefined : 0,
-                  backgroundImage:
-                    "url(https://picsum.photos/id/1018/1200/400)",
+                  backgroundImage: "url(/promo_cta_background.png)",
                   backgroundSize: "cover",
                   backgroundPosition: "center",
                   minHeight: "60vh",
@@ -246,7 +245,7 @@ export default function PromoSlider() {
                     right: 0,
                     bottom: 0,
                     background:
-                      "linear-gradient(to top, rgba(0,0,0,0.9) 0%, rgba(0,0,0,0.5) 50%, rgba(0,0,0,0.1) 100%)",
+                      "linear-gradient(to right, rgba(15, 15, 20, 0.95) 0%, rgba(15, 15, 20, 0.7) 40%, rgba(15, 15, 20, 0.2) 100%)",
                     zIndex: 1,
                   }}
                 />
