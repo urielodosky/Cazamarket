@@ -23,6 +23,7 @@ export default function PlanesPage() {
   const [activeTab, setActiveTab] = useState<PlanCategory>('productos');
   const [isActivating, setIsActivating] = useState(false);
   const [authModal, setAuthModal] = useState<{show: boolean, type: 'login' | 'vendor'}>({show: false, type: 'login'});
+  const [expandedPlans, setExpandedPlans] = useState<Record<string, boolean>>({});
   const router = useRouter();
 
   // Estado del modal de pago
@@ -166,23 +167,35 @@ export default function PlanesPage() {
                 )}
               </div>
 
-              <ul className="plan-features">
-                {plan.features.map((feature, fIndex) => (
-                  <li key={fIndex} className={feature.included ? 'feature-included' : 'feature-excluded'}>
-                    {feature.included ? (
-                      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" className="check-icon feature-icon-yes">
-                        <polyline points="20 6 9 17 4 12"></polyline>
-                      </svg>
-                    ) : (
-                      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" className="check-icon feature-icon-no">
-                        <line x1="18" y1="6" x2="6" y2="18"></line>
-                        <line x1="6" y1="6" x2="18" y2="18"></line>
-                      </svg>
-                    )}
-                    <span>{feature.text}</span>
-                  </li>
-                ))}
-              </ul>
+              <button 
+                className="plan-features-toggle" 
+                onClick={() => setExpandedPlans(prev => ({...prev, [`${activeTab}-${index}`]: !prev[`${activeTab}-${index}`]}))}
+              >
+                {expandedPlans[`${activeTab}-${index}`] ? 'Ocultar características' : 'Ver características'}
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" style={{ width: '16px', height: '16px', marginLeft: '4px', transform: expandedPlans[`${activeTab}-${index}`] ? 'rotate(180deg)' : 'none', transition: 'transform 0.3s' }}>
+                  <polyline points="6 9 12 15 18 9"></polyline>
+                </svg>
+              </button>
+
+              <div className={`plan-features-container ${expandedPlans[`${activeTab}-${index}`] ? 'expanded' : ''}`}>
+                <ul className="plan-features">
+                  {plan.features.map((feature, fIndex) => (
+                    <li key={fIndex} className={feature.included ? 'feature-included' : 'feature-excluded'}>
+                      {feature.included ? (
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" className="check-icon feature-icon-yes">
+                          <polyline points="20 6 9 17 4 12"></polyline>
+                        </svg>
+                      ) : (
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" className="check-icon feature-icon-no">
+                          <line x1="18" y1="6" x2="6" y2="18"></line>
+                          <line x1="6" y1="6" x2="18" y2="18"></line>
+                        </svg>
+                      )}
+                      <span>{feature.text}</span>
+                    </li>
+                  ))}
+                </ul>
+              </div>
 
               <button
                 className={`btn ${isCurrentPlan(plan) ? 'btn-danger' : plan.recommended ? 'btn-primary' : 'btn-outline'} plan-btn`}
