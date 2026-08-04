@@ -37,7 +37,7 @@ export async function updateSession(request: NextRequest) {
 
   // 6. Autenticación en Rutas
   // Rutas que requieren autenticación estricta
-  const protectedRoutes = ['/configuracion', '/mis-tiendas', '/favoritos', '/mensajes'];
+  const protectedRoutes = ['/configuracion', '/mis-tiendas', '/favoritos', '/mensajes', '/comunidad/nuevo'];
   const isProtectedRoute = protectedRoutes.some(route => request.nextUrl.pathname.startsWith(route));
 
   if (isProtectedRoute && !user) {

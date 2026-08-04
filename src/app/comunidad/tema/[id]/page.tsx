@@ -580,6 +580,7 @@ export default function TemaPage({ params }: { params: Promise<{ id: string }> }
         </div>
 
         {/* 5. Cuadro de Respuesta Integrado */}
+        {isLoggedIn && (
         <div style={{ paddingTop: '20px', borderTop: `1px solid ${themeColors.borderSubtle2}` }}>
           <form onSubmit={handleSendReply}>
             <textarea
@@ -625,10 +626,10 @@ export default function TemaPage({ params }: { params: Promise<{ id: string }> }
             </div>
           </form>
         </div>
-
+        )}
       </div>
 
-      {/* Replies Header + Buscador de Respuestas */}
+      {/* REPLIES SECTION */}
       <div style={{ marginBottom: '36px' }}>
         <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '20px', flexWrap: 'wrap', gap: '16px' }}>
           <h3 style={{ fontSize: '1.35rem', color: themeColors.textWhite, margin: 0, fontWeight: 700, display: 'flex', alignItems: 'center', gap: '10px' }}>
@@ -779,15 +780,16 @@ export default function TemaPage({ params }: { params: Promise<{ id: string }> }
 
                       {/* Action Buttons: Responder & (Eliminar o Denunciar) */}
                       <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
-                        <button
+                        {isLoggedIn && (
+                        <button 
                           onClick={() => handleOpenInlineReply(reply.id)}
                           style={{
                             display: 'inline-flex',
                             alignItems: 'center',
                             gap: '6px',
-                            background: isReplyingToThis ? 'var(--color-primary)' : 'rgba(255, 115, 0, 0.12)',
-                            color: isReplyingToThis ? '#ffffff' : 'var(--color-primary)',
-                            border: '1px solid rgba(255, 115, 0, 0.3)',
+                            background: isReplyingToThis ? 'rgba(255, 115, 0, 0.25)' : 'rgba(255, 115, 0, 0.15)',
+                            color: 'var(--color-primary)',
+                            border: '1px solid rgba(255, 115, 0, 0.4)',
                             padding: '6px 12px',
                             borderRadius: '8px',
                             fontSize: '0.8rem',
@@ -795,11 +797,13 @@ export default function TemaPage({ params }: { params: Promise<{ id: string }> }
                             cursor: 'pointer',
                             transition: 'all 0.2s ease'
                           }}
-                          title={`Responder a ${reply.author}`}
+                          onMouseEnter={e => e.currentTarget.style.background = 'rgba(255, 115, 0, 0.35)'}
+                          onMouseLeave={e => e.currentTarget.style.background = isReplyingToThis ? 'rgba(255, 115, 0, 0.25)' : 'rgba(255, 115, 0, 0.15)'}
                         >
                           <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round"><polyline points="9 17 4 12 9 7"></polyline><path d="M20 18v-2a4 4 0 0 0-4-4H4"></path></svg>
                           <span>{isReplyingToThis ? 'Cancelar' : 'Responder'}</span>
                         </button>
+                        )}
 
                         {isOwnerOfReply ? (
                           <button
@@ -1000,6 +1004,7 @@ export default function TemaPage({ params }: { params: Promise<{ id: string }> }
 
                               <div style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
                                 {/* Botón Responder en Sub-Respuesta */}
+                                {isLoggedIn && (
                                 <button
                                   onClick={() => handleOpenInlineReply(reply.id, sub.author)}
                                   style={{
@@ -1020,6 +1025,7 @@ export default function TemaPage({ params }: { params: Promise<{ id: string }> }
                                   <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round"><polyline points="9 17 4 12 9 7"></polyline><path d="M20 18v-2a4 4 0 0 0-4-4H4"></path></svg>
                                   <span>Responder</span>
                                 </button>
+                                )}
 
                                 {isOwnerOfSub ? (
                                   <button

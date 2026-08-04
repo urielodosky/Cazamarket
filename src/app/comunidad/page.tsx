@@ -51,7 +51,7 @@ export default function ComunidadPage() {
   const [posts, setPosts] = useState<ForumPost[]>([]);
   const router = useRouter();
   const searchParams = useSearchParams();
-  const { username, avatar } = useAuth();
+  const { username, avatar, isLoggedIn } = useAuth();
   const themeColors = useThemeColors();
 
   const urlCategory = searchParams.get('categoria') || '';
@@ -134,7 +134,8 @@ export default function ComunidadPage() {
           <h1 style={{ fontSize: '2rem', margin: '0 0 6px 0', color: 'var(--color-text-main)' }}>Foro de Comunidad</h1>
           <p style={{ margin: 0, color: 'var(--color-text-muted)', fontSize: '0.95rem' }}>Espacio de debate, consejos y novedades entre amantes de la caza, pesca y outdoor.</p>
         </div>
-        <Link href="/comunidad/nuevo" style={{ textDecoration: 'none' }}>
+        {isLoggedIn && (
+          <Link href="/comunidad/nuevo" style={{ textDecoration: 'none' }}>
           <button className="btn btn-primary" style={{ 
             padding: '12px 24px', 
             borderRadius: 'var(--radius-full)',
@@ -157,6 +158,7 @@ export default function ComunidadPage() {
             Crear Nuevo Tema
           </button>
         </Link>
+        )}
       </div>
 
       {/* Active Filter Badges */}
