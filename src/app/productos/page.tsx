@@ -100,6 +100,7 @@ function ProductosContent() {
         });
         setLocalProducts(formattedData);
       }
+      setIsLoading(false);
     };
     fetchProducts();
 
@@ -110,10 +111,6 @@ function ProductosContent() {
         if (parsed.theme) setTheme(parsed.theme);
       } catch (e) {}
     }
-    const timer = setTimeout(() => {
-      setIsLoading(false);
-    }, 1200);
-    return () => clearTimeout(timer);
   }, [isVendorModeActive]);
 
   const searchParams = useSearchParams();
@@ -518,15 +515,19 @@ function ProductosContent() {
 }
 
 export default function ProductosPage() {
-  const [mounted, setMounted] = useState(false);
-  useEffect(() => setMounted(true), []);
-  
-  if (!mounted) {
-    return <LoadingScreen />;
-  }
-
   return (
-    <Suspense fallback={<LoadingScreen />}>
+    <Suspense fallback={
+      <div style={{ padding: 'var(--spacing-8) var(--spacing-4)', maxWidth: '1200px', margin: '0 auto', minHeight: '60vh' }}>
+        <div className="responsive-grid-250">
+          <SkeletonCard />
+          <SkeletonCard />
+          <SkeletonCard />
+          <SkeletonCard />
+          <SkeletonCard />
+          <SkeletonCard />
+        </div>
+      </div>
+    }>
       <ProductosContent />
     </Suspense>
   );
