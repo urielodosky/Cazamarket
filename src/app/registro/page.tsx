@@ -271,6 +271,27 @@ export default function RegistroPage() {
             setIsLoading(false);
             return;
           }
+          
+          // Calcular edad exacta
+          const today = new Date();
+          const birthObj = new Date(yearNum, monthNum - 1, dayNum);
+          let age = today.getFullYear() - birthObj.getFullYear();
+          const m = today.getMonth() - birthObj.getMonth();
+          if (m < 0 || (m === 0 && today.getDate() < birthObj.getDate())) {
+            age--;
+          }
+          
+          if (age < 18) {
+            setErrorMsg('Debes ser mayor de 18 años para poder registrarte en CazaMarket.');
+            setIsLoading(false);
+            return;
+          }
+          if (age > 100) {
+            setErrorMsg('La fecha de nacimiento ingresada no parece ser válida.');
+            setIsLoading(false);
+            return;
+          }
+          
           finalBirthDate = `${yearNum}-${monthNum.toString().padStart(2, '0')}-${dayNum.toString().padStart(2, '0')}`;
         }
 
@@ -505,9 +526,25 @@ export default function RegistroPage() {
                         value={birthDate}
                         onChange={(e) => {
                           let val = e.target.value.replace(/\D/g, '');
-                          if (val.length > 2) val = val.slice(0, 2) + '/' + val.slice(2);
-                          if (val.length > 5) val = val.slice(0, 5) + '/' + val.slice(5, 9);
-                          setBirthDate(val);
+                          
+                          // Strict day validation as typing
+                          if (val.length >= 2) {
+                            let day = parseInt(val.slice(0, 2));
+                            if (day > 31) val = '31' + val.slice(2);
+                            if (day === 0) val = '01' + val.slice(2);
+                          }
+                          // Strict month validation as typing
+                          if (val.length >= 4) {
+                            let month = parseInt(val.slice(2, 4));
+                            if (month > 12) val = val.slice(0, 2) + '12' + val.slice(4);
+                            if (month === 0) val = val.slice(0, 2) + '01' + val.slice(4);
+                          }
+                          
+                          let formatted = val;
+                          if (val.length > 2) formatted = val.slice(0, 2) + '/' + val.slice(2);
+                          if (val.length > 4) formatted = formatted.slice(0, 5) + '/' + val.slice(4, 8);
+                          
+                          setBirthDate(formatted);
                         }}
                         maxLength={10}
                         required 
