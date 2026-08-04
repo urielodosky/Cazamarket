@@ -228,15 +228,15 @@ export default function RegistroPage() {
         }
 
         // Validación de Documento (DNI o CUIT)
-        const cleanDoc = cuit.replace(/\D/g, '');
-        if (personType === 'Jurídica' && cleanDoc.length !== 11) {
-          setErrorMsg('Para Persona Jurídica, debes ingresar un CUIT válido de 11 dígitos.');
-          setIsLoading(false);
-          return;
-        }
-        
-        if (cleanDoc.length === 11) {
-          // Modulo 11 CUIT/CUIL Validation
+        if (personType === 'Jurídica') {
+          const cleanDoc = cuit.replace(/\D/g, '');
+          if (cleanDoc.length !== 11) {
+            setErrorMsg('Para Persona Jurídica, debes ingresar un CUIT válido de 11 dígitos.');
+            setIsLoading(false);
+            return;
+          }
+          
+          // Modulo 11 CUIT Validation
           const mults = [5, 4, 3, 2, 7, 6, 5, 4, 3, 2];
           let sum = 0;
           for (let i = 0; i < 10; i++) {
@@ -247,14 +247,10 @@ export default function RegistroPage() {
           if (mod11 === 10) mod11 = 9;
           
           if (mod11 !== parseInt(cleanDoc[10])) {
-            setErrorMsg('El CUIT/CUIL ingresado no es válido (Fallo en dígito verificador). Revisa los números.');
+            setErrorMsg('El CUIT ingresado no es válido (Fallo en dígito verificador). Revisa los números.');
             setIsLoading(false);
             return;
           }
-        } else if (cleanDoc.length < 7 || cleanDoc.length > 8) {
-           setErrorMsg('El DNI ingresado no es válido. Debe tener entre 7 y 8 dígitos.');
-           setIsLoading(false);
-           return;
         }
 
         const res = await fetch('/api/auth/register', {
@@ -445,39 +441,43 @@ export default function RegistroPage() {
                     </select>
                   </div>
 
-                  <div className="form-group">
-                    <label htmlFor="cuit">{personType === 'Física' ? 'DNI o CUIL' : 'CUIT'}</label>
-                    <input 
-                      type="text" 
-                      id="cuit" 
-                      placeholder={personType === 'Física' ? "Sin guiones ni espacios" : "Ej: 30-12345678-9"} 
-                      value={cuit}
-                      onChange={(e) => setCuit(e.target.value)}
-                      required 
-                    />
-                  </div>
+                  {personType === 'Jurídica' && (
+                    <div className="form-group">
+                      <label htmlFor="cuit">CUIT</label>
+                      <input 
+                        type="text" 
+                        id="cuit" 
+                        placeholder="Ej: 30-12345678-9" 
+                        value={cuit}
+                        onChange={(e) => setCuit(e.target.value)}
+                        required 
+                      />
+                    </div>
+                  )}
 
-                  <div className="form-group">
-                    <label htmlFor="birthDate">Fecha de Nacimiento</label>
-                    <input 
-                      type="date" 
-                      id="birthDate" 
-                      value={birthDate}
-                      onChange={(e) => setBirthDate(e.target.value)}
-                      required 
-                      style={{
-                        width: '100%',
-                        padding: '12px',
-                        background: 'rgba(255,255,255,0.05)',
-                        border: '1px solid rgba(255,255,255,0.1)',
-                        borderRadius: '8px',
-                        color: 'white',
-                        fontSize: '1rem',
-                        outline: 'none',
-                        colorScheme: 'dark'
-                      }}
-                    />
-                  </div>
+                  {personType === 'Física' && (
+                    <div className="form-group">
+                      <label htmlFor="birthDate">Fecha de Nacimiento</label>
+                      <input 
+                        type="date" 
+                        id="birthDate" 
+                        value={birthDate}
+                        onChange={(e) => setBirthDate(e.target.value)}
+                        required 
+                        style={{
+                          width: '100%',
+                          padding: '12px',
+                          background: 'rgba(255,255,255,0.05)',
+                          border: '1px solid rgba(255,255,255,0.1)',
+                          borderRadius: '8px',
+                          color: 'white',
+                          fontSize: '1rem',
+                          outline: 'none',
+                          colorScheme: 'dark'
+                        }}
+                      />
+                    </div>
+                  )}
 
                   <div className="form-group">
                     <label htmlFor="phone">Teléfono de Contacto</label>
