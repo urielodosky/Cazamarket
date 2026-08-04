@@ -638,3 +638,44 @@
 [data-theme="light"] .cart-badge {
   box-shadow: 0 2px 5px rgba(0, 0, 0, 0.15);
 }
+
+/* ========================================
+   MOBILE RESPONSIVENESS
+   ======================================== */
+@media (max-width: 768px) {
+  .navbar-container {
+    flex-wrap: wrap;
+    padding: 10px 16px;
+    gap: 12px;
+  }
+  .navbar-logo-img {
+    height: 48px;
+  }
+  .navbar-center {
+    order: 3;
+    width: 100% !important;
+    max-width: 100% !important;
+    height: 44px !important;
+    padding: 0 !important;
+  }
+  .navbar-center.home-mode .search-bar-animated,
+  .navbar-center.expanded-mode .search-bar-animated {
+    position: relative;
+    left: 0;
+    top: 0;
+    width: 100%;
+    height: 100%;
+    bottom: auto;
+  }
+  .navbar-center .links-wrapper,
+  .divider-vertical-animated {
+    display: none !important;
+  }
+  .navbar-actions {
+    margin-left: auto;
+  }
+  .filters-panel {
+    width: 100% !important;
+    margin-left: 0 !important;
+  }
+}
