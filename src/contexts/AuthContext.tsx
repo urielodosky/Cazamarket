@@ -204,6 +204,7 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
     localStorage.removeItem('cazamarket_plan_tier');
     localStorage.removeItem('cazamarket_plan_category');
     localStorage.removeItem('cazamarket_profile');
+    localStorage.removeItem('cazamarket_cart');
     
     // Forzar recarga completa para limpiar los estados de react que dependen de localStorage
     window.location.href = '/';
