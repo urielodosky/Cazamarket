@@ -20,7 +20,7 @@ export default function NegociosPage() {
   const { permissions, planTier } = usePlan();
   const searchParams = useSearchParams();
   const themeColors = useThemeColors();
-  const [negocios, setNegocios] = useState<any[]>(NEGOCIOS_DATA);
+  const [negocios, setNegocios] = useState<any[]>([]);
 
   useEffect(() => {
     const loadUserStore = async () => {
@@ -91,12 +91,12 @@ export default function NegociosPage() {
         };
 
         if (permissions.tiendaVirtual) {
-          setNegocios([userNegocio, ...NEGOCIOS_DATA]);
+          setNegocios([userNegocio]);
         } else {
-          setNegocios(NEGOCIOS_DATA);
+          setNegocios([]);
         }
       } else {
-        setNegocios(NEGOCIOS_DATA);
+        setNegocios([]);
       }
     };
     
