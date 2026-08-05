@@ -167,38 +167,18 @@ export function PlanProvider({ children }: { children: React.ReactNode }) {
     if (!userId) return;
 
     if (category === 'productos') {
-      setProductPlanTier('gratis');
-      localStorage.setItem(userPlanKey(userId, 'productos'), 'gratis');
-      setPendingProductPlanTier(null);
-      localStorage.removeItem(userPlanKey(userId, 'pending_productos'));
+      setPendingProductPlanTier('gratis');
+      localStorage.setItem(userPlanKey(userId, 'pending_productos'), 'gratis');
     } else if (category === 'servicios') {
-      setServicePlanTier('gratis');
-      localStorage.setItem(userPlanKey(userId, 'servicios'), 'gratis');
-      setPendingServicePlanTier(null);
-      localStorage.removeItem(userPlanKey(userId, 'pending_servicios'));
+      setPendingServicePlanTier('gratis');
+      localStorage.setItem(userPlanKey(userId, 'pending_servicios'), 'gratis');
     } else if (category === 'mixto') {
-      setProductPlanTier('gratis');
-      setServicePlanTier('gratis');
-      localStorage.setItem(userPlanKey(userId, 'productos'), 'gratis');
-      localStorage.setItem(userPlanKey(userId, 'servicios'), 'gratis');
-      setPendingProductPlanTier(null);
-      setPendingServicePlanTier(null);
-      localStorage.removeItem(userPlanKey(userId, 'pending_productos'));
-      localStorage.removeItem(userPlanKey(userId, 'pending_servicios'));
+      setPendingProductPlanTier('gratis');
+      setPendingServicePlanTier('gratis');
+      localStorage.setItem(userPlanKey(userId, 'pending_productos'), 'gratis');
+      localStorage.setItem(userPlanKey(userId, 'pending_servicios'), 'gratis');
     }
-
-    const newProdTier = category === 'productos' || category === 'mixto' ? 'gratis' : productPlanTier;
-    const newServTier = category === 'servicios' || category === 'mixto' ? 'gratis' : servicePlanTier;
-
-    if (newProdTier === 'gratis' && newServTier === 'gratis') {
-      setSubscriptionStartDate(null);
-      localStorage.removeItem(userPlanKey(userId, 'subscriptionStartDate'));
-    }
-
-    if (newProdTier !== 'empresarial' && newServTier !== 'empresarial') {
-      localStorage.removeItem('cazamarket_virtual_advisor');
-    }
-  }, [userId, productPlanTier, servicePlanTier]);
+  }, [userId]);
 
   const permissions = getPlanPermissions(
     mounted ? productPlanTier : 'gratis',
@@ -251,6 +231,9 @@ export function PlanProvider({ children }: { children: React.ReactNode }) {
   const acceleratePlan = useCallback((category: PlanCategory) => {
     if (!userId) return;
     
+    const nextProdTier = (category === 'productos' || category === 'mixto') && pendingProductPlanTier ? pendingProductPlanTier : productPlanTier;
+    const nextServTier = (category === 'servicios' || category === 'mixto') && pendingServicePlanTier ? pendingServicePlanTier : servicePlanTier;
+
     if ((category === 'productos' || category === 'mixto') && pendingProductPlanTier) {
       setProductPlanTier(pendingProductPlanTier);
       localStorage.setItem(userPlanKey(userId, 'productos'), pendingProductPlanTier);
@@ -264,11 +247,19 @@ export function PlanProvider({ children }: { children: React.ReactNode }) {
       localStorage.removeItem(userPlanKey(userId, 'pending_servicios'));
     }
     
-    const now = new Date().toISOString();
-    setSubscriptionStartDate(now);
-    localStorage.setItem(userPlanKey(userId, 'subscriptionStartDate'), now);
+    if (nextProdTier === 'gratis' && nextServTier === 'gratis') {
+      setSubscriptionStartDate(null);
+      localStorage.removeItem(userPlanKey(userId, 'subscriptionStartDate'));
+    } else {
+      const now = new Date().toISOString();
+      setSubscriptionStartDate(now);
+      localStorage.setItem(userPlanKey(userId, 'subscriptionStartDate'), now);
+    }
     
-  }, [userId, pendingProductPlanTier, pendingServicePlanTier]);
+    if (nextProdTier !== 'empresarial' && nextServTier !== 'empresarial') {
+      localStorage.removeItem('cazamarket_virtual_advisor');
+    }
+  }, [userId, pendingProductPlanTier, pendingServicePlanTier, productPlanTier, servicePlanTier]);
 
   const planDisplayName = mounted 
     ? getPlanDisplayName(productPlanTier, servicePlanTier)
