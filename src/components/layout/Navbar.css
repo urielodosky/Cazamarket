@@ -448,16 +448,22 @@
     display: flex !important;
     gap: 8px;
     width: 100vw;
-    margin-left: -16px; /* Compensar padding de navbar-container */
-    padding: 10px 16px;
+    margin-left: -24px; /* Compensar padding de navbar-container nuevo (24px) */
+    padding: 10px 24px;
     background: var(--color-bg-base, #0f0f11);
     border-bottom: 1px solid rgba(255, 255, 255, 0.05);
     overflow-x: auto;
+    -webkit-overflow-scrolling: touch;
     scrollbar-width: none; /* Firefox */
   }
 
   .mobile-filters-panel::-webkit-scrollbar {
     display: none; /* Chrome/Safari */
+  }
+  
+  .mobile-filters-panel::after {
+    content: '';
+    padding-right: 24px;
   }
 
   .mobile-filters-panel .filter-wrapper-item {
