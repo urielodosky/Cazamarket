@@ -479,7 +479,6 @@
   margin: 0;
 }
 
-
 [data-theme="light"] .plan-features-toggle {
   background: rgba(0, 0, 0, 0.04);
   border: 1px solid rgba(0, 0, 0, 0.1);
@@ -487,5 +486,100 @@
 }
 [data-theme="light"] .plan-features-toggle:hover {
   background: rgba(0, 0, 0, 0.08);
+}
+
+/* ========================================
+   DESKTOP: FEATURES ALWAYS VISIBLE
+   ======================================== */
+@media (min-width: 769px) {
+  .plan-features-toggle {
+    display: none !important;
+  }
+  .plan-features-container {
+    grid-template-rows: 1fr !important;
+    margin-bottom: 16px !important;
+    margin-top: 16px !important;
+  }
+  .plan-features-container .plan-features {
+    overflow: visible !important;
+  }
+}
+
+/* ========================================
+   MOBILE: HORIZONTAL LAYOUT
+   ======================================== */
+@media (max-width: 768px) {
+  .plan-card {
+    display: grid !important;
+    grid-template-columns: 1fr auto !important;
+    gap: 12px 16px !important;
+    padding: 16px !important;
+    align-items: center !important;
+    text-align: left !important;
+  }
+  
+  .plan-badge {
+    position: static !important;
+    transform: none !important;
+    grid-column: 1 / -1 !important;
+    width: max-content !important;
+    margin: 0 auto -8px auto !important;
+  }
+  
+  .plan-header {
+    grid-column: 1 / -1 !important;
+    display: flex !important;
+    align-items: center !important;
+    justify-content: space-between !important;
+    padding: 0 !important;
+    margin: 0 !important;
+    border: none !important;
+    text-align: left !important;
+  }
+  
+  .plan-category-label {
+    display: none !important;
+  }
+  
+  .plan-name {
+    font-size: 1.1rem !important;
+    margin: 0 !important;
+  }
+  
+  .plan-price {
+    margin: 0 !important;
+  }
+  
+  .amount {
+    font-size: 1.25rem !important;
+  }
+  
+  .plan-original-price {
+    display: none !important;
+  }
+  
+  .plan-features-toggle {
+    grid-column: 1 !important;
+    margin: 0 !important;
+    padding: 8px 12px !important;
+    font-size: 0.8rem !important;
+  }
+  
+  .plan-btn {
+    grid-column: 2 !important;
+    margin: 0 !important;
+    padding: 8px 16px !important;
+    font-size: 0.85rem !important;
+    width: auto !important;
+  }
+  
+  .plan-features-container {
+    grid-column: 1 / -1 !important;
+    margin: 0 !important;
+  }
+  
+  .plan-features-container.expanded {
+    margin-top: 8px !important;
+  }
 }
 
