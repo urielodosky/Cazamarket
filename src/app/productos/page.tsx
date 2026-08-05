@@ -9,16 +9,11 @@ import LoadingScreen from '@/components/ui/LoadingScreen';
 import { useFavorites } from '@/contexts/FavoritesContext';
 import { useCart } from '@/contexts/CartContext';
 import { usePlan } from '@/contexts/PlanContext';
-
-import { PRODUCTOS_DATA } from '@/data/mock';
 import { createClient } from '@/lib/supabase/client';
-
-const MIS_PRODUCTOS_DATA: typeof PRODUCTOS_DATA = [];
 
 function ProductosContent() {
   const { isVendorModeActive } = useAuth();
   const { hasFeature, permissions } = usePlan();
-  const displayData = isVendorModeActive ? MIS_PRODUCTOS_DATA : PRODUCTOS_DATA;
   const router = useRouter();
   const [isLoading, setIsLoading] = useState(true);
   const { isFavorite, toggleFavorite } = useFavorites();
@@ -122,7 +117,7 @@ function ProductosContent() {
   const filterTipo = searchParams?.get('tipo') || '';
 
   const allowedLocalProducts = localProducts.slice(0, permissions.maxProductos);
-  const rawMergedData = [...allowedLocalProducts, ...displayData];
+  const rawMergedData = [...allowedLocalProducts];
   
   const mergedData = rawMergedData.filter((producto) => {
     // 1. Filtrar por búsqueda de texto (q)

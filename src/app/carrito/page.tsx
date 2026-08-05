@@ -5,7 +5,6 @@ import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import { useAuth } from '@/contexts/AuthContext';
 import { useCart, CartItem } from '@/contexts/CartContext';
-import { NEGOCIOS_DATA } from '@/data/mock';
 import { createClient } from '@/lib/supabase/client';
 import './carrito.css';
 
@@ -69,8 +68,8 @@ export default function CarritoPage() {
   }, {});
 
   const getStorePhone = (storeId: number) => {
-    const store = NEGOCIOS_DATA.find(n => n.id === storeId);
-    return store?.phone || '5491112345678';
+    // In the future this should fetch from Supabase. For now, default phone.
+    return '5491112345678';
   };
 
   const generateWhatsAppLink = (storeId: number, items: CartItem[], total: number) => {

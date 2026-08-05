@@ -8,7 +8,6 @@ import { useRouter, useSearchParams } from 'next/navigation';
 import { useFavorites } from '@/contexts/FavoritesContext';
 import { PlanTier, isAtLeast } from '@/types/planTypes';
 
-import { NEGOCIOS_DATA } from '@/data/mock';
 import { useThemeColors } from '@/hooks/useThemeColors';
 import { createClient } from '@/lib/supabase/client';
 
@@ -91,12 +90,12 @@ export default function NegociosPage() {
         };
 
         if (planTier !== 'gratis') {
-          setNegocios([userNegocio, ...NEGOCIOS_DATA]);
+          setNegocios([userNegocio]);
         } else {
-          setNegocios([...NEGOCIOS_DATA]);
+          setNegocios([]);
         }
       } else {
-        setNegocios([...NEGOCIOS_DATA]);
+        setNegocios([]);
       }
     };
     

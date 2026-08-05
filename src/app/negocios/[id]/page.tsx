@@ -9,7 +9,6 @@ import { PlanTier, isAtLeast } from '@/types/planTypes';
 import { usePlan } from '@/contexts/PlanContext';
 import { useAuth } from '@/contexts/AuthContext';
 import { useFavorites } from '@/contexts/FavoritesContext';
-import { NEGOCIOS_DATA, PRODUCTOS_DATA } from '@/data/mock';
 import { useThemeColors } from '@/hooks/useThemeColors';
 import { createClient } from '@/lib/supabase/client';
 import '../negocio.css';
@@ -384,19 +383,7 @@ export default function NegocioDetailPage({ params }: { params: Promise<{ id: st
         }
       }
     } else {
-      const found = NEGOCIOS_DATA.find((n: any) => n.id === negocioId);
-      if (found) {
-        const businessProducts = PRODUCTOS_DATA.filter((p: any) => p.seller && p.seller.id === negocioId);
-        
-        setNegocio({
-          ...BLANK_NEGOCIO,
-          ...found,
-          productsCount: businessProducts.length,
-          productSections: businessProducts.length > 0 ? [
-            { name: 'Catálogo', products: businessProducts }
-          ] : []
-        });
-      }
+      // Future: fetch store from Supabase if id is a valid UUID
       setIsLoading(false);
     }
   }, [unwrappedParams.id, negocioId, permissions.maxProductos, permissions.maxServicios]);

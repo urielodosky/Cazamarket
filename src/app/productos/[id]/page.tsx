@@ -10,7 +10,6 @@ import { useCart } from '@/contexts/CartContext';
 import { useFavorites } from '@/contexts/FavoritesContext';
 import { useAuth } from '@/contexts/AuthContext';
 import { usePlan } from '@/contexts/PlanContext';
-import { PRODUCTOS_DATA } from '@/data/mock';
 import { useThemeColors } from '@/hooks/useThemeColors';
 import { getPlanPermissions } from '@/types/planTypes';
 import '../producto.css';
@@ -237,9 +236,6 @@ export default function ProductoDetailPage({ params }: { params: Promise<{ id: s
         console.error(e);
       }
 
-      // Fallback a los datos mock
-      let baseProduct = PRODUCTOS_DATA.find(p => p.id.toString() === productId);
-      
       // Fallback a localStorage (antiguo)
       const existingStr = localStorage.getItem('cazamarket_my_products');
       if (existingStr) {
@@ -247,7 +243,6 @@ export default function ProductoDetailPage({ params }: { params: Promise<{ id: s
         const customProduct = existing.find((p: any) => p.id.toString() === productId);
         if (customProduct) {
           setProduct({
-            ...(baseProduct || {}),
             id: customProduct.id,
             name: customProduct.name,
             price: customProduct.price,
@@ -262,21 +257,7 @@ export default function ProductoDetailPage({ params }: { params: Promise<{ id: s
             seller: {
               ...(baseProduct?.seller || {}),
               id: customProduct.storeId || baseProduct?.seller?.id || 1,
-              name: customProduct.store || baseProduct?.seller?.name || 'Mi Negocio',
-              avatar: customProduct.avatar || baseProduct?.seller?.avatar || '',
-              shippingCost: customProduct.shippingCost,
-              branches: customProduct.branches || []
-            },
-            relatedProducts: PRODUCTOS_DATA.filter(p => p.seller.id === (customProduct.storeId || baseProduct?.seller?.id || 1) && p.category === customProduct.category && p.id.toString() !== productId).slice(0, 4)
-          });
-          setIsLoading(false);
-          return;
-        }
-      }
-
-      if (baseProduct) {
-        setProduct((prev: any) => prev || { ...baseProduct, relatedProducts: PRODUCTOS_DATA.filter(p => p.seller.id === baseProduct?.seller.id && p.category === baseProduct?.category && p.id.toString() !== productId).slice(0, 4) });
-      }
+      // Mock functionality removed
       setIsLoading(false);
     };
 
