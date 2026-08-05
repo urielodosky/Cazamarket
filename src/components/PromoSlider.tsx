@@ -107,14 +107,20 @@ export default function PromoSlider() {
       <style dangerouslySetInnerHTML={{__html: `
         @media (max-width: 768px) {
           .slider-arrow-btn { display: none !important; }
-          .slider-container { min-height: 480px !important; }
+          .slider-container { min-height: 280px !important; }
           .slide-bg { 
-            background-size: contain !important; 
-            background-position: top center !important; 
-            background-color: #0f0f11 !important; 
-            background-repeat: no-repeat !important;
-            min-height: 480px !important;
+            background-size: cover !important; 
+            background-position: center !important; 
+            background-color: transparent !important; 
+            min-height: 280px !important;
+            padding: 20px !important;
           }
+          .slider-badge { font-size: 0.65rem !important; padding: 4px 10px !important; margin-bottom: 8px !important; }
+          .slider-title { font-size: 1.3rem !important; margin-bottom: 6px !important; }
+          .slider-desc { font-size: 0.85rem !important; margin-bottom: 12px !important; line-height: 1.3 !important; max-width: 100% !important; }
+          .slider-btn { padding: 8px 16px !important; font-size: 0.85rem !important; min-height: auto !important; }
+          .slider-title-cta { font-size: 1.5rem !important; margin-bottom: 6px !important; }
+          .slider-desc-cta { font-size: 0.85rem !important; margin-bottom: 12px !important; line-height: 1.3 !important; max-width: 100% !important; }
         }
       `}} />
       <div
@@ -220,6 +226,7 @@ export default function PromoSlider() {
                 />
                 <div style={{ position: "relative", zIndex: 2 }}>
                   <span
+                    className="slider-badge"
                     style={{
                       display: "inline-block",
                       background: "var(--color-primary)",
@@ -235,6 +242,7 @@ export default function PromoSlider() {
                     {ad.badge}
                   </span>
                   <h2
+                    className="slider-title"
                     style={{
                       margin: "0 0 12px 0",
                       color: "#FFFFFF",
@@ -246,6 +254,7 @@ export default function PromoSlider() {
                     {ad.title}
                   </h2>
                   <p
+                    className="slider-desc"
                     style={{
                       margin: "0 0 24px 0",
                       color: "#F3F4F6",
@@ -258,6 +267,7 @@ export default function PromoSlider() {
                   </p>
                   <Link
                     href={ad.link}
+                    className="slider-btn"
                     style={{
                       display: "inline-flex",
                       alignItems: "center",
@@ -314,6 +324,7 @@ export default function PromoSlider() {
                 />
                 <div style={{ position: "relative", zIndex: 2 }}>
                   <span
+                    className="slider-badge"
                     style={{
                       display: "inline-block",
                       background: "var(--color-primary)",
@@ -329,6 +340,7 @@ export default function PromoSlider() {
                     ANUNCIA AQUÍ
                   </span>
                   <h1
+                    className="slider-title-cta"
                     style={{
                       margin: "0 0 16px 0",
                       color: "#FFFFFF",
@@ -340,6 +352,7 @@ export default function PromoSlider() {
                     Haz crecer tu negocio
                   </h1>
                   <p
+                    className="slider-desc-cta"
                     style={{
                       margin: "0 0 32px 0",
                       color: "#F3F4F6",
@@ -354,7 +367,7 @@ export default function PromoSlider() {
                   </p>
                   <button
                     onClick={() => setIsModalOpen(true)}
-                    className="btn btn-primary"
+                    className="btn btn-primary slider-btn"
                     style={{
                       display: "inline-flex",
                       alignItems: "center",
