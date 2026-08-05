@@ -107,6 +107,14 @@ export default function PromoSlider() {
       <style dangerouslySetInnerHTML={{__html: `
         @media (max-width: 768px) {
           .slider-arrow-btn { display: none !important; }
+          .slider-container { min-height: 480px !important; }
+          .slide-bg { 
+            background-size: contain !important; 
+            background-position: top center !important; 
+            background-color: #0f0f11 !important; 
+            background-repeat: no-repeat !important;
+            min-height: 480px !important;
+          }
         }
       `}} />
       <div
@@ -161,6 +169,7 @@ export default function PromoSlider() {
 
           {/* Slider Container */}
           <div
+            className="slider-container"
             onTouchStart={onTouchStart}
             onTouchMove={onTouchMove}
             onTouchEnd={onTouchEnd}
@@ -178,6 +187,7 @@ export default function PromoSlider() {
             {DEMO_ADS.map((ad, index) => (
               <div
                 key={ad.id}
+                className="slide-bg"
                 style={{
                   position: "absolute",
                   top: 0,
@@ -270,6 +280,7 @@ export default function PromoSlider() {
             {/* CTA Slide - Anuncia Aquí (last slide) */}
             {showCta && (
               <div
+                className="slide-bg"
                 style={{
                   position: isCtaSlide ? "relative" : "absolute",
                   top: 0,
