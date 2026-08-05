@@ -679,3 +679,39 @@
     margin-left: 0 !important;
   }
 }
+
+/* Búsqueda expandida en móvil */
+@media (max-width: 768px) {
+  .navbar-logo, .navbar-actions, .mobile-menu-btn {
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    transform-origin: center;
+  }
+  
+  .navbar-container.search-focused .navbar-logo,
+  .navbar-container.search-focused .navbar-actions,
+  .navbar-container.search-focused .mobile-menu-btn {
+    width: 0 !important;
+    opacity: 0 !important;
+    padding: 0 !important;
+    margin: 0 !important;
+    overflow: hidden;
+    transform: scaleX(0);
+    pointer-events: none;
+  }
+  
+  .navbar-container.search-focused .navbar-middle-area {
+    flex: 1;
+    width: 100% !important;
+    max-width: 100% !important;
+  }
+  
+  .navbar-container.search-focused .navbar-center {
+    width: 100% !important;
+    max-width: 100% !important;
+    justify-content: space-between;
+  }
+  
+  .navbar-container.search-focused .search-bar-animated {
+    width: 100% !important;
+  }
+}

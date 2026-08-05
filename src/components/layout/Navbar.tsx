@@ -38,6 +38,20 @@ export default function Navbar() {
   const [isFiltersOpen, setIsFiltersOpen] = useState(false);
   const [ratingFilter, setRatingFilter] = useState(0);
   const [searchQuery, setSearchQuery] = useState(searchParams?.get('q') || '');
+  const [isSearchFocused, setIsSearchFocused] = useState(false);
+
+  const [isGuestMenuOpen, setIsGuestMenuOpen] = useState(false);
+  const guestMenuRef = useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+    function handleClickOutside(event: MouseEvent) {
+      if (guestMenuRef.current && !guestMenuRef.current.contains(event.target as Node)) {
+        setIsGuestMenuOpen(false);
+      }
+    }
+    document.addEventListener('mousedown', handleClickOutside);
+    return () => document.removeEventListener('mousedown', handleClickOutside);
+  }, []);
 
   // Filtros state
   const [categoria, setCategoria] = useState('');
@@ -290,7 +304,7 @@ export default function Navbar() {
 
   return (
     <header className="navbar-header" suppressHydrationWarning>
-      <div className={`navbar-container ${isHome ? 'is-home-mobile' : ''}`}>
+      <div className={`navbar-container ${isHome ? 'is-home-mobile' : ''} ${isSearchFocused ? 'search-focused' : ''}`}>
         <button 
           className="mobile-menu-btn" 
           onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
@@ -358,6 +372,10 @@ export default function Navbar() {
                   type="text" 
                   value={searchQuery}
                   onChange={(e) => setSearchQuery(e.target.value)}
+                  onFocus={() => setIsSearchFocused(true)}
+                  onBlur={() => {
+                    setTimeout(() => setIsSearchFocused(false), 200);
+                  }}
                   placeholder={searchPlaceholder} 
                   onKeyDown={(e) => { if (e.key === 'Enter') executeSearch(); }}
                   style={{ marginLeft: '8px', color: themeColors.textWhite, width: '100%', background: 'transparent', border: 'none', outline: 'none' }}
@@ -476,9 +494,50 @@ export default function Navbar() {
           ) : isLoggedIn ? (
             <UserMenu />
           ) : (
-            <Link href="/registro" style={{ padding: '8px 24px', fontSize: '0.95rem', borderRadius: '100px', display: 'flex', alignItems: 'center', height: '40px', background: 'var(--color-primary)', color: 'white', fontWeight: 600, textDecoration: 'none' }}>
-              Empezar ahora
-            </Link>
+            <div className="guest-menu-container" ref={guestMenuRef} style={{ position: 'relative' }}>
+              <button 
+                onClick={() => setIsGuestMenuOpen(!isGuestMenuOpen)}
+                style={{
+                  width: '40px',
+                  height: '40px',
+                  borderRadius: '50%',
+                  background: 'var(--color-bg-surface-elevated)',
+                  border: '1px solid rgba(255,255,255,0.1)',
+                  cursor: 'pointer',
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                  padding: 0,
+                  outline: 'none'
+                }}
+              >
+                <div style={{ width: '32px', height: '32px', borderRadius: '50%', background: 'var(--color-primary)' }}></div>
+              </button>
+
+              {isGuestMenuOpen && (
+                <div className="user-dropdown-menu" style={{ 
+                  position: 'absolute', 
+                  right: 0, 
+                  top: '100%', 
+                  marginTop: '12px',
+                  background: 'var(--color-bg-surface-elevated)',
+                  border: '1px solid rgba(255, 255, 255, 0.1)',
+                  borderRadius: '12px',
+                  padding: '8px 0',
+                  minWidth: '200px',
+                  boxShadow: '0 10px 25px rgba(0,0,0,0.5)',
+                  zIndex: 1000,
+                  overflow: 'hidden'
+                }}>
+                  <Link href="/registro" onClick={() => setIsGuestMenuOpen(false)} style={{ display: 'block', padding: '12px 16px', color: 'white', textDecoration: 'none', fontWeight: 600, borderBottom: '1px solid rgba(255,255,255,0.05)' }}>
+                    Registrarse
+                  </Link>
+                  <Link href="/ingresar" onClick={() => setIsGuestMenuOpen(false)} style={{ display: 'block', padding: '12px 16px', color: 'var(--color-text-muted)', textDecoration: 'none', fontWeight: 500 }}>
+                    Iniciar sesión
+                  </Link>
+                </div>
+              )}
+            </div>
           )}
         </div>
       </div>
