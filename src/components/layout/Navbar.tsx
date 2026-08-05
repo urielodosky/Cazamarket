@@ -328,7 +328,7 @@ export default function Navbar() {
               src={logoPng.src}
               alt="CazaMarket Logo" 
               className="navbar-logo-img"
-              style={isMobile ? { height: '56px', width: 'auto', maxWidth: '140px', objectFit: 'contain' } : {}}
+              style={isMobile ? { height: '56px', width: '140px', objectFit: 'cover', objectPosition: 'left center' } : {}}
             />
           </Link>
         </div>
@@ -355,10 +355,9 @@ export default function Navbar() {
               zIndex: 10, 
               display: (isFilterablePage && !isHome && !isBusinessProfile) ? 'flex' : 'none',
               background: '#1A1D17',
-              width: '100%',
+              flex: 1, /* Takes up the available space smoothly */
               position: 'relative',
               left: 0,
-              marginRight: 'auto',
               borderRadius: '100px',
               height: '40px',
               padding: '0 12px'
