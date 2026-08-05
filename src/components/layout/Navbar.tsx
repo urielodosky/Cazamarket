@@ -328,7 +328,7 @@ export default function Navbar() {
               src={logoPng.src}
               alt="CazaMarket Logo" 
               className="navbar-logo-img"
-              style={isMobile ? { height: '56px', objectFit: 'contain' } : {}}
+              style={isMobile ? { height: '56px', width: '130px', objectFit: 'cover', objectPosition: 'left center' } : {}}
             />
           </Link>
         </div>
