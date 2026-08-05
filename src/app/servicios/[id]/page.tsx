@@ -520,9 +520,14 @@ export default function ServicioDetailPage({ params }: { params: Promise<{ id: s
 
           {/* Botones de Acción */}
           <div style={{ display: 'flex', flexDirection: 'column', gap: '16px', marginTop: '16px', position: 'relative' }}>
-            {isLoggedIn && canAddToCart(service.seller.id) && service.seller?.planTier && service.seller.planTier !== 'gratis' ? (
+            {canAddToCart(service.seller.id) ? (
               <button
                 onClick={() => {
+                  if (!isLoggedIn) {
+                    alert('Para usar el carrito debes registrarte o iniciar sesión');
+                    router.push('/registro');
+                    return;
+                  }
                   addToCart({
                     id: `servicio-${service.id}-${datesString}`,
                     name: `${service.name} ${selectedDates.length > 0 ? `(${datesString})` : ''}`,

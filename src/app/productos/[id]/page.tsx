@@ -694,10 +694,13 @@ export default function ProductoDetailPage({ params }: { params: Promise<{ id: s
             </Link>
             )}
 
-            {/* 3. Añadir al Carrito - Solo si el usuario está logueado Y el vendedor tiene plan pago */}
-            {isLoggedIn && product.seller?.planTier && product.seller.planTier !== 'gratis' && (
+            {/* 3. Añadir al Carrito - Visible para todos, pero requiere cuenta */}
             <button
               onClick={() => {
+                if (!isLoggedIn) {
+                  showToast('Para usar el carrito debes registrarte o iniciar sesión', 'error');
+                  return;
+                }
                 if (isInCart) {
                   router.push('/carrito');
                 } else {
@@ -746,7 +749,6 @@ export default function ProductoDetailPage({ params }: { params: Promise<{ id: s
                 </>
               )}
             </button>
-            )}
 
             {/* 4. Chat Directo (Sólo si tiene plan compatible) */}
             {hasFeature('chatInterno') && (
