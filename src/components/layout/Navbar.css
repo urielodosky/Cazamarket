@@ -449,7 +449,7 @@
     gap: 8px;
     width: 100vw;
     margin-left: -24px; /* Compensar padding de navbar-container nuevo (24px) */
-    padding: 10px 24px;
+    padding: 10px 0; /* Horizontal padding goes to pseudo elements */
     background: var(--color-bg-base, #0f0f11);
     border-bottom: 1px solid rgba(255, 255, 255, 0.05);
     overflow-x: auto;
@@ -461,9 +461,16 @@
     display: none; /* Chrome/Safari */
   }
   
+  .mobile-filters-panel::before {
+    content: '';
+    padding-left: 24px;
+    flex-shrink: 0;
+  }
+  
   .mobile-filters-panel::after {
     content: '';
     padding-right: 24px;
+    flex-shrink: 0;
   }
 
   .mobile-filters-panel .filter-wrapper-item {
