@@ -6,26 +6,9 @@ import SponsoredAds from '@/components/SponsoredAds';
 import './home.css';
 
 export default function Home() {
-  const schemaMarkup = {
-    "@context": "https://schema.org",
-    "@type": "WebSite",
-    "name": "CazaMarket",
-    "url": "https://cazamarket.vercel.app",
-    "description": "La plataforma de confianza para comercios y servicios de caza, camping y pesca.",
-    "potentialAction": {
-      "@type": "SearchAction",
-      "target": "https://cazamarket.vercel.app/productos?q={search_term_string}",
-      "query-input": "required name=search_term_string"
-    }
-  };
-
   return (
     <div className="home-container">
-      <script
-        type="application/ld+json"
-        dangerouslySetInnerHTML={{ __html: JSON.stringify(schemaMarkup) }}
-      />
-
+      <h1 className="sr-only">CazaMarket | Todo para el Cazador, Pescador y Campista</h1>
 
       <PromoSlider />
 
@@ -35,12 +18,9 @@ export default function Home() {
       
       <PlanesPreview />
 
-      {/* SEO Block para cumplir auditoría web */}
-      <section className="seo-block" style={{ padding: 'var(--spacing-4)', marginTop: 'var(--spacing-4)', borderTop: '1px solid rgba(255,255,255,0.05)' }}>
-        <h1 style={{ fontSize: '1.5rem', marginBottom: 'var(--spacing-2)', color: 'var(--color-primary)' }}>
-          CazaMarket | Todo para el Cazador, Pescador y Campista
-        </h1>
-        <div style={{ color: 'var(--color-text-muted)', fontSize: '0.9rem', lineHeight: '1.6', display: 'flex', flexDirection: 'column', gap: 'var(--spacing-2)' }}>
+      {/* SEO Block para cumplir auditoría web (Sin estilos pesados para evitar que los bots lo omitan) */}
+      <section className="seo-content-block">
+        <div className="container">
           <p>
             Bienvenido a <strong>CazaMarket</strong>, la plataforma definitiva y de confianza para comercios, guías y entusiastas del aire libre. 
             Si eres un apasionado cazador en busca de armerías especializadas, un pescador buscando los mejores señuelos, o un campista 
@@ -68,10 +48,10 @@ export default function Home() {
             y el campista pueden prepararse al máximo para su próxima aventura en la naturaleza. ¡Explora nuestras categorías y comienza tu viaje!
           </p>
         </div>
-        <div style={{ marginTop: 'var(--spacing-3)', paddingTop: 'var(--spacing-2)', borderTop: '1px solid rgba(255,255,255,0.05)', display: 'flex', gap: 'var(--spacing-3)' }}>
-          <Link href="/productos" className="auth-link">Ver Productos</Link>
-          <Link href="/servicios" className="auth-link">Ver Servicios</Link>
-          <Link href="/registro" className="auth-link">Crear cuenta gratuita</Link>
+        <div className="seo-links">
+          <Link href="/productos">Ver Productos</Link>
+          <Link href="/servicios">Ver Servicios</Link>
+          <Link href="/registro">Crear cuenta gratuita</Link>
         </div>
       </section>
     </div>
