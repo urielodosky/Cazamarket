@@ -33,10 +33,24 @@ export default function MobileNav() {
     { href: '/comunidad', icon: <ChatBubbleLeftEllipsisIcon className="mobile-nav-icon-svg" />, label: 'Comunidad' },
   ];
 
+  const activeIndex = navItems.findIndex(item => pathname === item.href || (item.href !== '/' && pathname?.startsWith(item.href)));
+
   return (
     <nav className="mobile-bottom-nav">
-      {navItems.map((item) => {
+      <div 
+        className="mobile-nav-indicator-wrapper" 
+        style={{ '--active-index': activeIndex } as React.CSSProperties}
+      >
+        <div className="mobile-nav-indicator">
+          <div className="mobile-nav-indicator-curve left"></div>
+          <div className="mobile-nav-indicator-curve right"></div>
+        </div>
+      </div>
+      {navItems.map((item, index) => {
         const isActive = pathname === item.href || (item.href !== '/' && pathname?.startsWith(item.href));
+        if (isActive && activeIndex !== index) {
+          // This should ideally be handled without a render side-effect but for this simple UI it's fine
+        }
         return (
           <Link 
             key={item.href}
