@@ -248,16 +248,26 @@ export default function ProductoDetailPage({ params }: { params: Promise<{ id: s
             price: customProduct.price,
             category: customProduct.category,
             condition: customProduct.condition,
-            description: customProduct.description || baseProduct?.description || '',
-            images: customProduct.image ? [customProduct.image] : baseProduct?.images || [],
-            media: customProduct.media || (customProduct.image ? [{ url: customProduct.image, type: 'image' }] : baseProduct?.media || []),
-            features: customProduct.features || baseProduct?.features || [],
+            description: customProduct.description || '',
+            images: customProduct.image ? [customProduct.image] : [],
+            media: customProduct.media || (customProduct.image ? [{ url: customProduct.image, type: 'image' }] : []),
+            features: customProduct.features || [],
             originalPrice: customProduct.discount ? (customProduct.discount.type === 'fijo' ? (parseFloat(customProduct.price.replace(/[^0-9.]/g, '')) + parseFloat(customProduct.discount.value)) : (parseFloat(customProduct.price.replace(/[^0-9.]/g, '')) / (1 - parseFloat(customProduct.discount.value) / 100))) : undefined,
             discount: customProduct.discount,
             seller: {
-              ...(baseProduct?.seller || {}),
-              id: customProduct.storeId || baseProduct?.seller?.id || 1,
-      // Mock functionality removed
+              id: customProduct.storeId || 1,
+              name: customProduct.store || 'Mi Negocio',
+              avatar: customProduct.avatar || '',
+              shippingCost: customProduct.shippingCost,
+              branches: customProduct.branches || []
+            },
+            relatedProducts: []
+          });
+          setIsLoading(false);
+          return;
+        }
+      }
+
       setIsLoading(false);
     };
 
