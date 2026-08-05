@@ -404,10 +404,7 @@ export default function PlanesPage() {
                       display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0,
                       overflow: 'hidden', padding: '6px'
                     }}>
-                      <svg viewBox="0 0 24 24" fill="none" stroke="white" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" style={{ width: '24px', height: '24px' }}>
-                        <path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"></path>
-                        <polyline points="22,6 12,13 2,6"></polyline>
-                      </svg>
+                      <img src="https://http2.mlstatic.com/frontend-assets/ui-navigation/5.19.1/mercadopago/logo__small@2x.png" alt="Mercado Pago" style={{ width: '100%', height: '100%', objectFit: 'contain' }} />
                     </div>
                     <div style={{ flex: 1 }}>
                       <p style={{ margin: 0, color: 'white', fontWeight: 600, fontSize: '0.95rem' }}>Mercado Pago</p>
