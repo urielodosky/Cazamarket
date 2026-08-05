@@ -44,12 +44,13 @@
   position: absolute;
   top: calc(100% + 8px);
   left: 0;
-  width: 280px; /* Reduced width so it doesn't overflow */
-  background: #151515;
+  width: 100%; /* Matches the exact width of the input */
+  box-sizing: border-box;
+  background: #0f0f0f; /* Extremely dark solid background */
   border: 1px solid #333333;
   border-radius: 10px;
-  padding: 12px;
-  box-shadow: 0 10px 40px rgba(0, 0, 0, 0.8);
+  padding: 10px;
+  box-shadow: 0 10px 40px rgba(0, 0, 0, 0.9);
   z-index: 1000;
   animation: popIn 0.2s ease-out forwards;
 }
@@ -145,11 +146,11 @@
 .cal-cell.day {
   cursor: pointer;
   transition: all 0.2s;
-  background: #1e1e1e;
+  background: #252525;
 }
 
 .cal-cell.day:hover {
-  background: #333333;
+  background: #404040;
 }
 
 .cal-cell.day.selected {
