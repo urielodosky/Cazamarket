@@ -69,10 +69,6 @@ export default function Navbar() {
 
   useEffect(() => {
     setIsClient(true);
-    const checkMobile = () => setIsMobile(window.innerWidth <= 768);
-    checkMobile();
-    window.addEventListener('resize', checkMobile);
-    return () => window.removeEventListener('resize', checkMobile);
   }, []);
 
   // Cerrar filtros automáticamente al navegar a una página sin filtros
@@ -322,13 +318,12 @@ export default function Navbar() {
           </svg>
         </button>
 
-        <div className="navbar-logo" style={isMobile ? { flexShrink: 0 } : {}}>
+        <div className="navbar-logo">
           <Link href="/">
             <img 
               src={logoPng.src}
               alt="CazaMarket Logo" 
               className="navbar-logo-img"
-              style={isMobile ? { height: '56px', width: '140px', objectFit: 'cover', objectPosition: 'left center' } : {}}
             />
           </Link>
         </div>
@@ -336,32 +331,15 @@ export default function Navbar() {
         
         <div 
           className={`navbar-middle-area ${!(isFilterablePage && !isHome && !isBusinessProfile) ? 'mobile-hidden' : ''}`}
-          style={isMobile ? {
-            display: 'flex',
-            flex: '1',
-            justifyContent: 'flex-start',
-            marginLeft: '8px',
-            minWidth: 0,
-            alignItems: 'center'
-          } : { 
+          style={{ 
             display: 'flex', 
             gap: '12px', 
             transition: 'all 0.5s cubic-bezier(0.4, 0, 0.2, 1)', 
             alignItems: 'stretch'
           }}
         >
-          <div className={`navbar-center glass-panel ${navbarModeClass}`} style={isMobile ? { width: '100%', margin: 0, padding: 0, height: '44px', display: 'flex', flexDirection: 'row', alignItems: 'center', justifyContent: 'flex-start' } : {}}>
-            <div className="search-bar-animated" style={isMobile ? {
-              zIndex: 10, 
-              display: (isFilterablePage && !isHome && !isBusinessProfile) ? 'flex' : 'none',
-              background: '#1A1D17',
-              flex: 1, /* Takes up the available space smoothly */
-              position: 'relative',
-              left: 0,
-              borderRadius: '100px',
-              height: '40px',
-              padding: '0 12px'
-            } : { 
+          <div className={`navbar-center glass-panel ${navbarModeClass}`}>
+            <div className="search-bar-animated" style={{ 
               zIndex: 10, 
               display: (isFilterablePage && !isHome && !isBusinessProfile) ? 'flex' : 'none',
               background: '#1A1D17'

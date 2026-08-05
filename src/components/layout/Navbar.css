@@ -649,29 +649,28 @@
     gap: 12px;
   }
   .navbar-logo {
-    flex-shrink: 0 !important;
+    flex-shrink: 0;
   }
   .navbar-logo-img {
-    height: 60px !important; /* Más grande (antes 48px) */
-    object-fit: contain !important;
+    height: 56px;
+    object-fit: contain;
   }
   .navbar-actions {
-    margin-left: auto !important;
-    flex-shrink: 0 !important;
+    margin-left: auto;
+    flex-shrink: 0;
   }
   .navbar-middle-area {
-    flex: 1 1 100% !important; /* Ocupa el espacio restante agresivamente */
-    display: flex !important;
-    justify-content: flex-start !important; /* Alinea el buscador hacia la izquierda */
-    margin-left: 16px !important; /* Lo acerca un poco más al logo */
-    min-width: 0 !important; 
+    flex: 1;
+    display: flex;
+    justify-content: flex-start;
+    margin-left: -30px; /* Jala el buscador a la izquierda sin romper su ancho */
+    min-width: 0; 
   }
   .navbar-center {
     width: 100% !important;
     max-width: 100% !important;
     height: 44px !important;
     padding: 0 !important;
-    margin: 0 !important; /* Eliminar cualquier margin: 0 auto */
   }
   .search-bar-animated {
     width: 100% !important;
