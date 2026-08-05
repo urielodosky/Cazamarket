@@ -15,7 +15,7 @@ import {
 import './planes.css';
 
 type PaymentMethod = 'mercadopago' | 'tarjeta';
-type PaymentStep = 'select' | 'processing' | 'success';
+type PaymentStep = 'select' | 'card' | 'processing' | 'success';
 
 export default function PlanesPage() {
   const { 
@@ -26,7 +26,8 @@ export default function PlanesPage() {
     pendingProductPlanTier,
     pendingServicePlanTier,
     calculateNextBillingDate,
-    acceleratePlan
+    acceleratePlan,
+    isPaidPlan
   } = usePlan();
   const { isLoggedIn, isVendor, phone, personType, birthDate, cuit, updateUser } = useAuth();
   const [activeTab, setActiveTab] = useState<PlanCategory>('productos');
@@ -83,6 +84,11 @@ export default function PlanesPage() {
 
   const handleConfirmPayment = () => {
     if (!paymentModal.plan) return;
+    
+    if (paymentMethod === 'tarjeta' && paymentStep === 'select') {
+      setPaymentStep('card');
+      return;
+    }
     
     setPaymentStep('processing');
     
@@ -343,10 +349,10 @@ export default function PlanesPage() {
                 </div>
                 <div>
                   <h3 style={{ margin: 0, color: 'white', fontSize: '1.25rem', fontWeight: 600, letterSpacing: '-0.02em' }}>
-                    {paymentStep === 'success' ? 'Pago exitoso' : paymentStep === 'processing' ? 'Procesando pago...' : 'Finalizar compra'}
+                    {paymentStep === 'success' ? 'Pago exitoso' : paymentStep === 'processing' ? 'Procesando pago...' : paymentStep === 'card' ? 'Datos de Tarjeta' : 'Finalizar compra'}
                   </h3>
                   <p style={{ margin: '4px 0 0', color: 'rgba(255,255,255,0.5)', fontSize: '0.85rem' }}>
-                    {paymentStep === 'success' ? 'Tu plan ha sido activado' : paymentStep === 'processing' ? 'No cierres esta ventana' : 'Simulación de pago segura'}
+                    {paymentStep === 'success' ? 'Tu plan ha sido activado' : paymentStep === 'processing' ? 'No cierres esta ventana' : paymentStep === 'card' ? 'Ingresa los datos de forma segura' : 'Simulación de pago segura'}
                   </p>
                 </div>
               </div>
@@ -398,7 +404,10 @@ export default function PlanesPage() {
                       display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0,
                       overflow: 'hidden', padding: '6px'
                     }}>
-                      <img src="https://http2.mlstatic.com/frontend-assets/ui-navigation/5.19.1/mercadopago/logo__small@2x.png" alt="Mercado Pago" style={{ width: '100%', height: '100%', objectFit: 'contain' }} />
+                      <svg viewBox="0 0 24 24" fill="none" stroke="white" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" style={{ width: '24px', height: '24px' }}>
+                        <path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"></path>
+                        <polyline points="22,6 12,13 2,6"></polyline>
+                      </svg>
                     </div>
                     <div style={{ flex: 1 }}>
                       <p style={{ margin: 0, color: 'white', fontWeight: 600, fontSize: '0.95rem' }}>Mercado Pago</p>
@@ -442,20 +451,22 @@ export default function PlanesPage() {
                   </div>
 
                   {/* Disclaimer de simulación */}
-                  <div style={{
-                    background: 'rgba(255, 193, 7, 0.08)', borderRadius: '8px', padding: '10px 14px',
-                    marginBottom: '20px', border: '1px solid rgba(255, 193, 7, 0.2)',
-                    display: 'flex', alignItems: 'center', gap: '10px'
-                  }}>
-                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#ffc107" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" style={{ flexShrink: 0 }}>
-                      <circle cx="12" cy="12" r="10"></circle>
-                      <line x1="12" y1="8" x2="12" y2="12"></line>
-                      <line x1="12" y1="16" x2="12.01" y2="16"></line>
-                    </svg>
-                    <p style={{ margin: 0, color: '#cca700', fontSize: '0.78rem', lineHeight: 1.4 }}>
-                      <strong>Importante:</strong> El cambio de plan se aplicará a partir de tu <strong>próximo ciclo de facturación</strong>. No se realizarán cobros extra este mes.
-                    </p>
-                  </div>
+                  {isPaidPlan && (
+                    <div style={{
+                      background: 'rgba(255, 193, 7, 0.08)', borderRadius: '8px', padding: '10px 14px',
+                      marginBottom: '20px', border: '1px solid rgba(255, 193, 7, 0.2)',
+                      display: 'flex', alignItems: 'center', gap: '10px'
+                    }}>
+                      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#ffc107" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" style={{ flexShrink: 0 }}>
+                        <circle cx="12" cy="12" r="10"></circle>
+                        <line x1="12" y1="8" x2="12" y2="12"></line>
+                        <line x1="12" y1="16" x2="12.01" y2="16"></line>
+                      </svg>
+                      <p style={{ margin: 0, color: '#cca700', fontSize: '0.78rem', lineHeight: 1.4 }}>
+                        <strong>Importante:</strong> El cambio de plan se aplicará a partir de tu <strong>próximo ciclo de facturación</strong>. No se realizarán cobros extra este mes, a menos que uses la opción <strong>Acelerar</strong> desde el panel principal.
+                      </p>
+                    </div>
+                  )}
 
                   {/* Botón de pagar */}
                   <button
@@ -472,6 +483,45 @@ export default function PlanesPage() {
                     Pagar ${paymentModal.plan.price}/mes
                   </button>
                 </>
+              )}
+
+              {/* PASO 1.5: Ingreso de Tarjeta */}
+              {paymentStep === 'card' && (
+                <div>
+                  <div style={{ display: 'flex', flexDirection: 'column', gap: '12px', marginBottom: '24px' }}>
+                    <input type="text" placeholder="Número de Tarjeta" style={{ padding: '14px', borderRadius: '12px', border: '1px solid rgba(255,255,255,0.1)', background: 'rgba(255,255,255,0.03)', color: 'white', fontSize: '1rem' }} />
+                    <div style={{ display: 'flex', gap: '12px' }}>
+                      <input type="text" placeholder="MM/AA" style={{ padding: '14px', borderRadius: '12px', border: '1px solid rgba(255,255,255,0.1)', background: 'rgba(255,255,255,0.03)', color: 'white', flex: 1, fontSize: '1rem' }} />
+                      <input type="text" placeholder="CVC" style={{ padding: '14px', borderRadius: '12px', border: '1px solid rgba(255,255,255,0.1)', background: 'rgba(255,255,255,0.03)', color: 'white', flex: 1, fontSize: '1rem' }} />
+                    </div>
+                    <input type="text" placeholder="Nombre en la tarjeta" style={{ padding: '14px', borderRadius: '12px', border: '1px solid rgba(255,255,255,0.1)', background: 'rgba(255,255,255,0.03)', color: 'white', fontSize: '1rem' }} />
+                  </div>
+                  <div style={{ fontSize: '0.8rem', color: '#888', marginBottom: '24px', display: 'flex', alignItems: 'flex-start', gap: '12px', background: 'rgba(34, 197, 94, 0.05)', padding: '12px', borderRadius: '8px', border: '1px solid rgba(34, 197, 94, 0.2)' }}>
+                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#22c55e" strokeWidth="2" style={{ flexShrink: 0, marginTop: '2px' }}><rect x="3" y="11" width="18" height="11" rx="2" ry="2"></rect><path d="M7 11V7a5 5 0 0 1 10 0v4"></path></svg>
+                    <span style={{ lineHeight: 1.4 }}><strong>Tus datos están encriptados.</strong> Nunca guardamos el número completo de tu tarjeta en nuestra base de datos. Solo guardamos un token seguro validado por nuestra pasarela de pagos, cumpliendo con la normativa internacional PCI DSS.</span>
+                  </div>
+                  <button
+                    onClick={handleConfirmPayment}
+                    style={{
+                      width: '100%', padding: '14px', fontSize: '1.05rem', fontWeight: 700,
+                      background: 'linear-gradient(135deg, var(--color-primary), #e06500)',
+                      border: 'none', borderRadius: '12px', color: 'white', cursor: 'pointer',
+                      transition: 'all 0.2s ease', boxShadow: '0 4px 15px rgba(255, 115, 0, 0.3)'
+                    }}
+                  >
+                    Confirmar Pago Seguro
+                  </button>
+                  <button
+                    onClick={() => setPaymentStep('select')}
+                    style={{
+                      width: '100%', padding: '12px', fontSize: '0.95rem', fontWeight: 600,
+                      background: 'transparent',
+                      border: 'none', color: '#888', cursor: 'pointer', marginTop: '12px'
+                    }}
+                  >
+                    Volver atrás
+                  </button>
+                </div>
               )}
 
               {/* PASO 2: Procesando pago */}
