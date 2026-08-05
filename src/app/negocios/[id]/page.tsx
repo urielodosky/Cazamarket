@@ -631,6 +631,7 @@ export default function NegocioDetailPage({ params }: { params: Promise<{ id: st
                       <CustomSelect 
                         options={[
                           { value: '', label: 'Categoría (Todas)' },
+                          { value: 'armas_de_fuego', label: 'Armas de Fuego' },
                           { value: 'armeria', label: 'Armería' },
                           { value: 'pesca', label: 'Pesca' },
                           { value: 'camping', label: 'Camping' }
@@ -1073,6 +1074,7 @@ export default function NegocioDetailPage({ params }: { params: Promise<{ id: st
                       <CustomSelect 
                         options={[
                           { value: '', label: 'Categoría (Todas)' },
+                          { value: 'armas_de_fuego', label: 'Armas de Fuego' },
                           { value: 'armeria', label: 'Armería' },
                           { value: 'pesca', label: 'Pesca' },
                           { value: 'camping', label: 'Camping' }

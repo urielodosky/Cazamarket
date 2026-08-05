@@ -8,6 +8,20 @@ export interface MainCategory {
 export const CATEGORIES_DATA: MainCategory[] = [
   // --- CATEGORÍAS DE PRODUCTOS ---
   {
+    id: 'armas_de_fuego',
+    name: 'Armas de Fuego',
+    type: 'producto',
+    subcategories: [
+      'Fusiles y Carabinas',
+      'Escopetas',
+      'Pistolas y Revólveres',
+      'Fusiles Tácticos',
+      'Armas de Colección y Avancarga',
+      'Municiones',
+      'Repuestos y Cargadores',
+    ],
+  },
+  {
     id: 'optica',
     name: 'Óptica, Visión y Fototrampeo',
     type: 'producto',

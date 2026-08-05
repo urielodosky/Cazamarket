@@ -5,6 +5,12 @@ import Link from 'next/link';
 export default function CategoryExplorer() {
   const categories = [
     {
+      id: 'armas_de_fuego',
+      name: 'Armas de Fuego',
+      image: 'https://images.unsplash.com/photo-1595590424283-b8f1784cb2c8?q=80&w=600&auto=format&fit=crop',
+      href: '/productos?categoria=Armas'
+    },
+    {
       id: 'caza',
       name: 'Caza',
       image: 'https://images.unsplash.com/photo-1588614959060-4d144f28b207?q=80&w=600&auto=format&fit=crop',
