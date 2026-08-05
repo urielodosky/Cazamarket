@@ -177,6 +177,11 @@ input[type="number"] {
     padding-left: 24px;
     padding-right: 24px;
   }
+  
+  /* Add padding to the bottom of the main content to account for the fixed MobileNav */
+  main {
+    padding-bottom: calc(70px + env(safe-area-inset-bottom));
+  }
   .desktop-only-loader {
     display: none !important;
   }
