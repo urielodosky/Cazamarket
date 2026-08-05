@@ -62,9 +62,18 @@ export default function UserMenu() {
                 )}
               </div>
               <div className="user-header-info">
-                <p className="user-name" style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
-                  {username || 'Usuario'}
-                </p>
+                {isVendor ? (
+                  <Link href="/negocios/1" style={{ textDecoration: 'none' }} onClick={() => setIsOpen(false)}>
+                    <p className="user-name" style={{ display: 'flex', alignItems: 'center', gap: '6px', cursor: 'pointer', transition: 'color 0.2s' }} onMouseEnter={(e) => e.currentTarget.style.color = 'var(--color-primary)'} onMouseLeave={(e) => e.currentTarget.style.color = ''}>
+                      {username || 'Usuario'}
+                      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" style={{ opacity: 0.7 }}><path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"></path><polyline points="15 3 21 3 21 9"></polyline><line x1="10" y1="14" x2="21" y2="3"></line></svg>
+                    </p>
+                  </Link>
+                ) : (
+                  <p className="user-name" style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
+                    {username || 'Usuario'}
+                  </p>
+                )}
                 <p className="user-email">{email || 'usuario@correo.com'}</p>
                 <span className={`user-role-badge ${isVendorModeActive ? 'vendor' : 'buyer'}`}>
                   {isVendorModeActive ? 'Modo Vendedor' : 'Modo Comprador'}
@@ -92,13 +101,22 @@ export default function UserMenu() {
                 <span>{isVendorModeActive ? 'Cambiar a Comprador' : 'Cambiar a Vendedor'}</span>
               </button>
 
-              {isVendorModeActive && (
-                <Link href="/mis-tiendas" className="dropdown-item" onClick={() => setIsOpen(false)}>
-                  <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-                    <path d="M20 16V7a2 2 0 0 0-2-2H6a2 2 0 0 0-2 2v9m16 0H4m16 0 1.28 2.55a1 1 0 0 1-.9 1.45H3.62a1 1 0 0 1-.9-1.45L4 16"></path>
-                  </svg>
-                  <span>Mi negocio</span>
-                </Link>
+              {isVendor && (
+                <>
+                  <Link href="/mis-tiendas" className="dropdown-item" onClick={() => setIsOpen(false)}>
+                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                      <path d="M20 16V7a2 2 0 0 0-2-2H6a2 2 0 0 0-2 2v9m16 0H4m16 0 1.28 2.55a1 1 0 0 1-.9 1.45H3.62a1 1 0 0 1-.9-1.45L4 16"></path>
+                    </svg>
+                    <span>Configurar negocio</span>
+                  </Link>
+                  <Link href="/negocios/1" className="dropdown-item" onClick={() => setIsOpen(false)}>
+                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                      <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"></path>
+                      <circle cx="12" cy="12" r="3"></circle>
+                    </svg>
+                    <span>Ver mi tienda</span>
+                  </Link>
+                </>
               )}
 
               <Link href="/favoritos" className="dropdown-item" onClick={() => setIsOpen(false)}>

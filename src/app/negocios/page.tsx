@@ -90,13 +90,13 @@ export default function NegociosPage() {
           theme: parsed.theme || null,
         };
 
-        if (permissions.tiendaVirtual) {
-          setNegocios([userNegocio]);
+        if (planTier !== 'gratis') {
+          setNegocios([userNegocio, ...NEGOCIOS_DATA]);
         } else {
-          setNegocios([]);
+          setNegocios([...NEGOCIOS_DATA]);
         }
       } else {
-        setNegocios([]);
+        setNegocios([...NEGOCIOS_DATA]);
       }
     };
     
