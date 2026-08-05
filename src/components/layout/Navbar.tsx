@@ -328,7 +328,7 @@ export default function Navbar() {
               src={logoPng.src}
               alt="CazaMarket Logo" 
               className="navbar-logo-img"
-              style={isMobile ? { height: '56px', width: '130px', objectFit: 'cover', objectPosition: 'left center' } : {}}
+              style={isMobile ? { height: '56px', width: 'auto', maxWidth: '140px', objectFit: 'contain' } : {}}
             />
           </Link>
         </div>
@@ -350,13 +350,12 @@ export default function Navbar() {
             alignItems: 'stretch'
           }}
         >
-          <div className={`navbar-center glass-panel ${navbarModeClass}`} style={isMobile ? { width: '100%', margin: 0, padding: 0, height: '44px', display: 'flex', alignItems: 'center' } : {}}>
+          <div className={`navbar-center glass-panel ${navbarModeClass}`} style={isMobile ? { width: '100%', margin: 0, padding: 0, height: '44px', display: 'flex', flexDirection: 'row', alignItems: 'center', justifyContent: 'flex-start' } : {}}>
             <div className="search-bar-animated" style={isMobile ? {
               zIndex: 10, 
               display: (isFilterablePage && !isHome && !isBusinessProfile) ? 'flex' : 'none',
               background: '#1A1D17',
               width: '100%',
-              maxWidth: '280px',
               position: 'relative',
               left: 0,
               marginRight: 'auto',
