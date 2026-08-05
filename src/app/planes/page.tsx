@@ -45,7 +45,7 @@ export default function PlanesPage() {
 
   useEffect(() => {
     if (paymentModal.show) {
-      fetch('https://dolarapi.com/v1/dolares/blue')
+      fetch('/api/dolar')
         .then(res => res.json())
         .then(data => {
           if (data.venta) setExchangeRate(data.venta);
