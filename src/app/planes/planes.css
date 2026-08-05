@@ -511,7 +511,7 @@
 @media (max-width: 768px) {
   .plan-card:not(.preview-card) {
     display: grid !important;
-    grid-template-columns: minmax(0, 1.2fr) minmax(0, auto) minmax(0, 1fr) !important;
+    grid-template-columns: minmax(0, 1.2fr) minmax(0, auto) minmax(0, auto) !important;
     gap: 6px !important;
     padding: 12px 12px !important;
     align-items: center !important;
@@ -544,11 +544,27 @@
     line-height: 1.1 !important;
     word-break: break-word !important;
   }
-  
-  .plan-card:not(.preview-card) .plan-features-toggle {
+
+  .plan-card:not(.preview-card) .plan-price {
     grid-column: 2 !important;
     grid-row: 2 !important;
-    margin: 0 auto !important;
+    margin: 0 !important;
+    text-align: center !important;
+    white-space: nowrap !important;
+  }
+  
+  .plan-card:not(.preview-card) .amount {
+    font-size: 1.05rem !important;
+  }
+  
+  .plan-card:not(.preview-card) .plan-original-price {
+    display: none !important;
+  }
+  
+  .plan-card:not(.preview-card) .plan-features-toggle {
+    grid-column: 3 !important;
+    grid-row: 2 !important;
+    margin: 0 0 0 auto !important;
     padding: 0 4px !important;
     font-size: 0.7rem !important;
     height: auto !important;
@@ -559,7 +575,7 @@
     text-decoration: underline !important;
     white-space: normal !important;
     line-height: 1.1 !important;
-    text-align: center !important;
+    text-align: right !important;
   }
   
   .plan-card:not(.preview-card) .plan-features-toggle svg {
@@ -567,22 +583,6 @@
     height: 10px !important;
     margin-left: 2px !important;
     vertical-align: middle !important;
-  }
-
-  .plan-card:not(.preview-card) .plan-price {
-    grid-column: 3 !important;
-    grid-row: 2 !important;
-    margin: 0 !important;
-    text-align: right !important;
-    white-space: nowrap !important;
-  }
-  
-  .plan-card:not(.preview-card) .amount {
-    font-size: 1.05rem !important;
-  }
-  
-  .plan-card:not(.preview-card) .plan-original-price {
-    display: none !important;
   }
   
   .plan-card:not(.preview-card) .plan-btn {
