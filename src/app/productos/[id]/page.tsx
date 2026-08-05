@@ -540,6 +540,17 @@ export default function ProductoDetailPage({ params }: { params: Promise<{ id: s
               </div>
             )}
           </div>
+          </div>
+
+          {/* Banner Condicional ANMaC para Armas */}
+          {(product.category === 'Armas' || product.category === 'armas_de_fuego' || product.category?.toLowerCase().includes('arma')) && (
+            <div style={{ background: 'rgba(255, 193, 7, 0.1)', border: '1px solid #ffc107', borderRadius: '8px', padding: '12px', marginTop: '16px' }}>
+              <p style={{ margin: 0, color: '#ffc107', fontSize: '0.85rem', fontWeight: 600, display: 'flex', alignItems: 'center', gap: '8px' }}>
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" style={{ flexShrink: 0 }}><path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"></path><line x1="12" y1="9" x2="12" y2="13"></line><line x1="12" y1="17" x2="12.01" y2="17"></line></svg>
+                <span>⚠️ Atención: La compra/venta de este artículo requiere Credencial de Legítimo Usuario (CLU) vigente y trámite ante ANMaC. CazaMarket no interviene en la transacción.</span>
+              </p>
+            </div>
+          )}
 
           {/* Botones de Acción */}
           <div style={{ display: 'grid', gridTemplateColumns: 'repeat(2, 1fr)', gap: '12px', marginTop: '16px' }}>
@@ -594,7 +605,9 @@ export default function ProductoDetailPage({ params }: { params: Promise<{ id: s
                 const cleanPhone = rawPhone.replace(/\D/g, '');
 
                 const waMessage = `Hola, soy ${buyerName} y te escribo para pedir información sobre el producto ${product.name}`;
-                const waUrl = `https://wa.me/${cleanPhone}?text=${encodeURIComponent(waMessage)}`;
+                const isArma = product.category === 'Armas' || product.category === 'armas_de_fuego' || product.category?.toLowerCase().includes('arma');
+                const anmacNotice = isArma ? `\n\n---\nAviso de seguridad CazaMarket:* Te recordamos que la transferencia de este artículo debe realizarse estrictamente bajo la normativa de ANMaC, exigiendo CLU vigente.*` : '';
+                const waUrl = `https://wa.me/${cleanPhone}?text=${encodeURIComponent(waMessage + anmacNotice)}`;
 
 
 
@@ -708,6 +721,7 @@ export default function ProductoDetailPage({ params }: { params: Promise<{ id: s
                     store: product.seller.name,
                     storeId: product.seller.id,
                     type: 'producto',
+                    category: product.category,
                     baseDiscount: product.discount ? { type: product.discount.type, value: product.discount.value } : undefined,
                     volumeDiscounts: product.volumeDiscounts
                   });

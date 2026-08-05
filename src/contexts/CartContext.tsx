@@ -14,6 +14,7 @@ export interface CartItem {
   storeId: number | string;
   quantity: number;
   type: 'producto' | 'servicio';
+  category?: string;
   baseDiscount?: { type: string, value: string };
   volumeDiscounts?: { minQty: string, type: string, value: string }[];
   timeDiscounts?: { minTime: string, type: string, value: string }[];

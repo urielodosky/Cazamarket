@@ -85,6 +85,11 @@ export default function CarritoPage() {
     
     message += `\n*Total estimado: $${total.toFixed(2)}*\n\n¿Tienen disponibilidad y cómo sería el envío/pago?`;
     
+    const hasArma = items.some(item => item.category === 'Armas' || item.category === 'armas_de_fuego' || item.category?.toLowerCase().includes('arma'));
+    if (hasArma) {
+      message += `\n\n---\nAviso de seguridad CazaMarket:* Te recordamos que la transferencia de este artículo debe realizarse estrictamente bajo la normativa de ANMaC, exigiendo CLU vigente.*`;
+    }
+
     return `https://wa.me/${phone}?text=${encodeURIComponent(message)}`;
   };
 

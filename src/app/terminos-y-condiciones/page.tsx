@@ -12,13 +12,13 @@ export default function TerminosYCondicionesPage() {
     }}>
       <h1 style={{ color: 'var(--color-primary)', marginBottom: '32px', textAlign: 'center' }}>Términos y Condiciones de Uso – Cazamarket</h1>
       
-      <div style={{ background: 'rgba(239,68,68,0.1)', border: '2px solid #ef4444', borderRadius: '8px', padding: '16px', marginBottom: '32px' }}>
-        <h2 style={{ color: '#ef4444', marginTop: 0, marginBottom: '8px', fontSize: '1.2rem', display: 'flex', alignItems: 'center', gap: '8px' }}>
-          <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"></path><line x1="12" y1="9" x2="12" y2="13"></line><line x1="12" y1="17" x2="12.01" y2="17"></line></svg>
-          POLÍTICA DE TOLERANCIA CERO: ARMAS DE FUEGO
+      <div style={{ background: 'rgba(255, 193, 7, 0.1)', border: '2px solid #ffc107', borderRadius: '8px', padding: '16px', marginBottom: '32px' }}>
+        <h2 style={{ color: '#ffc107', marginTop: 0, marginBottom: '8px', fontSize: '1.2rem', display: 'flex', alignItems: 'center', gap: '8px' }}>
+          <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><circle cx="12" cy="12" r="10"></circle><line x1="12" y1="8" x2="12" y2="12"></line><line x1="12" y1="16" x2="12.01" y2="16"></line></svg>
+          NATURALEZA DE LA PLATAFORMA
         </h2>
         <p style={{ color: 'white', margin: 0, fontWeight: 500 }}>
-          CazaMarket prohíbe terminantemente la venta, oferta, promoción o exhibición de cualquier tipo de <strong>ARMA DE FUEGO, MUNICIÓN o EXPLOSIVO</strong>. No somos una armería. Cualquier usuario o negocio que intente publicar armas de fuego será suspendido y bloqueado de forma inmediata, permanente e irrevocable, sin derecho a reembolso.
+          CazaMarket opera exclusivamente como un <strong>portal de exhibición publicitaria (vidriera de clasificados)</strong> y no participa, media ni garantiza ninguna transacción entre usuarios. La negociación y el pago de los artículos se realizan por fuera de la plataforma. Para la transferencia de material regulado (Armas de Fuego, Municiones, etc.), los usuarios asumen la responsabilidad total y absoluta de cumplir con la normativa vigente de la <strong>ANMaC</strong>, incluyendo la tenencia de la <strong>Credencial de Legítimo Usuario (CLU)</strong> y la utilización de los formularios <strong>SIGIMAC</strong>.
         </p>
       </div>
 
@@ -118,14 +118,14 @@ export default function TerminosYCondicionesPage() {
       <section style={{ marginBottom: '32px' }}>
         <h2 style={{ color: 'white', marginBottom: '16px', fontSize: '1.4rem' }}>5. Artículos Regulados y Prohibidos</h2>
         
-        <h3 style={{ color: '#ccc', fontSize: '1.1rem', marginBottom: '8px' }}>5.1. Prohibición de Armas de Fuego y Explosivos</h3>
+        <h3 style={{ color: '#ccc', fontSize: '1.1rem', marginBottom: '8px' }}>5.1. Material Regulado (Armas de Fuego, Municiones)</h3>
         <p style={{ marginBottom: '16px', color: 'var(--color-text-muted)' }}>
-          Queda estricta y terminantemente prohibida la publicación, promoción, oferta y/o comercialización de armas de fuego de cualquier calibre, municiones para armas de fuego, pólvora, explosivos, material inflamable de alto riesgo, y cualquier otro artículo bélico que requiera registro, autorización, tenencia o portación regulada por la Agencia Nacional de Materiales Controlados (ANMaC) o cualquier otra autoridad gubernamental competente.
+          CazaMarket permite la exhibición publicitaria de armas de fuego, municiones y accesorios regulados a través de su vidriera de clasificados. La Plataforma <strong>no interviene, media ni garantiza</strong> ninguna transacción entre usuarios. La negociación, el pago y la transferencia de dichos artículos se realizan por fuera de la Plataforma, bajo la exclusiva responsabilidad de las partes involucradas. Los usuarios que publiquen o adquieran material regulado asumen la responsabilidad total y absoluta de cumplir con la normativa vigente de la <strong>Agencia Nacional de Materiales Controlados (ANMaC)</strong>, incluyendo pero no limitándose a: la tenencia de la <strong>Credencial de Legítimo Usuario (CLU)</strong> vigente, la utilización de los formularios <strong>SIGIMAC</strong> para la transferencia de armas de fuego, y cualquier otro requisito legal aplicable. La Empresa se reserva el derecho de solicitar documentación probatoria y de dar de baja publicaciones que, a su sola discreción, considere que no cumplen con las regulaciones vigentes.
         </p>
 
-        <h3 style={{ color: '#ccc', fontSize: '1.1rem', marginBottom: '8px' }}>5.2. Artículos Permitidos (PCP y Accesorios)</h3>
+        <h3 style={{ color: '#ccc', fontSize: '1.1rem', marginBottom: '8px' }}>5.2. Artículos de Libre Circulación</h3>
         <p style={{ marginBottom: '16px', color: 'var(--color-text-muted)' }}>
-          La Plataforma permite exclusivamente la publicación de marcadoras, armas de aire comprimido, sistemas PCP (Pre-Charged Pneumatic), CO2, resorte o pistón, y sus respectivos accesorios (balines, miras telescópicas, infladores, fundas, indumentaria, cuchillería), siempre y cuando su comercialización, transporte y tenencia sean de libre circulación bajo la legislación vigente.
+          La Plataforma permite además la publicación de marcadoras, armas de aire comprimido, sistemas PCP (Pre-Charged Pneumatic), CO2, resorte o pistón, y sus respectivos accesorios (balines, miras telescópicas, infladores, fundas, indumentaria, cuchillería), siempre y cuando su comercialización, transporte y tenencia sean de libre circulación bajo la legislación vigente.
         </p>
 
         <h3 style={{ color: '#ccc', fontSize: '1.1rem', marginBottom: '8px' }}>5.3. Protección de Fauna</h3>

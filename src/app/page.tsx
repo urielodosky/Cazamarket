@@ -26,8 +26,6 @@ export default function Home() {
             Si eres un apasionado cazador en busca de equipamiento especializado, un pescador buscando los mejores señuelos, o un campista 
             preparando su próxima expedición de supervivencia, has llegado al lugar indicado. Nuestra misión es conectar a toda la comunidad 
             outdoor de Argentina y la región en un único ecosistema digital seguro y transparente. 
-            <br/><br/>
-            <strong style={{color: '#ff4444'}}>IMPORTANTE: CazaMarket es un sitio estrictamente para accesorios, indumentaria, pesca, camping y aire comprimido. ESTÁ TERMINANTEMENTE PROHIBIDA LA VENTA DE ARMAS DE FUEGO. No somos una armería ni permitimos su comercialización.</strong>
           </p>
           <p>
             Aquí podrás encontrar un directorio completo de <strong>tiendas, servicios y profesionales</strong>. Desde equipamiento táctico, 
