@@ -65,25 +65,25 @@
 }
 
 .mobile-nav-item.active .mobile-nav-icon {
-  transform: translateY(-44px); /* Matemáticamente concéntrico con el arco de la ola */
+  transform: translateY(-26px); /* Acomodado al nuevo centro más bajito */
   background-color: var(--color-primary);
   color: white;
   border: 4px solid var(--color-bg-base); /* Esto crea el "hueco" oscuro alrededor del ícono */
   box-shadow: 0 4px 12px color-mix(in srgb, var(--color-primary) 40%, transparent);
 }
 
-/* La ola perfecta usando SVG mask (Arcos geométricos para que sea 100% redonda y NO puntiaguda) */
+/* La ola perfecta usando SVG mask (Más bajita y con una cúpula redonda) */
 .mobile-nav-item.active::before {
   content: "";
   position: absolute;
-  top: -48px; /* Altura total de la ola por encima del navbar */
+  top: -24px; /* Bajamos la altura a la mitad (más bajito) */
   left: 50%;
   transform: translateX(-50%);
-  width: 140px; /* Ancho total para acomodar el semicírculo y los empalmes suaves */
-  height: 48px;
-  background-color: var(--color-bg-surface); /* Debe coincidir con el navbar */
-  -webkit-mask-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 140 48' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath d='M0,48 L22,48 A18,18 0 0,0 40,30 A30,30 0 0,1 100,30 A18,18 0 0,0 118,48 L140,48 Z' fill='black'/%3E%3C/svg%3E");
-  mask-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 140 48' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath d='M0,48 L22,48 A18,18 0 0,0 40,30 A30,30 0 0,1 100,30 A18,18 0 0,0 118,48 L140,48 Z' fill='black'/%3E%3C/svg%3E");
+  width: 120px; 
+  height: 24px;
+  background-color: var(--color-bg-surface); 
+  -webkit-mask-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 120 24' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath d='M0,24 C30,24 35,0 60,0 C85,0 90,24 120,24 Z' fill='black'/%3E%3C/svg%3E");
+  mask-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 120 24' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath d='M0,24 C30,24 35,0 60,0 C85,0 90,24 120,24 Z' fill='black'/%3E%3C/svg%3E");
   -webkit-mask-size: 100% 100%;
   mask-size: 100% 100%;
   pointer-events: none;
@@ -91,7 +91,7 @@
 
 .mobile-nav-item.active .mobile-nav-label {
   opacity: 1;
-  transform: translateY(-16px) scale(1.1); /* Centrado en el espacio vacío que dejó el ícono en el navbar */
+  transform: translateY(-8px) scale(1.1); /* Reacomodado al nuevo centro más bajito */
 }
 
 /* Mostrar solo en pantallas móviles */
