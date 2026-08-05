@@ -511,8 +511,8 @@
 @media (max-width: 768px) {
   .plan-card:not(.preview-card) {
     display: grid !important;
-    grid-template-columns: minmax(0, 1.2fr) minmax(0, auto) minmax(0, auto) !important;
-    gap: 6px !important;
+    grid-template-columns: auto auto 1fr !important;
+    gap: 8px !important;
     padding: 12px 12px !important;
     align-items: center !important;
     text-align: left !important;
@@ -542,19 +542,34 @@
     font-size: 0.95rem !important;
     margin: 0 !important;
     line-height: 1.1 !important;
-    word-break: break-word !important;
+    white-space: nowrap !important;
   }
 
   .plan-card:not(.preview-card) .plan-price {
     grid-column: 2 !important;
     grid-row: 2 !important;
     margin: 0 !important;
-    text-align: center !important;
+    text-align: left !important;
     white-space: nowrap !important;
+    display: flex !important;
+    align-items: baseline !important;
+    justify-content: flex-start !important;
+    gap: 2px !important;
+  }
+  
+  .plan-card:not(.preview-card) .currency {
+    font-size: 0.85rem !important;
+    margin: 0 !important;
   }
   
   .plan-card:not(.preview-card) .amount {
-    font-size: 1.05rem !important;
+    font-size: 1rem !important;
+    line-height: 1 !important;
+  }
+
+  .plan-card:not(.preview-card) .period {
+    font-size: 0.75rem !important;
+    margin: 0 !important;
   }
   
   .plan-card:not(.preview-card) .plan-original-price {
