@@ -439,7 +439,7 @@ export default function PlanesPage() {
                     </div>
                     <div style={{ flex: 1 }}>
                       <p style={{ margin: 0, color: 'white', fontWeight: 600, fontSize: '0.95rem' }}>Tarjeta de Débito</p>
-                      <p style={{ margin: '2px 0 0', color: '#777', fontSize: '0.8rem' }}>Visa, Mastercard, Cabal</p>
+                      <p style={{ margin: '2px 0 0', color: '#777', fontSize: '0.8rem' }}>Visa, Mastercard, Cabal (No crédito)</p>
                     </div>
                     <div style={{
                       width: '20px', height: '20px', borderRadius: '50%',
@@ -486,10 +486,19 @@ export default function PlanesPage() {
               {/* PASO 1.5: Ingreso de Tarjeta */}
               {paymentStep === 'card' && (
                 <div>
+                  <div style={{ background: 'rgba(239, 68, 68, 0.1)', padding: '10px 14px', borderRadius: '8px', border: '1px solid rgba(239, 68, 68, 0.3)', marginBottom: '20px', display: 'flex', alignItems: 'center', gap: '10px' }}>
+                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#ef4444" strokeWidth="2" style={{ flexShrink: 0 }}>
+                      <path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"></path>
+                      <line x1="12" y1="9" x2="12" y2="13"></line>
+                      <line x1="12" y1="17" x2="12.01" y2="17"></line>
+                    </svg>
+                    <p style={{ margin: 0, color: '#ff8a8a', fontSize: '0.85rem' }}>Solo aceptamos <strong>Tarjetas de Débito</strong>. Las tarjetas de crédito serán rechazadas automáticamente.</p>
+                  </div>
+                  
                   <div style={{ display: 'flex', flexDirection: 'column', gap: '12px', marginBottom: '24px' }}>
                     <input 
                       type="text" 
-                      placeholder="Número de Tarjeta" 
+                      placeholder="Número de Tarjeta de Débito" 
                       value={cardData.number}
                       onChange={(e) => {
                         let val = e.target.value.replace(/\D/g, '');
