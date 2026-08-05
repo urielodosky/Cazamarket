@@ -416,16 +416,15 @@ export default function PlanesPage() {
                     }}
                   >
                     <div style={{
-                      width: '44px', height: '44px', borderRadius: '10px', background: '#009ee3',
+                      width: '44px', height: '44px', borderRadius: '10px',
                       display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0,
-                      overflow: 'hidden', padding: '4px'
+                      overflow: 'hidden'
                     }}>
                       {/* eslint-disable-next-line @next/next/no-img-element */}
                       <img 
                         src="/mercadopago-logo.png" 
                         alt="Mercado Pago" 
-                        style={{ width: '34px', height: '34px', objectFit: 'contain' }}
-                        onError={(e) => { (e.target as HTMLImageElement).style.display = 'none'; (e.target as HTMLImageElement).parentElement!.innerHTML = '<span style="color:white;font-weight:900;font-size:1.1rem">MP</span>'; }}
+                        style={{ width: '44px', height: '44px', objectFit: 'contain' }}
                       />
                     </div>
                     <div style={{ flex: 1 }}>
