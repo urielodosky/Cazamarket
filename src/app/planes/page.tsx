@@ -40,6 +40,7 @@ export default function PlanesPage() {
   const [paymentModal, setPaymentModal] = useState<{show: boolean, plan: PlanCardData | null}>({show: false, plan: null});
   const [paymentMethod, setPaymentMethod] = useState<PaymentMethod>('mercadopago');
   const [paymentStep, setPaymentStep] = useState<PaymentStep>('select');
+  const [cardData, setCardData] = useState({ number: '', expiry: '', cvc: '', name: '' });
 
   const getPlans = (): PlanCardData[] => {
     if (activeTab === 'productos') return PRODUCT_PLANS;
@@ -486,12 +487,50 @@ export default function PlanesPage() {
               {paymentStep === 'card' && (
                 <div>
                   <div style={{ display: 'flex', flexDirection: 'column', gap: '12px', marginBottom: '24px' }}>
-                    <input type="text" placeholder="Número de Tarjeta" style={{ padding: '14px', borderRadius: '12px', border: '1px solid rgba(255,255,255,0.1)', background: 'rgba(255,255,255,0.03)', color: 'white', fontSize: '1rem' }} />
+                    <input 
+                      type="text" 
+                      placeholder="Número de Tarjeta" 
+                      value={cardData.number}
+                      onChange={(e) => {
+                        let val = e.target.value.replace(/\D/g, '');
+                        val = val.replace(/(.{4})/g, '$1 ').trim();
+                        setCardData({...cardData, number: val.substring(0, 19)});
+                      }}
+                      maxLength={19}
+                      inputMode="numeric"
+                      style={{ padding: '14px', borderRadius: '12px', border: '1px solid rgba(255,255,255,0.1)', background: 'rgba(255,255,255,0.03)', color: 'white', fontSize: '1rem' }} 
+                    />
                     <div style={{ display: 'flex', gap: '12px' }}>
-                      <input type="text" placeholder="MM/AA" style={{ padding: '14px', borderRadius: '12px', border: '1px solid rgba(255,255,255,0.1)', background: 'rgba(255,255,255,0.03)', color: 'white', flex: 1, fontSize: '1rem' }} />
-                      <input type="text" placeholder="CVC" style={{ padding: '14px', borderRadius: '12px', border: '1px solid rgba(255,255,255,0.1)', background: 'rgba(255,255,255,0.03)', color: 'white', flex: 1, fontSize: '1rem' }} />
+                      <input 
+                        type="text" 
+                        placeholder="MM/AA" 
+                        value={cardData.expiry}
+                        onChange={(e) => {
+                          let val = e.target.value.replace(/\D/g, '');
+                          if (val.length >= 2) val = val.substring(0,2) + '/' + val.substring(2,4);
+                          setCardData({...cardData, expiry: val});
+                        }}
+                        maxLength={5}
+                        inputMode="numeric"
+                        style={{ padding: '14px', borderRadius: '12px', border: '1px solid rgba(255,255,255,0.1)', background: 'rgba(255,255,255,0.03)', color: 'white', flex: 1, fontSize: '1rem' }} 
+                      />
+                      <input 
+                        type="text" 
+                        placeholder="CVC" 
+                        value={cardData.cvc}
+                        onChange={(e) => setCardData({...cardData, cvc: e.target.value.replace(/\D/g, '').substring(0, 4)})}
+                        maxLength={4}
+                        inputMode="numeric"
+                        style={{ padding: '14px', borderRadius: '12px', border: '1px solid rgba(255,255,255,0.1)', background: 'rgba(255,255,255,0.03)', color: 'white', flex: 1, fontSize: '1rem' }} 
+                      />
                     </div>
-                    <input type="text" placeholder="Nombre en la tarjeta" style={{ padding: '14px', borderRadius: '12px', border: '1px solid rgba(255,255,255,0.1)', background: 'rgba(255,255,255,0.03)', color: 'white', fontSize: '1rem' }} />
+                    <input 
+                      type="text" 
+                      placeholder="Nombre en la tarjeta" 
+                      value={cardData.name}
+                      onChange={(e) => setCardData({...cardData, name: e.target.value.replace(/[^a-zA-Z\s]/g, '')})}
+                      style={{ padding: '14px', borderRadius: '12px', border: '1px solid rgba(255,255,255,0.1)', background: 'rgba(255,255,255,0.03)', color: 'white', fontSize: '1rem' }} 
+                    />
                   </div>
                   <div style={{ fontSize: '0.8rem', color: '#888', marginBottom: '24px', display: 'flex', alignItems: 'flex-start', gap: '12px', background: 'rgba(34, 197, 94, 0.05)', padding: '12px', borderRadius: '8px', border: '1px solid rgba(34, 197, 94, 0.2)' }}>
                     <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#22c55e" strokeWidth="2" style={{ flexShrink: 0, marginTop: '2px' }}><rect x="3" y="11" width="18" height="11" rx="2" ry="2"></rect><path d="M7 11V7a5 5 0 0 1 10 0v4"></path></svg>
