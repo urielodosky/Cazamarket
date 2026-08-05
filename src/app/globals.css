@@ -173,6 +173,10 @@ input[type="number"] {
   appearance: textfield;
 }
 @media (max-width: 768px) {
+  .container-page {
+    padding-left: 24px;
+    padding-right: 24px;
+  }
   .desktop-only-loader {
     display: none !important;
   }
