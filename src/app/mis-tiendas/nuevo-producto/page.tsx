@@ -38,6 +38,7 @@ function NuevoProductoContent() {
   const [stock, setStock] = useState('1');
   const [description, setDescription] = useState('');
   const [formError, setFormError] = useState<string | null>(null);
+  const [hasFirearmsPermit, setHasFirearmsPermit] = useState(false);
 
   const [shippingMode, setShippingMode] = useState<'gratis' | 'sin_envio' | 'costo_extra'>('gratis');
   const [shippingCost, setShippingCost] = useState('');
@@ -241,6 +242,7 @@ function NuevoProductoContent() {
     if (!mediaPreview.some(m => m.type === 'image')) return 'Debes subir al menos una imagen para que sirva de portada.';
     if (!title || title.trim().length < 6) return 'El nombre del producto debe tener al menos 6 caracteres.';
     if (!category) return 'Debes seleccionar una categoría.';
+    if (category === 'Armas de Fuego' && !hasFirearmsPermit) return 'Debes confirmar que posees la documentación legal vigente (ANMaC) para publicar armas de fuego.';
     return null;
   };
 
@@ -659,6 +661,22 @@ function NuevoProductoContent() {
                     onChange={setSubcategory}
                     placeholder="Selecciona una subcategoría"
                   />
+                </div>
+              )}
+
+              {category === 'Armas de Fuego' && (
+                <div style={{ gridColumn: '1 / -1', background: 'rgba(255, 193, 7, 0.1)', border: '1px solid #ffc107', borderRadius: '8px', padding: '16px', display: 'flex', gap: '12px', alignItems: 'flex-start', marginTop: '8px' }}>
+                  <input
+                    type="checkbox"
+                    id="firearmsPermit"
+                    checked={hasFirearmsPermit}
+                    onChange={(e) => setHasFirearmsPermit(e.target.checked)}
+                    style={{ width: '20px', height: '20px', marginTop: '2px', cursor: 'pointer', accentColor: '#ffc107' }}
+                  />
+                  <label htmlFor="firearmsPermit" style={{ color: '#ffc107', fontSize: '0.9rem', cursor: 'pointer', lineHeight: 1.5 }}>
+                    <strong style={{ display: 'block', marginBottom: '4px' }}>Declaración Jurada (ANMaC)</strong>
+                    Confirmo que poseo la documentación legal, inscripción comercial y permisos vigentes emitidos por ANMaC para la exhibición y venta de este material. Entiendo que CazaMarket opera exclusivamente como vidriera y no interviene en la transacción.
+                  </label>
                 </div>
               )}
             </div>
