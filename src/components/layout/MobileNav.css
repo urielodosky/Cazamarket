@@ -72,18 +72,18 @@
   box-shadow: 0 4px 12px color-mix(in srgb, var(--color-primary) 40%, transparent);
 }
 
-/* La ola perfecta usando SVG mask (Ahora rodea completamente al ícono) */
+/* La ola perfecta usando SVG mask (Ahora es más ancha y "gordita") */
 .mobile-nav-item.active::before {
   content: "";
   position: absolute;
   top: -48px; /* Altura total de la ola por encima del navbar */
   left: 50%;
   transform: translateX(-50%);
-  width: 90px; /* Ancho suficiente para abrazar el ícono con su borde */
+  width: 120px; /* Más ancha para que sea "gordita" y no tan empinada */
   height: 48px;
   background-color: var(--color-bg-surface); /* Debe coincidir con el navbar */
-  -webkit-mask-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 90 48' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath d='M0,48 C20,48 25,0 45,0 C65,0 70,48 90,48 Z' fill='black'/%3E%3C/svg%3E");
-  mask-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 90 48' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath d='M0,48 C20,48 25,0 45,0 C65,0 70,48 90,48 Z' fill='black'/%3E%3C/svg%3E");
+  -webkit-mask-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 120 48' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath d='M0,48 C30,48 40,0 60,0 C80,0 90,48 120,48 Z' fill='black'/%3E%3C/svg%3E");
+  mask-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 120 48' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath d='M0,48 C30,48 40,0 60,0 C80,0 90,48 120,48 Z' fill='black'/%3E%3C/svg%3E");
   -webkit-mask-size: 100% 100%;
   mask-size: 100% 100%;
   pointer-events: none;
