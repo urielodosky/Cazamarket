@@ -15,6 +15,14 @@ const inter = Inter({
 export const metadata: Metadata = {
   title: "CazaMarket | Todo para el Cazador, Pescador y Campista",
   description: "La plataforma de confianza para comercios y servicios de caza, camping y pesca.",
+  metadataBase: new URL('https://cazamarket.vercel.app'),
+  alternates: {
+    canonical: '/',
+  },
+  icons: {
+    icon: '/favicon.ico',
+    apple: '/apple-touch-icon.png',
+  },
 };
 
 export default function RootLayout({
