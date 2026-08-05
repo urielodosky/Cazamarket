@@ -45,13 +45,11 @@
   top: calc(100% + 8px);
   left: 0;
   width: 320px;
-  background: var(--glass-bg);
-  backdrop-filter: blur(12px);
-  -webkit-backdrop-filter: blur(12px);
-  border: 1px solid var(--color-border);
+  background: #111111;
+  border: 1px solid #333333;
   border-radius: 12px;
   padding: 16px;
-  box-shadow: 0 10px 40px rgba(0, 0, 0, 0.5);
+  box-shadow: 0 10px 40px rgba(0, 0, 0, 0.8);
   z-index: 1000;
   animation: popIn 0.2s ease-out forwards;
 }
@@ -94,14 +92,18 @@
 }
 
 .cal-select {
-  background: rgba(0, 0, 0, 0.2);
-  border: 1px solid rgba(255, 255, 255, 0.1);
+  background: #222222;
+  border: 1px solid #444444;
   color: white;
   padding: 6px 10px;
   border-radius: 6px;
   font-size: 0.9rem;
   outline: none;
   cursor: pointer;
+  -webkit-appearance: none;
+  -moz-appearance: none;
+  appearance: none;
+  text-align: center;
 }
 
 .cal-select:focus {
@@ -136,16 +138,17 @@
   border-radius: 50%;
   border: none;
   background: transparent;
+  color: white;
 }
 
 .cal-cell.day {
-  color: white;
   cursor: pointer;
   transition: all 0.2s;
+  background: #1e1e1e;
 }
 
 .cal-cell.day:hover {
-  background: rgba(255, 255, 255, 0.1);
+  background: #333333;
 }
 
 .cal-cell.day.selected {
