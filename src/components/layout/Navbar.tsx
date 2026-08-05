@@ -558,7 +558,7 @@ export default function Navbar() {
                   <Link href="/registro" onClick={() => setIsGuestMenuOpen(false)} style={{ display: 'block', padding: '12px 16px', color: 'white', textDecoration: 'none', fontWeight: 600, borderBottom: '1px solid rgba(255,255,255,0.05)' }}>
                     Registrarse
                   </Link>
-                  <Link href="/ingresar" onClick={() => setIsGuestMenuOpen(false)} style={{ display: 'block', padding: '12px 16px', color: 'var(--color-text-muted)', textDecoration: 'none', fontWeight: 500 }}>
+                  <Link href="/registro?mode=login" onClick={() => setIsGuestMenuOpen(false)} style={{ display: 'block', padding: '12px 16px', color: 'var(--color-text-muted)', textDecoration: 'none', fontWeight: 500 }}>
                     Iniciar sesión
                   </Link>
                 </div>

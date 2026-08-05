@@ -41,6 +41,15 @@ export default function RegistroPage() {
   const [mfaCode, setMfaCode] = useState('');
 
   useEffect(() => {
+    if (typeof window !== 'undefined') {
+      const params = new URLSearchParams(window.location.search);
+      if (params.get('mode') === 'login') {
+        setIsLoginView(true);
+      }
+    }
+  }, []);
+
+  useEffect(() => {
     let timer: NodeJS.Timeout;
     if (resendTimer > 0) {
       timer = setTimeout(() => setResendTimer(resendTimer - 1), 1000);
@@ -344,6 +353,46 @@ export default function RegistroPage() {
   return (
     <div className="auth-container">
       <div className="auth-card glass-panel">
+        {/* Toggle Registrarse / Iniciar Sesión */}
+        {!isAwaitingOTP && !isAwaitingMFA && !isAwaitingPasswordResetOTP && !isForgotPasswordView && (
+          <div style={{ display: 'flex', background: 'rgba(0,0,0,0.2)', borderRadius: '12px', padding: '4px', marginBottom: '24px' }}>
+            <button 
+              type="button"
+              onClick={() => setIsLoginView(false)}
+              style={{
+                flex: 1,
+                padding: '10px',
+                borderRadius: '8px',
+                background: !isLoginView ? 'var(--color-primary)' : 'transparent',
+                color: !isLoginView ? '#fff' : 'var(--color-text-muted)',
+                fontWeight: !isLoginView ? 700 : 500,
+                border: 'none',
+                cursor: 'pointer',
+                transition: 'all 0.2s ease'
+              }}
+            >
+              Crear cuenta
+            </button>
+            <button 
+              type="button"
+              onClick={() => setIsLoginView(true)}
+              style={{
+                flex: 1,
+                padding: '10px',
+                borderRadius: '8px',
+                background: isLoginView ? 'var(--color-primary)' : 'transparent',
+                color: isLoginView ? '#fff' : 'var(--color-text-muted)',
+                fontWeight: isLoginView ? 700 : 500,
+                border: 'none',
+                cursor: 'pointer',
+                transition: 'all 0.2s ease'
+              }}
+            >
+              Iniciar sesión
+            </button>
+          </div>
+        )}
+
         <div className="auth-header">
           <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', position: 'relative', marginBottom: '8px' }}>
             {isAwaitingOTP && (
