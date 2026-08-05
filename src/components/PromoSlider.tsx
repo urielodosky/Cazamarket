@@ -28,6 +28,10 @@ export default function PromoSlider() {
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [mounted, setMounted] = useState(false);
   const [currentSlide, setCurrentSlide] = useState(0);
+  const [touchStart, setTouchStart] = useState<number | null>(null);
+  const [touchEnd, setTouchEnd] = useState<number | null>(null);
+
+  const minSwipeDistance = 50;
 
   const { isVendorModeActive } = useAuth();
 
@@ -41,15 +45,15 @@ export default function PromoSlider() {
 
   const totalSlides = DEMO_ADS.length + (showCta ? 1 : 0);
 
-  // Auto-advance every 6 seconds
+  // Auto-advance every 6 seconds, resets when currentSlide changes
   useEffect(() => {
     if (totalSlides > 1) {
-      const timer = setInterval(() => {
+      const timer = setTimeout(() => {
         setCurrentSlide((prev) => (prev + 1) % totalSlides);
       }, 6000);
-      return () => clearInterval(timer);
+      return () => clearTimeout(timer);
     }
-  }, [totalSlides]);
+  }, [totalSlides, currentSlide]);
 
   const goToSlide = (index: number) => {
     setCurrentSlide(index);
@@ -61,6 +65,28 @@ export default function PromoSlider() {
 
   const nextSlide = () => {
     setCurrentSlide((prev) => (prev + 1) % totalSlides);
+  };
+
+  const onTouchStart = (e: React.TouchEvent) => {
+    setTouchEnd(null);
+    setTouchStart(e.targetTouches[0].clientX);
+  };
+
+  const onTouchMove = (e: React.TouchEvent) => {
+    setTouchEnd(e.targetTouches[0].clientX);
+  };
+
+  const onTouchEnd = () => {
+    if (!touchStart || !touchEnd) return;
+    const distance = touchStart - touchEnd;
+    const isLeftSwipe = distance > minSwipeDistance;
+    const isRightSwipe = distance < -minSwipeDistance;
+    
+    if (isLeftSwipe) {
+      nextSlide();
+    } else if (isRightSwipe) {
+      prevSlide();
+    }
   };
 
   // If component is not mounted yet to avoid hydration mismatch, or if there's nothing to show
@@ -78,6 +104,11 @@ export default function PromoSlider() {
         animation: "fadeIn 1s ease-out 0.2s both",
       }}
     >
+      <style dangerouslySetInnerHTML={{__html: `
+        @media (max-width: 768px) {
+          .slider-arrow-btn { display: none !important; }
+        }
+      `}} />
       <div
         className="ad-banner-container"
         style={{ padding: "0 var(--spacing-4)", width: "100%" }}
@@ -87,6 +118,7 @@ export default function PromoSlider() {
           {/* Left Arrow */}
           {totalSlides > 1 && (
             <button
+              className="slider-arrow-btn"
               onClick={prevSlide}
               aria-label="Anterior"
               style={{
@@ -129,6 +161,9 @@ export default function PromoSlider() {
 
           {/* Slider Container */}
           <div
+            onTouchStart={onTouchStart}
+            onTouchMove={onTouchMove}
+            onTouchEnd={onTouchEnd}
             style={{
               position: "relative",
               borderRadius: "var(--radius-lg)",
@@ -136,6 +171,7 @@ export default function PromoSlider() {
               minHeight: "60vh",
               boxShadow: "var(--shadow-md)",
               flex: 1,
+              touchAction: "pan-y", /* Allows vertical scroll but captures horizontal swipes */
             }}
           >
             {/* Slides */}
@@ -370,6 +406,7 @@ export default function PromoSlider() {
           {/* Right Arrow */}
           {totalSlides > 1 && (
             <button
+              className="slider-arrow-btn"
               onClick={nextSlide}
               aria-label="Siguiente"
               style={{
