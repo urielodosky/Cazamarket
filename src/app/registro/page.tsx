@@ -4,6 +4,7 @@ import { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import Link from 'next/link';
 import { createClient } from '@/lib/supabase/client';
+import DatePicker from '@/components/DatePicker';
 import './registro.css';
 
 export default function RegistroPage() {
@@ -519,57 +520,11 @@ export default function RegistroPage() {
                   {personType === 'Física' && (
                     <div className="form-group">
                       <label htmlFor="birthDate">Fecha de Nacimiento</label>
-                      <input 
-                        type="text" 
-                        id="birthDate" 
-                        placeholder="DD/MM/AAAA" 
+                      <DatePicker 
+                        id="birthDate"
                         value={birthDate}
-                        onChange={(e) => {
-                          let val = e.target.value.replace(/\D/g, '');
-                          
-                          // Handle day validation
-                          if (val.length >= 2) {
-                            let day = parseInt(val.slice(0, 2));
-                            if (day > 31) val = '31' + val.slice(2);
-                            if (day === 0) val = '01' + val.slice(2);
-                          }
-                          
-                          // Handle month validation
-                          if (val.length >= 4) {
-                            let month = parseInt(val.slice(2, 4));
-                            if (month > 12) val = val.slice(0, 2) + '12' + val.slice(4);
-                            if (month === 0) val = val.slice(0, 2) + '01' + val.slice(4);
-                            
-                            // Check max days in month (e.g. Feb 31 -> Feb 28/29)
-                            let day = parseInt(val.slice(0, 2));
-                            if (month === 2) {
-                              let isLeapYear = false;
-                              if (val.length >= 8) {
-                                let year = parseInt(val.slice(4, 8));
-                                isLeapYear = ((year % 4 === 0) && (year % 100 !== 0)) || (year % 400 === 0);
-                              }
-                              let maxDays = isLeapYear ? 29 : (val.length < 8 ? 29 : 28); // Allow 29 until year is fully typed
-                              if (day > maxDays) val = maxDays.toString() + val.slice(2);
-                            } else if ([4, 6, 9, 11].includes(month)) {
-                              if (day > 30) val = '30' + val.slice(2);
-                            }
-                          }
-                          
-                          let formatted = val;
-                          if (val.length > 2) formatted = val.slice(0, 2) + '/' + val.slice(2);
-                          if (val.length > 4) formatted = formatted.slice(0, 5) + '/' + val.slice(4, 8);
-                          
-                          // Handle user hitting backspace over a slash
-                          if (e.nativeEvent && (e.nativeEvent as InputEvent).inputType === 'deleteContentBackward') {
-                            if (birthDate.endsWith('/')) {
-                               formatted = formatted.slice(0, -1);
-                            }
-                          }
-
-                          setBirthDate(formatted);
-                        }}
-                        maxLength={10}
-                        required 
+                        onChange={(val) => setBirthDate(val)}
+                        required
                       />
                     </div>
                   )}
