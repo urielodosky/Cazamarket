@@ -5,10 +5,10 @@
   left: 0;
   left: 0;
   right: 0;
-  height: 55px; /* Reducida de 65px */
-  background-color: var(--color-bg-base);
+  height: 52px; /* Reducida un poco más */
+  background-color: var(--color-bg-surface); /* Contraste con el fondo oscuro de la página */
   z-index: 1000;
-  box-shadow: 0 -4px 15px rgba(0, 0, 0, 0.2);
+  box-shadow: 0 -4px 20px rgba(0, 0, 0, 0.4); /* Sombra más fuerte */
   padding-bottom: env(safe-area-inset-bottom);
 }
 
@@ -65,24 +65,24 @@
 }
 
 .mobile-nav-item.active .mobile-nav-icon {
-  transform: translateY(-34px);
+  transform: translateY(-28px); /* Ajustado a la nueva ola más angosta */
   background-color: var(--color-primary);
   color: white;
   box-shadow: 0 4px 12px color-mix(in srgb, var(--color-primary) 40%, transparent);
 }
 
-/* La ola perfecta usando SVG mask (Mucho más marcada) */
+/* La ola perfecta usando SVG mask (Mucho más marcada y angosta) */
 .mobile-nav-item.active::before {
   content: "";
   position: absolute;
-  top: -28px; /* Altura de la ola por encima del navbar */
+  top: -24px; /* Altura de la ola por encima del navbar */
   left: 50%;
   transform: translateX(-50%);
-  width: 100px;
-  height: 28px;
-  background-color: var(--color-bg-base);
-  -webkit-mask-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 100 28' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath d='M0,28 C25,28 25,0 50,0 C75,0 75,28 100,28 Z' fill='black'/%3E%3C/svg%3E");
-  mask-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 100 28' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath d='M0,28 C25,28 25,0 50,0 C75,0 75,28 100,28 Z' fill='black'/%3E%3C/svg%3E");
+  width: 76px; /* Más angosta para abrazar mejor el icono */
+  height: 24px;
+  background-color: var(--color-bg-surface); /* Debe coincidir con el navbar */
+  -webkit-mask-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 76 24' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath d='M0,24 C20,24 22,0 38,0 C54,0 56,24 76,24 Z' fill='black'/%3E%3C/svg%3E");
+  mask-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 76 24' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath d='M0,24 C20,24 22,0 38,0 C54,0 56,24 76,24 Z' fill='black'/%3E%3C/svg%3E");
   -webkit-mask-size: 100% 100%;
   mask-size: 100% 100%;
   pointer-events: none;
