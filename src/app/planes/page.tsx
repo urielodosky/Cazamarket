@@ -18,7 +18,16 @@ type PaymentMethod = 'mercadopago' | 'tarjeta';
 type PaymentStep = 'select' | 'processing' | 'success';
 
 export default function PlanesPage() {
-  const { selectPlan, cancelPlan, productPlanTier, servicePlanTier } = usePlan();
+  const { 
+    selectPlan, 
+    cancelPlan, 
+    productPlanTier, 
+    servicePlanTier,
+    pendingProductPlanTier,
+    pendingServicePlanTier,
+    calculateNextBillingDate,
+    acceleratePlan
+  } = usePlan();
   const { isLoggedIn, isVendor, phone, personType, birthDate, cuit, updateUser } = useAuth();
   const [activeTab, setActiveTab] = useState<PlanCategory>('productos');
   const [isActivating, setIsActivating] = useState(false);
@@ -98,6 +107,19 @@ export default function PlanesPage() {
     return false;
   };
 
+  const isPendingPlan = (plan: PlanCardData): boolean => {
+    if (activeTab === 'productos') return plan.tier === pendingProductPlanTier;
+    if (activeTab === 'servicios') return plan.tier === pendingServicePlanTier;
+    if (activeTab === 'mixto') return plan.tier === pendingProductPlanTier && plan.tier === pendingServicePlanTier;
+    return false;
+  };
+
+  const nextBillingDate = calculateNextBillingDate();
+  const formattedNextBillingDate = nextBillingDate ? new Date(nextBillingDate).toLocaleDateString('es-AR', {
+    day: 'numeric',
+    month: 'long'
+  }) : '';
+
   const handleCancelPlan = (plan: PlanCardData) => {
     cancelPlan(activeTab);
   };
@@ -148,9 +170,10 @@ export default function PlanesPage() {
       <div className="planes-content">
         <div className={`plans-grid ${activeTab === 'productos' ? 'plans-grid-5' : ''}`}>
           {getPlans().map((plan, index) => (
-            <div key={`${activeTab}-${index}`} className={`plan-card glass-panel ${plan.recommended && !isCurrentPlan(plan) ? 'recommended' : ''} ${isCurrentPlan(plan) ? 'current-plan' : ''}`}>
-              {plan.recommended && !isCurrentPlan(plan) && <div className="plan-badge">MÁS ELEGIDO</div>}
+            <div key={`${activeTab}-${index}`} className={`plan-card glass-panel ${plan.recommended && !isCurrentPlan(plan) && !isPendingPlan(plan) ? 'recommended' : ''} ${isCurrentPlan(plan) ? 'current-plan' : ''} ${isPendingPlan(plan) ? 'pending-plan' : ''}`} style={isPendingPlan(plan) ? { border: '1px dashed var(--color-primary)' } : {}}>
+              {plan.recommended && !isCurrentPlan(plan) && !isPendingPlan(plan) && <div className="plan-badge">MÁS ELEGIDO</div>}
               {isCurrentPlan(plan) && <div className="plan-badge current-badge">TU PLAN</div>}
+              {isPendingPlan(plan) && <div className="plan-badge" style={{ background: 'var(--color-primary)' }}>EN PROCESO</div>}
 
               <div className="plan-header">
                 <span className="plan-category-label">{activeTab === 'mixto' ? 'Plan Mixto' : activeTab === 'productos' ? 'Plan Productos' : 'Plan Servicios'}</span>
@@ -198,12 +221,35 @@ export default function PlanesPage() {
               </div>
 
               <button
-                className={`btn ${isCurrentPlan(plan) ? 'btn-danger' : plan.recommended ? 'btn-primary' : 'btn-outline'} plan-btn`}
-                onClick={() => isCurrentPlan(plan) ? handleCancelPlan(plan) : handleSelectPlan(plan)}
-                style={isCurrentPlan(plan) ? { backgroundColor: 'rgba(239, 68, 68, 0.1)', color: '#ef4444', borderColor: '#ef4444' } : {}}
+                className={`btn ${isCurrentPlan(plan) ? 'btn-danger' : isPendingPlan(plan) ? 'btn-outline' : plan.recommended ? 'btn-primary' : 'btn-outline'} plan-btn`}
+                onClick={() => {
+                  if (isCurrentPlan(plan)) {
+                    handleCancelPlan(plan);
+                  } else if (isPendingPlan(plan)) {
+                    // Do nothing, wait for billing
+                  } else {
+                    handleSelectPlan(plan);
+                  }
+                }}
+                style={isCurrentPlan(plan) ? { backgroundColor: 'rgba(239, 68, 68, 0.1)', color: '#ef4444', borderColor: '#ef4444' } : (isPendingPlan(plan) ? { opacity: 0.6, cursor: 'default' } : {})}
               >
-                {isCurrentPlan(plan) ? 'Darse de baja' : plan.price === 0 ? 'Comenzar Gratis' : 'Elegir Plan'}
+                {isCurrentPlan(plan) ? 'Darse de baja' : isPendingPlan(plan) ? 'A la espera del cobro' : plan.price === 0 ? 'Comenzar Gratis' : 'Elegir Plan'}
               </button>
+
+              {isPendingPlan(plan) && formattedNextBillingDate && (
+                <div style={{ marginTop: '16px', textAlign: 'center' }}>
+                  <p style={{ fontSize: '0.85rem', color: 'var(--color-text-muted)', marginBottom: '8px' }}>
+                    Este plan entrará en vigencia automáticamente el <strong>{formattedNextBillingDate}</strong>.
+                  </p>
+                  <button 
+                    className="btn btn-primary" 
+                    style={{ padding: '6px 12px', fontSize: '0.85rem', width: '100%', borderRadius: 'var(--radius-full)' }}
+                    onClick={() => acceleratePlan(activeTab)}
+                  >
+                    Acelerar ahora
+                  </button>
+                </div>
+              )}
             </div>
           ))}
         </div>
