@@ -81,7 +81,7 @@ export default function ServicioDetailPage({ params }: { params: Promise<{ id: s
   const [isLoading, setIsLoading] = useState(true);
   const { addToCart, canAddToCart } = useCart();
   const { hasFeature } = usePlan();
-  const { username } = useAuth();
+  const { username, isLoggedIn } = useAuth();
   const themeColors = useThemeColors();
   const supabase = createClient();
 
@@ -520,7 +520,7 @@ export default function ServicioDetailPage({ params }: { params: Promise<{ id: s
 
           {/* Botones de Acción */}
           <div style={{ display: 'flex', flexDirection: 'column', gap: '16px', marginTop: '16px', position: 'relative' }}>
-            {canAddToCart(service.seller.id) ? (
+            {isLoggedIn && canAddToCart(service.seller.id) && service.seller?.planTier && service.seller.planTier !== 'gratis' ? (
               <button
                 onClick={() => {
                   addToCart({

@@ -324,12 +324,24 @@
   .mobile-filters-panel {
     display: none !important;
   }
+  .guest-cta-desktop {
+    display: inline-flex !important;
+  }
+  .guest-icon-mobile {
+    display: none !important;
+  }
 }
 
 /* Mobile Responsiveness */
 @media (max-width: 768px) {
   .mobile-menu-btn {
     display: none !important;
+  }
+  .guest-cta-desktop {
+    display: none !important;
+  }
+  .guest-icon-mobile {
+    display: flex !important;
   }
 
   /* Ajuste de los filtros en mobile */

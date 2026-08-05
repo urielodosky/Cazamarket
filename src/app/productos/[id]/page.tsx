@@ -443,7 +443,7 @@ export default function ProductoDetailPage({ params }: { params: Promise<{ id: s
 
           <div>
             {/* Store Avatar + Name + Rating */}
-            <div style={{ display: 'flex', alignItems: 'center', gap: '12px', marginBottom: '16px', cursor: 'pointer' }} onClick={() => { if (product.seller?.id) router.push(`/negocios/${product.seller.id}`); }}>
+            <div style={{ display: 'flex', alignItems: 'center', gap: '12px', marginBottom: '16px', cursor: product.seller?.planTier && product.seller.planTier !== 'gratis' ? 'pointer' : 'default' }} onClick={() => { if (product.seller?.id && product.seller?.planTier && product.seller.planTier !== 'gratis') router.push(`/negocios/${product.seller.id}`); }}>
               <img src={product.seller?.avatar || 'https://images.unsplash.com/photo-1511497584788-876760111969?q=80&w=200&auto=format&fit=crop'} alt={product.seller?.name} style={{ width: '40px', height: '40px', borderRadius: '50%', objectFit: 'cover', border: '1px solid var(--color-border)' }} />
               <div style={{ display: 'flex', flexDirection: 'column' }}>
                 <span style={{ color: 'var(--color-primary)', fontSize: '0.9rem', textTransform: 'uppercase', fontWeight: 'bold' }}>{product.seller?.name || 'Vendedor'}</span>
@@ -665,7 +665,8 @@ export default function ProductoDetailPage({ params }: { params: Promise<{ id: s
               })()}
             </div>
 
-            {/* 2. Botón Ver Tienda */}
+            {/* 2. Botón Ver Tienda - Solo si el vendedor tiene plan pago */}
+            {product.seller?.planTier && product.seller.planTier !== 'gratis' && (
             <Link href={`/negocios/${product.seller?.id || 1}`} style={{ textDecoration: 'none', width: '100%' }}>
               <button 
                 style={{ 
@@ -691,8 +692,10 @@ export default function ProductoDetailPage({ params }: { params: Promise<{ id: s
                 <span>Ver Tienda</span>
               </button>
             </Link>
+            )}
 
-            {/* 3. Añadir al Carrito */}
+            {/* 3. Añadir al Carrito - Solo si el usuario está logueado Y el vendedor tiene plan pago */}
+            {isLoggedIn && product.seller?.planTier && product.seller.planTier !== 'gratis' && (
             <button
               onClick={() => {
                 if (isInCart) {
@@ -743,6 +746,7 @@ export default function ProductoDetailPage({ params }: { params: Promise<{ id: s
                 </>
               )}
             </button>
+            )}
 
             {/* 4. Chat Directo (Sólo si tiene plan compatible) */}
             {hasFeature('chatInterno') && (

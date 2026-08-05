@@ -496,7 +496,28 @@ export default function Navbar() {
             <UserMenu />
           ) : (
             <div className="guest-menu-container" ref={guestMenuRef} style={{ position: 'relative' }}>
+              {/* Desktop: Botón CTA "Empezar ahora" */}
+              <Link href="/registro" className="guest-cta-desktop" style={{
+                display: 'inline-flex',
+                alignItems: 'center',
+                gap: '8px',
+                padding: '10px 24px',
+                borderRadius: 'var(--radius-full)',
+                background: 'var(--color-primary)',
+                color: '#fff',
+                fontWeight: 700,
+                fontSize: '0.9rem',
+                textDecoration: 'none',
+                boxShadow: '0 4px 15px rgba(220,100,0,0.3)',
+                transition: 'all 0.3s ease',
+                whiteSpace: 'nowrap',
+              }}>
+                Empezar ahora
+              </Link>
+
+              {/* Mobile: Ícono de usuario con dropdown */}
               <button 
+                className="guest-icon-mobile"
                 onClick={() => setIsGuestMenuOpen(!isGuestMenuOpen)}
                 style={{
                   width: '40px',
@@ -505,7 +526,7 @@ export default function Navbar() {
                   background: 'var(--color-bg-surface-elevated)',
                   border: '1px solid rgba(255,255,255,0.1)',
                   cursor: 'pointer',
-                  display: 'flex',
+                  display: 'none',
                   alignItems: 'center',
                   justifyContent: 'center',
                   padding: 0,
