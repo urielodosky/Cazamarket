@@ -20,7 +20,7 @@ export default function Home() {
 
       {/* SEO Block para cumplir auditoría web (Sin estilos pesados para evitar que los bots lo omitan) */}
       <section className="seo-content-block">
-        <div className="container">
+        <div className="seo-container">
           <p>
             Bienvenido a <strong>CazaMarket</strong>, la plataforma definitiva y de confianza para comercios, guías y entusiastas del aire libre. 
             Si eres un apasionado cazador en busca de armerías especializadas, un pescador buscando los mejores señuelos, o un campista 
@@ -49,9 +49,17 @@ export default function Home() {
           </p>
         </div>
         <div className="seo-links">
-          <Link href="/productos">Ver Productos</Link>
-          <Link href="/servicios">Ver Servicios</Link>
-          <Link href="/registro">Crear cuenta gratuita</Link>
+          <Link href="/productos" className="seo-btn">Ver Productos</Link>
+          <Link href="/servicios" className="seo-btn">Ver Servicios</Link>
+          <Link href="/registro" className="seo-btn seo-btn-primary">Crear cuenta gratuita</Link>
+          <a href="https://instagram.com/cazamarket.arg" target="_blank" rel="noopener noreferrer" className="seo-btn seo-btn-social">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+              <rect x="2" y="2" width="20" height="20" rx="5" ry="5"></rect>
+              <path d="M16 11.37A4 4 0 1 1 12.63 8 4 4 0 0 1 16 11.37z"></path>
+              <line x1="17.5" y1="6.5" x2="17.51" y2="6.5"></line>
+            </svg>
+            @cazamarket.arg
+          </a>
         </div>
       </section>
     </div>

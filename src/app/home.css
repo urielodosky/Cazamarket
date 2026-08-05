@@ -366,3 +366,108 @@
     margin-top: 0 !important;
   }
 }
+
+/* SEO Content Block Aesthetics */
+.seo-content-block {
+  width: 100%;
+  max-width: 1200px;
+  margin: var(--spacing-8) auto;
+  padding: var(--spacing-6);
+  background: var(--color-bg-surface);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-lg);
+  box-shadow: var(--shadow-sm);
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-6);
+}
+
+.seo-container {
+  color: var(--color-text-main);
+  line-height: 1.6;
+}
+
+.seo-container p {
+  margin-bottom: var(--spacing-4);
+  font-size: 0.95rem;
+  color: color-mix(in srgb, var(--color-text-main) 80%, transparent);
+}
+
+.seo-container h2 {
+  font-size: 1.3rem;
+  color: var(--color-primary);
+  margin-top: var(--spacing-6);
+  margin-bottom: var(--spacing-3);
+  font-weight: 700;
+}
+
+.seo-links {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--spacing-4);
+  justify-content: center;
+  align-items: center;
+  padding-top: var(--spacing-4);
+  border-top: 1px solid var(--color-border);
+}
+
+.seo-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 10px 20px;
+  border-radius: var(--radius-full);
+  font-size: 0.95rem;
+  font-weight: 600;
+  text-decoration: none;
+  background: transparent;
+  color: var(--color-text-main);
+  border: 2px solid var(--color-border);
+  transition: all 0.2s ease;
+}
+
+.seo-btn:hover {
+  border-color: var(--color-text-main);
+  background: color-mix(in srgb, var(--color-text-main) 5%, transparent);
+}
+
+.seo-btn-primary {
+  background: var(--color-primary);
+  color: #fff;
+  border-color: var(--color-primary);
+}
+
+.seo-btn-primary:hover {
+  background: var(--color-primary-hover);
+  border-color: var(--color-primary-hover);
+  color: #fff;
+}
+
+.seo-btn-social {
+  background: transparent;
+  border-color: #E1306C;
+  color: #E1306C;
+}
+
+.seo-btn-social:hover {
+  background: #E1306C;
+  color: #fff;
+  border-color: #E1306C;
+}
+
+@media (max-width: 768px) {
+  .seo-content-block {
+    padding: var(--spacing-4);
+    margin: var(--spacing-4) auto;
+  }
+  
+  .seo-links {
+    flex-direction: column;
+    width: 100%;
+  }
+  
+  .seo-btn {
+    width: 100%;
+    justify-content: center;
+  }
+}
