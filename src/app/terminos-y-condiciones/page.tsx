@@ -12,6 +12,16 @@ export default function TerminosYCondicionesPage() {
     }}>
       <h1 style={{ color: 'var(--color-primary)', marginBottom: '32px', textAlign: 'center' }}>Términos y Condiciones de Uso – Cazamarket</h1>
       
+      <div style={{ background: 'rgba(239,68,68,0.1)', border: '2px solid #ef4444', borderRadius: '8px', padding: '16px', marginBottom: '32px' }}>
+        <h2 style={{ color: '#ef4444', marginTop: 0, marginBottom: '8px', fontSize: '1.2rem', display: 'flex', alignItems: 'center', gap: '8px' }}>
+          <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"></path><line x1="12" y1="9" x2="12" y2="13"></line><line x1="12" y1="17" x2="12.01" y2="17"></line></svg>
+          POLÍTICA DE TOLERANCIA CERO: ARMAS DE FUEGO
+        </h2>
+        <p style={{ color: 'white', margin: 0, fontWeight: 500 }}>
+          CazaMarket prohíbe terminantemente la venta, oferta, promoción o exhibición de cualquier tipo de <strong>ARMA DE FUEGO, MUNICIÓN o EXPLOSIVO</strong>. No somos una armería. Cualquier usuario o negocio que intente publicar armas de fuego será suspendido y bloqueado de forma inmediata, permanente e irrevocable, sin derecho a reembolso.
+        </p>
+      </div>
+
       <section style={{ marginBottom: '32px' }}>
         <h2 style={{ color: 'white', marginBottom: '16px', fontSize: '1.4rem' }}>1. Introducción y Marco Legal</h2>
         
