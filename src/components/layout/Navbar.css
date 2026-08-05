@@ -1,9 +1,10 @@
 .navbar-header {
-  position: relative;
+  position: sticky;
   top: 0;
   z-index: var(--z-header);
   width: 100%;
   padding-top: var(--spacing-3);
+  background-color: var(--color-bg-base);
 }
 
 .navbar-container {
