@@ -509,7 +509,7 @@
    MOBILE: HORIZONTAL LAYOUT
    ======================================== */
 @media (max-width: 768px) {
-  .plan-card {
+  .plan-card:not(.preview-card) {
     display: grid !important;
     grid-template-columns: auto 1fr auto !important;
     gap: 8px !important;
@@ -518,7 +518,7 @@
     text-align: left !important;
   }
   
-  .plan-badge {
+  .plan-card:not(.preview-card) .plan-badge {
     position: static !important;
     transform: none !important;
     grid-column: 1 / -1 !important;
@@ -528,15 +528,15 @@
     font-size: 0.65rem !important;
   }
   
-  .plan-header {
+  .plan-card:not(.preview-card) .plan-header {
     display: contents !important;
   }
   
-  .plan-category-label {
+  .plan-card:not(.preview-card) .plan-category-label {
     display: none !important;
   }
   
-  .plan-name {
+  .plan-card:not(.preview-card) .plan-name {
     grid-column: 1 !important;
     grid-row: 2 !important;
     font-size: 1.05rem !important;
@@ -544,7 +544,7 @@
     white-space: nowrap !important;
   }
   
-  .plan-features-toggle {
+  .plan-card:not(.preview-card) .plan-features-toggle {
     grid-column: 2 !important;
     grid-row: 2 !important;
     margin: 0 auto !important;
@@ -556,28 +556,28 @@
     white-space: nowrap !important;
   }
   
-  .plan-features-toggle svg {
+  .plan-card:not(.preview-card) .plan-features-toggle svg {
     width: 12px !important;
     height: 12px !important;
     margin-left: 2px !important;
   }
 
-  .plan-price {
+  .plan-card:not(.preview-card) .plan-price {
     grid-column: 3 !important;
     grid-row: 2 !important;
     margin: 0 !important;
     text-align: right !important;
   }
   
-  .amount {
+  .plan-card:not(.preview-card) .amount {
     font-size: 1.1rem !important;
   }
   
-  .plan-original-price {
+  .plan-card:not(.preview-card) .plan-original-price {
     display: none !important;
   }
   
-  .plan-btn {
+  .plan-card:not(.preview-card) .plan-btn {
     grid-column: 1 / -1 !important;
     grid-row: 3 !important;
     margin: 4px auto 0 auto !important;
@@ -588,13 +588,13 @@
     height: auto !important;
   }
   
-  .plan-features-container {
+  .plan-card:not(.preview-card) .plan-features-container {
     grid-column: 1 / -1 !important;
     grid-row: 4 !important;
     margin: 0 !important;
   }
   
-  .plan-features-container.expanded {
+  .plan-card:not(.preview-card) .plan-features-container.expanded {
     margin-top: 8px !important;
   }
 }

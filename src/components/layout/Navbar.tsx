@@ -330,7 +330,7 @@ export default function Navbar() {
 
         
         <div 
-          className={`navbar-middle-area ${!(isFilterablePage && !isHome && !isBusinessProfile) ? 'mobile-hidden' : ''}`}
+          className={`navbar-middle-area ${!(isFilterablePage || isHome) || isBusinessProfile ? 'mobile-hidden' : ''}`}
           style={{ 
             display: 'flex', 
             gap: '12px', 
@@ -341,7 +341,7 @@ export default function Navbar() {
           <div className={`navbar-center glass-panel ${navbarModeClass}`}>
             <div className="search-bar-animated" style={{ 
               zIndex: 10, 
-              display: (isFilterablePage && !isHome && !isBusinessProfile) ? 'flex' : 'none',
+              display: (isFilterablePage || isHome) && !isBusinessProfile ? 'flex' : 'none',
               background: '#1A1D17'
             }}>
                 <button 
