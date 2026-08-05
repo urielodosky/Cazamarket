@@ -65,9 +65,14 @@ export default function Navbar() {
   const [provincias, setProvincias] = useState<SelectOption[]>([]);
   const [localidades, setLocalidades] = useState<SelectOption[]>([]);
   const [isClient, setIsClient] = useState(false);
+  const [isMobile, setIsMobile] = useState(false);
 
   useEffect(() => {
     setIsClient(true);
+    const checkMobile = () => setIsMobile(window.innerWidth <= 768);
+    checkMobile();
+    window.addEventListener('resize', checkMobile);
+    return () => window.removeEventListener('resize', checkMobile);
   }, []);
 
   // Cerrar filtros automáticamente al navegar a una página sin filtros
@@ -317,12 +322,13 @@ export default function Navbar() {
           </svg>
         </button>
 
-        <div className="navbar-logo">
+        <div className="navbar-logo" style={isMobile ? { flexShrink: 0 } : {}}>
           <Link href="/">
             <img 
               src={logoPng.src}
               alt="CazaMarket Logo" 
               className="navbar-logo-img"
+              style={isMobile ? { height: '56px', objectFit: 'contain' } : {}}
             />
           </Link>
         </div>
@@ -330,15 +336,34 @@ export default function Navbar() {
         
         <div 
           className={`navbar-middle-area ${!(isFilterablePage && !isHome && !isBusinessProfile) ? 'mobile-hidden' : ''}`}
-          style={{ 
+          style={isMobile ? {
+            display: 'flex',
+            flex: '1',
+            justifyContent: 'flex-start',
+            marginLeft: '8px',
+            minWidth: 0,
+            alignItems: 'center'
+          } : { 
             display: 'flex', 
             gap: '12px', 
             transition: 'all 0.5s cubic-bezier(0.4, 0, 0.2, 1)', 
             alignItems: 'stretch'
           }}
         >
-          <div className={`navbar-center glass-panel ${navbarModeClass}`}>
-            <div className="search-bar-animated" style={{ 
+          <div className={`navbar-center glass-panel ${navbarModeClass}`} style={isMobile ? { width: '100%', margin: 0, padding: 0, height: '44px', display: 'flex', alignItems: 'center' } : {}}>
+            <div className="search-bar-animated" style={isMobile ? {
+              zIndex: 10, 
+              display: (isFilterablePage && !isHome && !isBusinessProfile) ? 'flex' : 'none',
+              background: '#1A1D17',
+              width: '100%',
+              maxWidth: '280px',
+              position: 'relative',
+              left: 0,
+              marginRight: 'auto',
+              borderRadius: '100px',
+              height: '40px',
+              padding: '0 12px'
+            } : { 
               zIndex: 10, 
               display: (isFilterablePage && !isHome && !isBusinessProfile) ? 'flex' : 'none',
               background: '#1A1D17'
