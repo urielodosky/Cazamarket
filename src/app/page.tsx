@@ -60,6 +60,9 @@ export default function Home() {
             </svg>
             @cazamarket.arg
           </a>
+          <div style={{ width: '100%', height: '1px', background: 'var(--color-border)', margin: '8px 0' }}></div>
+          <Link href="/terminos-y-condiciones" className="seo-btn" style={{ border: 'none', padding: '5px 10px', fontSize: '0.85rem' }}>Términos y Condiciones</Link>
+          <Link href="/politica-de-privacidad" className="seo-btn" style={{ border: 'none', padding: '5px 10px', fontSize: '0.85rem' }}>Política de Privacidad</Link>
         </div>
       </section>
     </div>
