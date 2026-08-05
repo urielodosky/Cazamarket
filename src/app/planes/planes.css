@@ -511,10 +511,10 @@
 @media (max-width: 768px) {
   .plan-card {
     display: grid !important;
-    grid-template-columns: 1fr 1fr !important;
-    gap: 10px !important;
-    padding: 12px !important;
-    align-items: stretch !important;
+    grid-template-columns: auto 1fr auto !important;
+    gap: 8px !important;
+    padding: 12px 16px !important;
+    align-items: center !important;
     text-align: left !important;
   }
   
@@ -529,14 +529,7 @@
   }
   
   .plan-header {
-    grid-column: 1 / -1 !important;
-    display: flex !important;
-    align-items: center !important;
-    justify-content: space-between !important;
-    padding: 0 !important;
-    margin: 0 !important;
-    border: none !important;
-    text-align: left !important;
+    display: contents !important;
   }
   
   .plan-category-label {
@@ -544,12 +537,30 @@
   }
   
   .plan-name {
-    font-size: 1rem !important;
+    grid-column: 1 !important;
+    grid-row: 2 !important;
+    font-size: 1.05rem !important;
     margin: 0 !important;
+    white-space: nowrap !important;
   }
   
+  .plan-features-toggle {
+    grid-column: 2 !important;
+    grid-row: 2 !important;
+    margin: 0 auto !important;
+    padding: 4px 10px !important;
+    font-size: 0.7rem !important;
+    border-radius: 20px !important;
+    height: auto !important;
+    width: max-content !important;
+    white-space: nowrap !important;
+  }
+
   .plan-price {
+    grid-column: 3 !important;
+    grid-row: 2 !important;
     margin: 0 !important;
+    text-align: right !important;
   }
   
   .amount {
@@ -560,27 +571,20 @@
     display: none !important;
   }
   
-  .plan-features-toggle {
-    grid-column: 1 !important;
-    margin: 0 !important;
-    padding: 6px 8px !important;
-    font-size: 0.75rem !important;
-    height: 100% !important;
-    white-space: nowrap !important;
-  }
-  
   .plan-btn {
-    grid-column: 2 !important;
-    margin: 0 !important;
-    padding: 6px 8px !important;
-    font-size: 0.75rem !important;
-    width: 100% !important;
-    height: 100% !important;
-    white-space: nowrap !important;
+    grid-column: 1 / -1 !important;
+    grid-row: 3 !important;
+    margin: 4px auto 0 auto !important;
+    padding: 6px 20px !important;
+    font-size: 0.8rem !important;
+    width: auto !important;
+    min-width: 160px !important;
+    height: auto !important;
   }
   
   .plan-features-container {
     grid-column: 1 / -1 !important;
+    grid-row: 4 !important;
     margin: 0 !important;
   }
   
