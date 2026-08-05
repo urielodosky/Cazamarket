@@ -37,7 +37,7 @@ export default function PlanesPage() {
   const router = useRouter();
 
   // Estado del modal de pago
-  const [paymentModal, setPaymentModal] = useState<{show: boolean, plan: PlanCardData | null}>({show: false, plan: null});
+  const [paymentModal, setPaymentModal] = useState<{show: boolean, plan: PlanCardData | null, isAccelerating?: boolean}>({show: false, plan: null});
   const [paymentMethod, setPaymentMethod] = useState<PaymentMethod>('mercadopago');
   const [paymentStep, setPaymentStep] = useState<PaymentStep>('select');
   const [cardData, setCardData] = useState({ number: '', expiry: '', cvc: '', name: '' });
@@ -111,8 +111,12 @@ export default function PlanesPage() {
       
       // Después de mostrar el éxito 2 segundos, activar el plan
       setTimeout(() => {
-        selectPlan(paymentModal.plan!.tier, activeTab);
-        setPaymentModal({ show: false, plan: null });
+        if (paymentModal.isAccelerating) {
+          acceleratePlan(activeTab);
+        } else {
+          selectPlan(paymentModal.plan!.tier, activeTab);
+        }
+        setPaymentModal({ show: false, plan: null, isAccelerating: false });
         setPaymentStep('select');
         router.push('/configuracion');
       }, 2000);
@@ -263,7 +267,11 @@ export default function PlanesPage() {
                   <button 
                     className="btn btn-primary" 
                     style={{ padding: '6px 12px', fontSize: '0.85rem', width: '100%', borderRadius: 'var(--radius-full)' }}
-                    onClick={() => acceleratePlan(activeTab)}
+                    onClick={() => {
+                      setPaymentModal({ show: true, plan, isAccelerating: true });
+                      setPaymentStep('select');
+                      setPaymentMethod('mercadopago');
+                    }}
                   >
                     Acelerar ahora
                   </button>
