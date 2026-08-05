@@ -65,11 +65,11 @@ export default function ProductoDetailPage({ params }: { params: Promise<{ id: s
   };
 
   // Sistema de notificaciones Toast premium
-  const [toast, setToast] = useState<{ text: string; type: 'success' | 'error' | 'info' } | null>(null);
+  const [toast, setToast] = useState<{ text: string; type: 'success' | 'error' | 'info'; action?: { label: string, href: string } } | null>(null);
 
-  const showToast = (text: string, type: 'success' | 'error' | 'info' = 'info') => {
-    setToast({ text, type });
-    setTimeout(() => setToast(null), 4000); // Ocultar después de 4 segundos
+  const showToast = (text: string, type: 'success' | 'error' | 'info' = 'info', action?: { label: string, href: string }) => {
+    setToast({ text, type, action });
+    setTimeout(() => setToast(null), 5000); // Dar más tiempo si hay acción
   };
 
   const handleContactIntent = async () => {
@@ -349,6 +349,11 @@ export default function ProductoDetailPage({ params }: { params: Promise<{ id: s
             <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><circle cx="12" cy="12" r="10"></circle><line x1="12" y1="16" x2="12" y2="12"></line><line x1="12" y1="8" x2="12.01" y2="8"></line></svg>
           )}
           <span>{toast.text}</span>
+          {toast.action && (
+            <Link href={toast.action.href} onClick={() => setToast(null)} style={{ marginLeft: '12px', padding: '6px 12px', background: 'rgba(255,255,255,0.2)', borderRadius: '16px', color: '#fff', textDecoration: 'none', fontSize: '0.85rem', fontWeight: 700, whiteSpace: 'nowrap' }}>
+              {toast.action.label}
+            </Link>
+          )}
         </div>
       )}
 
@@ -698,7 +703,7 @@ export default function ProductoDetailPage({ params }: { params: Promise<{ id: s
             <button
               onClick={() => {
                 if (!isLoggedIn) {
-                  showToast('Para usar el carrito debes registrarte o iniciar sesión', 'error');
+                  showToast('Para usar el carrito debes registrarte o iniciar sesión', 'error', { label: 'Registrarse', href: '/registro' });
                   return;
                 }
                 if (isInCart) {
