@@ -44,11 +44,11 @@
   position: absolute;
   top: calc(100% + 8px);
   left: 0;
-  width: 320px;
-  background: #111111;
+  width: 280px; /* Reduced width so it doesn't overflow */
+  background: #151515;
   border: 1px solid #333333;
-  border-radius: 12px;
-  padding: 16px;
+  border-radius: 10px;
+  padding: 12px;
   box-shadow: 0 10px 40px rgba(0, 0, 0, 0.8);
   z-index: 1000;
   animation: popIn 0.2s ease-out forwards;
@@ -70,14 +70,15 @@
   background: rgba(255, 255, 255, 0.05);
   border: 1px solid rgba(255, 255, 255, 0.1);
   color: white;
-  width: 32px;
-  height: 32px;
-  border-radius: 8px;
+  width: 28px;
+  height: 28px;
+  border-radius: 6px;
   cursor: pointer;
   display: flex;
   align-items: center;
   justify-content: center;
   font-weight: bold;
+  font-size: 0.85rem;
   transition: all 0.2s;
 }
 
@@ -95,9 +96,9 @@
   background: #222222;
   border: 1px solid #444444;
   color: white;
-  padding: 6px 10px;
+  padding: 4px 6px;
   border-radius: 6px;
-  font-size: 0.9rem;
+  font-size: 0.85rem;
   outline: none;
   cursor: pointer;
   -webkit-appearance: none;
@@ -118,15 +119,15 @@
 .calendar-grid {
   display: grid;
   grid-template-columns: repeat(7, 1fr);
-  gap: 4px;
+  gap: 2px;
 }
 
 .cal-day-name {
   text-align: center;
-  font-size: 0.8rem;
+  font-size: 0.75rem;
   font-weight: 600;
   color: var(--color-text-muted);
-  margin-bottom: 8px;
+  margin-bottom: 6px;
 }
 
 .cal-cell {
@@ -134,7 +135,7 @@
   display: flex;
   align-items: center;
   justify-content: center;
-  font-size: 0.9rem;
+  font-size: 0.85rem;
   border-radius: 50%;
   border: none;
   background: transparent;
