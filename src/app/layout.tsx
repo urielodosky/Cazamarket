@@ -18,6 +18,33 @@ export const metadata: Metadata = {
   metadataBase: new URL('https://cazamarket.vercel.app'),
   alternates: {
     canonical: '/',
+    languages: {
+      'es-AR': '/',
+      'es-CL': '/',
+      'es-UY': '/'
+    },
+  },
+  openGraph: {
+    title: "CazaMarket | Todo para el Cazador, Pescador y Campista",
+    description: "La plataforma de confianza para comercios y servicios de caza, camping y pesca en la región.",
+    url: 'https://cazamarket.vercel.app',
+    siteName: 'CazaMarket',
+    images: [
+      {
+        url: '/hero_equipamiento.png', // Using an existing image as OG image
+        width: 1200,
+        height: 630,
+        alt: 'CazaMarket Portada',
+      },
+    ],
+    locale: 'es_AR',
+    type: 'website',
+  },
+  twitter: {
+    card: 'summary_large_image',
+    title: "CazaMarket | El Marketplace Outdoor",
+    description: "Explora la plataforma de confianza para encontrar productos y servicios de caza, pesca y camping.",
+    images: ['/hero_equipamiento.png'],
   },
   icons: {
     icon: '/favicon.ico',

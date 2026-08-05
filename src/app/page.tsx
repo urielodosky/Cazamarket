@@ -6,8 +6,26 @@ import SponsoredAds from '@/components/SponsoredAds';
 import './home.css';
 
 export default function Home() {
+  const schemaMarkup = {
+    "@context": "https://schema.org",
+    "@type": "WebSite",
+    "name": "CazaMarket",
+    "url": "https://cazamarket.vercel.app",
+    "description": "La plataforma de confianza para comercios y servicios de caza, camping y pesca.",
+    "potentialAction": {
+      "@type": "SearchAction",
+      "target": "https://cazamarket.vercel.app/productos?q={search_term_string}",
+      "query-input": "required name=search_term_string"
+    }
+  };
+
   return (
     <div className="home-container">
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{ __html: JSON.stringify(schemaMarkup) }}
+      />
+
 
       <PromoSlider />
 
