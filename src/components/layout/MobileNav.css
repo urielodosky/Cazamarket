@@ -6,9 +6,8 @@
   right: 0;
   height: 65px;
   background-color: var(--color-bg-base); /* Color sólido, NO glass */
-  border-top: 1px solid var(--color-border);
   z-index: 1000;
-  box-shadow: 0 -4px 15px rgba(0, 0, 0, 0.1);
+  box-shadow: 0 -4px 15px rgba(0, 0, 0, 0.2); /* Sombra un poco más fuerte para compensar la falta de borde */
   padding-bottom: env(safe-area-inset-bottom);
 }
 
@@ -63,38 +62,33 @@
 }
 
 .mobile-nav-item.active .mobile-nav-icon {
-  transform: translateY(-24px);
+  transform: translateY(-20px);
   background-color: var(--color-primary);
   color: white;
-  border: 6px solid var(--color-bg-base);
-  /* The glow around the orange icon, not a border shadow */
   box-shadow: 0 4px 12px color-mix(in srgb, var(--color-primary) 40%, transparent);
 }
 
-/* Curvas matemáticas perfectas (Bezier-like) acopladas a la barra */
-.mobile-nav-item.active::before,
-.mobile-nav-item.active::after {
+/* La ola perfecta usando SVG mask */
+.mobile-nav-item.active::before {
   content: "";
   position: absolute;
-  top: -22px; /* Se asientan exactamente sobre el borde de la barra */
-  width: 22px;
-  height: 22px;
+  top: -16px; /* Altura de la ola por encima del navbar */
+  left: 50%;
+  transform: translateX(-50%);
+  width: 90px;
+  height: 16px;
+  background-color: var(--color-bg-base);
+  -webkit-mask-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 90 16' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath d='M0,16 C25,16 30,0 45,0 C60,0 65,16 90,16 Z' fill='black'/%3E%3C/svg%3E");
+  mask-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 90 16' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath d='M0,16 C25,16 30,0 45,0 C60,0 65,16 90,16 Z' fill='black'/%3E%3C/svg%3E");
+  -webkit-mask-size: 100% 100%;
+  mask-size: 100% 100%;
   pointer-events: none;
-}
-
-.mobile-nav-item.active::before {
-  right: calc(50% + 28px); /* 44px/2 + 6px de borde = 28px */
-  background: radial-gradient(circle at 0 0, transparent 21px, var(--color-bg-base) 22px);
-}
-
-.mobile-nav-item.active::after {
-  left: calc(50% + 28px);
-  background: radial-gradient(circle at 100% 0, transparent 21px, var(--color-bg-base) 22px);
+  z-index: -1;
 }
 
 .mobile-nav-item.active .mobile-nav-label {
   opacity: 1;
-  transform: translateY(0) scale(1);
+  transform: translateY(2px) scale(1);
 }
 
 /* Mostrar solo en pantallas móviles */
