@@ -539,6 +539,8 @@ export default function ProductoDetailPage({ params }: { params: Promise<{ id: s
                 )}
               </div>
             )}
+          </div>
+
           {/* Banner Condicional ANMaC para Armas */}
           {(product.category === 'Armas' || product.category === 'armas_de_fuego' || product.category?.toLowerCase().includes('arma')) && (
             <div style={{ background: 'rgba(255, 193, 7, 0.1)', border: '1px solid #ffc107', borderRadius: '8px', padding: '12px', marginTop: '16px' }}>
