@@ -45,13 +45,10 @@ export default function PlanesPage() {
 
   useEffect(() => {
     if (paymentModal.show) {
-      fetch('https://dolarapi.com/v1/dolares')
+      fetch('https://dolarapi.com/v1/dolares/blue')
         .then(res => res.json())
         .then(data => {
-          if (Array.isArray(data)) {
-            const maxVenta = Math.max(...data.map((d: any) => d.venta || 0));
-            if (maxVenta > 0) setExchangeRate(maxVenta);
-          }
+          if (data.venta) setExchangeRate(data.venta);
         })
         .catch(err => console.error('Error fetching dollar rate:', err));
     }
