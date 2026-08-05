@@ -172,6 +172,13 @@ input[type="number"] {
   -moz-appearance: textfield;
   appearance: textfield;
 }
+
+@media (min-width: 769px) {
+  .desktop-hidden {
+    display: none !important;
+  }
+}
+
 @media (max-width: 768px) {
   .container-page {
     padding-left: 24px;

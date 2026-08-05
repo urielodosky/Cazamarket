@@ -123,11 +123,11 @@ export default function UserMenu() {
                 <span>Configuración</span>
               </Link>
 
-              <Link href="/planes" className="dropdown-item" onClick={() => setIsOpen(false)}>
+              <Link href="/planes" className="dropdown-item desktop-hidden" onClick={() => setIsOpen(false)}>
                 <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
                   <path d="M23 6l-9.5 9.5-5-5L1 18"></path><polyline points="16 6 23 6 23 13"></polyline>
                 </svg>
-                <span>Planes de Publicidad</span>
+                <span>Planes</span>
               </Link>
 
               <Link href="/carrito" className="dropdown-item" onClick={() => setIsOpen(false)}>
