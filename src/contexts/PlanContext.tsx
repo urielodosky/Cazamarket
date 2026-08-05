@@ -93,8 +93,18 @@ export function PlanProvider({ children }: { children: React.ReactNode }) {
 
     const pendingProd = localStorage.getItem(userPlanKey(userId, 'pending_productos')) as PlanTier | null;
     const pendingServ = localStorage.getItem(userPlanKey(userId, 'pending_servicios')) as PlanTier | null;
-    if (pendingProd) setPendingProductPlanTier(pendingProd);
-    if (pendingServ) setPendingServicePlanTier(pendingServ);
+    
+    // Si tenían un plan pendiente (por el bug anterior), lo aplicamos inmediatamente
+    if (pendingProd) {
+      setProductPlanTier(pendingProd);
+      localStorage.setItem(userPlanKey(userId, 'productos'), pendingProd);
+      localStorage.removeItem(userPlanKey(userId, 'pending_productos'));
+    }
+    if (pendingServ) {
+      setServicePlanTier(pendingServ);
+      localStorage.setItem(userPlanKey(userId, 'servicios'), pendingServ);
+      localStorage.removeItem(userPlanKey(userId, 'pending_servicios'));
+    }
 
     const savedStartDate = localStorage.getItem(userPlanKey(userId, 'subscriptionStartDate'));
     if (savedStartDate) {
@@ -107,23 +117,7 @@ export function PlanProvider({ children }: { children: React.ReactNode }) {
   const selectPlan = useCallback((tier: PlanTier, category: PlanCategory) => {
     if (!userId) return;
 
-    // Determine if user already has a paid plan in this category
-    const isUpgradingFromPaid = (category === 'productos' || category === 'mixto') && productPlanTier !== 'gratis' 
-                             || (category === 'servicios' || category === 'mixto') && servicePlanTier !== 'gratis';
-                             
-    // If upgrading from gratis, it's instant. If changing a paid plan, it goes to pending.
-    if (isUpgradingFromPaid && tier !== 'gratis') {
-      if (category === 'productos' || category === 'mixto') {
-        setPendingProductPlanTier(tier);
-        localStorage.setItem(userPlanKey(userId, 'pending_productos'), tier);
-      }
-      if (category === 'servicios' || category === 'mixto') {
-        setPendingServicePlanTier(tier);
-        localStorage.setItem(userPlanKey(userId, 'pending_servicios'), tier);
-      }
-      return;
-    }
-
+    // Todo cambio de plan se aplica inmediatamente para mejor experiencia UX en la simulación.
     if (category === 'productos') {
       setProductPlanTier(tier);
       localStorage.setItem(userPlanKey(userId, 'productos'), tier);
