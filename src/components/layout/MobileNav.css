@@ -63,35 +63,33 @@
 }
 
 .mobile-nav-item.active .mobile-nav-icon {
-  transform: translateY(-20px);
+  transform: translateY(-24px);
   background-color: var(--color-primary);
   color: white;
   border: 6px solid var(--color-bg-base);
+  /* The glow around the orange icon, not a border shadow */
   box-shadow: 0 4px 12px color-mix(in srgb, var(--color-primary) 40%, transparent);
 }
 
-/* Las curvas cóncavas acopladas al icono activo */
-.mobile-nav-item.active .mobile-nav-icon::before,
-.mobile-nav-item.active .mobile-nav-icon::after {
+/* Curvas matemáticas perfectas (Bezier-like) acopladas a la barra */
+.mobile-nav-item.active::before,
+.mobile-nav-item.active::after {
   content: "";
   position: absolute;
-  top: 15px; /* Alineado con el borde superior del navbar */
-  width: 18px;
-  height: 18px;
-  background: transparent;
+  top: -22px; /* Se asientan exactamente sobre el borde de la barra */
+  width: 22px;
+  height: 22px;
   pointer-events: none;
 }
 
-.mobile-nav-item.active .mobile-nav-icon::before {
-  left: -23px; /* A la izquierda del borde de 6px */
-  border-top-right-radius: 18px;
-  box-shadow: 5px -5px 0 0 var(--color-bg-base);
+.mobile-nav-item.active::before {
+  right: calc(50% + 28px); /* 44px/2 + 6px de borde = 28px */
+  background: radial-gradient(circle at 0 0, transparent 21px, var(--color-bg-base) 22px);
 }
 
-.mobile-nav-item.active .mobile-nav-icon::after {
-  right: -23px; /* A la derecha del borde de 6px */
-  border-top-left-radius: 18px;
-  box-shadow: -5px -5px 0 0 var(--color-bg-base);
+.mobile-nav-item.active::after {
+  left: calc(50% + 28px);
+  background: radial-gradient(circle at 100% 0, transparent 21px, var(--color-bg-base) 22px);
 }
 
 .mobile-nav-item.active .mobile-nav-label {
