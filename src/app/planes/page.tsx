@@ -1,6 +1,6 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import { useAuth } from '@/contexts/AuthContext';
 import { usePlan } from '@/contexts/PlanContext';
@@ -41,6 +41,18 @@ export default function PlanesPage() {
   const [paymentMethod, setPaymentMethod] = useState<PaymentMethod>('mercadopago');
   const [paymentStep, setPaymentStep] = useState<PaymentStep>('select');
   const [cardData, setCardData] = useState({ number: '', expiry: '', cvc: '', name: '' });
+  const [exchangeRate, setExchangeRate] = useState<number>(1400); // Default fallback
+
+  useEffect(() => {
+    if (paymentModal.show) {
+      fetch('https://dolarapi.com/v1/dolares/mep')
+        .then(res => res.json())
+        .then(data => {
+          if (data.venta) setExchangeRate(data.venta);
+        })
+        .catch(err => console.error('Error fetching dollar rate:', err));
+    }
+  }, [paymentModal.show]);
 
   const getPlans = (): PlanCardData[] => {
     if (activeTab === 'productos') return PRODUCT_PLANS;
@@ -378,9 +390,12 @@ export default function PlanesPage() {
                       </div>
                       <div style={{ textAlign: 'right' }}>
                         <p style={{ margin: 0, color: 'var(--color-primary)', fontSize: '1.6rem', fontWeight: 800 }}>
-                          ${paymentModal.plan.price}
+                          ${(paymentModal.plan.price * exchangeRate).toLocaleString('es-AR')}
                         </p>
-                        <p style={{ margin: 0, color: '#666', fontSize: '0.8rem' }}>/mes</p>
+                        <p style={{ margin: 0, color: '#666', fontSize: '0.8rem' }}>ARS / mes</p>
+                        <p style={{ margin: '4px 0 0', color: '#888', fontSize: '0.75rem' }}>
+                          (Eq. a ${paymentModal.plan.price} USD)
+                        </p>
                       </div>
                     </div>
                   </div>
@@ -478,7 +493,7 @@ export default function PlanesPage() {
                     onMouseOver={(e) => e.currentTarget.style.transform = 'translateY(-1px)'}
                     onMouseOut={(e) => e.currentTarget.style.transform = 'translateY(0)'}
                   >
-                    Pagar ${paymentModal.plan.price}/mes
+                    Pagar ${(paymentModal.plan.price * exchangeRate).toLocaleString('es-AR')} ARS/mes
                   </button>
                 </>
               )}
@@ -554,7 +569,7 @@ export default function PlanesPage() {
                       transition: 'all 0.2s ease', boxShadow: '0 4px 15px rgba(255, 115, 0, 0.3)'
                     }}
                   >
-                    Confirmar Pago Seguro
+                    Pagar ${(paymentModal.plan!.price * exchangeRate).toLocaleString('es-AR')} ARS Seguro
                   </button>
                   <button
                     onClick={() => setPaymentStep('select')}
