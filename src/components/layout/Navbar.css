@@ -648,11 +648,25 @@
     padding: 10px 16px;
     gap: 12px;
   }
+  .navbar-logo {
+    flex-shrink: 0;
+  }
   .navbar-logo-img {
-    height: 48px;
+    height: 56px; /* Más grande (antes 48px) */
+    object-fit: contain;
+  }
+  .navbar-actions {
+    margin-left: auto;
+    flex-shrink: 0;
+  }
+  .navbar-middle-area {
+    flex: 1; /* Ocupa el espacio restante */
+    display: flex;
+    justify-content: flex-start; /* Alinea el buscador hacia la izquierda */
+    margin-left: 8px; /* Lo acerca un poco más al logo */
+    min-width: 0; /* Permite que el buscador se achique si es necesario sin desbordar */
   }
   .navbar-center {
-    order: 3;
     width: 100% !important;
     max-width: 100% !important;
     height: 44px !important;
