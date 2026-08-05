@@ -548,12 +548,18 @@
     grid-column: 2 !important;
     grid-row: 2 !important;
     margin: 0 auto !important;
-    padding: 4px 10px !important;
-    font-size: 0.7rem !important;
-    border-radius: 20px !important;
+    padding: 2px 8px !important;
+    font-size: 0.65rem !important;
+    border-radius: 12px !important;
     height: auto !important;
     width: max-content !important;
     white-space: nowrap !important;
+  }
+  
+  .plan-features-toggle svg {
+    width: 12px !important;
+    height: 12px !important;
+    margin-left: 2px !important;
   }
 
   .plan-price {
@@ -575,10 +581,10 @@
     grid-column: 1 / -1 !important;
     grid-row: 3 !important;
     margin: 4px auto 0 auto !important;
-    padding: 6px 20px !important;
-    font-size: 0.8rem !important;
+    padding: 4px 16px !important;
+    font-size: 0.75rem !important;
     width: auto !important;
-    min-width: 160px !important;
+    min-width: 140px !important;
     height: auto !important;
   }
   
