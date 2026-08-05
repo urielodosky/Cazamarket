@@ -508,10 +508,14 @@ export default function Navbar() {
                   alignItems: 'center',
                   justifyContent: 'center',
                   padding: 0,
-                  outline: 'none'
+                  outline: 'none',
+                  color: 'var(--color-text-muted)'
                 }}
               >
-                <div style={{ width: '32px', height: '32px', borderRadius: '50%', background: 'var(--color-primary)' }}></div>
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" style={{ width: '20px', height: '20px' }}>
+                  <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path>
+                  <circle cx="12" cy="7" r="4"></circle>
+                </svg>
               </button>
 
               {isGuestMenuOpen && (
