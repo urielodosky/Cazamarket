@@ -119,6 +119,7 @@ export default function MiNegocioPage() {
   const [description, setDescription] = useState('');
   const [businessType, setBusinessType] = useState('');
   const [categories, setCategories] = useState(['', '', '']);
+  const [hasFirearmsPermit, setHasFirearmsPermit] = useState(false);
   const [storeBanner, setStoreBanner] = useState('https://images.unsplash.com/photo-1511497584788-876760111969?q=80&w=1200&auto=format&fit=crop');
   
   const [isEditingName, setIsEditingName] = useState(false);
@@ -159,7 +160,8 @@ export default function MiNegocioPage() {
       if (parsed.storeDescription) setDescription(parsed.storeDescription);
       if (parsed.storeName) setName(parsed.storeName);
       if (parsed.businessType) setBusinessType(parsed.businessType);
-      if (parsed.categories) setCategories(parsed.categories);
+      if (parsed.categories) setCategories(parsed.categories ? (Array.isArray(parsed.categories) ? parsed.categories : [parsed.categories]) : ['', '', '']);
+      setHasFirearmsPermit(!!parsed.hasFirearmsPermit);
       if (parsed.telefono) setTelefono(parsed.telefono);
       if (parsed.theme) setTheme(parsed.theme);
       
@@ -490,6 +492,30 @@ export default function MiNegocioPage() {
                 );
               })}
             </div>
+            
+            {categories.includes('Armas de Fuego') && (
+              <div style={{ background: 'rgba(255, 193, 7, 0.1)', border: '1px solid #ffc107', borderRadius: '8px', padding: '16px', display: 'flex', gap: '12px', alignItems: 'flex-start', marginTop: '16px' }}>
+                <input
+                  type="checkbox"
+                  id="firearmsPermitStore"
+                  checked={hasFirearmsPermit}
+                  onChange={(e) => {
+                    setHasFirearmsPermit(e.target.checked);
+                    const savedProfile = localStorage.getItem('cazamarket_profile');
+                    if (savedProfile) {
+                      const parsed = JSON.parse(savedProfile);
+                      parsed.hasFirearmsPermit = e.target.checked;
+                      localStorage.setItem('cazamarket_profile', JSON.stringify(parsed));
+                    }
+                  }}
+                  style={{ width: '20px', height: '20px', marginTop: '2px', cursor: 'pointer', accentColor: '#ffc107' }}
+                />
+                <label htmlFor="firearmsPermitStore" style={{ color: '#ffc107', fontSize: '0.9rem', cursor: 'pointer', lineHeight: 1.5 }}>
+                  <strong style={{ display: 'block', marginBottom: '4px' }}>Declaración Jurada Comercial (ANMaC)</strong>
+                  Confirmo que mi negocio posee la inscripción comercial vigente y permisos emitidos por ANMaC para la exhibición y venta de este material. Entiendo que CazaMarket opera exclusivamente como vidriera publicitaria.
+                </label>
+              </div>
+            )}
 
             {isEditingDesc ? (
               <textarea 
