@@ -29,20 +29,20 @@
   display: flex;
   align-items: center;
   justify-content: center;
-  width: 48px;
-  height: 48px;
+  width: 44px;
+  height: 44px;
   border-radius: 50%;
   margin-bottom: 2px;
   transition: all 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
   position: relative;
   z-index: 2;
   color: var(--color-text-muted);
-  transform: translateY(10px); /* Centered by default because label is hidden */
+  transform: translateY(8px); /* Centered by default because label is hidden */
 }
 
 .mobile-nav-icon-svg {
-  width: 24px;
-  height: 24px;
+  width: 20px;
+  height: 20px;
   stroke-width: 2;
 }
 
@@ -57,63 +57,41 @@
   color: var(--color-primary);
 }
 
-/* Indicator Wrapper (Mueve la ola) */
-.mobile-nav-indicator-wrapper {
-  position: absolute;
-  top: 0;
-  left: 0;
-  width: 20%; /* 100% / 5 nav items */
-  height: 100%;
-  pointer-events: none;
-  transition: transform 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
-  z-index: 1;
-  transform: translateX(calc(var(--active-index, 0) * 100%));
-}
-
-/* El círculo (bump) central */
-.mobile-nav-indicator {
-  position: absolute;
-  top: -24px;
-  left: 50%;
-  transform: translateX(-50%);
-  width: 60px;
-  height: 60px;
-  background-color: var(--color-bg-base);
-  border-radius: 50%;
-}
-
-/* Las curvas cóncavas a los costados del bump */
-.mobile-nav-indicator-curve {
-  position: absolute;
-  top: 50%; /* Mitad del círculo */
-  width: 20px;
-  height: 20px;
-  background: transparent;
-}
-
-.mobile-nav-indicator-curve.left {
-  left: -19px;
-  border-top-right-radius: 20px;
-  box-shadow: 6px -10px 0 0 var(--color-bg-base);
-}
-
-.mobile-nav-indicator-curve.right {
-  right: -19px;
-  border-top-left-radius: 20px;
-  box-shadow: -6px -10px 0 0 var(--color-bg-base);
-}
-
 /* Estado Activo: Efecto "Ola" hacia arriba */
 .mobile-nav-item.active {
   color: var(--color-primary);
 }
 
 .mobile-nav-item.active .mobile-nav-icon {
-  transform: translateY(-24px);
+  transform: translateY(-20px);
   background-color: var(--color-primary);
   color: white;
-  /* El borde ya lo provee el .mobile-nav-indicator detrás */
+  border: 6px solid var(--color-bg-base);
   box-shadow: 0 4px 12px color-mix(in srgb, var(--color-primary) 40%, transparent);
+}
+
+/* Las curvas cóncavas acopladas al icono activo */
+.mobile-nav-item.active .mobile-nav-icon::before,
+.mobile-nav-item.active .mobile-nav-icon::after {
+  content: "";
+  position: absolute;
+  top: 15px; /* Alineado con el borde superior del navbar */
+  width: 18px;
+  height: 18px;
+  background: transparent;
+  pointer-events: none;
+}
+
+.mobile-nav-item.active .mobile-nav-icon::before {
+  left: -23px; /* A la izquierda del borde de 6px */
+  border-top-right-radius: 18px;
+  box-shadow: 5px -5px 0 0 var(--color-bg-base);
+}
+
+.mobile-nav-item.active .mobile-nav-icon::after {
+  right: -23px; /* A la derecha del borde de 6px */
+  border-top-left-radius: 18px;
+  box-shadow: -5px -5px 0 0 var(--color-bg-base);
 }
 
 .mobile-nav-item.active .mobile-nav-label {

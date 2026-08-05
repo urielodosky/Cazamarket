@@ -37,20 +37,8 @@ export default function MobileNav() {
 
   return (
     <nav className="mobile-bottom-nav">
-      <div 
-        className="mobile-nav-indicator-wrapper" 
-        style={{ '--active-index': activeIndex } as React.CSSProperties}
-      >
-        <div className="mobile-nav-indicator">
-          <div className="mobile-nav-indicator-curve left"></div>
-          <div className="mobile-nav-indicator-curve right"></div>
-        </div>
-      </div>
       {navItems.map((item, index) => {
         const isActive = pathname === item.href || (item.href !== '/' && pathname?.startsWith(item.href));
-        if (isActive && activeIndex !== index) {
-          // This should ideally be handled without a render side-effect but for this simple UI it's fine
-        }
         return (
           <Link 
             key={item.href}
