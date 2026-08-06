@@ -60,8 +60,14 @@ export async function POST(request: Request) {
       if (existingUser) {
         step = 'check_ghost_user';
         const { data: authUser, error: authError } = await supabaseAdmin.auth.admin.getUserById(existingUser.id);
-        
-        if (authError) throw authError;
+        if (authError) {
+          if (authError.message.includes('not found') || authError.status === 404) {
+             // Orfandad detectada en el catch de auth
+             await supabaseAdmin.from('profiles').delete().eq('id', existingUser.id);
+          } else {
+             throw authError;
+          }
+        }
 
         if (authUser && authUser.user) {
           if (!authUser.user.email_confirmed_at) {
@@ -74,6 +80,9 @@ export async function POST(request: Request) {
               { status: 400 }
             );
           }
+        } else if (!authError) {
+          // Si no hay authUser.user y no tiró error, es un perfil huérfano.
+          await supabaseAdmin.from('profiles').delete().eq('id', existingUser.id);
         }
       }
 
@@ -92,7 +101,13 @@ export async function POST(request: Request) {
         if (existingCuitUser) {
           step = 'check_ghost_cuit_user';
           const { data: authUser, error: authError } = await supabaseAdmin.auth.admin.getUserById(existingCuitUser.id);
-          if (authError) throw authError;
+          if (authError) {
+            if (authError.message.includes('not found') || authError.status === 404) {
+               await supabaseAdmin.from('profiles').delete().eq('id', existingCuitUser.id);
+            } else {
+               throw authError;
+            }
+          }
 
           if (authUser && authUser.user) {
             if (!authUser.user.email_confirmed_at) {
@@ -105,10 +120,14 @@ export async function POST(request: Request) {
                 { status: 400 }
               );
             }
+          } else if (!authError) {
+            // Perfil huérfano
+            await supabaseAdmin.from('profiles').delete().eq('id', existingCuitUser.id);
+          }
           }
         }
-      }
       
+
       step = 'signup';
       const signUpRes = await supabase.auth.signUp({
         email,
@@ -134,8 +153,8 @@ export async function POST(request: Request) {
     }
 
     if (error) {
-      console.error(`[SECURITY LOG] Error DB registro (Email: ${email}):`, error.message);
-      return NextResponse.json({ error: 'Error al procesar el registro' }, { status: 400 });
+      console.error(`[SECURITY LOG] Error DB registro (Email: ${email}):`, JSON.stringify(error));
+      return NextResponse.json({ error: error.message || 'Error al procesar el registro' }, { status: 400 });
     }
 
     // Respuesta exitosa
