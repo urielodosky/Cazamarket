@@ -57,6 +57,38 @@ export async function POST(request: Request) {
           }
         }
       }
+
+      // Check for duplicate CUIT
+      if (cuit) {
+        step = 'check_cuit';
+        const { data: existingCuitUser, error: cuitCheckError } = await supabaseAdmin
+          .from('profiles')
+          .select('id')
+          .eq('cuit', cuit)
+          .limit(1)
+          .maybeSingle();
+
+        if (cuitCheckError) throw cuitCheckError;
+
+        if (existingCuitUser) {
+          step = 'check_ghost_cuit_user';
+          const { data: authUser, error: authError } = await supabaseAdmin.auth.admin.getUserById(existingCuitUser.id);
+          if (authError) throw authError;
+
+          if (authUser && authUser.user) {
+            if (!authUser.user.email_confirmed_at) {
+              step = 'delete_ghost_cuit_user';
+              const { error: delError } = await supabaseAdmin.auth.admin.deleteUser(existingCuitUser.id);
+              if (delError) throw delError;
+            } else {
+              return NextResponse.json(
+                { error: 'El CUIT ingresado ya está registrado en otra cuenta verificada.' },
+                { status: 400 }
+              );
+            }
+          }
+        }
+      }
       
       step = 'signup';
       const signUpRes = await supabase.auth.signUp({

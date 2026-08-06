@@ -33,11 +33,34 @@ export async function POST(request: Request) {
       return NextResponse.json({ error: 'No valid fields provided' }, { status: 400 });
     }
 
-    // Crear cliente admin para bypasear RLS
+    // Crear cliente admin para bypasear RLS (necesario para verificar si el nombre está en uso por otro usuario)
     const supabaseAdmin = createAdminClient(
       process.env.NEXT_PUBLIC_SUPABASE_URL!,
       process.env.SUPABASE_SERVICE_ROLE_KEY!
     );
+
+    // Verificar unicidad de nombre de usuario si se está intentando cambiar
+    if (safeUpdates.full_name) {
+      const { data: existingUser, error: checkError } = await supabaseAdmin
+        .from('profiles')
+        .select('id')
+        .ilike('full_name', safeUpdates.full_name)
+        .neq('id', user.id)
+        .limit(1)
+        .maybeSingle();
+
+      if (checkError) {
+        console.error(`[SECURITY LOG] Error DB verificando unicidad de nombre (User: ${user.id}):`, checkError.message);
+        return NextResponse.json({ error: 'Error interno al validar el nombre de usuario' }, { status: 500 });
+      }
+
+      if (existingUser) {
+        return NextResponse.json(
+          { error: 'Este nombre de usuario / razón social ya está en uso por otra cuenta. Por favor, elige otro.' },
+          { status: 400 }
+        );
+      }
+    }
 
     const { error } = await supabaseAdmin
       .from('profiles')
