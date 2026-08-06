@@ -26,9 +26,28 @@ export async function POST(request: Request) {
       process.env.SUPABASE_SERVICE_ROLE_KEY || process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!
     );
 
-    let step = 'check_existing_user';
+    let step = 'check_existing_email';
     let data, error;
     try {
+      // 1. Verificar si el email ya existe en auth.users (saltando la protección de enumeración)
+      const { data: existingEmailData, error: emailCheckError } = await supabaseAdmin.rpc('check_email_exists', { search_email: email });
+      if (emailCheckError) throw emailCheckError;
+      
+      if (existingEmailData) {
+        if (!existingEmailData.email_confirmed_at) {
+          // Es un fantasma. Lo borramos para liberar el correo.
+          step = 'delete_ghost_email_user';
+          const { error: delError } = await supabaseAdmin.auth.admin.deleteUser(existingEmailData.id);
+          if (delError) throw delError;
+        } else {
+          return NextResponse.json(
+            { error: 'Este correo electrónico ya está registrado. Por favor, inicia sesión.' },
+            { status: 400 }
+          );
+        }
+      }
+
+      step = 'check_existing_username';
       const { data: existingUser, error: checkError } = await supabaseAdmin
         .from('profiles')
         .select('id, full_name')
@@ -115,46 +134,6 @@ export async function POST(request: Request) {
     }
 
     if (error) {
-      if (error.message.includes('already registered')) {
-        // LIMPIEZA 2: El correo existe. Veamos si es fantasma.
-        const { data: usersData } = await supabaseAdmin.auth.admin.listUsers();
-        if (usersData && usersData.users) {
-          const ghost = usersData.users.find(u => u.email === email && !u.email_confirmed_at);
-          if (ghost) {
-            // El correo está secuestrado por un fantasma. Lo destruimos.
-            await supabaseAdmin.auth.admin.deleteUser(ghost.id);
-            
-            // Reintentamos el registro limpio
-            const retry = await supabase.auth.signUp({
-              email,
-              password,
-              options: { 
-                data: { 
-                  full_name: username, 
-                  avatar_url: '',
-                  person_type: person_type || null,
-                  birth_date: birth_date || null,
-                  cuit: cuit || null,
-                  phone: phone || null,
-                  contact_email: contact_email || email,
-                  terms_accepted_at: new Date().toISOString(),
-                } 
-              }
-            });
-            
-            if (retry.error) {
-              console.error(`[SECURITY LOG] Error DB registro (Email: ${email}):`, retry.error.message);
-              return NextResponse.json({ error: 'Error al procesar el registro (Intento fallido)' }, { status: 400 });
-            }
-            return NextResponse.json({ success: true, data: retry.data });
-          }
-        }
-        
-        return NextResponse.json(
-          { error: 'Este correo electrónico ya está registrado y verificado. Por favor, inicia sesión.' },
-          { status: 400 }
-        );
-      }
       console.error(`[SECURITY LOG] Error DB registro (Email: ${email}):`, error.message);
       return NextResponse.json({ error: 'Error al procesar el registro' }, { status: 400 });
     }
