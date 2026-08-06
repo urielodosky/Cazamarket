@@ -260,9 +260,9 @@ export default function PlanesPage() {
                     handleSelectPlan(plan);
                   }
                 }}
-                style={isCurrentPlan(plan) ? { backgroundColor: 'rgba(239, 68, 68, 0.1)', color: '#ef4444', borderColor: '#ef4444' } : (isPendingPlan(plan) ? { opacity: 0.6, cursor: 'default' } : {})}
+                style={isCurrentPlan(plan) ? { backgroundColor: 'rgba(239, 68, 68, 0.1)', color: '#ef4444', borderColor: '#ef4444' } : (isPendingPlan(plan) ? { backgroundColor: 'rgba(255, 255, 255, 0.04)', color: '#999', borderColor: 'rgba(255, 255, 255, 0.1)', cursor: 'default', opacity: 1, padding: '12px 10px' } : {})}
               >
-                {isCurrentPlan(plan) ? 'Darse de baja' : isPendingPlan(plan) ? 'A la espera del cobro' : plan.price === 0 ? 'Comenzar Gratis' : 'Elegir Plan'}
+                {isCurrentPlan(plan) ? 'Darse de baja' : isPendingPlan(plan) ? 'Cambio en curso' : plan.price === 0 ? 'Comenzar Gratis' : 'Elegir Plan'}
               </button>
 
               {isPendingPlan(plan) && formattedNextBillingDate && (
