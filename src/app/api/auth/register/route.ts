@@ -91,7 +91,7 @@ export async function POST(request: Request) {
         step = 'check_cuit';
         const { data: existingCuitUser, error: cuitCheckError } = await supabaseAdmin
           .from('profiles')
-          .select('id')
+          .select('id, full_name')
           .eq('cuit', cuit)
           .limit(1)
           .maybeSingle();
@@ -116,7 +116,7 @@ export async function POST(request: Request) {
               if (delError) throw delError;
             } else {
               return NextResponse.json(
-                { error: 'El CUIT ingresado ya está registrado en otra cuenta verificada.' },
+                { error: `El CUIT ingresado ya está registrado a nombre de ${existingCuitUser.full_name}.` },
                 { status: 400 }
               );
             }
