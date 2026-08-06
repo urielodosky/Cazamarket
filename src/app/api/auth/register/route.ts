@@ -154,7 +154,15 @@ export async function POST(request: Request) {
 
     if (error) {
       console.error(`[SECURITY LOG] Error DB registro (Email: ${email}):`, JSON.stringify(error));
-      return NextResponse.json({ error: error.message || 'Error al procesar el registro' }, { status: 400 });
+      
+      let finalErrorMessage = error.message || 'Error al procesar el registro';
+      
+      // Manejar el error 500 de Supabase cuando falla el envío del email (límite alcanzado o SMTP mal configurado)
+      if (finalErrorMessage === '{}' || (error as any).status === 500 || (error as any).name === 'AuthRetryableFetchError') {
+         finalErrorMessage = 'Error interno del servidor. Es probable que se haya alcanzado el límite de correos electrónicos de Supabase. Por favor, intenta de nuevo más tarde o revisa la configuración SMTP.';
+      }
+
+      return NextResponse.json({ error: finalErrorMessage }, { status: 400 });
     }
 
     // Respuesta exitosa
