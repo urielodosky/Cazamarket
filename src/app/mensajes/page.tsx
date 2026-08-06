@@ -319,18 +319,19 @@ export default function MensajesPage() {
                   onClick={() => setIsAdvisorModalOpen(true)}
                   className="btn-glow"
                   style={{
-                    background: 'var(--color-primary)', color: '#fff', border: 'none', padding: '8px 16px', 
-                    borderRadius: 'var(--radius-full)', fontSize: '0.85rem', cursor: 'pointer', fontWeight: 600, display: 'flex', alignItems: 'center', gap: '6px'
+                    background: 'var(--color-primary)', color: '#fff', border: 'none', padding: '8px 12px', 
+                    borderRadius: 'var(--radius-full)', fontSize: '0.85rem', cursor: 'pointer', fontWeight: 600, display: 'flex', alignItems: 'center', gap: '6px',
+                    whiteSpace: 'nowrap'
                   }}
                 >
-                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" width="16" height="16">
+                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" width="16" height="16" style={{ flexShrink: 0 }}>
                     <rect x="3" y="11" width="18" height="10" rx="2" />
                     <circle cx="12" cy="5" r="2" />
                     <path d="M12 7v4" />
                     <line x1="8" y1="16" x2="8" y2="16" />
                     <line x1="16" y1="16" x2="16" y2="16" />
                   </svg>
-                  Crear asesor virtual
+                  Bot Asesor
                 </button>
               )}
             </div>
