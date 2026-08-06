@@ -81,9 +81,27 @@ export default function ServicioDetailPage({ params }: { params: Promise<{ id: s
   const [isLoading, setIsLoading] = useState(true);
   const { addToCart, canAddToCart } = useCart();
   const { hasFeature } = usePlan();
-  const { username, isLoggedIn } = useAuth();
+  const { username, isLoggedIn, supabaseUser } = useAuth();
   const themeColors = useThemeColors();
   const supabase = createClient();
+
+  const handleContactIntent = async () => {
+    if (supabaseUser && service?.seller?.id && supabaseUser.id !== service.seller.id) {
+      try {
+        const sellerId = service.seller.id || '00000000-0000-0000-0000-000000000000';
+        // Insert service interaction
+        await supabase.from('interactions').insert({
+          buyer_id: supabaseUser.id,
+          seller_id: sellerId,
+          product_id: null, // Since we don't know if the column `service_id` exists in all DBs yet, we just log it as a business interaction or with service_id
+          service_id: service.id,
+          status: 'pending_time'
+        });
+      } catch(err) {
+        // Silently ignore constraint violations
+      }
+    }
+  };
 
   const nextImage = (e: React.MouseEvent) => {
     e.stopPropagation();
@@ -134,6 +152,7 @@ export default function ServicioDetailPage({ params }: { params: Promise<{ id: s
               name: sellerProfile.store_name || sellerProfile.full_name || 'Mi Negocio',
               avatar: sellerProfile.avatar_url || '',
               phone: sellerProfile.phone || '',
+              planTier: sellerProfile.service_plan_tier || 'gratis'
             }
           });
           setIsLoading(false);
@@ -184,7 +203,8 @@ export default function ServicioDetailPage({ params }: { params: Promise<{ id: s
               avatar: parsedProfile.avatar || currentService.seller?.avatar || '',
               phone: parsedProfile.telefono || currentService.seller?.phone || 'No especificado',
               socials: parsedProfile.redesSociales || currentService.seller?.socials || [],
-              theme: parsedProfile.theme || currentService.seller?.theme || null
+              theme: parsedProfile.theme || currentService.seller?.theme || null,
+              planTier: 'gratis'
             };
           }
         }
@@ -520,12 +540,16 @@ export default function ServicioDetailPage({ params }: { params: Promise<{ id: s
 
           {/* Botones de Acción */}
           <div style={{ display: 'flex', flexDirection: 'column', gap: '16px', marginTop: '16px', position: 'relative' }}>
-            {canAddToCart(service.seller.id) ? (
+            {service.seller?.planTier !== 'gratis' ? (
               <button
                 onClick={() => {
                   if (!isLoggedIn) {
                     alert('Para usar el carrito debes registrarte o iniciar sesión');
                     router.push('/registro');
+                    return;
+                  }
+                  if (supabaseUser && supabaseUser.id === service.seller.id) {
+                    alert('No puedes agregar tus propios servicios al carrito');
                     return;
                   }
                   addToCart({
@@ -551,7 +575,13 @@ export default function ServicioDetailPage({ params }: { params: Promise<{ id: s
                 {/* 1. Contactar al Guía */}
                 <div style={{ position: 'relative', width: '100%' }}>
                   <button
-                    onClick={() => setIsContactMenuOpen(!isContactMenuOpen)}
+                    onClick={() => {
+                      if (supabaseUser && supabaseUser.id === service.seller.id) {
+                        alert('No puedes contactarte a ti mismo');
+                        return;
+                      }
+                      setIsContactMenuOpen(!isContactMenuOpen);
+                    }}
                     style={{ width: '100%', padding: '14px 18px', fontSize: '0.95rem', fontWeight: 700, borderRadius: '12px', background: 'var(--color-primary)', border: 'none', color: '#fff', cursor: 'pointer', transition: 'all 0.2s ease', display: 'flex', justifyContent: 'center', alignItems: 'center', gap: '8px', boxShadow: '0 4px 15px rgba(0, 0, 0, 0.3)' }}
                     onMouseEnter={(e) => { e.currentTarget.style.background = 'var(--color-primary-hover)'; e.currentTarget.style.transform = 'translateY(-2px)'; }}
                     onMouseLeave={(e) => { e.currentTarget.style.background = 'var(--color-primary)'; e.currentTarget.style.transform = 'translateY(0)'; }}
@@ -623,7 +653,10 @@ export default function ServicioDetailPage({ params }: { params: Promise<{ id: s
                           href={waUrl}
                           target="_blank"
                           rel="noopener noreferrer"
-                          onClick={() => setIsContactMenuOpen(false)}
+                          onClick={() => {
+                            setIsContactMenuOpen(false);
+                            handleContactIntent();
+                          }}
                           style={{
                             display: 'flex',
                             alignItems: 'center',
@@ -664,7 +697,10 @@ export default function ServicioDetailPage({ params }: { params: Promise<{ id: s
                               href={socialUrl}
                               target="_blank"
                               rel="noopener noreferrer"
-                              onClick={() => setIsContactMenuOpen(false)}
+                              onClick={() => {
+                                setIsContactMenuOpen(false);
+                                handleContactIntent();
+                              }}
                               style={{
                                 display: 'flex',
                                 alignItems: 'center',

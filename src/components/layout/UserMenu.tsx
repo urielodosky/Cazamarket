@@ -4,11 +4,13 @@ import { useState, useRef, useEffect } from 'react';
 import Link from 'next/link';
 import { useAuth } from '@/contexts/AuthContext';
 import { useTheme } from '@/contexts/ThemeContext';
+import { usePlan } from '@/contexts/PlanContext';
 import './UserMenu.css';
 
 export default function UserMenu() {
-  const { logout, username, email, avatar, isVendor, toggleVendorMode, isVendorModeActive } = useAuth();
+  const { logout, username, email, avatar, isVendor, toggleVendorMode, isVendorModeActive, supabaseUser } = useAuth();
   const { mode, toggleMode } = useTheme();
+  const { permissions } = usePlan();
   const [isOpen, setIsOpen] = useState(false);
   const menuRef = useRef<HTMLDivElement>(null);
 
@@ -108,13 +110,6 @@ export default function UserMenu() {
                       <path d="M20 16V7a2 2 0 0 0-2-2H6a2 2 0 0 0-2 2v9m16 0H4m16 0 1.28 2.55a1 1 0 0 1-.9 1.45H3.62a1 1 0 0 1-.9-1.45L4 16"></path>
                     </svg>
                     <span>Configurar negocio</span>
-                  </Link>
-                  <Link href="/negocios/1" className="dropdown-item" onClick={() => setIsOpen(false)}>
-                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-                      <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"></path>
-                      <circle cx="12" cy="12" r="3"></circle>
-                    </svg>
-                    <span>Ver mi tienda</span>
                   </Link>
                 </>
               )}

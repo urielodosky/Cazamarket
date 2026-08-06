@@ -30,6 +30,11 @@ export default function ResenasPage() {
   
   const [isLoadingData, setIsLoadingData] = useState(true);
 
+  // Modal para dejar reseña
+  const [reviewModal, setReviewModal] = useState<{ show: boolean, interactionId: string, productId: string | null }>({ show: false, interactionId: '', productId: null });
+  const [reviewData, setReviewData] = useState<{ outcome: string, comment: string, rating: number }>({ outcome: 'concreto', comment: '', rating: 5 });
+  const [isSubmittingReview, setIsSubmittingReview] = useState(false);
+
   useEffect(() => {
     if (isMounted && !isLoggedIn) {
       router.push('/');
@@ -119,25 +124,29 @@ export default function ResenasPage() {
     }
   };
 
-  const handleLeaveReview = async (id: string, productId: string | null) => {
-    const comment = window.prompt('Escribe tu reseña:');
-    if (!comment) return;
-    const ratingStr = window.prompt('Calificación (1-5):', '5');
-    const rating = Math.min(5, Math.max(1, parseInt(ratingStr || '5')));
+  const openReviewModal = (id: string, productId: string | null) => {
+    setReviewModal({ show: true, interactionId: id, productId });
+    setReviewData({ outcome: 'concreto', comment: '', rating: 5 });
+  };
 
+  const submitReview = async () => {
+    if (!reviewModal.interactionId || !reviewData.outcome) return;
+    setIsSubmittingReview(true);
     try {
       await supabase.from('reviews').insert({
-        interaction_id: id,
-        seller_rating: rating,
-        product_rating: productId ? rating : null,
-        comment: comment,
-        is_published: true
+        interaction_id: reviewModal.interactionId,
+        seller_rating: reviewData.rating,
+        product_rating: reviewModal.productId ? reviewData.rating : null,
+        comment: reviewData.comment || null,
+        is_published: true,
+        purchase_outcome: reviewData.outcome
       });
 
-      await supabase.from('interactions').update({ status: 'published' }).eq('id', id);
+      await supabase.from('interactions').update({ status: 'published' }).eq('id', reviewModal.interactionId);
       window.location.reload();
     } catch(e) {
       console.error(e);
+      setIsSubmittingReview(false);
     }
   };
 
@@ -419,7 +428,7 @@ export default function ResenasPage() {
                                     {item.products ? `Producto: ${item.products.name}` : 'Interacción: General/Servicio'}
                                   </span>
                                 </div>
-                                <button onClick={() => handleLeaveReview(item.id, item.product_id)} style={{ padding: '8px 16px', borderRadius: '8px', border: 'none', background: 'var(--color-primary)', color: '#fff', cursor: 'pointer', fontWeight: 600 }}>Dejar reseña</button>
+                                <button onClick={() => openReviewModal(item.id, item.product_id)} style={{ padding: '8px 16px', borderRadius: '8px', border: 'none', background: 'var(--color-primary)', color: '#fff', cursor: 'pointer', fontWeight: 600 }}>Dejar reseña</button>
                               </div>
                             </div>
                           ))
@@ -496,6 +505,113 @@ export default function ResenasPage() {
 
         </div>
       </div>
+
+      {/* Modal de Reseña */}
+      {reviewModal.show && (
+        <div style={{
+          position: 'fixed', top: 0, left: 0, right: 0, bottom: 0,
+          backgroundColor: 'rgba(0, 0, 0, 0.8)', display: 'flex', alignItems: 'center', justifyContent: 'center',
+          zIndex: 9999, backdropFilter: 'blur(5px)', padding: '20px'
+        }}>
+          <div style={{
+            background: 'var(--color-bg-base)', borderRadius: '16px', width: '100%', maxWidth: '500px',
+            padding: '30px', position: 'relative', border: `1px solid ${themeColors.borderSubtle2}`,
+            boxShadow: '0 10px 40px rgba(0,0,0,0.8)'
+          }}>
+            <button 
+              onClick={() => setReviewModal({ show: false, interactionId: '', productId: null })}
+              style={{ position: 'absolute', top: '15px', right: '15px', background: 'none', border: 'none', color: 'var(--color-text-muted)', fontSize: '1.5rem', cursor: 'pointer' }}
+            >×</button>
+            
+            <h2 style={{ margin: '0 0 24px 0', color: 'var(--color-text-main)', fontSize: '1.4rem', textAlign: 'center' }}>¿Cómo te fue con el vendedor?</h2>
+            
+            {/* 3 Botones de Outcome */}
+            <div style={{ display: 'flex', flexDirection: 'column', gap: '10px', marginBottom: '24px' }}>
+              <button 
+                onClick={() => setReviewData(p => ({ ...p, outcome: 'concreto' }))}
+                style={{
+                  padding: '12px', borderRadius: '12px', fontWeight: 600, fontSize: '1rem', cursor: 'pointer',
+                  border: reviewData.outcome === 'concreto' ? '2px solid #10B981' : `1px solid ${themeColors.borderSubtle3}`,
+                  background: reviewData.outcome === 'concreto' ? 'rgba(16, 185, 129, 0.1)' : 'transparent',
+                  color: reviewData.outcome === 'concreto' ? '#10B981' : 'var(--color-text-main)',
+                  transition: 'all 0.2s ease'
+                }}
+              >
+                ✓ Se concretó la compra
+              </button>
+              <button 
+                onClick={() => setReviewData(p => ({ ...p, outcome: 'no_concreto' }))}
+                style={{
+                  padding: '12px', borderRadius: '12px', fontWeight: 600, fontSize: '1rem', cursor: 'pointer',
+                  border: reviewData.outcome === 'no_concreto' ? '2px solid #EF4444' : `1px solid ${themeColors.borderSubtle3}`,
+                  background: reviewData.outcome === 'no_concreto' ? 'rgba(239, 68, 68, 0.1)' : 'transparent',
+                  color: reviewData.outcome === 'no_concreto' ? '#EF4444' : 'var(--color-text-main)',
+                  transition: 'all 0.2s ease'
+                }}
+              >
+                ✗ No se concretó
+              </button>
+              <button 
+                onClick={() => setReviewData(p => ({ ...p, outcome: 'no_comunique' }))}
+                style={{
+                  padding: '12px', borderRadius: '12px', fontWeight: 600, fontSize: '1rem', cursor: 'pointer',
+                  border: reviewData.outcome === 'no_comunique' ? '2px solid #9CA3AF' : `1px solid ${themeColors.borderSubtle3}`,
+                  background: reviewData.outcome === 'no_comunique' ? 'rgba(156, 163, 175, 0.1)' : 'transparent',
+                  color: reviewData.outcome === 'no_comunique' ? '#9CA3AF' : 'var(--color-text-main)',
+                  transition: 'all 0.2s ease'
+                }}
+              >
+                − No me comuniqué
+              </button>
+            </div>
+
+            {(reviewData.outcome === 'concreto' || reviewData.outcome === 'no_concreto') && (
+              <div style={{ animation: 'fadeIn 0.3s ease-in-out' }}>
+                <div style={{ marginBottom: '20px' }}>
+                  <label style={{ display: 'block', color: 'var(--color-text-muted)', marginBottom: '8px', fontSize: '0.9rem' }}>Calificación (Opcional)</label>
+                  <div style={{ display: 'flex', gap: '8px', justifyContent: 'center' }}>
+                    {[1, 2, 3, 4, 5].map(star => (
+                      <button 
+                        key={star}
+                        onClick={() => setReviewData(p => ({ ...p, rating: star }))}
+                        style={{ background: 'none', border: 'none', cursor: 'pointer', padding: 0 }}
+                      >
+                        <svg width="32" height="32" viewBox="0 0 24 24" fill={star <= reviewData.rating ? "#FFD700" : "none"} stroke="#FFD700" strokeWidth="2"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"></polygon></svg>
+                      </button>
+                    ))}
+                  </div>
+                </div>
+
+                <div style={{ marginBottom: '24px' }}>
+                  <label style={{ display: 'block', color: 'var(--color-text-muted)', marginBottom: '8px', fontSize: '0.9rem' }}>Comentario (Opcional)</label>
+                  <textarea 
+                    value={reviewData.comment}
+                    onChange={e => setReviewData(p => ({ ...p, comment: e.target.value }))}
+                    placeholder="¿Qué te pareció la experiencia?"
+                    style={{
+                      width: '100%', minHeight: '100px', padding: '12px', borderRadius: '8px',
+                      background: 'rgba(0,0,0,0.2)', border: `1px solid ${themeColors.borderSubtle2}`,
+                      color: 'var(--color-text-main)', resize: 'vertical'
+                    }}
+                  />
+                </div>
+              </div>
+            )}
+
+            <button 
+              onClick={submitReview}
+              disabled={isSubmittingReview || !reviewData.outcome}
+              style={{
+                width: '100%', padding: '14px', borderRadius: '12px', fontWeight: 700, fontSize: '1rem',
+                border: 'none', background: 'var(--color-primary)', color: '#fff', cursor: 'pointer',
+                opacity: (isSubmittingReview || !reviewData.outcome) ? 0.7 : 1
+              }}
+            >
+              {isSubmittingReview ? 'Enviando...' : 'Enviar Reseña'}
+            </button>
+          </div>
+        </div>
+      )}
     </div>
   );
 }

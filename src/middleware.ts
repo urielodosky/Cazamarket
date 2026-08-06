@@ -15,13 +15,19 @@ export default async function proxy(request: NextRequest) {
 
   // 1.5 Strict CORS Configuration for API Routes
   if (request.nextUrl.pathname.startsWith('/api/')) {
-    const allowedOrigins = ['https://cazamarket.com', 'https://www.cazamarket.com'];
+    const allowedOrigins = [
+      'https://cazamarket.com', 
+      'https://www.cazamarket.com',
+      'https://cazamarket.vercel.app'
+    ];
     if (process.env.NEXT_PUBLIC_SITE_URL) allowedOrigins.push(process.env.NEXT_PUBLIC_SITE_URL);
     
     const origin = request.headers.get('origin');
     
     // Si la petición proviene de un navegador (tiene Origin) y no está en nuestra lista blanca
-    if (origin && !allowedOrigins.includes(origin) && process.env.NODE_ENV === 'production') {
+    const isVercelPreview = origin && origin.endsWith('.vercel.app');
+    
+    if (origin && !allowedOrigins.includes(origin) && !isVercelPreview && process.env.NODE_ENV === 'production') {
       console.warn(`[SECURITY LOG] Petición CORS bloqueada desde origen no autorizado: ${origin}`);
       return new NextResponse(
         JSON.stringify({ error: 'CORS policy violation: Origin not allowed' }),

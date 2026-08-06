@@ -1,6 +1,6 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import Link from 'next/link';
 import { 
   BuildingStorefrontIcon, 
@@ -11,21 +11,44 @@ import {
   EyeIcon,
   CursorArrowRaysIcon
 } from '@heroicons/react/24/outline';
-
-const TOP_NEGOCIOS: any[] = [];
-const TOP_SERVICIOS: any[] = [];
-const TOP_PRODUCTOS: any[] = [];
+import { createClient } from '@/lib/supabase/client';
 
 export default function TrendingSection() {
   const [activeTab, setActiveTab] = useState<'negocios' | 'servicios' | 'productos'>('negocios');
   const [showAll, setShowAll] = useState(false);
+  const [topNegocios, setTopNegocios] = useState<any[]>([]);
+  const [topServicios, setTopServicios] = useState<any[]>([]);
+  const [topProductos, setTopProductos] = useState<any[]>([]);
+  const [isLoading, setIsLoading] = useState(true);
+  const supabase = createClient();
+
+  useEffect(() => {
+    const fetchTopData = async () => {
+      setIsLoading(true);
+      try {
+        const { data: nData } = await supabase.rpc('get_top_negocios_semanal');
+        if (nData) setTopNegocios(nData);
+
+        const { data: pData } = await supabase.rpc('get_top_productos_semanal');
+        if (pData) setTopProductos(pData);
+
+        const { data: sData } = await supabase.rpc('get_top_servicios_semanal');
+        if (sData) setTopServicios(sData);
+      } catch (err) {
+        console.error('Error fetching top data:', err);
+      }
+      setIsLoading(false);
+    };
+
+    fetchTopData();
+  }, []);
 
   const formatNumber = (num: number) => new Intl.NumberFormat('es-AR').format(num);
 
   const tabs = [
-    { id: 'negocios', label: 'Top Negocios', icon: <BuildingStorefrontIcon style={{ width: '20px' }} />, data: TOP_NEGOCIOS },
-    { id: 'servicios', label: 'Top Servicios', icon: <MapIcon style={{ width: '20px' }} />, data: TOP_SERVICIOS },
-    { id: 'productos', label: 'Top Productos', icon: <ShoppingBagIcon style={{ width: '20px' }} />, data: TOP_PRODUCTOS }
+    { id: 'negocios', label: 'Top Negocios', icon: <BuildingStorefrontIcon style={{ width: '20px' }} />, data: topNegocios },
+    { id: 'servicios', label: 'Top Servicios', icon: <MapIcon style={{ width: '20px' }} />, data: topServicios },
+    { id: 'productos', label: 'Top Productos', icon: <ShoppingBagIcon style={{ width: '20px' }} />, data: topProductos }
   ];
 
   const activeTabData = tabs.find(t => t.id === activeTab)!;
@@ -75,24 +98,25 @@ export default function TrendingSection() {
               </div>
               
               <div style={{ flex: 1, overflow: 'hidden' }}>
-                <h4 style={{ margin: '0 0 4px 0', fontSize: '1rem', whiteSpace: 'nowrap', textOverflow: 'ellipsis', overflow: 'hidden' }}>{item.name}</h4>
+                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start' }}>
+                  <h4 style={{ margin: '0 0 4px 0', fontSize: '1rem', whiteSpace: 'nowrap', textOverflow: 'ellipsis', overflow: 'hidden' }}>{item.name || 'Sin nombre'}</h4>
+                  <span style={{ background: 'rgba(16, 185, 129, 0.1)', color: '#10B981', padding: '2px 8px', borderRadius: '12px', fontSize: '0.75rem', fontWeight: 'bold' }}>
+                    {item.ventas_concretadas} ventas
+                  </span>
+                </div>
                 
-                {activeTab === 'negocios' && <p style={{ margin: 0, fontSize: '0.85rem', color: 'var(--color-text-muted)' }}>{item.type}</p>}
-                {activeTab === 'servicios' && <p style={{ margin: 0, fontSize: '0.85rem', color: 'var(--color-text-muted)' }}>{item.location}</p>}
+                {activeTab === 'negocios' && <p style={{ margin: 0, fontSize: '0.85rem', color: 'var(--color-text-muted)' }}>{item.type || 'Negocio'}</p>}
+                {activeTab === 'servicios' && <p style={{ margin: 0, fontSize: '0.85rem', color: 'var(--color-text-muted)' }}>{item.location || 'Argentina'}</p>}
                 {activeTab === 'productos' && <p style={{ margin: 0, fontSize: '0.85rem', color: 'var(--color-primary)', fontWeight: 'bold' }}>-</p>}
                 
                 <div style={{ display: 'flex', alignItems: 'center', gap: '4px', marginTop: '6px', fontSize: '0.75rem', color: 'var(--color-text-muted)' }}>
-                  {activeTab === 'negocios' ? (
-                    <><EyeIcon style={{ width: '14px', height: '14px' }} /> {formatNumber(item.views)} visitas</>
-                  ) : (
-                    <><CursorArrowRaysIcon style={{ width: '14px', height: '14px' }} /> {formatNumber(item.clicks)} clics</>
-                  )}
+                  <CursorArrowRaysIcon style={{ width: '14px', height: '14px' }} /> {formatNumber(item.total_clicks || item.clicks || 0)} interacciones
                 </div>
               </div>
             </Link>
           )) : (
             <p style={{ textAlign: 'center', color: 'var(--color-text-muted)', padding: 'var(--spacing-4) 0' }}>
-              No hay {activeTabData.label.toLowerCase()} para mostrar esta semana.
+              {isLoading ? 'Cargando ranking semanal...' : `No hay ${activeTabData.label.toLowerCase()} para mostrar esta semana.`}
             </p>
           )}
         </div>

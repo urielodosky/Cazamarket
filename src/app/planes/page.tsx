@@ -79,17 +79,23 @@ export default function PlanesPage() {
       updateUser({ role: 'negocio' });
     }
 
-    // Plan gratuito → activar directo sin pago
-    if (plan.price === 0) {
+    const isUpgradingFromPaid = (activeTab === 'productos' || activeTab === 'mixto') && productPlanTier !== 'gratis' 
+                             || (activeTab === 'servicios' || activeTab === 'mixto') && servicePlanTier !== 'gratis';
+
+    // Plan gratuito o cambio de plan de pago a otro de pago → activar/pendiente directo sin pago
+    if (plan.price === 0 || isUpgradingFromPaid) {
       setIsActivating(true);
       setTimeout(() => {
         selectPlan(plan.tier, activeTab);
-        router.push('/configuracion');
-      }, 2500);
+        setIsActivating(false);
+        if (plan.price === 0) {
+          router.push('/configuracion');
+        }
+      }, 1500);
       return;
     }
 
-    // Plan de pago → abrir modal de pago
+    // Plan de pago (primera vez) → abrir modal de pago
     setPaymentModal({ show: true, plan });
     setPaymentStep('select');
     setPaymentMethod('mercadopago');

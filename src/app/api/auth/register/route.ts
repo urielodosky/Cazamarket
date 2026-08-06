@@ -21,56 +21,66 @@ export async function POST(request: Request) {
     person_type = typeof person_type === 'string' ? person_type.trim().replace(/[<>]/g, '') : '';
 
     const supabase = await createServerClient();
-    
-    // Crear cliente admin con plenos poderes
     const supabaseAdmin = createAdminClient(
       process.env.NEXT_PUBLIC_SUPABASE_URL!,
-      process.env.SUPABASE_SERVICE_ROLE_KEY!
+      process.env.SUPABASE_SERVICE_ROLE_KEY || process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!
     );
 
-    // 1. LIMPIEZA: Verificar si el nombre de usuario está secuestrado por una cuenta fantasma
-    const { data: existingUser } = await supabaseAdmin
-      .from('profiles')
-      .select('id, full_name')
-      .ilike('full_name', username)
-      .limit(1)
-      .maybeSingle();
+    let step = 'check_existing_user';
+    let data, error;
+    try {
+      const { data: existingUser, error: checkError } = await supabaseAdmin
+        .from('profiles')
+        .select('id, full_name')
+        .ilike('full_name', username)
+        .limit(1)
+        .maybeSingle();
 
-    if (existingUser) {
-      // El username existe, veamos si es fantasma (sin confirmar)
-      const { data: authUser } = await supabaseAdmin.auth.admin.getUserById(existingUser.id);
-      
-      if (authUser && authUser.user) {
-        if (!authUser.user.email_confirmed_at) {
-          // ¡ES UN FANTASMA! Lo destruimos sin piedad para liberar el nombre.
-          await supabaseAdmin.auth.admin.deleteUser(existingUser.id);
-        } else {
-          // Es un usuario real verificado
-          return NextResponse.json(
-            { error: 'El nombre de usuario ya está en uso por una cuenta verificada. Por favor, elige otro.' },
-            { status: 400 }
-          );
+      if (checkError) throw checkError;
+
+      if (existingUser) {
+        step = 'check_ghost_user';
+        const { data: authUser, error: authError } = await supabaseAdmin.auth.admin.getUserById(existingUser.id);
+        
+        if (authError) throw authError;
+
+        if (authUser && authUser.user) {
+          if (!authUser.user.email_confirmed_at) {
+            step = 'delete_ghost_user';
+            const { error: delError } = await supabaseAdmin.auth.admin.deleteUser(existingUser.id);
+            if (delError) throw delError;
+          } else {
+            return NextResponse.json(
+              { error: 'El nombre de usuario ya esta en uso por una cuenta verificada. Por favor, elige otro.' },
+              { status: 400 }
+            );
+          }
         }
       }
-    }
-
-    // 2. Proceder con el registro normal
-    const { data, error } = await supabase.auth.signUp({
-      email,
-      password,
-      options: {
-        data: {
-          full_name: username,
-          avatar_url: '',
-          person_type: person_type || null,
-          birth_date: birth_date || null,
-          cuit: cuit || null,
-          phone: phone || null,
-          contact_email: contact_email || email,
-          terms_accepted_at: new Date().toISOString(),
+      
+      step = 'signup';
+      const signUpRes = await supabase.auth.signUp({
+        email,
+        password,
+        options: {
+          data: {
+            full_name: username,
+            avatar_url: '',
+            person_type: person_type || null,
+            birth_date: birth_date || null,
+            cuit: cuit || null,
+            phone: phone || null,
+            contact_email: contact_email || email,
+            terms_accepted_at: new Date().toISOString(),
+          },
         },
-      },
-    });
+      });
+      data = signUpRes.data;
+      error = signUpRes.error;
+
+    } catch (err: any) {
+       return NextResponse.json({ error: `Falló en paso ${step}: ${err.message}` }, { status: 500 });
+    }
 
     if (error) {
       if (error.message.includes('already registered')) {
@@ -121,10 +131,11 @@ export async function POST(request: Request) {
     return NextResponse.json({ success: true, data });
 
   } catch (error: any) {
-    console.error('[SECURITY LOG] Error crítico en /api/auth/register:', error?.message || 'Unknown error');
+    console.error('[SECURITY LOG] Error critico en /api/auth/register:', error?.message || 'Unknown error');
+    console.error('FULL ERROR OBJECT:', JSON.stringify(error, null, 2));
     return NextResponse.json(
-      { error: 'Ocurrió un error inesperado al procesar el registro.' },
-      { status: 500 }
+      { error: error?.message || 'Ocurrio un error inesperado al procesar el registro.' },
+      { status: error?.status || 500 }
     );
   }
 }

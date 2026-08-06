@@ -11,12 +11,13 @@ import {
   PLAN_TIER_ORDER
 } from '@/types/planTypes';
 import { useAuth } from './AuthContext';
+import { createClient } from '@/lib/supabase/client';
 
 interface PlanContextType {
   productPlanTier: PlanTier;
   servicePlanTier: PlanTier;
-  planTier: PlanTier; // mantenido por retrocompatibilidad
-  planCategory: PlanCategory; // mantenido por retrocompatibilidad
+  planTier: PlanTier; 
+  planCategory: PlanCategory; 
   permissions: PlanPermissions;
   planDisplayName: string;
   selectPlan: (tier: PlanTier, category: PlanCategory) => void;
@@ -33,11 +34,6 @@ interface PlanContextType {
 
 const PlanContext = createContext<PlanContextType | undefined>(undefined);
 
-// Helper: construir la clave de localStorage vinculada al usuario
-function userPlanKey(userId: string, suffix: string) {
-  return `cazamarket_plan_${userId}_${suffix}`;
-}
-
 export function PlanProvider({ children }: { children: React.ReactNode }) {
   const { isVendor, upgradeToVendor, supabaseUser, isLoggedIn } = useAuth();
   const [productPlanTier, setProductPlanTier] = useState<PlanTier>('gratis');
@@ -47,137 +43,125 @@ export function PlanProvider({ children }: { children: React.ReactNode }) {
   const [subscriptionStartDate, setSubscriptionStartDate] = useState<string | null>(null);
   const [mounted, setMounted] = useState(false);
 
-  const userId = supabaseUser?.id || '';
+  const supabase = createClient();
+  const userId = supabaseUser?.id;
 
-  // Cargar planes del usuario actual (o resetear a gratis si no hay usuario)
+  // Cargar planes desde Supabase
   useEffect(() => {
-    if (!userId) {
-      // No hay usuario logueado → todo gratis
-      setProductPlanTier('gratis');
-      setServicePlanTier('gratis');
+    const loadPlans = async () => {
+      if (!userId || !isLoggedIn) {
+        setProductPlanTier('gratis');
+        setServicePlanTier('gratis');
+        setPendingProductPlanTier(null);
+        setPendingServicePlanTier(null);
+        setSubscriptionStartDate(null);
+        setMounted(true);
+        return;
+      }
+
+      const { data, error } = await supabase
+        .from('profiles')
+        .select('product_plan_tier, service_plan_tier, pending_product_plan_tier, pending_service_plan_tier, subscription_start_date')
+        .eq('id', userId)
+        .single();
+
+      if (data && !error) {
+        setProductPlanTier((data.product_plan_tier as PlanTier) || 'gratis');
+        setServicePlanTier((data.service_plan_tier as PlanTier) || 'gratis');
+        setPendingProductPlanTier((data.pending_product_plan_tier as PlanTier) || null);
+        setPendingServicePlanTier((data.pending_service_plan_tier as PlanTier) || null);
+        setSubscriptionStartDate(data.subscription_start_date || null);
+      }
       setMounted(true);
+    };
+
+    loadPlans();
+  }, [userId, isLoggedIn]);
+
+  const updateProfilePlans = async (updates: any) => {
+    if (!userId) return;
+    await supabase.from('profiles').update(updates).eq('id', userId);
+  };
+
+  const selectPlan = useCallback(async (tier: PlanTier, category: PlanCategory) => {
+    if (!userId) {
+      alert("Debes iniciar sesión con una cuenta real para seleccionar un plan.");
       return;
     }
 
-    // Leer planes específicos de este usuario
-    const savedProd = localStorage.getItem(userPlanKey(userId, 'productos')) as PlanTier | null;
-    const savedServ = localStorage.getItem(userPlanKey(userId, 'servicios')) as PlanTier | null;
-
-    // Migrar del modelo antiguo (claves genéricas) si existen y este usuario no tiene claves propias
-    if (!savedProd && !savedServ) {
-      const oldProd = localStorage.getItem('cazamarket_plan_tier_productos') as PlanTier | null;
-      const oldServ = localStorage.getItem('cazamarket_plan_tier_servicios') as PlanTier | null;
-      if (oldProd || oldServ) {
-        // Migrar al nuevo modelo per-usuario
-        if (oldProd) {
-          localStorage.setItem(userPlanKey(userId, 'productos'), oldProd);
-          setProductPlanTier(oldProd);
-        }
-        if (oldServ) {
-          localStorage.setItem(userPlanKey(userId, 'servicios'), oldServ);
-          setServicePlanTier(oldServ);
-        }
-        // Limpiar las claves viejas genéricas
-        localStorage.removeItem('cazamarket_plan_tier_productos');
-        localStorage.removeItem('cazamarket_plan_tier_servicios');
-        localStorage.removeItem('cazamarket_plan_tier');
-        localStorage.removeItem('cazamarket_plan_category');
-      } else {
-        setProductPlanTier('gratis');
-        setServicePlanTier('gratis');
-      }
-    } else {
-      setProductPlanTier(savedProd || 'gratis');
-      setServicePlanTier(savedServ || 'gratis');
-    }
-
-    const pendingProd = localStorage.getItem(userPlanKey(userId, 'pending_productos')) as PlanTier | null;
-    const pendingServ = localStorage.getItem(userPlanKey(userId, 'pending_servicios')) as PlanTier | null;
-    if (pendingProd) setPendingProductPlanTier(pendingProd);
-    if (pendingServ) setPendingServicePlanTier(pendingServ);
-
-    const savedStartDate = localStorage.getItem(userPlanKey(userId, 'subscriptionStartDate'));
-    if (savedStartDate) {
-      setSubscriptionStartDate(savedStartDate);
-    }
-
-    setMounted(true);
-  }, [userId]);
-
-  const selectPlan = useCallback((tier: PlanTier, category: PlanCategory) => {
-    if (!userId) return;
-
-    // Determine if user already has a paid plan in this category
     const isUpgradingFromPaid = (category === 'productos' || category === 'mixto') && productPlanTier !== 'gratis' 
                              || (category === 'servicios' || category === 'mixto') && servicePlanTier !== 'gratis';
                              
-    // If upgrading from gratis, it's instant. If changing a paid plan, it goes to pending.
+    const updates: any = {};
+
     if (isUpgradingFromPaid && tier !== 'gratis') {
       if (category === 'productos' || category === 'mixto') {
         setPendingProductPlanTier(tier);
-        localStorage.setItem(userPlanKey(userId, 'pending_productos'), tier);
+        updates.pending_product_plan_tier = tier;
       }
       if (category === 'servicios' || category === 'mixto') {
         setPendingServicePlanTier(tier);
-        localStorage.setItem(userPlanKey(userId, 'pending_servicios'), tier);
+        updates.pending_service_plan_tier = tier;
       }
+      await updateProfilePlans(updates);
       return;
     }
 
     if (category === 'productos') {
       setProductPlanTier(tier);
-      localStorage.setItem(userPlanKey(userId, 'productos'), tier);
       setPendingProductPlanTier(null);
-      localStorage.removeItem(userPlanKey(userId, 'pending_productos'));
+      updates.product_plan_tier = tier;
+      updates.pending_product_plan_tier = null;
     } else if (category === 'servicios') {
       setServicePlanTier(tier);
-      localStorage.setItem(userPlanKey(userId, 'servicios'), tier);
       setPendingServicePlanTier(null);
-      localStorage.removeItem(userPlanKey(userId, 'pending_servicios'));
+      updates.service_plan_tier = tier;
+      updates.pending_service_plan_tier = null;
     } else if (category === 'mixto') {
       setProductPlanTier(tier);
       setServicePlanTier(tier);
-      localStorage.setItem(userPlanKey(userId, 'productos'), tier);
-      localStorage.setItem(userPlanKey(userId, 'servicios'), tier);
       setPendingProductPlanTier(null);
       setPendingServicePlanTier(null);
-      localStorage.removeItem(userPlanKey(userId, 'pending_productos'));
-      localStorage.removeItem(userPlanKey(userId, 'pending_servicios'));
+      updates.product_plan_tier = tier;
+      updates.service_plan_tier = tier;
+      updates.pending_product_plan_tier = null;
+      updates.pending_service_plan_tier = null;
     }
 
     if (!subscriptionStartDate && tier !== 'gratis') {
       const now = new Date().toISOString();
       setSubscriptionStartDate(now);
-      localStorage.setItem(userPlanKey(userId, 'subscriptionStartDate'), now);
+      updates.subscription_start_date = now;
     }
 
     const newProdTier = category === 'productos' || category === 'mixto' ? tier : productPlanTier;
     const newServTier = category === 'servicios' || category === 'mixto' ? tier : servicePlanTier;
 
-    if (newProdTier !== 'empresarial' && newServTier !== 'empresarial') {
-      localStorage.removeItem('cazamarket_virtual_advisor');
-    }
+    await updateProfilePlans(updates);
 
     if (newProdTier !== 'gratis' || newServTier !== 'gratis') {
       upgradeToVendor();
     }
   }, [userId, productPlanTier, servicePlanTier, upgradeToVendor, subscriptionStartDate]);
 
-  const cancelPlan = useCallback((category: PlanCategory) => {
+  const cancelPlan = useCallback(async (category: PlanCategory) => {
     if (!userId) return;
 
+    const updates: any = {};
     if (category === 'productos') {
       setPendingProductPlanTier('gratis');
-      localStorage.setItem(userPlanKey(userId, 'pending_productos'), 'gratis');
+      updates.pending_product_plan_tier = 'gratis';
     } else if (category === 'servicios') {
       setPendingServicePlanTier('gratis');
-      localStorage.setItem(userPlanKey(userId, 'pending_servicios'), 'gratis');
+      updates.pending_service_plan_tier = 'gratis';
     } else if (category === 'mixto') {
       setPendingProductPlanTier('gratis');
       setPendingServicePlanTier('gratis');
-      localStorage.setItem(userPlanKey(userId, 'pending_productos'), 'gratis');
-      localStorage.setItem(userPlanKey(userId, 'pending_servicios'), 'gratis');
+      updates.pending_product_plan_tier = 'gratis';
+      updates.pending_service_plan_tier = 'gratis';
     }
+    
+    await updateProfilePlans(updates);
   }, [userId]);
 
   const permissions = getPlanPermissions(
@@ -228,37 +212,37 @@ export function PlanProvider({ children }: { children: React.ReactNode }) {
     return current.toISOString();
   }, [subscriptionStartDate]);
 
-  const acceleratePlan = useCallback((category: PlanCategory) => {
+  const acceleratePlan = useCallback(async (category: PlanCategory) => {
     if (!userId) return;
     
     const nextProdTier = (category === 'productos' || category === 'mixto') && pendingProductPlanTier ? pendingProductPlanTier : productPlanTier;
     const nextServTier = (category === 'servicios' || category === 'mixto') && pendingServicePlanTier ? pendingServicePlanTier : servicePlanTier;
 
+    const updates: any = {};
+
     if ((category === 'productos' || category === 'mixto') && pendingProductPlanTier) {
       setProductPlanTier(pendingProductPlanTier);
-      localStorage.setItem(userPlanKey(userId, 'productos'), pendingProductPlanTier);
       setPendingProductPlanTier(null);
-      localStorage.removeItem(userPlanKey(userId, 'pending_productos'));
+      updates.product_plan_tier = pendingProductPlanTier;
+      updates.pending_product_plan_tier = null;
     }
     if ((category === 'servicios' || category === 'mixto') && pendingServicePlanTier) {
       setServicePlanTier(pendingServicePlanTier);
-      localStorage.setItem(userPlanKey(userId, 'servicios'), pendingServicePlanTier);
       setPendingServicePlanTier(null);
-      localStorage.removeItem(userPlanKey(userId, 'pending_servicios'));
+      updates.service_plan_tier = pendingServicePlanTier;
+      updates.pending_service_plan_tier = null;
     }
     
     if (nextProdTier === 'gratis' && nextServTier === 'gratis') {
       setSubscriptionStartDate(null);
-      localStorage.removeItem(userPlanKey(userId, 'subscriptionStartDate'));
+      updates.subscription_start_date = null;
     } else {
       const now = new Date().toISOString();
       setSubscriptionStartDate(now);
-      localStorage.setItem(userPlanKey(userId, 'subscriptionStartDate'), now);
+      updates.subscription_start_date = now;
     }
     
-    if (nextProdTier !== 'empresarial' && nextServTier !== 'empresarial') {
-      localStorage.removeItem('cazamarket_virtual_advisor');
-    }
+    await updateProfilePlans(updates);
   }, [userId, pendingProductPlanTier, pendingServicePlanTier, productPlanTier, servicePlanTier]);
 
   const planDisplayName = mounted 
@@ -301,4 +285,3 @@ export function usePlan() {
   }
   return context;
 }
-

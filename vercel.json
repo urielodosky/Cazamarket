@@ -1,0 +1,8 @@
+{
+  "crons": [
+    {
+      "path": "/api/cron/bot-retargeting",
+      "schedule": "0 * * * *"
+    }
+  ]
+}

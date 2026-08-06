@@ -5,29 +5,77 @@ import { useAuth } from '@/contexts/AuthContext';
 import { usePlan } from '@/contexts/PlanContext';
 import VirtualAdvisorModal from '@/components/chat/VirtualAdvisorModal';
 import { useThemeColors } from '@/hooks/useThemeColors';
+import { createClient } from '@/lib/supabase/client';
 import './mensajes.css';
-
-// --- INITIAL MOCK DATA ---
-const INITIAL_CHATS: any[] = [];
 
 export default function MensajesPage() {
   const themeColors = useThemeColors();
-  const { isVendorModeActive } = useAuth();
+  const { isVendorModeActive, supabaseUser } = useAuth();
   const { hasFeature } = usePlan();
+  const supabase = createClient();
   
   const canUseBot = hasFeature('botAsesor');
   const [isAdvisorModalOpen, setIsAdvisorModalOpen] = useState(false);
   
-  // Si el usuario no está en modo vendedor, forzamos a que vea 'negocios'
   const [activeTab, setActiveTab] = useState<'negocios' | 'clientes'>('negocios');
-  const [activeChatId, setActiveChatId] = useState<number | null>(null);
+  const [activeChatId, setActiveChatId] = useState<string | null>(null);
   const [messageInput, setMessageInput] = useState('');
-
+  
   const [chats, setChats] = useState<any[]>([]);
+  const [messages, setMessages] = useState<any[]>([]);
+  const [isUploading, setIsUploading] = useState(false);
+
+  const messagesEndRef = useRef<HTMLDivElement>(null);
+  const fileInputRef = useRef<HTMLInputElement>(null);
+
+  // Fetch chats on mount
+  useEffect(() => {
+    if (!supabaseUser) return;
+
+    const fetchChats = async () => {
+      // In a real app we'd join with profiles to get names and avatars.
+      // We will do a basic fetch for now.
+      const { data, error } = await supabase
+        .from('chats')
+        .select('*, buyer:profiles!buyer_id(store_name, avatar_url, first_name, last_name), seller:profiles!seller_id(store_name, avatar_url, first_name, last_name)')
+        .or(`buyer_id.eq.${supabaseUser.id},seller_id.eq.${supabaseUser.id}`)
+        .order('updated_at', { ascending: false });
+
+      if (data) {
+        // Map data to UI expected format
+        const mappedChats = data.map(c => {
+          const isBuyer = c.buyer_id === supabaseUser.id;
+          const otherParty = isBuyer ? c.seller : c.buyer;
+          const type = isBuyer ? 'negocios' : 'clientes'; // If I am buyer, I am talking to a negocio
+          
+          let name = 'Usuario';
+          if (otherParty) {
+            name = otherParty.store_name || `${otherParty.first_name || ''} ${otherParty.last_name || ''}`.trim() || 'Usuario';
+          }
+
+          return {
+            id: c.id,
+            type: type,
+            name: name,
+            avatar: otherParty?.avatar_url || 'https://via.placeholder.com/150',
+            online: false,
+            time: new Date(c.updated_at).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
+            lastMessage: 'Abrir chat para ver mensajes',
+            unread: 0,
+            dbChat: c
+          };
+        });
+        setChats(mappedChats);
+      }
+    };
+
+    fetchChats();
+  }, [supabaseUser, supabase]);
+
   const currentChats = chats.filter(c => c.type === activeTab);
   const activeChat = chats.find(c => c.id === activeChatId);
 
-  // Auto-select first chat when switching tabs
+  // Auto-select first chat
   useEffect(() => {
     if (currentChats.length > 0) {
       if (typeof window !== 'undefined' && window.innerWidth > 768) {
@@ -38,167 +86,230 @@ export default function MensajesPage() {
     } else {
       setActiveChatId(null);
     }
-  }, [activeTab]);
+  }, [activeTab, chats.length]);
 
-  const messagesEndRef = useRef<HTMLDivElement>(null);
-  
+  // Fetch messages and subscribe to Realtime
+  useEffect(() => {
+    if (!activeChatId || !supabaseUser) return;
+
+    const fetchMessages = async () => {
+      const { data } = await supabase
+        .from('messages')
+        .select('*')
+        .eq('chat_id', activeChatId)
+        .order('created_at', { ascending: true });
+      
+      if (data) setMessages(data);
+    };
+
+    fetchMessages();
+
+    // Subscribe to new messages
+    const channel = supabase.channel(`chat_${activeChatId}`)
+      .on('postgres_changes', { 
+        event: 'INSERT', 
+        schema: 'public', 
+        table: 'messages',
+        filter: `chat_id=eq.${activeChatId}`
+      }, (payload) => {
+        setMessages(prev => [...prev, payload.new]);
+      })
+      .subscribe();
+
+    return () => {
+      supabase.removeChannel(channel);
+    };
+  }, [activeChatId, supabaseUser, supabase]);
+
   const scrollToBottom = () => {
     messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
   };
 
   useEffect(() => {
-    if (activeChat) {
-      scrollToBottom();
+    scrollToBottom();
+  }, [messages]);
+
+  const handleSendMessage = async (text: string | null = null, optionContext?: any, attachmentUrl?: string, attachmentType?: string) => {
+    if (!activeChatId || !supabaseUser) return;
+    if (!text?.trim() && !attachmentUrl) return;
+
+    const userText = text?.trim() || '';
+
+    // Optimistic UI for text
+    if (userText && !attachmentUrl) {
+      setMessageInput('');
     }
-  }, [activeChat?.messages, activeChatId]);
 
-  const handleSendMessage = (text: string, optionContext?: any) => {
-    if (!text.trim() || !activeChatId) return;
+    try {
+      await supabase.from('messages').insert({
+        chat_id: activeChatId,
+        sender_id: supabaseUser.id,
+        content: userText || null,
+        attachment_url: attachmentUrl || null,
+        attachment_type: attachmentType || null
+      });
 
-    const userText = text.trim();
-    const newMsg = { id: Date.now(), text: userText, sender: 'me', time: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }) };
-    
-    setChats(prev => prev.map(c => {
-      if (c.id === activeChatId) {
-        return { ...c, messages: [...c.messages, newMsg], lastMessage: userText };
+      // Update chat updated_at
+      await supabase.from('chats').update({ updated_at: new Date().toISOString() }).eq('id', activeChatId);
+      
+      // Virtual Advisor Logic (Client side for now, only if I am a buyer talking to a seller)
+      if (activeChat?.type === 'negocios' && userText && !attachmentUrl) {
+        triggerVirtualAdvisor(userText, optionContext);
       }
-      return c;
-    }));
+    } catch(err) {
+      console.error(err);
+    }
+  };
 
-    if (text === messageInput) setMessageInput('');
+  const handleFileUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file || !activeChatId || !supabaseUser) return;
 
-    // Chatbot logic
-    const chat = chats.find(c => c.id === activeChatId);
-    if (!chat) return;
+    setIsUploading(true);
 
-    const getWhatsappTextWithHistory = (configuredText: string, chatMessages: any[], currentUserText: string) => {
-      const history = chatMessages.map((m: any) => `${m.sender === 'me' ? 'Cliente' : 'Bot'}: ${m.text}`).join('\n');
-      return `${configuredText}\n\n--- Historial del chat ---\n${history}\nCliente: ${currentUserText}`;
-    };
+    try {
+      // Create a unique file name
+      const fileExt = file.name.split('.').pop();
+      const fileName = `${activeChatId}/${Date.now()}_${Math.random().toString(36).substring(7)}.${fileExt}`;
+      
+      // Determine type based on MIME
+      let type = 'document';
+      if (file.type.startsWith('image/')) type = 'image';
+      else if (file.type.startsWith('video/')) type = 'video';
+      else if (file.type.startsWith('audio/')) type = 'audio';
 
-    if (optionContext) {
-      if (optionContext.responseType === 'goto') {
-        const botContext = localStorage.getItem('cazamarket_virtual_advisor');
-        if (botContext) {
-          try {
-            const data = JSON.parse(botContext);
-            let targetRule = data.generalRules?.find((r: any) => r.id === optionContext.ruleId);
-            if (!targetRule && chat.productId && data.productRules?.[chat.productId]) {
-              targetRule = data.productRules[chat.productId].find((r: any) => r.id === optionContext.ruleId);
-            }
-            if (targetRule) {
-              let targetNode = null;
-              if (optionContext.gotoId === 'root') {
-                targetNode = targetRule;
-              } else {
-                const findNode = (opts: any[], id: string): any => {
-                  for (let o of opts) {
-                    if (o.id === id) return o;
-                    if (o.options) {
-                      const res = findNode(o.options, id);
-                      if (res) return res;
-                    }
-                  }
-                  return null;
-                };
-                if (targetRule.options) {
-                  targetNode = findNode(targetRule.options, optionContext.gotoId);
-                }
-              }
-              if (targetNode) {
-                optionContext = { ...targetNode, ruleId: optionContext.ruleId };
-              }
-            }
-          } catch(e) {}
+      // Upload to Storage
+      const { data, error } = await supabase.storage
+        .from('chat_attachments')
+        .upload(fileName, file, { upsert: false });
+
+      if (error) {
+        alert('Error al subir el archivo: ' + error.message);
+        setIsUploading(false);
+        return;
+      }
+
+      // Get public URL
+      const { data: { publicUrl } } = supabase.storage.from('chat_attachments').getPublicUrl(fileName);
+
+      // Send message with attachment
+      await handleSendMessage(null, null, publicUrl, type);
+
+    } catch (err) {
+      console.error(err);
+      alert('Hubo un error inesperado al subir el archivo.');
+    }
+
+    setIsUploading(false);
+    if (fileInputRef.current) fileInputRef.current.value = '';
+  };
+
+  // --- VIRTUAL ADVISOR LOGIC ---
+  const triggerVirtualAdvisor = async (userText: string, optionContext?: any) => {
+    if (!activeChat || !activeChat.dbChat?.seller_id) return;
+    const sellerId = activeChat.dbChat.seller_id;
+    const productId = activeChat.dbChat.product_id;
+    const chatId = activeChat.dbChat.id;
+
+    try {
+      // 1. Fetch Bot Settings
+      let query = supabase.from('bot_settings').select('*').eq('seller_id', sellerId);
+      if (productId) query = query.eq('product_id', productId);
+      else query = query.is('product_id', null);
+      
+      const { data: settingsData } = await query.single();
+      const isActive = settingsData ? settingsData.is_active : true;
+      const inheritGeneral = settingsData ? settingsData.inherit_general : true;
+
+      if (!isActive) return;
+
+      // 2. Fetch Rules
+      let rulesQuery = supabase.from('bot_rules').select('*').eq('seller_id', sellerId);
+      if (productId && !inheritGeneral) {
+        rulesQuery = rulesQuery.eq('product_id', productId);
+      } else if (productId && inheritGeneral) {
+        rulesQuery = rulesQuery.or(`product_id.eq.${productId},product_id.is.null`);
+      } else {
+        rulesQuery = rulesQuery.is('product_id', null);
+      }
+
+      const { data: rules } = await rulesQuery;
+      if (!rules || rules.length === 0) return;
+
+      // Prioritize product specific rules if any
+      const sortedRules = rules.sort((a: any, b: any) => {
+        if (a.product_id && !b.product_id) return -1;
+        if (!a.product_id && b.product_id) return 1;
+        return 0;
+      });
+
+      const normalizeText = (t: string) => t.normalize("NFD").replace(/[\u0300-\u036f]/g, "").toLowerCase();
+      const normalizedUserText = normalizeText(userText);
+      
+      // Check Cooldown and Fire Once
+      const { data: currentChat } = await supabase.from('chats').select('*').eq('id', chatId).single();
+      if (!currentChat) return;
+
+      let matchedRule = sortedRules.find((r: any) => r.condition_type === 'exact' && normalizeText(r.condition_value) === normalizedUserText);
+      if (!matchedRule) matchedRule = sortedRules.find((r: any) => r.condition_type === 'keyword' && normalizedUserText.includes(normalizeText(r.condition_value)));
+      if (!matchedRule) {
+        // Evaluate Always rule only if not in cooldown and not fired once already if fire_once is true
+        const alwaysRules = sortedRules.filter((r: any) => r.condition_type === 'always');
+        for (const r of alwaysRules) {
+          if (r.fire_once && currentChat.bot_fired_once) continue;
+          if (r.cooldown_hours && currentChat.bot_cooldown_until && new Date(currentChat.bot_cooldown_until) > new Date()) continue;
+          matchedRule = r;
+          break;
         }
       }
 
-      setTimeout(() => {
-        const botMsg = { 
-          id: Date.now() + 1, 
-          text: optionContext.responseText, 
-          sender: 'them', 
-          time: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
-          options: optionContext.responseType === 'options' ? optionContext.options : undefined,
-          fileName: optionContext.responseType === 'file' ? optionContext.fileName : undefined,
-          whatsappText: optionContext.responseType === 'whatsapp' ? getWhatsappTextWithHistory(optionContext.whatsappText || '', chat.messages, userText) : undefined,
-          ruleId: optionContext.ruleId
-        };
-        setChats(prev => prev.map(c => {
-          if (c.id === activeChatId) {
-            return { ...c, messages: [...c.messages, botMsg], lastMessage: optionContext.responseText };
+      if (matchedRule) {
+        setTimeout(async () => {
+          // Check if Reactivation message should be used
+          let responseText = matchedRule.response_text;
+          if (matchedRule.condition_type === 'always' && currentChat.bot_fired_once && matchedRule.reactivation_text) {
+             responseText = matchedRule.reactivation_text;
           }
-          return c;
-        }));
-      }, 800);
-      return; // Skip global rules
-    }
 
-    const botContext = localStorage.getItem('cazamarket_virtual_advisor');
-    if (botContext) {
-      try {
-        const data = JSON.parse(botContext);
-        let rulesToCheck = data.generalRules || [];
-        if (chat.productId && data.productRules && data.productRules[chat.productId]) {
-           rulesToCheck = [...data.productRules[chat.productId], ...rulesToCheck];
-        }
+          // Insert bot response
+          await supabase.from('messages').insert({
+            chat_id: chatId,
+            sender_id: sellerId,
+            content: responseText,
+            attachment_url: null,
+            attachment_type: null
+          });
 
-        const normalizeText = (text: string) => text.normalize("NFD").replace(/[\u0300-\u036f]/g, "").toLowerCase();
-        const normalizedUserText = normalizeText(userText);
+          // Update chat tracking
+          const isFlowEnd = !matchedRule.options || matchedRule.options.length === 0;
+          let updateData: any = { 
+            bot_status: isFlowEnd ? 'active' : 'waiting_user_response',
+            bot_last_message_at: new Date().toISOString()
+          };
 
-        let matchedRule = rulesToCheck.find((r: any) => r.conditionType === 'exact' && normalizeText(r.conditionValue) === normalizedUserText);
-        if (!matchedRule) {
-          matchedRule = rulesToCheck.find((r: any) => r.conditionType === 'keyword' && normalizedUserText.includes(normalizeText(r.conditionValue)));
-        }
-        if (!matchedRule) {
-          matchedRule = rulesToCheck.find((r: any) => r.conditionType === 'any');
-        }
+          if (matchedRule.condition_type === 'always') {
+            updateData.bot_fired_once = true;
+            if (isFlowEnd && matchedRule.cooldown_hours) {
+              const cooldownDate = new Date();
+              cooldownDate.setHours(cooldownDate.getHours() + matchedRule.cooldown_hours);
+              updateData.bot_cooldown_until = cooldownDate.toISOString();
+              updateData.bot_status = 'cooldown';
+            }
+          }
 
-        if (matchedRule) {
-          setTimeout(() => {
-            const botMsg = { 
-              id: Date.now() + 1, 
-              text: matchedRule.responseText, 
-              sender: 'them', 
-              time: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
-              options: matchedRule.responseType === 'options' ? matchedRule.options : undefined,
-              fileName: matchedRule.responseType === 'file' ? matchedRule.fileName : undefined,
-              whatsappText: matchedRule.responseType === 'whatsapp' ? getWhatsappTextWithHistory(matchedRule.whatsappText || '', chat.messages, userText) : undefined,
-              ruleId: matchedRule.id
-            };
-            setChats(prev => prev.map(c => {
-              if (c.id === activeChatId) {
-                return { ...c, messages: [...c.messages, botMsg], lastMessage: matchedRule.responseText };
-              }
-              return c;
-            }));
-          }, 800);
-        }
-      } catch(e) {}
-    }
+          await supabase.from('chats').update(updateData).eq('id', chatId);
+        }, 1000);
+      }
+    } catch(e) {}
   };
 
   return (
     <div style={{ maxWidth: '1400px', margin: '0 auto', height: 'calc(100vh - 140px)', minHeight: '600px', padding: 'var(--spacing-6)' }}>
       
-      <div className="glass-panel messages-container" style={{ 
-        display: 'flex', 
-        height: '75vh', 
-        minHeight: '600px', 
-        borderRadius: 'var(--radius-xl)', 
-        overflow: 'hidden',
-        border: '1px solid var(--color-border)',
-        boxShadow: '0 10px 30px rgba(0,0,0,0.05)'
-      }}>
+      <div className="glass-panel messages-container" style={{ display: 'flex', height: '75vh', minHeight: '600px', borderRadius: 'var(--radius-xl)', overflow: 'hidden', border: '1px solid var(--color-border)', boxShadow: '0 10px 30px rgba(0,0,0,0.05)' }}>
         
         {/* --- LEFT AREA (CHAT LIST) --- */}
-        <div className={`messages-sidebar ${activeChatId ? 'hidden-on-mobile' : ''}`} style={{ 
-          width: '320px', 
-          borderRight: '1px solid var(--color-border)', 
-          display: 'flex', 
-          flexDirection: 'column', 
-          background: themeColors.bgSubtle2 
-        }}>  
+        <div className={`messages-sidebar ${activeChatId ? 'hidden-on-mobile' : ''}`} style={{ width: '320px', borderRight: '1px solid var(--color-border)', display: 'flex', flexDirection: 'column', background: themeColors.bgSubtle2 }}>  
           {/* Header & Tabs */}
           <div style={{ padding: '20px', borderBottom: '1px solid var(--color-border)' }}>
             <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '16px' }}>
@@ -208,14 +319,9 @@ export default function MensajesPage() {
                   onClick={() => setIsAdvisorModalOpen(true)}
                   className="btn-glow"
                   style={{
-                    background: 'var(--color-primary)', 
-                    color: '#fff', border: 'none', padding: '8px 16px', 
-                    borderRadius: 'var(--radius-full)', fontSize: '0.85rem', cursor: 'pointer', 
-                    fontWeight: 600, display: 'flex', alignItems: 'center', gap: '6px',
-                    transition: 'all 0.2s'
+                    background: 'var(--color-primary)', color: '#fff', border: 'none', padding: '8px 16px', 
+                    borderRadius: 'var(--radius-full)', fontSize: '0.85rem', cursor: 'pointer', fontWeight: 600, display: 'flex', alignItems: 'center', gap: '6px'
                   }}
-                  onMouseEnter={e => { e.currentTarget.style.transform = 'translateY(-2px)'; e.currentTarget.style.boxShadow = '0 4px 12px rgba(255,115,0,0.2)'; }}
-                  onMouseLeave={e => { e.currentTarget.style.transform = 'translateY(0)'; e.currentTarget.style.boxShadow = 'none'; }}
                 >
                   <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" width="16" height="16">
                     <rect x="3" y="11" width="18" height="10" rx="2" />
@@ -232,29 +338,20 @@ export default function MensajesPage() {
             <div style={{ display: 'flex', background: themeColors.bgSubtle3, borderRadius: 'var(--radius-full)', padding: '6px', gap: '4px' }}>
               <button 
                 onClick={() => setActiveTab('negocios')}
-                style={{ 
-                  flex: 1, padding: '10px 16px', borderRadius: 'var(--radius-full)', border: 'none', cursor: 'pointer', fontWeight: 600, fontSize: '0.9rem', transition: 'all 0.3s',
+                style={{ flex: 1, padding: '10px 16px', borderRadius: 'var(--radius-full)', border: 'none', cursor: 'pointer', fontWeight: 600, fontSize: '0.9rem',
                   background: activeTab === 'negocios' ? 'var(--color-primary)' : 'transparent',
-                  color: activeTab === 'negocios' ? '#fff' : 'var(--color-text-muted)',
-                  boxShadow: activeTab === 'negocios' ? '0 2px 8px rgba(255,115,0,0.4)' : 'none'
+                  color: activeTab === 'negocios' ? '#fff' : 'var(--color-text-muted)'
                 }}
-              >
-                Con Negocios
-              </button>
+              >Con Negocios</button>
               
-              {/* Solo mostrar la pestaña de clientes si está en modo vendedor */}
               {isVendorModeActive && (
                 <button 
                   onClick={() => setActiveTab('clientes')}
-                  style={{ 
-                    flex: 1, padding: '10px 16px', borderRadius: 'var(--radius-full)', border: 'none', cursor: 'pointer', fontWeight: 600, fontSize: '0.9rem', transition: 'all 0.3s',
+                  style={{ flex: 1, padding: '10px 16px', borderRadius: 'var(--radius-full)', border: 'none', cursor: 'pointer', fontWeight: 600, fontSize: '0.9rem',
                     background: activeTab === 'clientes' ? 'var(--color-primary)' : 'transparent',
-                    color: activeTab === 'clientes' ? '#fff' : 'var(--color-text-muted)',
-                    boxShadow: activeTab === 'clientes' ? '0 2px 8px rgba(255,115,0,0.4)' : 'none'
+                    color: activeTab === 'clientes' ? '#fff' : 'var(--color-text-muted)'
                   }}
-                >
-                  Con Clientes
-                </button>
+                >Con Clientes</button>
               )}
             </div>
           </div>
@@ -271,39 +368,20 @@ export default function MensajesPage() {
                 key={chat.id}
                 onClick={() => setActiveChatId(chat.id)}
                 style={{ 
-                  display: 'flex', alignItems: 'center', gap: '14px', padding: '14px', cursor: 'pointer', transition: 'all 0.3s', 
+                  display: 'flex', alignItems: 'center', gap: '14px', padding: '14px', cursor: 'pointer', 
                   borderRadius: 'var(--radius-lg)', marginBottom: '8px',
                   background: activeChatId === chat.id ? 'linear-gradient(90deg, rgba(255,115,0,0.15), transparent)' : 'transparent',
-                  border: '1px solid',
-                  borderColor: activeChatId === chat.id ? 'rgba(255,115,0,0.3)' : 'transparent'
+                  border: '1px solid', borderColor: activeChatId === chat.id ? 'rgba(255,115,0,0.3)' : 'transparent'
                 }}
-                onMouseEnter={e => { if (activeChatId !== chat.id) e.currentTarget.style.background = 'rgba(255,255,255,0.03)' }}
-                onMouseLeave={e => { if (activeChatId !== chat.id) e.currentTarget.style.background = 'transparent' }}
               >
-                {/* Avatar */}
                 <div style={{ position: 'relative', width: '48px', height: '48px', flexShrink: 0 }}>
                   <img src={chat.avatar} alt={chat.name} style={{ width: '100%', height: '100%', borderRadius: '50%', objectFit: 'cover' }} />
-                  {chat.online && (
-                    <div style={{ position: 'absolute', bottom: 2, right: 2, width: '12px', height: '12px', background: '#25D366', borderRadius: '50%', border: '2px solid var(--color-bg-base)' }} />
-                  )}
                 </div>
-                
-                {/* Info */}
                 <div style={{ flex: 1, minWidth: 0 }}>
                   <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '4px' }}>
                     <h4 style={{ margin: 0, fontSize: '1rem', color: 'var(--color-text-main)', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>{chat.name}</h4>
-                    <span style={{ fontSize: '0.75rem', color: 'var(--color-text-muted)' }}>{chat.time}</span>
                   </div>
-                  <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-                    <p style={{ margin: 0, fontSize: '0.85rem', color: chat.unread > 0 ? 'var(--color-text-main)' : 'var(--color-text-muted)', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis', fontWeight: chat.unread > 0 ? 600 : 400 }}>
-                      {chat.lastMessage}
-                    </p>
-                    {chat.unread > 0 && (
-                      <span style={{ background: 'var(--color-primary)', color: '#fff', fontSize: '0.7rem', fontWeight: 'bold', padding: '2px 6px', borderRadius: '10px' }}>
-                        {chat.unread}
-                      </span>
-                    )}
-                  </div>
+                  <p style={{ margin: 0, fontSize: '0.85rem', color: 'var(--color-text-muted)' }}>{chat.lastMessage}</p>
                 </div>
               </div>
             ))}
@@ -318,8 +396,7 @@ export default function MensajesPage() {
               <div style={{ padding: '16px 24px', borderBottom: '1px solid var(--color-border)', display: 'flex', alignItems: 'center', justifyContent: 'space-between', background: themeColors.bgSubtle }}>
                 <div style={{ display: 'flex', alignItems: 'center', gap: '16px' }}>
                   <button 
-                    className="mobile-back-btn"
-                    onClick={() => setActiveChatId(null)}
+                    className="mobile-back-btn" onClick={() => setActiveChatId(null)}
                     style={{ background: 'transparent', border: 'none', color: 'var(--color-primary)', cursor: 'pointer', padding: '0 8px 0 0' }}
                   >
                     <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><polyline points="15 18 9 12 15 6"></polyline></svg>
@@ -327,91 +404,46 @@ export default function MensajesPage() {
                   <img src={activeChat.avatar} alt={activeChat.name} style={{ width: '40px', height: '40px', borderRadius: '50%', objectFit: 'cover' }} />
                   <div>
                     <h3 style={{ margin: '0 0 2px 0', fontSize: '1.1rem', color: 'var(--color-text-main)' }}>{activeChat.name}</h3>
-                    <span style={{ fontSize: '0.8rem', color: activeChat.online ? '#25D366' : 'var(--color-text-muted)' }}>
-                      {activeChat.online ? 'En línea' : 'Última vez recientemente'}
-                    </span>
                   </div>
                 </div>
-                
-                <button style={{ background: 'transparent', border: 'none', color: 'var(--color-text-muted)', cursor: 'pointer' }}>
-                  <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><circle cx="12" cy="12" r="1"></circle><circle cx="12" cy="5" r="1"></circle><circle cx="12" cy="19" r="1"></circle></svg>
-                </button>
               </div>
 
               {/* Messages Area */}
               <div style={{ flex: 1, padding: '24px', overflowY: 'auto', display: 'flex', flexDirection: 'column', gap: '16px' }}>
-                {activeChat.messages.map((msg: any) => {
-                  const isMe = msg.sender === 'me';
+                {messages.map((msg: any) => {
+                  const isMe = msg.sender_id === supabaseUser?.id;
                   return (
                     <div key={msg.id} style={{ display: 'flex', flexDirection: 'column', alignItems: isMe ? 'flex-end' : 'flex-start' }}>
                       <div style={{ 
-                        maxWidth: '70%', 
-                        padding: '12px 16px', 
-                        borderRadius: 'var(--radius-lg)', 
-                        background: isMe ? 'var(--color-primary)' : 'rgba(255,255,255,0.05)',
-                        color: isMe ? '#fff' : 'var(--color-text-main)',
-                        borderBottomRightRadius: isMe ? '4px' : 'var(--radius-lg)',
-                        borderBottomLeftRadius: !isMe ? '4px' : 'var(--radius-lg)',
-                        boxShadow: '0 2px 5px rgba(0,0,0,0.1)'
+                        maxWidth: '70%', padding: '12px 16px', borderRadius: 'var(--radius-lg)', 
+                        background: isMe ? 'var(--color-primary)' : 'rgba(255,255,255,0.05)', color: isMe ? '#fff' : 'var(--color-text-main)',
+                        borderBottomRightRadius: isMe ? '4px' : 'var(--radius-lg)', borderBottomLeftRadius: !isMe ? '4px' : 'var(--radius-lg)'
                       }}>
-                        <p style={{ margin: 0, fontSize: '0.95rem', lineHeight: 1.4 }}>{msg.text}</p>
+                        {msg.content && <p style={{ margin: 0, fontSize: '0.95rem', lineHeight: 1.4 }}>{msg.content}</p>}
                         
-                        {msg.fileName && (
-                          <div style={{ marginTop: '8px', padding: '8px 12px', background: themeColors.bgSubtle2, borderRadius: '4px', display: 'flex', alignItems: 'center', gap: '8px', cursor: 'pointer' }}>
-                            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path d="M13 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V9z"></path><polyline points="13 2 13 9 20 9"></polyline></svg>
-                            <span style={{ fontSize: '0.85rem' }}>{msg.fileName}</span>
-                          </div>
-                        )}
-
-                        {msg.whatsappText && (
-                          <a 
-                            href={`https://wa.me/1234567890?text=${encodeURIComponent(msg.whatsappText)}`}
-                            target="_blank"
-                            rel="noopener noreferrer"
-                            style={{ 
-                              marginTop: '12px', padding: '10px 16px', background: '#25D366', color: '#fff', 
-                              borderRadius: 'var(--radius-full)', display: 'inline-flex', alignItems: 'center', gap: '8px', 
-                              textDecoration: 'none', fontWeight: 600, fontSize: '0.9rem', cursor: 'pointer',
-                              boxShadow: '0 2px 5px rgba(0,0,0,0.2)', transition: 'all 0.2s'
-                            }}
-                            onMouseEnter={e => e.currentTarget.style.transform = 'translateY(-2px)'}
-                            onMouseLeave={e => e.currentTarget.style.transform = 'translateY(0)'}
-                          >
-                            <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413z"/></svg>
-                            Contactar por WhatsApp
-                          </a>
-                        )}
-
-                        {msg.options && msg.options.length > 0 && (
-                          <div style={{ marginTop: '12px', display: 'flex', flexDirection: 'column', gap: '8px' }}>
-                            {msg.options.map((opt: any, i: number) => (
-                              <button 
-                                key={i}
-                                onClick={() => handleSendMessage(opt.label || opt, typeof opt === 'object' ? { ...opt, ruleId: msg.ruleId } : undefined)}
-                                style={{ 
-                                  background: 'rgba(255,115,0,0.1)', color: 'var(--color-primary)', border: '1px solid var(--color-primary)', 
-                                  padding: '10px 16px', borderRadius: 'var(--radius-full)', cursor: 'pointer', fontSize: '0.85rem', textAlign: 'center', fontWeight: 600,
-                                  transition: 'all 0.2s', boxShadow: '0 2px 4px rgba(0,0,0,0.1)'
-                                }}
-                                onMouseEnter={e => {
-                                  e.currentTarget.style.background = 'var(--color-primary)';
-                                  e.currentTarget.style.color = '#fff';
-                                  e.currentTarget.style.transform = 'translateY(-1px)';
-                                }}
-                                onMouseLeave={e => {
-                                  e.currentTarget.style.background = 'rgba(255,115,0,0.1)';
-                                  e.currentTarget.style.color = 'var(--color-primary)';
-                                  e.currentTarget.style.transform = 'translateY(0)';
-                                }}
-                              >
-                                {opt.label || opt}
-                              </button>
-                            ))}
+                        {/* Attachments rendering */}
+                        {msg.attachment_url && (
+                          <div style={{ marginTop: msg.content ? '10px' : '0' }}>
+                            {msg.attachment_type === 'image' && (
+                              <img src={msg.attachment_url} alt="Adjunto" style={{ maxWidth: '100%', borderRadius: '8px', cursor: 'pointer' }} onClick={() => window.open(msg.attachment_url, '_blank')} />
+                            )}
+                            {msg.attachment_type === 'video' && (
+                              <video src={msg.attachment_url} controls style={{ maxWidth: '100%', borderRadius: '8px' }} />
+                            )}
+                            {msg.attachment_type === 'audio' && (
+                              <audio src={msg.attachment_url} controls style={{ maxWidth: '100%', borderRadius: '8px', minWidth: '250px' }} />
+                            )}
+                            {msg.attachment_type === 'document' && (
+                              <a href={msg.attachment_url} target="_blank" rel="noopener noreferrer" style={{ display: 'flex', alignItems: 'center', gap: '8px', color: 'inherit', textDecoration: 'none', background: 'rgba(0,0,0,0.1)', padding: '10px', borderRadius: '8px' }}>
+                                <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path d="M13 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V9z"></path><polyline points="13 2 13 9 20 9"></polyline></svg>
+                                <span>Ver Documento Adjunto</span>
+                              </a>
+                            )}
                           </div>
                         )}
                       </div>
-                      <span style={{ fontSize: '0.7rem', color: 'var(--color-text-muted)', marginTop: '4px', marginRight: isMe ? '4px' : '0', marginLeft: !isMe ? '4px' : '0' }}>
-                        {msg.time}
+                      <span style={{ fontSize: '0.7rem', color: 'var(--color-text-muted)', marginTop: '4px' }}>
+                        {new Date(msg.created_at).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
                       </span>
                     </div>
                   );
@@ -421,8 +453,27 @@ export default function MensajesPage() {
 
               {/* Input Area */}
               <div style={{ padding: '16px 24px', borderTop: '1px solid var(--color-border)', background: themeColors.bgSubtle, display: 'flex', gap: '12px', alignItems: 'center' }}>
-                <button style={{ background: 'transparent', border: 'none', color: 'var(--color-text-muted)', cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-                  <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M21.44 11.05l-9.19 9.19a6 6 0 0 1-8.49-8.49l9.19-9.19a4 4 0 0 1 5.66 5.66l-9.2 9.19a2 2 0 0 1-2.83-2.83l8.49-8.48"></path></svg>
+                
+                {/* File Input (Hidden) */}
+                <input 
+                  type="file" 
+                  ref={fileInputRef} 
+                  hidden 
+                  onChange={handleFileUpload} 
+                  accept="image/jpeg,image/png,image/webp,video/mp4,audio/ogg,audio/mpeg,application/pdf,application/vnd.openxmlformats-officedocument.wordprocessingml.document" 
+                />
+
+                <button 
+                  onClick={() => fileInputRef.current?.click()}
+                  disabled={isUploading}
+                  style={{ background: 'transparent', border: 'none', color: 'var(--color-text-muted)', cursor: isUploading ? 'not-allowed' : 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center' }}
+                  title="Adjuntar archivo (Img, Video, Audio, Doc)"
+                >
+                  {isUploading ? (
+                    <div style={{ width: '24px', height: '24px', border: '2px solid', borderColor: 'var(--color-primary) transparent', borderRadius: '50%', animation: 'spin 1s linear infinite' }} />
+                  ) : (
+                    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M21.44 11.05l-9.19 9.19a6 6 0 0 1-8.49-8.49l9.19-9.19a4 4 0 0 1 5.66 5.66l-9.2 9.19a2 2 0 0 1-2.83-2.83l8.49-8.48"></path></svg>
+                  )}
                 </button>
                 
                 <input 
@@ -442,13 +493,6 @@ export default function MensajesPage() {
                   style={{ 
                     background: 'var(--color-primary)', border: 'none', color: '#fff', 
                     width: '42px', height: '42px', borderRadius: '50%', cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center', 
-                    transition: 'all 0.2s'
-                  }}
-                  onMouseEnter={e => {
-                    e.currentTarget.style.transform = 'scale(1.05)';
-                  }}
-                  onMouseLeave={e => {
-                    e.currentTarget.style.transform = 'scale(1)';
                   }}
                 >
                   <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" style={{ marginLeft: '-2px' }}><line x1="22" y1="2" x2="11" y2="13"></line><polygon points="22 2 15 22 11 13 2 9 22 2"></polygon></svg>
@@ -459,17 +503,17 @@ export default function MensajesPage() {
             <div style={{ flex: 1, display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', color: 'var(--color-text-muted)' }}>
               <svg width="64" height="64" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1" strokeLinecap="round" strokeLinejoin="round" style={{ marginBottom: '16px', opacity: 0.5 }}><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"></path></svg>
               <h2>Tus Mensajes</h2>
-              <p>Selecciona un chat para comenzar a enviar mensajes.</p>
+              <p>Selecciona un chat para comenzar a enviar mensajes y archivos multimedia.</p>
             </div>
           )}
         </div>
       </div>
 
-      {isAdvisorModalOpen && (
-        <VirtualAdvisorModal 
-          onClose={() => setIsAdvisorModalOpen(false)} 
-        />
-      )}
+      {isAdvisorModalOpen && <VirtualAdvisorModal onClose={() => setIsAdvisorModalOpen(false)} />}
+      
+      <style dangerouslySetInnerHTML={{__html: `
+        @keyframes spin { 100% { transform: rotate(360deg); } }
+      `}} />
     </div>
   );
 }

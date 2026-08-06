@@ -22,85 +22,87 @@ export default function NegociosPage() {
   const [negocios, setNegocios] = useState<any[]>([]);
 
   useEffect(() => {
-    const loadUserStore = async () => {
-      const savedProfile = localStorage.getItem('cazamarket_profile');
-      if (savedProfile) {
-        const parsed = JSON.parse(savedProfile);
-        
-        let pCount = 0;
-        let sCount = 0;
-        
-        // Fetch real counts from Supabase if user is logged in
-        if (supabaseUser) {
-          try {
-            const { data: prods } = await supabase.from('products').select('id').eq('user_id', supabaseUser.id);
-            const { data: servs } = await supabase.from('services').select('id').eq('user_id', supabaseUser.id);
-            
-            pCount = prods ? Math.min(prods.length, permissions.maxProductos) : 0;
-            sCount = servs ? Math.min(servs.length, permissions.maxServicios) : 0;
-          } catch (e) {
-            console.error('Error fetching counts from Supabase', e);
-          }
-        } else {
-          // Fallback to localStorage if not logged in
-          try {
-            const savedProductsStr = localStorage.getItem('cazamarket_my_products');
-            if (savedProductsStr) {
-              const prods = JSON.parse(savedProductsStr) || [];
-              pCount = Array.isArray(prods) ? Math.min(prods.length, permissions.maxProductos) : 0;
+    const loadBusinesses = async () => {
+      try {
+        const { data: profiles, error } = await supabase
+          .from('profiles')
+          .select('*')
+          .eq('role', 'negocio');
+
+        if (error) {
+          console.error('Error fetching businesses:', error);
+          return;
+        }
+
+        if (profiles) {
+          // Filter businesses that have a paid plan
+          const paidBusinesses = profiles.filter(p => 
+            p.product_plan_tier !== 'gratis' || p.service_plan_tier !== 'gratis'
+          );
+
+          // Obtener conteos para cada negocio (optimizado: agrupamos en paralelo si es posible, pero para simplificar lo hacemos en bloque)
+          // Podríamos hacer un count agrupado pero supabase rpc es mejor. Para mantenerlo simple:
+          
+          const mappedBusinesses = await Promise.all(paidBusinesses.map(async (parsed) => {
+            let pCount = 0;
+            let sCount = 0;
+            try {
+              const { count: prodsCount } = await supabase.from('products').select('*', { count: 'exact', head: true }).eq('user_id', parsed.id);
+              const { count: servsCount } = await supabase.from('services').select('*', { count: 'exact', head: true }).eq('user_id', parsed.id);
+              pCount = prodsCount || 0;
+              sCount = servsCount || 0;
+            } catch (e) {
+              console.error(e);
             }
-          } catch (e) {}
 
-          try {
-            const savedServicesStr = localStorage.getItem('cazamarket_my_services');
-            if (savedServicesStr) {
-              const servs = JSON.parse(savedServicesStr) || [];
-              sCount = Array.isArray(servs) ? Math.min(servs.length, permissions.maxServicios) : 0;
+            const parsedLocations: any[] = [];
+            if (parsed.province || parsed.locality) {
+              parsedLocations.push({ province: parsed.province || '', city: parsed.locality || '' });
             }
-          } catch (e) {}
-        }
-
-        const parsedLocations: any[] = [];
-        if (parsed.provincia || parsed.localidad) {
-          parsedLocations.push({ province: parsed.provincia || '', city: parsed.localidad || '' });
-        }
-        if (parsed.sucursales && Array.isArray(parsed.sucursales)) {
-          parsed.sucursales.forEach((suc: any) => {
-            if (suc.provincia || suc.localidad) {
-              parsedLocations.push({ province: suc.provincia || '', city: suc.localidad || '' });
+            if (parsed.branches && Array.isArray(parsed.branches)) {
+              parsed.branches.forEach((suc: any) => {
+                if (suc.provincia || suc.localidad) {
+                  parsedLocations.push({ province: suc.provincia || '', city: suc.localidad || '' });
+                }
+              });
             }
-          });
-        }
 
-        const userNegocio = {
-          id: 1,
-          name: parsed.storeName || parsed.username || parsed.nombre || 'Mi Negocio',
-          rating: 0,
-          reviews: 0,
-          image: 'https://images.unsplash.com/photo-1503614472-8c93d56e92ce?q=80&w=1200&auto=format&fit=crop',
-          avatar: parsed.avatar || 'https://ui-avatars.com/api/?name=Mi+Negocio&background=ff7300&color=fff',
-          planTier: planTier,
-          description: parsed.storeDescription || 'Bienvenido a mi tienda oficial en CazaMarket.',
-          businessType: parsed.businessType || 'Tienda',
-          categories: parsed.categories ? (Array.isArray(parsed.categories) ? parsed.categories : [parsed.categories]) : [],
-          locations: parsedLocations,
-          productsCount: pCount,
-          servicesCount: sCount,
-          theme: parsed.theme || null,
-        };
+            // Determine highest plan tier for display purposes
+            const pTier = parsed.product_plan_tier || 'gratis';
+            const sTier = parsed.service_plan_tier || 'gratis';
+            const isEmprendedorOrHigher = pTier === 'empresarial' || pTier === 'comercial' || pTier === 'emprendedor' ||
+                                          sTier === 'empresarial' || sTier === 'comercial' || sTier === 'emprendedor';
 
-        if (planTier !== 'gratis') {
-          setNegocios([userNegocio]);
-        } else {
-          setNegocios([]);
+            const planTierStr = isEmprendedorOrHigher ? 'emprendedor' : (pTier !== 'gratis' ? pTier : sTier);
+
+            return {
+              id: parsed.id,
+              name: parsed.store_name || parsed.full_name || 'Mi Negocio',
+              rating: parsed.trust_score ? (parsed.trust_score / 20).toFixed(1) : 0,
+              reviews: 0,
+              image: 'https://images.unsplash.com/photo-1503614472-8c93d56e92ce?q=80&w=1200&auto=format&fit=crop',
+              avatar: parsed.avatar_url || 'https://ui-avatars.com/api/?name=Mi+Negocio&background=ff7300&color=fff',
+              planTier: planTierStr,
+              description: parsed.store_description || 'Bienvenido a mi tienda oficial en CazaMarket.',
+              businessType: parsed.business_type || 'Tienda',
+              categories: parsed.store_categories ? (Array.isArray(parsed.store_categories) ? parsed.store_categories : [parsed.store_categories]) : [],
+              locations: parsedLocations,
+              productsCount: pCount,
+              servicesCount: sCount,
+              theme: parsed.store_theme || null,
+              verified: true // Todos los que están aquí tienen un plan pago, ergo están verificados.
+            };
+          }));
+          
+          setNegocios(mappedBusinesses);
         }
-      } else {
-        setNegocios([]);
+      } catch (err) {
+        console.error("Unexpected error loading businesses:", err);
       }
     };
     
-    loadUserStore();
-  }, [planTier, permissions.tiendaVirtual, permissions.maxProductos, permissions.maxServicios, supabaseUser]);
+    loadBusinesses();
+  }, [supabase]);
 
   const q = searchParams?.get('q')?.toLowerCase() || '';
   const filterCategoria = searchParams?.get('categoria') || '';

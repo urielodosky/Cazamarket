@@ -64,7 +64,7 @@ function getSocialUrl(platform: string, handle: string) {
 
 function EditButton({ onClick, style, label }: { onClick: () => void, style?: React.CSSProperties, label?: string }) {
   return (
-    <button 
+    <button
       onClick={onClick}
       style={{
         position: 'absolute', zIndex: 20,
@@ -103,7 +103,7 @@ const ensureCategoriesArray = (raw: any, targetLen: number = 3): string[] => {
 };
 
 export default function MiNegocioPage() {
-  const { isVendorModeActive, username, email, avatar, updateUser } = useAuth();
+  const { isVendorModeActive, username, email, avatar, updateUser, storeDescription, businessType: authBusinessType, storeCategories, storeTheme, phone, province, locality, street, streetNumber, branches, socialMedia } = useAuth();
   const { permissions, planTier, planDisplayName } = usePlan();
   const themeColors = useThemeColors();
   const [activeTab, setActiveTab] = useState<'productos' | 'servicios' | 'informacion' | 'apariencia'>('productos');
@@ -116,24 +116,23 @@ export default function MiNegocioPage() {
 
   // Editable States
   const [name, setName] = useState(username || 'Mi Negocio');
-  const [description, setDescription] = useState('');
-  const [businessType, setBusinessType] = useState('');
-  const [categories, setCategories] = useState(['', '', '']);
-  const [hasFirearmsPermit, setHasFirearmsPermit] = useState(false);
+  const [description, setDescription] = useState(storeDescription || '');
+  const [businessType, setBusinessType] = useState(authBusinessType || '');
+  const [categories, setCategories] = useState(storeCategories?.length > 0 ? storeCategories : ['', '', '']);
   const [storeBanner, setStoreBanner] = useState('https://images.unsplash.com/photo-1511497584788-876760111969?q=80&w=1200&auto=format&fit=crop');
-  
+
   const [isEditingName, setIsEditingName] = useState(false);
   const [isEditingDesc, setIsEditingDesc] = useState(false);
   const [isAvatarHovered, setIsAvatarHovered] = useState(false);
   const [myProducts, setMyProducts] = useState<any[]>([]);
   const [myServices, setMyServices] = useState<any[]>([]);
   const [openMenuId, setOpenMenuId] = useState<number | null>(null);
-  
+
   // Contact and Location states
-  const [telefono, setTelefono] = useState('');
-  const [ubicacionPrincipal, setUbicacionPrincipal] = useState<any>(null);
-  const [sucursales, setSucursales] = useState<any[]>([]);
-  const [redesSociales, setRedesSociales] = useState<{ red: string, usuario: string }[]>([]);
+  const [telefono, setTelefono] = useState(phone || '');
+  const [ubicacionPrincipal, setUbicacionPrincipal] = useState<any>({ provincia: province, localidad: locality, calle: street, numero: streetNumber });
+  const [sucursales, setSucursales] = useState<any[]>(branches || []);
+  const [redesSociales, setRedesSociales] = useState<{ red: string, usuario: string }[]>(socialMedia || []);
 
   const supabase = createClient();
   const { supabaseUser } = useAuth();
@@ -144,7 +143,7 @@ export default function MiNegocioPage() {
         try {
           const { data: prods } = await supabase.from('products').select('*').eq('user_id', supabaseUser.id);
           const { data: servs } = await supabase.from('services').select('*').eq('user_id', supabaseUser.id);
-          
+
           if (prods) setMyProducts(prods);
           if (servs) setMyServices(servs);
         } catch (error) {
@@ -153,33 +152,17 @@ export default function MiNegocioPage() {
       }
     };
     fetchProductsAndServices();
-
-    const savedProfile = localStorage.getItem('cazamarket_profile');
-    if (savedProfile) {
-      const parsed = JSON.parse(savedProfile);
-      if (parsed.storeDescription) setDescription(parsed.storeDescription);
-      if (parsed.storeName) setName(parsed.storeName);
-      if (parsed.businessType) setBusinessType(parsed.businessType);
-      if (parsed.categories) setCategories(parsed.categories ? (Array.isArray(parsed.categories) ? parsed.categories : [parsed.categories]) : ['', '', '']);
-      setHasFirearmsPermit(!!parsed.hasFirearmsPermit);
-      if (parsed.telefono) setTelefono(parsed.telefono);
-      if (parsed.theme) setTheme(parsed.theme);
-      
-      setUbicacionPrincipal({
-        provincia: getProvinceName(parsed.provincia),
-        localidad: parsed.localidad || '',
-        calle: parsed.calle || '',
-        numero: parsed.numero || ''
-      });
-      if (parsed.sucursales) {
-        setSucursales(parsed.sucursales.map((suc: any) => ({
-          ...suc,
-          provincia: getProvinceName(suc.provincia)
-        })));
-      }
-      if (parsed.redesSociales) setRedesSociales(parsed.redesSociales);
-    }
-  }, []);
+    
+    // Sync state if context changes after initial mount
+    if (storeTheme) setTheme(storeTheme);
+    if (storeDescription) setDescription(storeDescription);
+    if (username) setName(username);
+    if (authBusinessType) setBusinessType(authBusinessType);
+    if (storeCategories?.length > 0) setCategories(storeCategories);
+    if (phone) setTelefono(phone);
+    if (socialMedia?.length > 0) setRedesSociales(socialMedia);
+    if (branches?.length > 0) setSucursales(branches);
+  }, [storeTheme, storeDescription, username, authBusinessType, storeCategories, phone, socialMedia, branches]);
 
   React.useEffect(() => {
     // Auto-select first available tab if default is not available
@@ -192,40 +175,19 @@ export default function MiNegocioPage() {
 
   const handleDescChange = (newDesc: string) => {
     setDescription(newDesc);
-    const savedProfile = localStorage.getItem('cazamarket_profile');
-    if (savedProfile) {
-      const parsed = JSON.parse(savedProfile);
-      parsed.storeDescription = newDesc;
-      localStorage.setItem('cazamarket_profile', JSON.stringify(parsed));
-    } else {
-      localStorage.setItem('cazamarket_profile', JSON.stringify({ storeDescription: newDesc }));
-    }
+    updateUser({ storeDescription: newDesc });
   };
 
   const handleThemeChange = (field: string, value: string) => {
     const newTheme = { ...theme, [field]: value };
     setTheme(newTheme);
-    const savedProfile = localStorage.getItem('cazamarket_profile');
-    if (savedProfile) {
-      const parsed = JSON.parse(savedProfile);
-      parsed.theme = newTheme;
-      localStorage.setItem('cazamarket_profile', JSON.stringify(parsed));
-    } else {
-      localStorage.setItem('cazamarket_profile', JSON.stringify({ theme: newTheme }));
-    }
+    updateUser({ storeTheme: newTheme });
   };
 
   const handleResetTheme = () => {
     const defaultTheme = { primaryColor: '#ff7300', textColor: '#ffffff', bgColor: '#111310' };
     setTheme(defaultTheme);
-    const savedProfile = localStorage.getItem('cazamarket_profile');
-    if (savedProfile) {
-      const parsed = JSON.parse(savedProfile);
-      parsed.theme = defaultTheme;
-      localStorage.setItem('cazamarket_profile', JSON.stringify(parsed));
-    } else {
-      localStorage.setItem('cazamarket_profile', JSON.stringify({ theme: defaultTheme }));
-    }
+    updateUser({ storeTheme: defaultTheme });
   };
 
   const handleAvatarChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -295,7 +257,7 @@ export default function MiNegocioPage() {
 
   return (
     <div className="container-page" style={customStyles}>
-      
+
       {/* Limits indicator */}
       <div style={{ display: 'flex', justifyContent: 'flex-end', marginBottom: '16px', gap: '12px' }}>
         <div style={{ display: 'flex', alignItems: 'center', gap: '8px', padding: '6px 16px', borderRadius: 'var(--radius-full)', background: 'color-mix(in srgb, var(--color-primary) 8%, transparent)', border: '1px solid color-mix(in srgb, var(--color-primary) 20%, transparent)' }}>
@@ -314,42 +276,42 @@ export default function MiNegocioPage() {
       </div>
 
       <div className="glass-panel" style={{ borderRadius: 'var(--radius-lg)', padding: 0, position: 'relative' }}>
-        
+
         {/* Banner */}
         {isAtLeast(planTier, 'emprendedor') ? (
-          <div style={{ 
-            height: '280px', 
-            backgroundImage: `url(${storeBanner})`, 
-            backgroundSize: 'cover', 
+          <div style={{
+            height: '280px',
+            backgroundImage: `url(${storeBanner})`,
+            backgroundSize: 'cover',
             backgroundPosition: 'center',
             position: 'relative',
             borderTopLeftRadius: 'var(--radius-lg)',
             borderTopRightRadius: 'var(--radius-lg)'
           }}>
-             <div style={{ position: 'absolute', inset: 0, background: 'linear-gradient(to bottom, rgba(0,0,0,0.1), rgba(0,0,0,0.8))', borderTopLeftRadius: 'var(--radius-lg)', borderTopRightRadius: 'var(--radius-lg)' }} />
-             <input 
-               type="file" 
-               ref={bannerInputRef} 
-               onChange={handleBannerChange} 
-               accept="image/*" 
-               style={{ display: 'none' }} 
-             />
-             <EditButton onClick={() => bannerInputRef.current?.click()} style={{ top: '16px', right: '16px' }} label="Cambiar Portada" />
+            <div style={{ position: 'absolute', inset: 0, background: 'linear-gradient(to bottom, rgba(0,0,0,0.1), rgba(0,0,0,0.8))', borderTopLeftRadius: 'var(--radius-lg)', borderTopRightRadius: 'var(--radius-lg)' }} />
+            <input
+              type="file"
+              ref={bannerInputRef}
+              onChange={handleBannerChange}
+              accept="image/*"
+              style={{ display: 'none' }}
+            />
+            <EditButton onClick={() => bannerInputRef.current?.click()} style={{ top: '16px', right: '16px' }} label="Cambiar Portada" />
           </div>
         ) : (
           <div style={{ height: '80px', position: 'relative', background: 'var(--color-bg-surface-elevated)', borderTopLeftRadius: 'var(--radius-lg)', borderTopRightRadius: 'var(--radius-lg)' }}>
-             <Link href="/planes" style={{ position: 'absolute', top: '16px', right: '16px', padding: '6px 12px', background: 'rgba(255,115,0,0.1)', color: 'var(--color-primary)', borderRadius: 'var(--radius-full)', fontSize: '0.85rem', fontWeight: 600, textDecoration: 'none', border: '1px solid rgba(255,115,0,0.2)' }}>
-               Mejorar plan para Banner
-             </Link>
+            <Link href="/planes" style={{ position: 'absolute', top: '16px', right: '16px', padding: '6px 12px', background: 'rgba(255,115,0,0.1)', color: 'var(--color-primary)', borderRadius: 'var(--radius-full)', fontSize: '0.85rem', fontWeight: 600, textDecoration: 'none', border: '1px solid rgba(255,115,0,0.2)' }}>
+              Mejorar plan para Banner
+            </Link>
           </div>
         )}
 
         <div style={{ padding: '0 var(--spacing-5) var(--spacing-5) var(--spacing-5)', position: 'relative' }}>
-          
+
           {/* Header Info (Avatar & Title) */}
-          <div style={{ 
-            display: 'flex', 
-            gap: '32px', 
+          <div style={{
+            display: 'flex',
+            gap: '32px',
             alignItems: 'flex-end',
             marginTop: isAtLeast(planTier, 'emprendedor') ? '-60px' : '-40px',
             marginBottom: '32px',
@@ -357,14 +319,14 @@ export default function MiNegocioPage() {
             zIndex: 10
           }}>
             {/* Avatar */}
-            <div 
+            <div
               style={{ position: 'relative', cursor: 'pointer' }}
               onMouseEnter={() => setIsAvatarHovered(true)}
               onMouseLeave={() => setIsAvatarHovered(false)}
             >
-              <div style={{ 
-                width: '140px', 
-                height: '140px', 
+              <div style={{
+                width: '140px',
+                height: '140px',
                 borderRadius: '50%',
                 border: '6px solid var(--color-bg-surface)',
                 backgroundImage: `url(${avatar || 'https://images.unsplash.com/photo-1511497584788-876760111969?q=80&w=200&auto=format&fit=crop'})`,
@@ -383,11 +345,11 @@ export default function MiNegocioPage() {
               </div>
               {isAvatarHovered && (
                 <>
-                  <input 
-                    type="file" 
-                    accept="image/*" 
-                    ref={fileInputRef} 
-                    style={{ display: 'none' }} 
+                  <input
+                    type="file"
+                    accept="image/*"
+                    ref={fileInputRef}
+                    style={{ display: 'none' }}
                     onChange={handleAvatarChange}
                   />
                   <EditButton onClick={() => fileInputRef.current?.click()} style={{ bottom: '24px', left: '50%', transform: 'translateX(-50%)', padding: '8px', background: 'rgba(0,0,0,0.8)' }} />
@@ -400,7 +362,7 @@ export default function MiNegocioPage() {
               <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start' }}>
                 <div style={{ width: '100%', maxWidth: '600px' }}>
                   {isEditingName ? (
-                    <input 
+                    <input
                       autoFocus
                       type="text"
                       value={name}
@@ -409,7 +371,7 @@ export default function MiNegocioPage() {
                         setIsEditingName(false);
                         updateUser({ username: name, avatar });
                       }}
-                      onKeyDown={(e) => { 
+                      onKeyDown={(e) => {
                         if (e.key === 'Enter') {
                           setIsEditingName(false);
                           updateUser({ username: name, avatar });
@@ -418,7 +380,7 @@ export default function MiNegocioPage() {
                       style={{ fontSize: '2.5rem', fontWeight: 'bold', margin: '0 0 12px 0', color: '#fff', background: 'rgba(255,255,255,0.05)', border: '1px dashed var(--color-primary)', borderRadius: 'var(--radius-md)', padding: '4px 12px', width: '100%', outline: 'none', lineHeight: 1.1 }}
                     />
                   ) : (
-                    <h1 
+                    <h1
                       onClick={() => setIsEditingName(true)}
                       style={{ fontSize: '2.5rem', margin: '0 0 12px 0', color: '#fff', lineHeight: 1.1, cursor: 'pointer', display: 'inline-block', borderBottom: '1px dashed rgba(255,255,255,0.2)' }}
                       title="Clic para editar el nombre"
@@ -434,10 +396,10 @@ export default function MiNegocioPage() {
 
           {/* Description & Tags */}
           <div style={{ display: 'flex', flexDirection: 'column', gap: '20px', marginBottom: '40px', position: 'relative', padding: '24px', background: 'rgba(255,255,255,0.02)', borderRadius: 'var(--radius-md)' }}>
-            
+
             <div style={{ display: 'flex', gap: '16px', flexWrap: 'wrap', alignItems: 'center', position: 'relative', zIndex: 15 }}>
               <div style={{ minWidth: '200px' }}>
-                <CustomSelect 
+                <CustomSelect
                   options={[
                     { value: '', label: 'Tipo de Negocio' },
                     { value: 'Mayorista', label: 'Mayorista' },
@@ -447,14 +409,7 @@ export default function MiNegocioPage() {
                   value={businessType || ''}
                   onChange={(val) => {
                     setBusinessType(val);
-                    const savedProfile = localStorage.getItem('cazamarket_profile');
-                    if (savedProfile) {
-                      const parsed = JSON.parse(savedProfile);
-                      parsed.businessType = val;
-                      localStorage.setItem('cazamarket_profile', JSON.stringify(parsed));
-                    } else {
-                      localStorage.setItem('cazamarket_profile', JSON.stringify({ businessType: val }));
-                    }
+                    updateUser({ businessType: val });
                   }}
                   placeholder="Tipo de Negocio"
                 />
@@ -466,7 +421,7 @@ export default function MiNegocioPage() {
 
                 return (
                   <div key={index} style={{ minWidth: '220px', flex: 1 }}>
-                    <CustomSelect 
+                    <CustomSelect
                       options={[
                         { value: '', label: `Categoría ${index + 1}` },
                         ...availableCategories.map(c => ({ value: c.name, label: c.name }))
@@ -476,15 +431,7 @@ export default function MiNegocioPage() {
                         const newCats = ensureCategoriesArray(categories, permissions.maxCategorias || 3);
                         newCats[index] = val;
                         setCategories(newCats);
-                        
-                        const savedProfile = localStorage.getItem('cazamarket_profile');
-                        if (savedProfile) {
-                          const parsed = JSON.parse(savedProfile);
-                          parsed.categories = newCats;
-                          localStorage.setItem('cazamarket_profile', JSON.stringify(parsed));
-                        } else {
-                          localStorage.setItem('cazamarket_profile', JSON.stringify({ categories: newCats }));
-                        }
+                        updateUser({ storeCategories: newCats });
                       }}
                       placeholder={`Categoría ${index + 1}`}
                     />
@@ -492,33 +439,9 @@ export default function MiNegocioPage() {
                 );
               })}
             </div>
-            
-            {categories.includes('Armas de Fuego') && (
-              <div style={{ background: 'rgba(255, 193, 7, 0.1)', border: '1px solid #ffc107', borderRadius: '8px', padding: '16px', display: 'flex', gap: '12px', alignItems: 'flex-start', marginTop: '16px' }}>
-                <input
-                  type="checkbox"
-                  id="firearmsPermitStore"
-                  checked={hasFirearmsPermit}
-                  onChange={(e) => {
-                    setHasFirearmsPermit(e.target.checked);
-                    const savedProfile = localStorage.getItem('cazamarket_profile');
-                    if (savedProfile) {
-                      const parsed = JSON.parse(savedProfile);
-                      parsed.hasFirearmsPermit = e.target.checked;
-                      localStorage.setItem('cazamarket_profile', JSON.stringify(parsed));
-                    }
-                  }}
-                  style={{ width: '20px', height: '20px', marginTop: '2px', cursor: 'pointer', accentColor: '#ffc107' }}
-                />
-                <label htmlFor="firearmsPermitStore" style={{ color: '#ffc107', fontSize: '0.9rem', cursor: 'pointer', lineHeight: 1.5 }}>
-                  <strong style={{ display: 'block', marginBottom: '4px' }}>Declaración Jurada Comercial (ANMaC)</strong>
-                  Confirmo que mi negocio posee la inscripción comercial vigente y permisos emitidos por ANMaC para la exhibición y venta de este material. Entiendo que CazaMarket opera exclusivamente como vidriera publicitaria.
-                </label>
-              </div>
-            )}
 
             {isEditingDesc ? (
-              <textarea 
+              <textarea
                 autoFocus
                 value={description}
                 onChange={(e) => handleDescChange(e.target.value)}
@@ -528,7 +451,7 @@ export default function MiNegocioPage() {
                 style={{ width: '100%', background: 'rgba(255,255,255,0.05)', color: 'var(--color-text-main)', fontSize: '1.05rem', lineHeight: 1.6, padding: '12px', border: '1px dashed var(--color-primary)', borderRadius: 'var(--radius-md)', outline: 'none', resize: 'vertical' }}
               />
             ) : (
-              <p 
+              <p
                 onClick={() => setIsEditingDesc(true)}
                 title="Clic para editar la descripción"
                 style={{ color: description ? 'var(--color-text-muted)' : 'var(--color-text-muted)', fontSize: '1.05rem', lineHeight: 1.6, maxWidth: '900px', margin: 0, cursor: 'pointer', borderBottom: '1px dashed rgba(255,255,255,0.2)', paddingBottom: '4px', display: 'inline-block', opacity: description ? 1 : 0.6 }}
@@ -544,12 +467,12 @@ export default function MiNegocioPage() {
               if (tab === 'servicios' && permissions.maxServicios === 0) return null;
               if (tab === 'productos' && permissions.maxProductos === 0) return null;
               return (
-                <button 
+                <button
                   key={tab}
                   onClick={() => setActiveTab(tab as any)}
-                  style={{ 
-                    padding: '16px 32px', 
-                    fontSize: '1.05rem', 
+                  style={{
+                    padding: '16px 32px',
+                    fontSize: '1.05rem',
                     fontWeight: 600,
                     color: activeTab === tab ? 'var(--color-primary)' : 'var(--color-text-muted)',
                     borderBottom: activeTab === tab ? '3px solid var(--color-primary)' : '3px solid transparent',
@@ -570,7 +493,7 @@ export default function MiNegocioPage() {
 
           {/* Tab Content Area */}
           <div style={{ minHeight: '400px' }}>
-            
+
             {/* APARIENCIA TAB */}
             {activeTab === 'apariencia' && permissions.coloresPersonalizados && (
               <div style={{ maxWidth: '600px', margin: '0 auto', padding: '40px 20px' }}>
@@ -609,9 +532,9 @@ export default function MiNegocioPage() {
                       <h4 style={{ margin: '0 0 4px 0', fontSize: '1.1rem' }}>Color Principal</h4>
                       <div style={{ color: 'var(--color-text-muted)', fontSize: '0.9rem' }}>Botones, íconos y detalles destacados</div>
                     </div>
-                    <input 
-                      type="color" 
-                      value={theme.primaryColor} 
+                    <input
+                      type="color"
+                      value={theme.primaryColor}
                       onChange={(e) => handleThemeChange('primaryColor', e.target.value)}
                       style={{ width: '50px', height: '50px', padding: '0', border: 'none', borderRadius: '8px', cursor: 'pointer', background: 'none' }}
                     />
@@ -622,9 +545,9 @@ export default function MiNegocioPage() {
                       <h4 style={{ margin: '0 0 4px 0', fontSize: '1.1rem' }}>Color de Texto</h4>
                       <div style={{ color: 'var(--color-text-muted)', fontSize: '0.9rem' }}>El color de los textos principales</div>
                     </div>
-                    <input 
-                      type="color" 
-                      value={theme.textColor} 
+                    <input
+                      type="color"
+                      value={theme.textColor}
                       onChange={(e) => handleThemeChange('textColor', e.target.value)}
                       style={{ width: '50px', height: '50px', padding: '0', border: 'none', borderRadius: '8px', cursor: 'pointer', background: 'none' }}
                     />
@@ -635,15 +558,15 @@ export default function MiNegocioPage() {
                       <h4 style={{ margin: '0 0 4px 0', fontSize: '1.1rem' }}>Color de Fondo</h4>
                       <div style={{ color: 'var(--color-text-muted)', fontSize: '0.9rem' }}>Fondo general de tu página de negocio</div>
                     </div>
-                    <input 
-                      type="color" 
-                      value={theme.bgColor} 
+                    <input
+                      type="color"
+                      value={theme.bgColor}
                       onChange={(e) => handleThemeChange('bgColor', e.target.value)}
                       style={{ width: '50px', height: '50px', padding: '0', border: 'none', borderRadius: '8px', cursor: 'pointer', background: 'none' }}
                     />
                   </div>
                 </div>
-                
+
                 <div style={{ marginTop: '40px', padding: '20px', background: theme.bgColor, color: theme.textColor, borderRadius: 'var(--radius-md)', border: `1px solid ${theme.primaryColor}`, textAlign: 'center' }}>
                   <h4 style={{ margin: '0 0 12px 0' }}>Vista Previa de Tienda</h4>
                   <button style={{ background: theme.primaryColor, color: '#fff', border: 'none', padding: '10px 24px', borderRadius: 'var(--radius-full)', fontWeight: 'bold' }}>Botón Principal</button>
@@ -660,7 +583,7 @@ export default function MiNegocioPage() {
                     + Nuevo Producto
                   </Link>
                 </div>
-                
+
                 {myProducts.length === 0 ? (
                   <div style={{ color: 'var(--color-text-muted)', textAlign: 'center', padding: '100px 20px', border: '1px dashed var(--color-border)', borderRadius: 'var(--radius-lg)' }}>
                     <h3 style={{ color: 'var(--color-text-main)', marginBottom: '8px' }}>Aún no has creado ningún producto</h3>
@@ -669,14 +592,14 @@ export default function MiNegocioPage() {
                 ) : (
                   <div className="responsive-grid-250">
                     {myProducts.slice(0, permissions.maxProductos).map(producto => (
-                      <div key={producto.id} className="glass-panel" 
-                           onClick={() => router.push(`/productos/${producto.id}`)}
-                           style={{ position: 'relative', borderRadius: 'var(--radius-lg)', overflow: 'hidden', display: 'flex', flexDirection: 'column', transition: 'transform 0.2s', cursor: 'pointer' }}
-                           onMouseEnter={(e) => e.currentTarget.style.transform = 'translateY(-5px)'}
-                           onMouseLeave={(e) => e.currentTarget.style.transform = 'none'}>
+                      <div key={producto.id} className="glass-panel"
+                        onClick={() => router.push(`/productos/${producto.id}`)}
+                        style={{ position: 'relative', borderRadius: 'var(--radius-lg)', overflow: 'hidden', display: 'flex', flexDirection: 'column', transition: 'transform 0.2s', cursor: 'pointer' }}
+                        onMouseEnter={(e) => e.currentTarget.style.transform = 'translateY(-5px)'}
+                        onMouseLeave={(e) => e.currentTarget.style.transform = 'none'}>
 
                         <div className="aspect-image-4-3" style={{ backgroundImage: `url(${producto.image})` }}>
-                          <button 
+                          <button
                             onClick={(e) => { e.stopPropagation(); setOpenMenuId(openMenuId === producto.id ? null : producto.id); }}
                             style={{ position: 'absolute', top: '10px', right: '10px', zIndex: 20, background: 'rgba(0, 0, 0, 0.4)', backdropFilter: 'blur(4px)', border: 'none', color: '#fff', width: '32px', height: '32px', borderRadius: '50%', display: 'flex', alignItems: 'center', justifyContent: 'center', cursor: 'pointer', transition: 'background 0.2s' }}
                             onMouseEnter={(e) => e.currentTarget.style.background = 'rgba(0, 0, 0, 0.7)'}
@@ -708,22 +631,22 @@ export default function MiNegocioPage() {
                           )}
                         </div>
                         <div className="card-content-fluid" style={{ display: 'flex', flexDirection: 'column', flex: 1, padding: '16px' }}>
-                          
+
                           <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '8px' }}>
-                             <span style={{ color: 'var(--color-primary)', fontSize: '0.75rem', textTransform: 'uppercase', fontWeight: 'bold' }}>
-                               {producto.store}
-                             </span>
-                             <span style={{ background: 'rgba(255,255,255,0.05)', color: 'var(--color-text-muted)', fontSize: '0.7rem', padding: '2px 8px', borderRadius: 'var(--radius-full)' }}>
-                               {producto.category}
-                             </span>
+                            <span style={{ color: 'var(--color-primary)', fontSize: '0.75rem', textTransform: 'uppercase', fontWeight: 'bold' }}>
+                              {producto.store}
+                            </span>
+                            <span style={{ background: 'rgba(255,255,255,0.05)', color: 'var(--color-text-muted)', fontSize: '0.7rem', padding: '2px 8px', borderRadius: 'var(--radius-full)' }}>
+                              {producto.category}
+                            </span>
                           </div>
 
                           <h3 style={{ fontSize: '1.1rem', color: 'var(--color-text-main)', margin: '0 0 var(--spacing-2) 0' }}>{producto.name}</h3>
-                          
+
                           <p style={{ color: 'var(--color-text-muted)', fontSize: '0.85rem', lineHeight: 1.4, margin: '0 0 var(--spacing-4) 0', display: '-webkit-box', WebkitLineClamp: 2, WebkitBoxOrient: 'vertical', overflow: 'hidden' }}>
                             {producto.description}
                           </p>
-                          
+
                           <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-end', marginTop: 'auto' }}>
                             <div>
                               <span style={{ display: 'block', fontSize: '0.8rem', color: 'var(--color-text-muted)' }}>{producto.condition}</span>
@@ -746,7 +669,7 @@ export default function MiNegocioPage() {
                 )}
               </div>
             )}
-            
+
             {/* SERVICIOS TAB */}
             {activeTab === 'servicios' && (
               <div>
@@ -756,7 +679,7 @@ export default function MiNegocioPage() {
                     + Nuevo Servicio
                   </Link>
                 </div>
-                
+
                 {myServices.length === 0 ? (
                   <div style={{ color: 'var(--color-text-muted)', textAlign: 'center', padding: '100px 20px', border: '1px dashed var(--color-border)', borderRadius: 'var(--radius-lg)' }}>
                     <div style={{ display: 'flex', justifyContent: 'center', marginBottom: '16px', color: 'var(--color-primary)', opacity: 0.8 }}>
@@ -771,14 +694,14 @@ export default function MiNegocioPage() {
                 ) : (
                   <div className="responsive-grid-250">
                     {myServices.slice(0, permissions.maxServicios).map(servicio => (
-                      <div key={servicio.id} className="glass-panel" 
-                           onClick={() => router.push(`/servicios/${servicio.id}`)}
-                           style={{ position: 'relative', borderRadius: 'var(--radius-lg)', overflow: 'hidden', display: 'flex', flexDirection: 'column', transition: 'transform 0.2s', cursor: 'pointer' }}
-                           onMouseEnter={(e) => e.currentTarget.style.transform = 'translateY(-5px)'}
-                           onMouseLeave={(e) => e.currentTarget.style.transform = 'none'}>
+                      <div key={servicio.id} className="glass-panel"
+                        onClick={() => router.push(`/servicios/${servicio.id}`)}
+                        style={{ position: 'relative', borderRadius: 'var(--radius-lg)', overflow: 'hidden', display: 'flex', flexDirection: 'column', transition: 'transform 0.2s', cursor: 'pointer' }}
+                        onMouseEnter={(e) => e.currentTarget.style.transform = 'translateY(-5px)'}
+                        onMouseLeave={(e) => e.currentTarget.style.transform = 'none'}>
 
                         <div className="aspect-image-4-3" style={{ backgroundImage: `url(${servicio.image})` }}>
-                          <button 
+                          <button
                             onClick={(e) => { e.stopPropagation(); setOpenMenuId(openMenuId === servicio.id ? null : servicio.id); }}
                             style={{ position: 'absolute', top: '10px', right: '10px', zIndex: 20, background: 'rgba(0, 0, 0, 0.4)', backdropFilter: 'blur(4px)', border: 'none', color: '#fff', width: '32px', height: '32px', borderRadius: '50%', display: 'flex', alignItems: 'center', justifyContent: 'center', cursor: 'pointer', transition: 'background 0.2s' }}
                             onMouseEnter={(e) => e.currentTarget.style.background = 'rgba(0, 0, 0, 0.7)'}
@@ -810,22 +733,22 @@ export default function MiNegocioPage() {
                           )}
                         </div>
                         <div className="card-content-fluid" style={{ display: 'flex', flexDirection: 'column', flex: 1, padding: '16px' }}>
-                          
+
                           <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '8px' }}>
-                             <span style={{ color: 'var(--color-primary)', fontSize: '0.75rem', textTransform: 'uppercase', fontWeight: 'bold' }}>
-                               {servicio.store}
-                             </span>
-                             <span style={{ background: 'rgba(255,255,255,0.05)', color: 'var(--color-text-muted)', fontSize: '0.7rem', padding: '2px 8px', borderRadius: 'var(--radius-full)' }}>
-                               {servicio.category}
-                             </span>
+                            <span style={{ color: 'var(--color-primary)', fontSize: '0.75rem', textTransform: 'uppercase', fontWeight: 'bold' }}>
+                              {servicio.store}
+                            </span>
+                            <span style={{ background: 'rgba(255,255,255,0.05)', color: 'var(--color-text-muted)', fontSize: '0.7rem', padding: '2px 8px', borderRadius: 'var(--radius-full)' }}>
+                              {servicio.category}
+                            </span>
                           </div>
 
                           <h3 style={{ fontSize: '1.1rem', color: 'var(--color-text-main)', margin: '0 0 var(--spacing-2) 0' }}>{servicio.name}</h3>
-                          
+
                           <p style={{ color: 'var(--color-text-muted)', fontSize: '0.85rem', lineHeight: 1.4, margin: '0 0 var(--spacing-4) 0', display: '-webkit-box', WebkitLineClamp: 2, WebkitBoxOrient: 'vertical', overflow: 'hidden' }}>
                             {servicio.description}
                           </p>
-                          
+
                           <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-end', marginTop: 'auto' }}>
                             <div>
                               <span style={{ display: 'block', fontSize: '0.8rem', color: 'var(--color-text-muted)' }}>{servicio.condition}</span>
@@ -853,14 +776,14 @@ export default function MiNegocioPage() {
             {activeTab === 'informacion' && (
               <div style={{ display: 'grid', gridTemplateColumns: '1fr', gap: '40px', position: 'relative', padding: '24px', background: themeColors.bgSubtle3, borderRadius: 'var(--radius-md)' }}>
                 <EditButton onClick={() => router.push('/configuracion')} style={{ top: '24px', right: '24px' }} label="Editar en Configuración" />
-                
+
                 <div>
                   <h3 style={{ margin: '0 0 24px 0', color: 'var(--color-primary)', display: 'flex', alignItems: 'center', gap: '8px' }}>
                     <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72 12.84 12.84 0 0 0 .7 2.81 2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45 12.84 12.84 0 0 0 2.81.7A2 2 0 0 1 22 16.92z"></path></svg>
                     Contacto Directo
                   </h3>
                   <div style={{ display: 'flex', flexDirection: 'column', gap: '16px', color: themeColors.textWhite, fontSize: '1.05rem', maxWidth: '600px' }}>
-                    
+
                     <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', borderBottom: `1px solid ${themeColors.borderSubtle2}`, paddingBottom: '12px' }}>
                       <span style={{ color: 'var(--color-text-muted)', display: 'flex', alignItems: 'center', gap: '8px' }}>
                         <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><circle cx="12" cy="12" r="10"></circle><polyline points="12 6 12 12 16 14"></polyline></svg>
@@ -875,9 +798,9 @@ export default function MiNegocioPage() {
                         Teléfono
                       </span>
                       {isAtLeast(planTier, 'emprendedor') && telefono ? (
-                        <a 
-                          href={`https://wa.me/${telefono.replace(/\\D/g, '')}`} 
-                          target="_blank" 
+                        <a
+                          href={`https://wa.me/${telefono.replace(/\\D/g, '')}`}
+                          target="_blank"
                           rel="noopener noreferrer"
                           style={{ color: 'var(--color-primary)', textDecoration: 'none', fontWeight: 'bold' }}
                         >
@@ -895,9 +818,9 @@ export default function MiNegocioPage() {
                           {red.red}
                         </span>
                         {isAtLeast(planTier, 'emprendedor') ? (
-                          <a 
-                            href={getSocialUrl(red.red, red.usuario) || '#'} 
-                            target={getSocialUrl(red.red, red.usuario) ? "_blank" : "_self"} 
+                          <a
+                            href={getSocialUrl(red.red, red.usuario) || '#'}
+                            target={getSocialUrl(red.red, red.usuario) ? "_blank" : "_self"}
                             rel="noopener noreferrer"
                             style={{ color: themeColors.textWhite, textDecoration: 'none', fontWeight: 'bold' }}
                           >
@@ -920,7 +843,7 @@ export default function MiNegocioPage() {
                     Ubicaciones y Sucursales
                   </h3>
                   <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(280px, 1fr))', gap: '24px' }}>
-                    
+
                     {/* Sede Principal */}
                     {ubicacionPrincipal && (ubicacionPrincipal.provincia || ubicacionPrincipal.calle) && (
                       <div style={{ background: themeColors.bgSubtle2, padding: '20px', borderRadius: 'var(--radius-lg)', border: `1px solid ${themeColors.borderSubtle2}` }}>

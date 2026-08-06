@@ -72,7 +72,7 @@ export default function ProductoDetailPage({ params }: { params: Promise<{ id: s
   };
 
   const handleContactIntent = async () => {
-    if (supabaseUser && product?.seller?.id) {
+    if (supabaseUser && product?.seller?.id && supabaseUser.id !== product.seller.id) {
       try {
         const sellerId = product.seller.id || '00000000-0000-0000-0000-000000000000';
         // Insert product interaction
@@ -225,7 +225,8 @@ export default function ProductoDetailPage({ params }: { params: Promise<{ id: s
               shippingCost: data.shipping_cost,
               branches: data.pickup_branches || [],
               rating: sellerRating,
-              reviewsCount: sellerReviewsCount
+              reviewsCount: sellerReviewsCount,
+              planTier: sellerProfile.product_plan_tier || 'gratis'
             },
             relatedProducts: relatedList
           });
@@ -259,7 +260,8 @@ export default function ProductoDetailPage({ params }: { params: Promise<{ id: s
               name: customProduct.store || 'Mi Negocio',
               avatar: customProduct.avatar || '',
               shippingCost: customProduct.shippingCost,
-              branches: customProduct.branches || []
+              branches: customProduct.branches || [],
+              planTier: 'gratis'
             },
             relatedProducts: []
           });
@@ -562,6 +564,10 @@ export default function ProductoDetailPage({ params }: { params: Promise<{ id: s
                     showToast('Debes iniciar sesión para contactar al vendedor', 'error');
                     return;
                   }
+                  if (supabaseUser && supabaseUser.id === product.seller.id) {
+                    showToast('No puedes contactarte a ti mismo', 'error');
+                    return;
+                  }
                   setIsContactMenuOpen(!isContactMenuOpen);
                 }}
                 style={{ 
@@ -702,11 +708,16 @@ export default function ProductoDetailPage({ params }: { params: Promise<{ id: s
             </Link>
             )}
 
-            {/* 3. Añadir al Carrito - Visible para todos, pero requiere cuenta */}
+            {/* 3. Añadir al Carrito - Visible solo si el vendedor tiene un plan pago */}
+            {product.seller?.planTier !== 'gratis' && (
             <button
               onClick={() => {
                 if (!isLoggedIn) {
                   showToast('Para usar el carrito debes registrarte o iniciar sesión', 'error', { label: 'Registrarse', href: '/registro' });
+                  return;
+                }
+                if (supabaseUser && supabaseUser.id === product.seller.id) {
+                  showToast('No puedes agregar tus propios productos', 'error');
                   return;
                 }
                 if (isInCart) {
@@ -758,6 +769,7 @@ export default function ProductoDetailPage({ params }: { params: Promise<{ id: s
                 </>
               )}
             </button>
+            )}
 
             {/* 4. Chat Directo (Sólo si tiene plan compatible) */}
             {hasFeature('chatInterno') && (
