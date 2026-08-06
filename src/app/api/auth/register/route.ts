@@ -41,7 +41,7 @@ export async function POST(request: Request) {
           if (delError) throw delError;
         } else {
           return NextResponse.json(
-            { error: 'Este correo electrónico ya está registrado. Por favor, inicia sesión.' },
+            { error: 'El mail ya se encuentra registrado, por favor pruebe con otro' },
             { status: 400 }
           );
         }
