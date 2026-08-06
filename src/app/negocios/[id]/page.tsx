@@ -111,6 +111,10 @@ export default function NegocioDetailPage({ params }: { params: Promise<{ id: st
   const isOwnProfile = negocioId === 1 || unwrappedParams.id === supabaseUser?.id;
 
   useEffect(() => {
+    window.scrollTo(0, 0);
+  }, []);
+
+  useEffect(() => {
     const tab = searchParams.get('tab');
     if (tab && ['productos', 'servicios', 'informacion', 'comunidad'].includes(tab)) {
       setActiveTab(tab);

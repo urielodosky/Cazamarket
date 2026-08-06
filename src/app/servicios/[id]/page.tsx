@@ -85,6 +85,10 @@ export default function ServicioDetailPage({ params }: { params: Promise<{ id: s
   const themeColors = useThemeColors();
   const supabase = createClient();
 
+  useEffect(() => {
+    window.scrollTo(0, 0);
+  }, []);
+
   const handleContactIntent = async () => {
     if (supabaseUser && service?.seller?.id && supabaseUser.id !== service.seller.id) {
       try {

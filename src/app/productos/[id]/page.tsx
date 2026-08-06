@@ -48,6 +48,10 @@ export default function ProductoDetailPage({ params }: { params: Promise<{ id: s
   const themeColors = useThemeColors();
   const supabase = createClient();
 
+  useEffect(() => {
+    window.scrollTo(0, 0);
+  }, []);
+
   const isInCart = cart.some(item => item.id === `producto-${product?.id}`);
 
   const getSellerFeature = (feature: any) => {
