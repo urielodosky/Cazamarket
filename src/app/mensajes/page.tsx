@@ -104,7 +104,8 @@ export default function MensajesPage() {
             time: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
             lastMessage: 'Envía un mensaje para probar tu bot general',
             unread: 0,
-            dbChat: null
+            dbChat: null,
+            isPinned: false
           });
         }
 
@@ -268,7 +269,8 @@ export default function MensajesPage() {
               time: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
               lastMessage: userText || 'Archivo enviado',
               unread: 0,
-              dbChat: newChat
+              dbChat: newChat,
+              isPinned: false
             };
             return [newMapped, ...prev.filter(c => c.id !== 'bot-test-chat')];
           });
@@ -599,7 +601,6 @@ export default function MensajesPage() {
                     <h3 style={{ margin: '0 0 2px 0', fontSize: '1.1rem', color: 'var(--color-text-main)' }}>{activeChat.name}</h3>
                   </div>
                 </div>
-              </div>
               </div>
 
               {/* Pinned Message Banner */}
