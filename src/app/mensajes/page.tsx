@@ -304,7 +304,7 @@ export default function MensajesPage() {
   };
 
   return (
-    <div style={{ maxWidth: '1400px', margin: '0 auto', height: 'calc(100vh - 140px)', minHeight: '600px', padding: 'var(--spacing-6)' }}>
+    <div className="layout-container mensajes-page-wrapper">
       
       <div className="glass-panel messages-container" style={{ display: 'flex', height: '75vh', minHeight: '600px', borderRadius: 'var(--radius-xl)', overflow: 'hidden', border: '1px solid var(--color-border)', boxShadow: '0 10px 30px rgba(0,0,0,0.05)' }}>
         

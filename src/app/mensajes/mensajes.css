@@ -4,9 +4,14 @@
   display: none !important;
 }
 
+.mensajes-page-wrapper {
+  padding: var(--spacing-6) 0;
+  height: calc(100vh - 140px);
+  min-height: 600px;
+}
+
 @media (max-width: 768px) {
-  /* Parent container overrides */
-  div[style*="padding: var(--spacing-6)"] {
+  .mensajes-page-wrapper {
     padding: 0 !important;
     height: calc(100vh - 60px) !important;
     min-height: 0 !important;
