@@ -525,7 +525,7 @@ export default function MensajesPage() {
                         background: isMe ? 'var(--color-primary)' : 'rgba(255,255,255,0.05)', color: isMe ? '#fff' : 'var(--color-text-main)',
                         borderBottomRightRadius: isMe ? '4px' : 'var(--radius-lg)', borderBottomLeftRadius: !isMe ? '4px' : 'var(--radius-lg)'
                       }}>
-                        {msg.content && <p style={{ margin: 0, fontSize: '0.95rem', lineHeight: 1.4 }}>{msg.content}</p>}
+                        {msg.content && <p style={{ margin: 0, fontSize: '0.95rem', lineHeight: 1.4, wordBreak: 'break-word', whiteSpace: 'pre-wrap' }}>{msg.content}</p>}
                         
                         {/* Attachments rendering */}
                         {msg.attachment_url && (
