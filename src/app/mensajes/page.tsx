@@ -167,7 +167,18 @@ export default function MensajesPage() {
       
       if (data) {
         let unreadIds: string[] = [];
-        const messagesData = data.map(m => {
+        
+        // Filter out messages deleted for me
+        const currentDbChat = chats.find(c => c.id === activeChatId)?.dbChat;
+        const isBuyer = currentDbChat?.buyer_id === supabaseUser.id;
+
+        const messagesData = data.filter((m: any) => {
+          if (currentDbChat) {
+            if (isBuyer && m.deleted_by_buyer) return false;
+            if (!isBuyer && m.deleted_by_seller) return false;
+          }
+          return true;
+        }).map(m => {
           if (m.sender_id !== supabaseUser.id && m.status !== 'read') {
              unreadIds.push(m.id);
              return { ...m, status: 'read' };
@@ -374,8 +385,12 @@ export default function MensajesPage() {
   };
 
   const hardDeleteMessage = async (msgId: string) => {
+    if (!activeChat?.dbChat || !supabaseUser) return;
+    const isBuyer = activeChat.dbChat.buyer_id === supabaseUser.id;
+    const updateField = isBuyer ? 'deleted_by_buyer' : 'deleted_by_seller';
+    
     setMessages(prev => prev.filter(m => m.id !== msgId));
-    await supabase.from('messages').delete().eq('id', msgId);
+    await supabase.from('messages').update({ [updateField]: true }).eq('id', msgId);
   };
 
   const togglePinMessage = async (msg: any) => {
@@ -665,8 +680,8 @@ export default function MensajesPage() {
                 {messages.map((msg: any) => {
                   const isMe = msg.sender_id === supabaseUser?.id;
                   return (
-                    <div key={msg.id} className="message-item-container" style={{ display: 'flex', flexDirection: 'column', alignItems: isMe ? 'flex-end' : 'flex-start', position: 'relative' }}>
-                      <div style={{ display: 'flex', alignItems: 'center', gap: '8px', flexDirection: isMe ? 'row-reverse' : 'row' }}>
+                    <div key={msg.id} className="message-item-container" style={{ display: 'flex', flexDirection: 'column', alignItems: isMe ? 'flex-end' : 'flex-start', position: 'relative', maxWidth: '100%' }}>
+                      <div style={{ display: 'flex', alignItems: 'center', gap: '8px', flexDirection: isMe ? 'row-reverse' : 'row', maxWidth: '100%' }}>
                         {msg.is_deleted ? (
                           <div style={{ padding: '12px 16px', borderRadius: 'var(--radius-lg)', background: 'rgba(255,255,255,0.05)', color: 'var(--color-text-muted)', fontStyle: 'italic', display: 'flex', alignItems: 'center', gap: '8px' }}>
                             <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><circle cx="12" cy="12" r="10"></circle><line x1="4.93" y1="4.93" x2="19.07" y2="19.07"></line></svg>
@@ -674,11 +689,11 @@ export default function MensajesPage() {
                           </div>
                         ) : (
                           <div style={{ 
-                            maxWidth: '70vw', padding: '12px 16px', borderRadius: 'var(--radius-lg)', 
+                            maxWidth: '70vw', minWidth: 0, padding: '12px 16px', borderRadius: 'var(--radius-lg)', 
                             background: isMe ? 'var(--color-primary)' : 'rgba(255,255,255,0.05)', color: isMe ? '#fff' : 'var(--color-text-main)',
                             borderBottomRightRadius: isMe ? '4px' : 'var(--radius-lg)', borderBottomLeftRadius: !isMe ? '4px' : 'var(--radius-lg)'
                           }}>
-                            {msg.content && <p style={{ margin: 0, fontSize: '0.95rem', lineHeight: 1.4, wordBreak: 'break-word', whiteSpace: 'pre-wrap' }}>{msg.content}</p>}
+                            {msg.content && <p style={{ margin: 0, fontSize: '0.95rem', lineHeight: 1.4, wordBreak: 'break-all', overflowWrap: 'anywhere', whiteSpace: 'pre-wrap' }}>{msg.content}</p>}
                         
                         {/* Attachments rendering */}
                         {msg.attachment_url && (
@@ -722,7 +737,7 @@ export default function MensajesPage() {
                               )}
                               <button onClick={(e) => { e.stopPropagation(); hardDeleteMessage(msg.id); setOpenMessageMenu(null); }} style={{ display: 'flex', alignItems: 'center', gap: '8px', width: '100%', textAlign: 'left', background: 'transparent', border: 'none', padding: '8px 12px', color: 'var(--color-danger, #ff4444)', cursor: 'pointer', fontSize: '0.85rem' }}>
                                 <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg>
-                                {msg.is_deleted ? "Borrar de mi vista" : "Eliminar permanentemente"}
+                                Borrar para mí
                               </button>
                             </div>
                           )}
