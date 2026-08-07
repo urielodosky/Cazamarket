@@ -44,12 +44,15 @@ export default function MensajesPage() {
       if (data) {
         // Map data to UI expected format
         const mappedChats = data.map(c => {
+          const isTestChat = c.buyer_id === supabaseUser.id && c.seller_id === supabaseUser.id;
           const isBuyer = c.buyer_id === supabaseUser.id;
-          const otherParty = isBuyer ? c.seller : c.buyer;
-          const type = isBuyer ? 'negocios' : 'clientes'; // If I am buyer, I am talking to a negocio
+          const otherParty = isTestChat ? c.seller : (isBuyer ? c.seller : c.buyer);
+          const type = isTestChat ? 'negocios' : (isBuyer ? 'negocios' : 'clientes'); 
           
           let name = 'Usuario';
-          if (otherParty) {
+          if (isTestChat) {
+            name = 'Tú (Prueba del Bot General)';
+          } else if (otherParty) {
             name = otherParty.store_name || `${otherParty.first_name || ''} ${otherParty.last_name || ''}`.trim() || 'Usuario';
           }
 
@@ -57,7 +60,7 @@ export default function MensajesPage() {
             id: c.id,
             type: type,
             name: name,
-            avatar: otherParty?.avatar_url || 'https://via.placeholder.com/150',
+            avatar: otherParty?.avatar_url || 'https://ui-avatars.com/api/?name=User',
             online: false,
             time: new Date(c.updated_at).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
             lastMessage: 'Abrir chat para ver mensajes',
@@ -65,6 +68,23 @@ export default function MensajesPage() {
             dbChat: c
           };
         });
+
+        // Inject a virtual test chat if it doesn't exist and user can use bot
+        const hasTestChat = data.some(c => c.buyer_id === supabaseUser.id && c.seller_id === supabaseUser.id);
+        if (!hasTestChat && canUseBot) {
+          mappedChats.unshift({
+            id: 'bot-test-chat',
+            type: 'negocios',
+            name: 'Tú (Prueba del Bot General)',
+            avatar: 'https://ui-avatars.com/api/?name=Prueba&background=ff7300&color=fff',
+            online: true,
+            time: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
+            lastMessage: 'Envía un mensaje para probar tu bot general',
+            unread: 0,
+            dbChat: null
+          });
+        }
+
         setChats(mappedChats);
       }
     };
@@ -141,25 +161,46 @@ export default function MensajesPage() {
     }
 
     try {
+      let targetChatId = activeChatId;
+      let targetDbChat = activeChat?.dbChat;
+
+      // Handle the virtual test chat
+      if (activeChatId === 'bot-test-chat') {
+        const { data: newChat, error: createError } = await supabase.from('chats').insert({
+          buyer_id: supabaseUser.id,
+          seller_id: supabaseUser.id,
+          product_id: null
+        }).select().single();
+        
+        if (newChat) {
+          targetChatId = newChat.id;
+          targetDbChat = newChat;
+          setActiveChatId(newChat.id); // switch the active chat silently
+        } else {
+          console.error('Error creating test chat', createError);
+          return;
+        }
+      }
+
       await supabase.from('messages').insert({
-        chat_id: activeChatId,
+        chat_id: targetChatId,
         sender_id: supabaseUser.id,
         content: userText || null,
         attachment_url: attachmentUrl || null,
         attachment_type: attachmentType || null
       });
 
-      // Update chat updated_at and pause bot if seller is intervening
+      // Update chat updated_at and pause bot if seller is intervening (unless it's a test chat where they act as buyer)
       const updatePayload: any = { updated_at: new Date().toISOString() };
-      if (activeChat?.type === 'clientes') {
+      if (activeChat?.type === 'clientes' && activeChatId !== 'bot-test-chat') {
         updatePayload.bot_status = 'paused';
       }
       
-      await supabase.from('chats').update(updatePayload).eq('id', activeChatId);
+      await supabase.from('chats').update(updatePayload).eq('id', targetChatId);
       
       // Virtual Advisor Logic (Client side for now, only if I am a buyer talking to a seller)
       if (activeChat?.type === 'negocios' && userText && !attachmentUrl) {
-        triggerVirtualAdvisor(userText, optionContext);
+        triggerVirtualAdvisor(userText, optionContext, targetDbChat);
       }
     } catch(err) {
       console.error(err);
@@ -210,11 +251,12 @@ export default function MensajesPage() {
   };
 
   // --- VIRTUAL ADVISOR LOGIC ---
-  const triggerVirtualAdvisor = async (userText: string, optionContext?: any) => {
-    if (!activeChat || !activeChat.dbChat?.seller_id) return;
-    const sellerId = activeChat.dbChat.seller_id;
-    const productId = activeChat.dbChat.product_id;
-    const chatId = activeChat.dbChat.id;
+  const triggerVirtualAdvisor = async (userText: string, optionContext?: any, explicitDbChat?: any) => {
+    const dbChatToUse = explicitDbChat || activeChat?.dbChat;
+    if (!dbChatToUse || !dbChatToUse.seller_id) return;
+    const sellerId = dbChatToUse.seller_id;
+    const productId = dbChatToUse.product_id;
+    const chatId = dbChatToUse.id;
 
     try {
       // 1. Fetch Bot Settings (Only needed to check if bot is globally disabled, but we should probably check seller general settings)
