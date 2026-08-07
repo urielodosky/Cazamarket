@@ -25,6 +25,9 @@ export default function MensajesPage() {
   const [isLoadingChats, setIsLoadingChats] = useState(true);
   const [messages, setMessages] = useState<any[]>([]);
   const [isUploading, setIsUploading] = useState(false);
+  
+  // Custom modal state
+  const [chatToDelete, setChatToDelete] = useState<string | null>(null);
 
   const messagesEndRef = useRef<HTMLDivElement>(null);
   const fileInputRef = useRef<HTMLInputElement>(null);
@@ -421,15 +424,20 @@ export default function MensajesPage() {
   };
 
   const deleteChat = async (chatId: string) => {
-    const confirm = window.confirm('¿Seguro que deseas eliminar este chat de forma permanente?');
-    if (!confirm) return;
+    setChatToDelete(chatId);
+  };
+
+  const confirmDeleteChat = async () => {
+    if (!chatToDelete) return;
+    const chatId = chatToDelete;
     
-    const chatToDelete = chats.find(c => c.id === chatId);
-    const isTestChat = chatToDelete?.dbChat?.buyer_id === chatToDelete?.dbChat?.seller_id || chatId === 'bot-test-chat';
+    const chatToDeleteObj = chats.find(c => c.id === chatId);
+    const isTestChat = chatToDeleteObj?.dbChat?.buyer_id === chatToDeleteObj?.dbChat?.seller_id || chatId === 'bot-test-chat';
 
     if (isTestChat) {
       setMessages([]);
       await supabase.from('messages').delete().eq('chat_id', chatId);
+      setChatToDelete(null);
       return;
     }
 
@@ -438,6 +446,7 @@ export default function MensajesPage() {
     
     await supabase.from('messages').delete().eq('chat_id', chatId);
     await supabase.from('chats').delete().eq('id', chatId);
+    setChatToDelete(null);
   };
 
   // --- VIRTUAL ADVISOR LOGIC ---
@@ -629,16 +638,16 @@ export default function MensajesPage() {
                     <h4 style={{ margin: 0, fontSize: '1rem', color: 'var(--color-text-main)', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>{chat.name}</h4>
                     <div style={{ position: 'relative' }}>
                       <button onClick={(e) => { e.stopPropagation(); setOpenChatMenu(openChatMenu === chat.id ? null : chat.id); }} style={{ background: 'transparent', border: 'none', color: chat.isPinned ? 'var(--color-primary)' : 'var(--color-text-muted)', cursor: 'pointer', padding: '4px' }}>
-                        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><circle cx="12" cy="12" r="1"></circle><circle cx="12" cy="5" r="1"></circle><circle cx="12" cy="19" r="1"></circle></svg>
+                        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><circle cx="12" cy="12" r="1"></circle><circle cx="12" cy="5" r="1"></circle><circle cx="12" cy="19" r="1"></circle></svg>
                       </button>
                       {openChatMenu === chat.id && (
-                        <div style={{ position: 'absolute', right: 0, top: '100%', background: 'var(--color-bg, #1a1a1a)', border: '1px solid var(--color-border)', borderRadius: 'var(--radius-md)', padding: '4px', zIndex: 50, minWidth: '120px', boxShadow: '0 4px 12px rgba(0,0,0,0.2)' }}>
-                          <button onClick={(e) => { e.stopPropagation(); togglePinChat(chat); setOpenChatMenu(null); }} style={{ display: 'flex', alignItems: 'center', gap: '8px', width: '100%', textAlign: 'left', background: 'transparent', border: 'none', padding: '8px 12px', color: 'var(--color-text-main)', cursor: 'pointer', fontSize: '0.85rem' }}>
-                            <svg width="14" height="14" viewBox="0 0 24 24" fill={chat.isPinned ? "currentColor" : "none"} stroke="currentColor" strokeWidth="2"><line x1="12" y1="17" x2="12" y2="22"></line><path d="M5 17h14v-1.76a2 2 0 0 0-1.11-1.79l-1.78-.9A2 2 0 0 1 15 10.76V6h1a2 2 0 0 0 0-4H8a2 2 0 0 0 0 4h1v4.76a2 2 0 0 1-1.11 1.79l-1.78.9A2 2 0 0 0 5 15.24Z"></path></svg>
-                            {chat.isPinned ? "Desfijar" : "Fijar chat"}
+                        <div className="chat-dropdown-menu">
+                          <button className="chat-dropdown-item" onClick={(e) => { e.stopPropagation(); togglePinChat(chat); setOpenChatMenu(null); }}>
+                            <svg width="16" height="16" viewBox="0 0 24 24" fill={chat.isPinned ? "currentColor" : "none"} stroke="currentColor" strokeWidth="2"><line x1="12" y1="17" x2="12" y2="22"></line><path d="M5 17h14v-1.76a2 2 0 0 0-1.11-1.79l-1.78-.9A2 2 0 0 1 15 10.76V6h1a2 2 0 0 0 0-4H8a2 2 0 0 0 0 4h1v4.76a2 2 0 0 1-1.11 1.79l-1.78.9A2 2 0 0 0 5 15.24Z"></path></svg>
+                            {chat.isPinned ? "Desfijar chat" : "Fijar chat"}
                           </button>
-                          <button onClick={(e) => { e.stopPropagation(); deleteChat(chat.id); setOpenChatMenu(null); }} style={{ display: 'flex', alignItems: 'center', gap: '8px', width: '100%', textAlign: 'left', background: 'transparent', border: 'none', padding: '8px 12px', color: 'var(--color-danger, #ff4444)', cursor: 'pointer', fontSize: '0.85rem' }}>
-                            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><polyline points="3 6 5 6 21 6"></polyline><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path></svg>
+                          <button className="chat-dropdown-item danger" onClick={(e) => { e.stopPropagation(); deleteChat(chat.id); setOpenChatMenu(null); }}>
+                            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><polyline points="3 6 5 6 21 6"></polyline><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path></svg>
                             Eliminar chat
                           </button>
                         </div>
@@ -767,21 +776,21 @@ export default function MensajesPage() {
                           </button>
                         </div>
                         {openMessageMenu === msg.id && (
-                          <div style={{ position: 'absolute', right: isMe ? 0 : 'auto', left: isMe ? 'auto' : 0, top: '100%', background: 'var(--color-bg, #1a1a1a)', border: '1px solid var(--color-border)', borderRadius: 'var(--radius-md)', padding: '4px', zIndex: 50, minWidth: '160px', boxShadow: '0 4px 12px rgba(0,0,0,0.2)' }}>
+                          <div className="chat-dropdown-menu" style={{ right: isMe ? 0 : 'auto', left: isMe ? 'auto' : 0, top: '100%' }}>
                             {!msg.is_deleted && (
-                              <button onClick={(e) => { e.stopPropagation(); togglePinMessage(msg); setOpenMessageMenu(null); }} style={{ display: 'flex', alignItems: 'center', gap: '8px', width: '100%', textAlign: 'left', background: 'transparent', border: 'none', padding: '8px 12px', color: 'var(--color-text-main)', cursor: 'pointer', fontSize: '0.85rem' }}>
-                                <svg width="14" height="14" viewBox="0 0 24 24" fill={msg.is_pinned ? "currentColor" : "none"} stroke="currentColor" strokeWidth="2"><line x1="12" y1="17" x2="12" y2="22"></line><path d="M5 17h14v-1.76a2 2 0 0 0-1.11-1.79l-1.78-.9A2 2 0 0 1 15 10.76V6h1a2 2 0 0 0 0-4H8a2 2 0 0 0 0 4h1v4.76a2 2 0 0 1-1.11 1.79l-1.78.9A2 2 0 0 0 5 15.24Z"></path></svg>
+                              <button className="chat-dropdown-item" onClick={(e) => { e.stopPropagation(); togglePinMessage(msg); setOpenMessageMenu(null); }}>
+                                <svg width="16" height="16" viewBox="0 0 24 24" fill={msg.is_pinned ? "currentColor" : "none"} stroke="currentColor" strokeWidth="2"><line x1="12" y1="17" x2="12" y2="22"></line><path d="M5 17h14v-1.76a2 2 0 0 0-1.11-1.79l-1.78-.9A2 2 0 0 1 15 10.76V6h1a2 2 0 0 0 0-4H8a2 2 0 0 0 0 4h1v4.76a2 2 0 0 1-1.11 1.79l-1.78.9A2 2 0 0 0 5 15.24Z"></path></svg>
                                 {msg.is_pinned ? "Desfijar mensaje" : "Fijar mensaje"}
                               </button>
                             )}
                             {!msg.is_deleted && isMe && (
-                              <button onClick={(e) => { e.stopPropagation(); deleteMessage(msg.id); setOpenMessageMenu(null); }} style={{ display: 'flex', alignItems: 'center', gap: '8px', width: '100%', textAlign: 'left', background: 'transparent', border: 'none', padding: '8px 12px', color: 'var(--color-danger, #ff4444)', cursor: 'pointer', fontSize: '0.85rem' }}>
-                                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><polyline points="3 6 5 6 21 6"></polyline><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path></svg>
+                              <button className="chat-dropdown-item danger" onClick={(e) => { e.stopPropagation(); deleteMessage(msg.id); setOpenMessageMenu(null); }}>
+                                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><polyline points="3 6 5 6 21 6"></polyline><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path></svg>
                                 Eliminar para todos
                               </button>
                             )}
-                            <button onClick={(e) => { e.stopPropagation(); hardDeleteMessage(msg.id); setOpenMessageMenu(null); }} style={{ display: 'flex', alignItems: 'center', gap: '8px', width: '100%', textAlign: 'left', background: 'transparent', border: 'none', padding: '8px 12px', color: 'var(--color-danger, #ff4444)', cursor: 'pointer', fontSize: '0.85rem' }}>
-                              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg>
+                            <button className="chat-dropdown-item danger" onClick={(e) => { e.stopPropagation(); hardDeleteMessage(msg.id); setOpenMessageMenu(null); }}>
+                              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg>
                               Borrar para mí
                             </button>
                           </div>
@@ -867,6 +876,33 @@ export default function MensajesPage() {
       <style dangerouslySetInnerHTML={{__html: `
         @keyframes spin { 100% { transform: rotate(360deg); } }
       `}} />
+
+      {/* Delete Chat Modal */}
+      {chatToDelete && (
+        <div className="custom-modal-overlay" onClick={() => setChatToDelete(null)}>
+          <div className="custom-modal-content" onClick={e => e.stopPropagation()}>
+            <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="var(--color-danger, #ff4444)" strokeWidth="1.5" style={{ margin: '0 auto' }}>
+              <path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"></path>
+              <line x1="12" y1="9" x2="12" y2="13"></line>
+              <line x1="12" y1="17" x2="12.01" y2="17"></line>
+            </svg>
+            <h3 className="custom-modal-title">¿Eliminar chat?</h3>
+            <p className="custom-modal-desc">
+              {chats.find(c => c.id === chatToDelete)?.dbChat?.buyer_id === chats.find(c => c.id === chatToDelete)?.dbChat?.seller_id || chatToDelete === 'bot-test-chat'
+                ? '¿Estás seguro que deseas vaciar el historial de mensajes de este chat de prueba? Esta acción no se puede deshacer.'
+                : '¿Seguro que deseas eliminar este chat de forma permanente? Se perderán todos los mensajes. Esta acción no se puede deshacer.'}
+            </p>
+            <div className="custom-modal-actions">
+              <button className="custom-modal-btn custom-modal-btn-cancel" onClick={() => setChatToDelete(null)}>
+                Cancelar
+              </button>
+              <button className="custom-modal-btn custom-modal-btn-confirm" onClick={confirmDeleteChat}>
+                Eliminar chat
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 }
