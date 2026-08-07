@@ -139,6 +139,7 @@ export default function VirtualAdvisorModal({ onClose, productId }: VirtualAdvis
   const [inheritGeneral, setInheritGeneral] = useState(true);
   const [retargetingDays, setRetargetingDays] = useState<number | ''>('');
   const [retargetingMessage, setRetargetingMessage] = useState('');
+  const [saveSuccess, setSaveSuccess] = useState(false);
   
   // Form State
   const [conditionType, setConditionType] = useState<'exact' | 'keyword' | 'always'>('exact');
@@ -228,7 +229,8 @@ export default function VirtualAdvisorModal({ onClose, productId }: VirtualAdvis
         retargeting_message: retargetingMessage || null
       };
       await supabase.from('bot_settings').upsert(payload, { onConflict: 'seller_id,product_id' });
-      alert('Configuración global guardada.');
+      setSaveSuccess(true);
+      setTimeout(() => setSaveSuccess(false), 3000);
     } catch(e) { console.error(e); }
   };
 
@@ -328,7 +330,10 @@ export default function VirtualAdvisorModal({ onClose, productId }: VirtualAdvis
                   </div>
                 </div>
 
-                <button onClick={saveSettings} style={{ background: 'var(--color-primary)', color: '#fff', border: 'none', padding: '8px 16px', borderRadius: '4px', cursor: 'pointer', fontWeight: 600 }}>Guardar Ajustes Globales</button>
+                <div style={{ display: 'flex', alignItems: 'center', gap: '16px' }}>
+                  <button onClick={saveSettings} style={{ background: 'var(--color-primary)', color: '#fff', border: 'none', padding: '8px 16px', borderRadius: '4px', cursor: 'pointer', fontWeight: 600 }}>Guardar Ajustes Globales</button>
+                  {saveSuccess && <span style={{ color: '#4caf50', fontWeight: 500, fontSize: '0.9rem' }}>¡Guardado correctamente!</span>}
+                </div>
               </div>
 
               {!isAdding ? (
