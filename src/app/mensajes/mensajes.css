@@ -49,7 +49,10 @@
   }
 
   .nested-options-container {
-    padding-left: 8px !important;
+    padding-left: 0 !important;
+    border-left: none !important;
+    border-top: 2px dashed var(--color-primary);
+    padding-top: 16px;
   }
 
   .nested-option-node {
