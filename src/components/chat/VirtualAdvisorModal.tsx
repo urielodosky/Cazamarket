@@ -432,7 +432,7 @@ export default function VirtualAdvisorModal({ onClose, productId }: VirtualAdvis
                       <div style={{ background: 'rgba(255, 115, 0, 0.05)', padding: '16px', borderRadius: '8px', border: '1px solid rgba(255, 115, 0, 0.2)' }}>
                         <h4 style={{ margin: '0 0 12px 0', color: 'var(--color-primary)' }}>Configuración de Reactivación y Cooldown</h4>
                         <div style={{ display: 'flex', alignItems: 'center', gap: '12px', marginBottom: '16px' }}>
-                          <input type="checkbox" id="fireOnceCheck" checked={fireOnce} onChange={e => setFireOnce(e.target.checked)} />
+                          <input type="checkbox" id="fireOnceCheck" checked={fireOnce} onChange={e => setFireOnce(e.target.checked)} style={{ width: '20px', height: '20px', cursor: 'pointer', margin: 0, flexShrink: 0 }} />
                           <label htmlFor="fireOnceCheck" style={{ color: themeColors.textWhite }}>Disparar SOLO una vez y no volver a molestar</label>
                         </div>
                         
