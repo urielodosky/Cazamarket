@@ -501,7 +501,9 @@ export default function MensajesPage() {
             sender_id: sellerId,
             content: responseText,
             attachment_url: matchedRule.attachment_url || null,
-            attachment_type: matchedRule.attachment_type || null
+            attachment_type: matchedRule.attachment_type || null,
+            is_bot: true,
+            bot_options: matchedRule.options || null
           });
 
           // Update chat tracking
@@ -678,7 +680,7 @@ export default function MensajesPage() {
               {/* Messages Area */}
               <div style={{ flex: 1, padding: '24px 24px 120px 24px', overflowY: 'auto', display: 'flex', flexDirection: 'column', gap: '16px' }}>
                 {messages.map((msg: any) => {
-                  const isMe = msg.sender_id === supabaseUser?.id;
+                  const isMe = activeChatId === 'bot-test-chat' ? !msg.is_bot : msg.sender_id === supabaseUser?.id;
                   return (
                     <div key={msg.id} className="message-item-container" style={{ display: 'flex', flexDirection: 'column', alignItems: isMe ? 'flex-end' : 'flex-start', position: 'relative', maxWidth: '100%' }}>
                       <div style={{ display: 'flex', alignItems: 'center', gap: '8px', flexDirection: isMe ? 'row-reverse' : 'row', maxWidth: '100%', position: 'relative' }}>
@@ -713,6 +715,40 @@ export default function MensajesPage() {
                                 <span>Ver Documento Adjunto</span>
                               </a>
                             )}
+                          </div>
+                        )}
+                          </div>
+                        )}
+                        
+                        {/* Bot Options Rendering */}
+                        {msg.bot_options && msg.bot_options.length > 0 && (
+                          <div style={{ marginTop: '12px', display: 'flex', flexDirection: 'column', gap: '8px', width: '100%' }}>
+                            {msg.bot_options.map((opt: any) => (
+                              <button
+                                key={opt.id}
+                                onClick={(e) => {
+                                  e.stopPropagation();
+                                  handleSendMessage(opt.label);
+                                }}
+                                style={{
+                                  background: 'var(--color-bg, #1a1a1a)',
+                                  color: 'var(--color-primary)',
+                                  border: '1px solid var(--color-primary)',
+                                  padding: '10px 16px',
+                                  borderRadius: 'var(--radius-full)',
+                                  cursor: 'pointer',
+                                  fontWeight: 600,
+                                  fontSize: '0.9rem',
+                                  textAlign: 'center',
+                                  transition: 'all 0.2s ease',
+                                  width: '100%'
+                                }}
+                                onMouseEnter={e => { e.currentTarget.style.background = 'var(--color-primary)'; e.currentTarget.style.color = '#fff'; }}
+                                onMouseLeave={e => { e.currentTarget.style.background = 'var(--color-bg, #1a1a1a)'; e.currentTarget.style.color = 'var(--color-primary)'; }}
+                              >
+                                {opt.label}
+                              </button>
+                            ))}
                           </div>
                         )}
                           </div>
