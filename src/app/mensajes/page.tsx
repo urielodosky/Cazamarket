@@ -149,8 +149,13 @@ export default function MensajesPage() {
         attachment_type: attachmentType || null
       });
 
-      // Update chat updated_at
-      await supabase.from('chats').update({ updated_at: new Date().toISOString() }).eq('id', activeChatId);
+      // Update chat updated_at and pause bot if seller is intervening
+      const updatePayload: any = { updated_at: new Date().toISOString() };
+      if (activeChat?.type === 'clientes') {
+        updatePayload.bot_status = 'paused';
+      }
+      
+      await supabase.from('chats').update(updatePayload).eq('id', activeChatId);
       
       // Virtual Advisor Logic (Client side for now, only if I am a buyer talking to a seller)
       if (activeChat?.type === 'negocios' && userText && !attachmentUrl) {

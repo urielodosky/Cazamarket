@@ -19,91 +19,110 @@ export async function GET(request: Request) {
   try {
     console.log('Running Bot Retargeting Cron Job...');
 
-    // 1. Fetch all bot settings that have retargeting enabled
+    // 1. Fetch all active bot settings
     const { data: settings, error: settingsError } = await supabase
       .from('bot_settings')
       .select('*')
-      .not('retargeting_days', 'is', null)
-      .not('retargeting_message', 'is', null)
       .eq('is_active', true);
 
     if (settingsError || !settings) {
       throw new Error(settingsError?.message || 'Error fetching settings');
     }
 
-    let processedCount = 0;
+    let retargetingCount = 0;
+    let reactivationCount = 0;
 
-    // 2. Iterate through settings and check their corresponding chats
+    // 2. Iterate through settings and process Reactivation and Retargeting
     for (const setting of settings) {
-      const hours = setting.retargeting_days; // DB column is named days but we treat it as hours now
-      if (!hours) continue;
+      // --- SILENT REACTIVATION ---
+      if (setting.bot_reactivation_hours) {
+        const reactThreshold = new Date();
+        reactThreshold.setHours(reactThreshold.getHours() - setting.bot_reactivation_hours);
 
-      // Calculate the threshold date
-      const thresholdDate = new Date();
-      thresholdDate.setHours(thresholdDate.getHours() - hours);
+        let reactQuery = supabase
+          .from('chats')
+          .select('id, updated_at')
+          .eq('seller_id', setting.seller_id)
+          .eq('bot_status', 'paused')
+          .lt('updated_at', reactThreshold.toISOString());
 
-      // Fetch chats for this seller (and specific product if applicable)
-      // that haven't been updated since the threshold date.
-      let chatQuery = supabase
-        .from('chats')
-        .select('id, updated_at, seller_id')
-        .eq('seller_id', setting.seller_id)
-        .lt('updated_at', thresholdDate.toISOString());
+        if (setting.product_id) reactQuery = reactQuery.eq('product_id', setting.product_id);
+        else reactQuery = reactQuery.is('product_id', null);
 
-      if (setting.product_id) {
-        chatQuery = chatQuery.eq('product_id', setting.product_id);
-      } else {
-        chatQuery = chatQuery.is('product_id', null);
-      }
+        const { data: chatsToReactivate } = await reactQuery;
 
-      const { data: inactiveChats, error: chatsError } = await chatQuery;
-      
-      if (chatsError || !inactiveChats) {
-        console.error(`Error fetching chats for setting ${setting.id}:`, chatsError);
-        continue;
-      }
-
-      for (const chat of inactiveChats) {
-        // Double check who sent the last message to avoid spamming
-        // If the last message was already sent by the seller (e.g. previous retargeting), skip.
-        const { data: lastMessage } = await supabase
-          .from('messages')
-          .select('sender_id')
-          .eq('chat_id', chat.id)
-          .order('created_at', { ascending: false })
-          .limit(1)
-          .single();
-
-        if (lastMessage && lastMessage.sender_id === chat.seller_id) {
-          // Seller already had the last word, don't spam
-          continue;
+        if (chatsToReactivate && chatsToReactivate.length > 0) {
+          for (const chat of chatsToReactivate) {
+            await supabase.from('chats').update({
+              bot_status: 'active',
+              bot_cooldown_until: null,
+              bot_waiting_for_user: false,
+              bot_fired_once: false // Reset fire once so it can trigger from scratch
+            }).eq('id', chat.id);
+            reactivationCount++;
+          }
         }
+      }
 
-        // Insert retargeting message
-        await supabase.from('messages').insert({
-          chat_id: chat.id,
-          sender_id: setting.seller_id,
-          content: setting.retargeting_message,
-          attachment_url: null,
-          attachment_type: null
-        });
+      // --- RETARGETING ---
+      if (setting.retargeting_days && setting.retargeting_message) {
+        const hours = setting.retargeting_days; 
+        const thresholdDate = new Date();
+        thresholdDate.setHours(thresholdDate.getHours() - hours);
 
-        // Reset Bot Status for this chat (so it can listen to rules again)
-        await supabase.from('chats').update({
-          bot_status: 'active',
-          bot_cooldown_until: null,
-          bot_waiting_for_user: false,
-          bot_fired_once: false, // Reset fire once so it can trigger again
-          updated_at: new Date().toISOString()
-        }).eq('id', chat.id);
+        let chatQuery = supabase
+          .from('chats')
+          .select('id, updated_at, seller_id')
+          .eq('seller_id', setting.seller_id)
+          .lt('updated_at', thresholdDate.toISOString());
 
-        processedCount++;
+        if (setting.product_id) chatQuery = chatQuery.eq('product_id', setting.product_id);
+        else chatQuery = chatQuery.is('product_id', null);
+
+        const { data: inactiveChats } = await chatQuery;
+        
+        if (inactiveChats) {
+          for (const chat of inactiveChats) {
+            // Check if seller had the last word
+            const { data: lastMessage } = await supabase
+              .from('messages')
+              .select('sender_id')
+              .eq('chat_id', chat.id)
+              .order('created_at', { ascending: false })
+              .limit(1)
+              .single();
+
+            if (lastMessage && lastMessage.sender_id === chat.seller_id) {
+              continue; // Seller already spoke last
+            }
+
+            // Insert retargeting message
+            await supabase.from('messages').insert({
+              chat_id: chat.id,
+              sender_id: setting.seller_id,
+              content: setting.retargeting_message,
+              attachment_url: null,
+              attachment_type: null
+            });
+
+            // Update chat to trigger updated_at and reset bot status
+            await supabase.from('chats').update({
+              bot_status: 'active',
+              bot_cooldown_until: null,
+              bot_waiting_for_user: false,
+              bot_fired_once: false,
+              updated_at: new Date().toISOString()
+            }).eq('id', chat.id);
+
+            retargetingCount++;
+          }
+        }
       }
     }
 
     return NextResponse.json({ 
       success: true, 
-      message: `Retargeting cron completed. Messages sent: ${processedCount}` 
+      message: `Cron completed. Reactivations: ${reactivationCount}, Retargeting messages sent: ${retargetingCount}` 
     });
 
   } catch (error: any) {
