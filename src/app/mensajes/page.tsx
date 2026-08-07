@@ -22,6 +22,7 @@ export default function MensajesPage() {
   const [messageInput, setMessageInput] = useState('');
   
   const [chats, setChats] = useState<any[]>([]);
+  const [isLoadingChats, setIsLoadingChats] = useState(true);
   const [messages, setMessages] = useState<any[]>([]);
   const [isUploading, setIsUploading] = useState(false);
 
@@ -33,6 +34,7 @@ export default function MensajesPage() {
     if (!supabaseUser) return;
 
     const fetchChats = async () => {
+      setIsLoadingChats(true);
       // In a real app we'd join with profiles to get names and avatars.
       // We will do a basic fetch for now.
       const { data, error } = await supabase
@@ -98,6 +100,7 @@ export default function MensajesPage() {
 
         setChats(mappedChats);
       }
+      setIsLoadingChats(false);
     };
 
     fetchChats();
@@ -464,14 +467,26 @@ export default function MensajesPage() {
 
           {/* Chat List */}
           <div style={{ flex: 1, overflowY: 'auto', padding: '12px' }}>
-            {currentChats.length === 0 && (
+            {isLoadingChats ? (
+              <div style={{ display: 'flex', flexDirection: 'column', gap: '12px' }}>
+                {[1, 2, 3, 4].map(i => (
+                  <div key={i} style={{ display: 'flex', alignItems: 'center', gap: '14px', padding: '14px', borderRadius: 'var(--radius-lg)', background: 'rgba(255,255,255,0.03)', animation: 'pulse 1.5s infinite ease-in-out' }}>
+                    <div style={{ width: '48px', height: '48px', borderRadius: '50%', background: 'rgba(255,255,255,0.05)', flexShrink: 0 }} />
+                    <div style={{ flex: 1 }}>
+                      <div style={{ width: '60%', height: '14px', borderRadius: '4px', background: 'rgba(255,255,255,0.05)', marginBottom: '8px' }} />
+                      <div style={{ width: '40%', height: '10px', borderRadius: '4px', background: 'rgba(255,255,255,0.03)' }} />
+                    </div>
+                  </div>
+                ))}
+              </div>
+            ) : currentChats.length === 0 ? (
               <div style={{ padding: '24px', textAlign: 'center', color: 'var(--color-text-muted)', fontSize: '0.9rem' }}>
                 No tienes mensajes en esta sección.
               </div>
-            )}
-            {currentChats.map(chat => (
-              <div 
-                key={chat.id}
+            ) : (
+              currentChats.map(chat => (
+                <div 
+                  key={chat.id}
                 onClick={() => setActiveChatId(chat.id)}
                 style={{ 
                   display: 'flex', alignItems: 'center', gap: '14px', padding: '14px', cursor: 'pointer', 
