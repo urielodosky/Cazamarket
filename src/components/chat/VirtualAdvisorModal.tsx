@@ -182,7 +182,7 @@ export default function VirtualAdvisorModal({ onClose, productId }: VirtualAdvis
       if (productId) query = query.eq('product_id', productId);
       else query = query.is('product_id', null);
       
-      const { data: settingsData } = await query.single();
+      const { data: settingsData } = await query.maybeSingle();
       if (settingsData) {
         setInheritGeneral(settingsData.inherit_general);
         setRetargetingDays(settingsData.retargeting_days || '');
@@ -320,11 +320,11 @@ export default function VirtualAdvisorModal({ onClose, productId }: VirtualAdvis
                 )}
                 
                 <div style={{ marginBottom: '16px' }}>
-                  <label style={{ display: 'block', marginBottom: '8px', color: 'var(--color-text-muted)' }}>Retargeting Automático (Días de Inactividad)</label>
-                  <p style={{ fontSize: '0.8rem', color: 'var(--color-text-muted)', marginBottom: '8px', lineHeight: 1.4 }}>Si el cliente deja de hablar durante X días, el bot enviará automáticamente este mensaje. ¡Perfecto para revivir leads caídos!</p>
-                  <div style={{ display: 'flex', gap: '12px', alignItems: 'flex-start' }}>
-                    <input type="number" min="1" value={retargetingDays} onChange={e => setRetargetingDays(Number(e.target.value) || '')} placeholder="Días (Ej: 1)" style={{ width: '120px', padding: '10px', background: themeColors.bgSubtle3, color: themeColors.textWhite, border: '1px solid var(--color-border)', borderRadius: '4px', outline: 'none' }} />
-                    <input type="text" value={retargetingMessage} onChange={e => setRetargetingMessage(e.target.value)} placeholder="Ej: ¡Hola! ¿Aún sigues interesado en nuestros productos?" style={{ flex: 1, padding: '10px', background: themeColors.bgSubtle3, color: themeColors.textWhite, border: '1px solid var(--color-border)', borderRadius: '4px', outline: 'none' }} />
+                  <label style={{ display: 'block', marginBottom: '8px', color: 'var(--color-text-muted)' }}>Retargeting Automático (Horas de Inactividad)</label>
+                  <p style={{ fontSize: '0.8rem', color: 'var(--color-text-muted)', marginBottom: '8px', lineHeight: 1.4 }}>Si el cliente deja de hablar durante X horas, el bot enviará automáticamente este mensaje. ¡Perfecto para revivir leads caídos!</p>
+                  <div style={{ display: 'flex', gap: '12px', alignItems: 'flex-start', flexWrap: 'wrap' }}>
+                    <input type="number" min="1" value={retargetingDays} onChange={e => setRetargetingDays(Number(e.target.value) || '')} placeholder="Horas (Ej: 24)" style={{ width: '120px', padding: '10px', background: themeColors.bgSubtle3, color: themeColors.textWhite, border: '1px solid var(--color-border)', borderRadius: '4px', outline: 'none' }} />
+                    <input type="text" value={retargetingMessage} onChange={e => setRetargetingMessage(e.target.value)} placeholder="Ej: ¡Hola! ¿Aún sigues interesado en nuestros productos?" style={{ flex: '1 1 200px', padding: '10px', background: themeColors.bgSubtle3, color: themeColors.textWhite, border: '1px solid var(--color-border)', borderRadius: '4px', outline: 'none' }} />
                   </div>
                 </div>
 

@@ -35,12 +35,12 @@ export async function GET(request: Request) {
 
     // 2. Iterate through settings and check their corresponding chats
     for (const setting of settings) {
-      const days = setting.retargeting_days;
-      if (!days) continue;
+      const hours = setting.retargeting_days; // DB column is named days but we treat it as hours now
+      if (!hours) continue;
 
       // Calculate the threshold date
       const thresholdDate = new Date();
-      thresholdDate.setDate(thresholdDate.getDate() - days);
+      thresholdDate.setHours(thresholdDate.getHours() - hours);
 
       // Fetch chats for this seller (and specific product if applicable)
       // that haven't been updated since the threshold date.
