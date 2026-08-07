@@ -150,6 +150,8 @@ export default function VirtualAdvisorModal({ onClose, productId }: VirtualAdvis
   const [reactivationText, setReactivationText] = useState('');
   const [options, setOptions] = useState<AdvisorOption[]>([]);
   const [fileName, setFileName] = useState('');
+  const [attachmentFile, setAttachmentFile] = useState<File | null>(null);
+  const [isUploading, setIsUploading] = useState(false);
   const [whatsappText, setWhatsappText] = useState('');
   const [gotoId, setGotoId] = useState('');
   const [cooldownHours, setCooldownHours] = useState<number | ''>('');
@@ -247,6 +249,43 @@ export default function VirtualAdvisorModal({ onClose, productId }: VirtualAdvis
 
     if (!supabaseUser) return;
 
+    let finalAttachmentUrl = null;
+    let finalAttachmentType = null;
+    let finalFileName = fileName;
+
+    if ((responseType === 'file' || responseType === 'file_options') && attachmentFile) {
+      setIsUploading(true);
+      try {
+        const fileExt = attachmentFile.name.split('.').pop();
+        const storageFileName = `bot_${supabaseUser.id}_${Date.now()}_${Math.random().toString(36).substring(7)}.${fileExt}`;
+        
+        let type = 'document';
+        if (attachmentFile.type.startsWith('image/')) type = 'image';
+        else if (attachmentFile.type.startsWith('video/')) type = 'video';
+        else if (attachmentFile.type.startsWith('audio/')) type = 'audio';
+
+        const { error: uploadError } = await supabase.storage
+          .from('chat_attachments')
+          .upload(storageFileName, attachmentFile, { upsert: false });
+
+        if (uploadError) {
+          alert('Error al subir el archivo: ' + uploadError.message);
+          setIsUploading(false);
+          return;
+        }
+
+        const { data: { publicUrl } } = supabase.storage.from('chat_attachments').getPublicUrl(storageFileName);
+        finalAttachmentUrl = publicUrl;
+        finalAttachmentType = type;
+        finalFileName = attachmentFile.name;
+      } catch (err) {
+        console.error(err);
+        setIsUploading(false);
+        return;
+      }
+      setIsUploading(false);
+    }
+
     const payload = {
       seller_id: supabaseUser.id,
       product_id: productId || null,
@@ -256,7 +295,9 @@ export default function VirtualAdvisorModal({ onClose, productId }: VirtualAdvis
       response_text: responseText.trim(),
       reactivation_text: reactivationText.trim() || null,
       options: (responseType === 'options' || responseType === 'file_options') ? options : null,
-      file_name: (responseType === 'file' || responseType === 'file_options') ? (fileName.trim() || 'documento.pdf') : null,
+      file_name: (responseType === 'file' || responseType === 'file_options') ? (finalFileName.trim() || 'documento') : null,
+      attachment_url: finalAttachmentUrl,
+      attachment_type: finalAttachmentType,
       whatsapp_text: responseType === 'whatsapp' ? (whatsappText.trim() || 'Hola') : null,
       goto_id: responseType === 'goto' ? gotoId : null,
       cooldown_hours: conditionType === 'always' && !fireOnce ? cooldownHours : null,
@@ -275,6 +316,8 @@ export default function VirtualAdvisorModal({ onClose, productId }: VirtualAdvis
         reactivationText: data.reactivation_text || '',
         options: data.options,
         fileName: data.file_name,
+        attachmentUrl: data.attachment_url,
+        attachmentType: data.attachment_type,
         whatsappText: data.whatsapp_text,
         gotoId: data.goto_id,
         cooldownHours: data.cooldown_hours,
@@ -479,9 +522,32 @@ export default function VirtualAdvisorModal({ onClose, productId }: VirtualAdvis
                     )}
 
                     {(responseType === 'file' || responseType === 'file_options') && (
-                      <div>
-                        <label style={{ display: 'block', marginBottom: '8px', color: 'var(--color-text-muted)' }}>Nombre del Archivo</label>
-                        <input type="text" value={fileName} onChange={e => setFileName(e.target.value)} style={{ width: '100%', padding: '10px', background: themeColors.bgSubtle3, color: themeColors.textWhite, border: '1px solid var(--color-border)', borderRadius: '4px', outline: 'none' }} />
+                      <div style={{ background: themeColors.bgSubtle3, padding: '16px', borderRadius: '8px', border: '1px dashed var(--color-primary)' }}>
+                        <label style={{ display: 'block', marginBottom: '8px', color: 'var(--color-primary)', fontWeight: 600 }}>Subir Archivo Adjunto</label>
+                        <p style={{ fontSize: '0.85rem', color: 'var(--color-text-muted)', marginBottom: '12px' }}>Selecciona el PDF, imagen o documento que el bot enviará.</p>
+                        
+                        <input 
+                          type="file" 
+                          onChange={e => {
+                            const file = e.target.files?.[0];
+                            if (file) {
+                              setAttachmentFile(file);
+                              setFileName(file.name);
+                            }
+                          }} 
+                          style={{ color: themeColors.textWhite, width: '100%' }} 
+                        />
+                        
+                        {fileName && !attachmentFile && (
+                          <div style={{ marginTop: '12px', fontSize: '0.85rem', color: 'var(--color-success, #4caf50)' }}>
+                            ✓ Archivo actual: {fileName} (Para cambiarlo, selecciona otro archivo)
+                          </div>
+                        )}
+                        {attachmentFile && (
+                          <div style={{ marginTop: '12px', fontSize: '0.85rem', color: 'var(--color-primary)' }}>
+                            Archivo listo para subir: {attachmentFile.name}
+                          </div>
+                        )}
                       </div>
                     )}
 
@@ -493,8 +559,10 @@ export default function VirtualAdvisorModal({ onClose, productId }: VirtualAdvis
                     )}
 
                     <div style={{ display: 'flex', gap: '12px', marginTop: '16px' }}>
-                      <button onClick={handleAddRule} style={{ flex: 1, background: 'var(--color-primary)', color: themeColors.textWhite, border: 'none', padding: '12px', borderRadius: 'var(--radius-sm)', cursor: 'pointer', fontWeight: 600 }}>Guardar Regla</button>
-                      <button onClick={() => setIsAdding(false)} style={{ flex: 1, background: themeColors.bgSubtle3, color: themeColors.textWhite, border: 'none', padding: '12px', borderRadius: 'var(--radius-sm)', cursor: 'pointer', fontWeight: 600 }}>Cancelar</button>
+                      <button onClick={handleAddRule} disabled={isUploading} style={{ flex: 1, background: 'var(--color-primary)', color: themeColors.textWhite, border: 'none', padding: '12px', borderRadius: 'var(--radius-sm)', cursor: isUploading ? 'not-allowed' : 'pointer', fontWeight: 600, opacity: isUploading ? 0.7 : 1 }}>
+                        {isUploading ? 'Subiendo archivo y guardando...' : 'Guardar Regla'}
+                      </button>
+                      <button onClick={() => setIsAdding(false)} disabled={isUploading} style={{ flex: 1, background: themeColors.bgSubtle3, color: themeColors.textWhite, border: 'none', padding: '12px', borderRadius: 'var(--radius-sm)', cursor: isUploading ? 'not-allowed' : 'pointer', fontWeight: 600 }}>Cancelar</button>
                     </div>
                   </div>
                 </div>

@@ -500,8 +500,8 @@ export default function MensajesPage() {
             chat_id: chatId,
             sender_id: sellerId,
             content: responseText,
-            attachment_url: null,
-            attachment_type: null
+            attachment_url: matchedRule.attachment_url || null,
+            attachment_type: matchedRule.attachment_type || null
           });
 
           // Update chat tracking
