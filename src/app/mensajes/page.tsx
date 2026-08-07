@@ -42,8 +42,19 @@ export default function MensajesPage() {
         .order('updated_at', { ascending: false });
 
       if (data) {
+        // Filter out duplicate test chats (keep only the newest)
+        let foundTestChat = false;
+        const filteredData = data.filter(c => {
+           if (c.buyer_id === supabaseUser.id && c.seller_id === supabaseUser.id) {
+             if (foundTestChat) return false;
+             foundTestChat = true;
+             return true;
+           }
+           return true;
+        });
+
         // Map data to UI expected format
-        const mappedChats = data.map(c => {
+        const mappedChats = filteredData.map(c => {
           const isTestChat = c.buyer_id === supabaseUser.id && c.seller_id === supabaseUser.id;
           const isBuyer = c.buyer_id === supabaseUser.id;
           const otherParty = isTestChat ? c.seller : (isBuyer ? c.seller : c.buyer);
@@ -70,7 +81,7 @@ export default function MensajesPage() {
         });
 
         // Inject a virtual test chat if it doesn't exist and user can use bot
-        const hasTestChat = data.some(c => c.buyer_id === supabaseUser.id && c.seller_id === supabaseUser.id);
+        const hasTestChat = filteredData.some(c => c.buyer_id === supabaseUser.id && c.seller_id === supabaseUser.id);
         if (!hasTestChat && canUseBot) {
           mappedChats.unshift({
             id: 'bot-test-chat',
@@ -99,18 +110,26 @@ export default function MensajesPage() {
   useEffect(() => {
     if (currentChats.length > 0) {
       if (typeof window !== 'undefined' && window.innerWidth > 768) {
-        setActiveChatId(currentChats[0].id);
+        // Only auto-select if we don't have an active chat in the current tab
+        if (!activeChatId || !currentChats.some(c => c.id === activeChatId)) {
+          setActiveChatId(currentChats[0].id);
+        }
       } else {
-        setActiveChatId(null);
+        if (!activeChatId || !currentChats.some(c => c.id === activeChatId)) {
+          setActiveChatId(null);
+        }
       }
     } else {
       setActiveChatId(null);
     }
+  // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [activeTab, chats.length]);
 
   // Fetch messages and subscribe to Realtime
   useEffect(() => {
     if (!activeChatId || !supabaseUser) return;
+    
+    setMessages([]); // Clear messages while fetching
 
     const fetchMessages = async () => {
       const { data } = await supabase
@@ -166,29 +185,69 @@ export default function MensajesPage() {
 
       // Handle the virtual test chat
       if (activeChatId === 'bot-test-chat') {
-        const { data: newChat, error: createError } = await supabase.from('chats').insert({
-          buyer_id: supabaseUser.id,
-          seller_id: supabaseUser.id,
-          product_id: null
-        }).select().single();
+        const { data: existingChat } = await supabase.from('chats')
+          .select('*')
+          .eq('buyer_id', supabaseUser.id)
+          .eq('seller_id', supabaseUser.id)
+          .is('product_id', null)
+          .order('created_at', { ascending: false })
+          .limit(1)
+          .single();
+
+        let newChat = existingChat;
+        if (!newChat) {
+          const { data: createdChat, error: createError } = await supabase.from('chats').insert({
+            buyer_id: supabaseUser.id,
+            seller_id: supabaseUser.id,
+            product_id: null
+          }).select().single();
+          if (createError) {
+            console.error('Error creating test chat', createError);
+            return;
+          }
+          newChat = createdChat;
+        }
         
         if (newChat) {
           targetChatId = newChat.id;
           targetDbChat = newChat;
+          
+          // Add the real chat to the state and remove the dummy one
+          setChats(prev => {
+            if (prev.some(c => c.id === newChat.id)) return prev; // Already exists
+            const newMapped = {
+              id: newChat.id,
+              type: 'negocios',
+              name: 'Tú (Prueba del Bot General)',
+              avatar: 'https://ui-avatars.com/api/?name=Prueba&background=ff7300&color=fff',
+              online: true,
+              time: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
+              lastMessage: userText || 'Archivo enviado',
+              unread: 0,
+              dbChat: newChat
+            };
+            return [newMapped, ...prev.filter(c => c.id !== 'bot-test-chat')];
+          });
+          
           setActiveChatId(newChat.id); // switch the active chat silently
-        } else {
-          console.error('Error creating test chat', createError);
-          return;
         }
       }
 
-      await supabase.from('messages').insert({
+      const { data: insertedMsg } = await supabase.from('messages').insert({
         chat_id: targetChatId,
         sender_id: supabaseUser.id,
         content: userText || null,
         attachment_url: attachmentUrl || null,
         attachment_type: attachmentType || null
-      });
+      }).select().single();
+
+      // Optimistically append the message so it shows up instantly
+      if (insertedMsg) {
+        setMessages(prev => {
+           if (prev.some(m => m.id === insertedMsg.id)) return prev;
+           return [...prev, insertedMsg];
+        });
+      }
 
       // Update chat updated_at and pause bot if seller is intervening (unless it's a test chat where they act as buyer)
       const updatePayload: any = { updated_at: new Date().toISOString() };
