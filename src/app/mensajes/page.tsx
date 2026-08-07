@@ -69,6 +69,8 @@ export default function MensajesPage() {
             name = otherParty.store_name || `${otherParty.first_name || ''} ${otherParty.last_name || ''}`.trim() || 'Usuario';
           }
 
+          const isPinned = isBuyer ? c.pinned_by_buyer : c.pinned_by_seller;
+
           return {
             id: c.id,
             type: type,
@@ -78,8 +80,16 @@ export default function MensajesPage() {
             time: new Date(c.updated_at).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
             lastMessage: 'Abrir chat para ver mensajes',
             unread: 0,
-            dbChat: c
+            dbChat: c,
+            isPinned: isPinned
           };
+        });
+
+        // Sort mappedChats: pinned first, then by updated_at descending
+        mappedChats.sort((a, b) => {
+          if (a.isPinned && !b.isPinned) return -1;
+          if (!a.isPinned && b.isPinned) return 1;
+          return new Date(b.dbChat?.updated_at || 0).getTime() - new Date(a.dbChat?.updated_at || 0).getTime();
         });
 
         // Inject a virtual test chat if it doesn't exist and user can use bot
@@ -141,7 +151,22 @@ export default function MensajesPage() {
         .eq('chat_id', activeChatId)
         .order('created_at', { ascending: true });
       
-      if (data) setMessages(data);
+      if (data) {
+        let unreadIds: string[] = [];
+        const messagesData = data.map(m => {
+          if (m.sender_id !== supabaseUser.id && m.status !== 'read') {
+             unreadIds.push(m.id);
+             return { ...m, status: 'read' };
+          }
+          return m;
+        });
+        
+        setMessages(messagesData);
+
+        if (unreadIds.length > 0) {
+           supabase.from('messages').update({ status: 'read' }).in('id', unreadIds).then();
+        }
+      }
     };
 
     fetchMessages();
@@ -156,8 +181,21 @@ export default function MensajesPage() {
       }, (payload) => {
         setMessages(prev => {
           if (prev.some(m => m.id === payload.new.id)) return prev;
-          return [...prev, payload.new];
+          const msg = { ...payload.new };
+          if (msg.sender_id !== supabaseUser.id && msg.status !== 'read') {
+             supabase.from('messages').update({ status: 'read' }).eq('id', msg.id).then();
+             msg.status = 'read';
+          }
+          return [...prev, msg];
         });
+      })
+      .on('postgres_changes', {
+        event: 'UPDATE',
+        schema: 'public',
+        table: 'messages',
+        filter: `chat_id=eq.${activeChatId}`
+      }, (payload) => {
+         setMessages(prev => prev.map(m => m.id === payload.new.id ? { ...m, ...payload.new } : m));
       })
       .subscribe();
 
@@ -313,6 +351,38 @@ export default function MensajesPage() {
 
     setIsUploading(false);
     if (fileInputRef.current) fileInputRef.current.value = '';
+  };
+
+  const deleteMessage = async (msgId: string) => {
+    setMessages(prev => prev.map(m => m.id === msgId ? { ...m, is_deleted: true } : m));
+    await supabase.from('messages').update({ is_deleted: true }).eq('id', msgId);
+  };
+
+  const togglePinMessage = async (msg: any) => {
+    const newStatus = !msg.is_pinned;
+    setMessages(prev => prev.map(m => m.id === msg.id ? { ...m, is_pinned: newStatus } : m));
+    await supabase.from('messages').update({ is_pinned: newStatus }).eq('id', msg.id);
+  };
+
+  const togglePinChat = async (chat: any) => {
+    if (!chat.dbChat || !supabaseUser) return;
+    const isBuyer = chat.dbChat.buyer_id === supabaseUser.id;
+    const updateField = isBuyer ? 'pinned_by_buyer' : 'pinned_by_seller';
+    const newStatus = !chat.isPinned;
+    
+    setChats(prev => {
+      const updated = prev.map(c => c.id === chat.id ? { ...c, isPinned: newStatus } : c);
+      updated.sort((a, b) => {
+        if (a.id === 'bot-test-chat') return -1;
+        if (b.id === 'bot-test-chat') return 1;
+        if (a.isPinned && !b.isPinned) return -1;
+        if (!a.isPinned && b.isPinned) return 1;
+        return new Date(b.dbChat?.updated_at || 0).getTime() - new Date(a.dbChat?.updated_at || 0).getTime();
+      });
+      return updated;
+    });
+
+    await supabase.from('chats').update({ [updateField]: newStatus }).eq('id', chat.id);
   };
 
   // --- VIRTUAL ADVISOR LOGIC ---
@@ -500,6 +570,9 @@ export default function MensajesPage() {
                 <div style={{ flex: 1, minWidth: 0 }}>
                   <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '4px' }}>
                     <h4 style={{ margin: 0, fontSize: '1rem', color: 'var(--color-text-main)', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>{chat.name}</h4>
+                    <button onClick={(e) => { e.stopPropagation(); togglePinChat(chat); }} style={{ background: 'transparent', border: 'none', color: chat.isPinned ? 'var(--color-primary)' : 'var(--color-text-muted)', cursor: 'pointer', padding: 0 }} title={chat.isPinned ? "Desfijar chat" : "Fijar chat"}>
+                      <svg width="16" height="16" viewBox="0 0 24 24" fill={chat.isPinned ? "currentColor" : "none"} stroke="currentColor" strokeWidth="2"><line x1="12" y1="17" x2="12" y2="22"></line><path d="M5 17h14v-1.76a2 2 0 0 0-1.11-1.79l-1.78-.9A2 2 0 0 1 15 10.76V6h1a2 2 0 0 0 0-4H8a2 2 0 0 0 0 4h1v4.76a2 2 0 0 1-1.11 1.79l-1.78.9A2 2 0 0 0 5 15.24Z"></path></svg>
+                    </button>
                   </div>
                   <p style={{ margin: 0, fontSize: '0.85rem', color: 'var(--color-text-muted)' }}>{chat.lastMessage}</p>
                 </div>
@@ -527,19 +600,41 @@ export default function MensajesPage() {
                   </div>
                 </div>
               </div>
+              </div>
+
+              {/* Pinned Message Banner */}
+              {(() => {
+                const pinnedMsg = messages.slice().reverse().find(m => m.is_pinned && !m.is_deleted);
+                if (!pinnedMsg) return null;
+                return (
+                  <div style={{ padding: '8px 24px', background: 'rgba(255,115,0,0.1)', borderBottom: '1px solid rgba(255,115,0,0.2)', display: 'flex', alignItems: 'center', gap: '12px' }}>
+                    <svg width="16" height="16" viewBox="0 0 24 24" fill="var(--color-primary)" stroke="var(--color-primary)" strokeWidth="2"><line x1="12" y1="17" x2="12" y2="22"></line><path d="M5 17h14v-1.76a2 2 0 0 0-1.11-1.79l-1.78-.9A2 2 0 0 1 15 10.76V6h1a2 2 0 0 0 0-4H8a2 2 0 0 0 0 4h1v4.76a2 2 0 0 1-1.11 1.79l-1.78.9A2 2 0 0 0 5 15.24Z"></path></svg>
+                    <div style={{ flex: 1, overflow: 'hidden', whiteSpace: 'nowrap', textOverflow: 'ellipsis', fontSize: '0.85rem', color: 'var(--color-text-main)' }}>
+                      {pinnedMsg.content || (pinnedMsg.attachment_type ? `Archivo ${pinnedMsg.attachment_type}` : 'Mensaje fijado')}
+                    </div>
+                  </div>
+                );
+              })()}
 
               {/* Messages Area */}
               <div style={{ flex: 1, padding: '24px', overflowY: 'auto', display: 'flex', flexDirection: 'column', gap: '16px' }}>
                 {messages.map((msg: any) => {
                   const isMe = msg.sender_id === supabaseUser?.id;
                   return (
-                    <div key={msg.id} style={{ display: 'flex', flexDirection: 'column', alignItems: isMe ? 'flex-end' : 'flex-start' }}>
-                      <div style={{ 
-                        maxWidth: '70%', padding: '12px 16px', borderRadius: 'var(--radius-lg)', 
-                        background: isMe ? 'var(--color-primary)' : 'rgba(255,255,255,0.05)', color: isMe ? '#fff' : 'var(--color-text-main)',
-                        borderBottomRightRadius: isMe ? '4px' : 'var(--radius-lg)', borderBottomLeftRadius: !isMe ? '4px' : 'var(--radius-lg)'
-                      }}>
-                        {msg.content && <p style={{ margin: 0, fontSize: '0.95rem', lineHeight: 1.4, wordBreak: 'break-word', whiteSpace: 'pre-wrap' }}>{msg.content}</p>}
+                    <div key={msg.id} className="message-item-container" style={{ display: 'flex', flexDirection: 'column', alignItems: isMe ? 'flex-end' : 'flex-start', position: 'relative' }}>
+                      <div style={{ display: 'flex', alignItems: 'center', gap: '8px', flexDirection: isMe ? 'row-reverse' : 'row' }}>
+                        {msg.is_deleted ? (
+                          <div style={{ padding: '12px 16px', borderRadius: 'var(--radius-lg)', background: 'rgba(255,255,255,0.05)', color: 'var(--color-text-muted)', fontStyle: 'italic', display: 'flex', alignItems: 'center', gap: '8px' }}>
+                            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><circle cx="12" cy="12" r="10"></circle><line x1="4.93" y1="4.93" x2="19.07" y2="19.07"></line></svg>
+                            Este mensaje fue eliminado
+                          </div>
+                        ) : (
+                          <div style={{ 
+                            maxWidth: '70vw', padding: '12px 16px', borderRadius: 'var(--radius-lg)', 
+                            background: isMe ? 'var(--color-primary)' : 'rgba(255,255,255,0.05)', color: isMe ? '#fff' : 'var(--color-text-main)',
+                            borderBottomRightRadius: isMe ? '4px' : 'var(--radius-lg)', borderBottomLeftRadius: !isMe ? '4px' : 'var(--radius-lg)'
+                          }}>
+                            {msg.content && <p style={{ margin: 0, fontSize: '0.95rem', lineHeight: 1.4, wordBreak: 'break-word', whiteSpace: 'pre-wrap' }}>{msg.content}</p>}
                         
                         {/* Attachments rendering */}
                         {msg.attachment_url && (
@@ -561,10 +656,32 @@ export default function MensajesPage() {
                             )}
                           </div>
                         )}
+                          </div>
+                        )}
+                        {!msg.is_deleted && (
+                          <div className="msg-actions-hover" style={{ display: 'flex', gap: '4px' }}>
+                            {isMe && (
+                              <button onClick={() => deleteMessage(msg.id)} style={{ background: 'transparent', border: 'none', color: 'var(--color-danger, #ff4444)', cursor: 'pointer', padding: '4px' }} title="Eliminar para todos">
+                                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><polyline points="3 6 5 6 21 6"></polyline><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path></svg>
+                              </button>
+                            )}
+                            <button onClick={() => togglePinMessage(msg)} style={{ background: 'transparent', border: 'none', color: msg.is_pinned ? 'var(--color-primary)' : 'var(--color-text-muted)', cursor: 'pointer', padding: '4px' }} title={msg.is_pinned ? "Desfijar mensaje" : "Fijar mensaje"}>
+                              <svg width="16" height="16" viewBox="0 0 24 24" fill={msg.is_pinned ? "currentColor" : "none"} stroke="currentColor" strokeWidth="2"><line x1="12" y1="17" x2="12" y2="22"></line><path d="M5 17h14v-1.76a2 2 0 0 0-1.11-1.79l-1.78-.9A2 2 0 0 1 15 10.76V6h1a2 2 0 0 0 0-4H8a2 2 0 0 0 0 4h1v4.76a2 2 0 0 1-1.11 1.79l-1.78.9A2 2 0 0 0 5 15.24Z"></path></svg>
+                            </button>
+                          </div>
+                        )}
                       </div>
-                      <span style={{ fontSize: '0.7rem', color: 'var(--color-text-muted)', marginTop: '4px' }}>
-                        {new Date(msg.created_at).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
-                      </span>
+                      <div style={{ display: 'flex', alignItems: 'center', gap: '4px', marginTop: '4px' }}>
+                        <span style={{ fontSize: '0.7rem', color: 'var(--color-text-muted)' }}>
+                          {new Date(msg.created_at).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
+                        </span>
+                        {isMe && !msg.is_deleted && (
+                           <span style={{ display: 'flex', color: msg.status === 'read' ? '#53bdeb' : 'var(--color-text-muted)' }}>
+                             {(msg.status === 'sent' || !msg.status) && <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><polyline points="20 6 9 17 4 12"></polyline></svg>}
+                             {(msg.status === 'delivered' || msg.status === 'read') && <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><polyline points="18 6 7 17 2 12"></polyline><polyline points="22 6 11 17 6 12"></polyline></svg>}
+                           </span>
+                        )}
+                      </div>
                     </div>
                   );
                 })}
