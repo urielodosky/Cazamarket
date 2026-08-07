@@ -217,36 +217,32 @@ export default function MensajesPage() {
     const chatId = activeChat.dbChat.id;
 
     try {
-      // 1. Fetch Bot Settings
-      let query = supabase.from('bot_settings').select('*').eq('seller_id', sellerId);
-      if (productId) query = query.eq('product_id', productId);
-      else query = query.is('product_id', null);
-      
-      const { data: settingsData } = await query.single();
+      // 1. Fetch Bot Settings (Only needed to check if bot is globally disabled, but we should probably check seller general settings)
+      const { data: settingsData } = await supabase.from('bot_settings').select('is_active').eq('seller_id', sellerId).is('product_id', null).single();
       const isActive = settingsData ? settingsData.is_active : true;
-      const inheritGeneral = settingsData ? settingsData.inherit_general : true;
 
       if (!isActive) return;
 
-      // 2. Fetch Rules
-      let rulesQuery = supabase.from('bot_rules').select('*').eq('seller_id', sellerId);
-      if (productId && !inheritGeneral) {
-        rulesQuery = rulesQuery.eq('product_id', productId);
-      } else if (productId && inheritGeneral) {
-        rulesQuery = rulesQuery.or(`product_id.eq.${productId},product_id.is.null`);
+      // 2. Fetch Rules: Specific Priority -> Fallback General
+      let rules: any[] = [];
+      
+      if (productId) {
+        // Try to fetch specific bot rules first
+        const { data: specificRules } = await supabase.from('bot_rules').select('*').eq('seller_id', sellerId).eq('product_id', productId);
+        if (specificRules && specificRules.length > 0) {
+          rules = specificRules;
+        } else {
+          // Fallback to general bot if no specific rules exist
+          const { data: generalRules } = await supabase.from('bot_rules').select('*').eq('seller_id', sellerId).is('product_id', null);
+          rules = generalRules || [];
+        }
       } else {
-        rulesQuery = rulesQuery.is('product_id', null);
+        // No product ID in chat, just fetch general bot
+        const { data: generalRules } = await supabase.from('bot_rules').select('*').eq('seller_id', sellerId).is('product_id', null);
+        rules = generalRules || [];
       }
 
-      const { data: rules } = await rulesQuery;
-      if (!rules || rules.length === 0) return;
-
-      // Prioritize product specific rules if any
-      const sortedRules = rules.sort((a: any, b: any) => {
-        if (a.product_id && !b.product_id) return -1;
-        if (!a.product_id && b.product_id) return 1;
-        return 0;
-      });
+      if (rules.length === 0) return;
 
       const normalizeText = (t: string) => t.normalize("NFD").replace(/[\u0300-\u036f]/g, "").toLowerCase();
       const normalizedUserText = normalizeText(userText);
@@ -255,11 +251,11 @@ export default function MensajesPage() {
       const { data: currentChat } = await supabase.from('chats').select('*').eq('id', chatId).single();
       if (!currentChat) return;
 
-      let matchedRule = sortedRules.find((r: any) => r.condition_type === 'exact' && normalizeText(r.condition_value) === normalizedUserText);
-      if (!matchedRule) matchedRule = sortedRules.find((r: any) => r.condition_type === 'keyword' && normalizedUserText.includes(normalizeText(r.condition_value)));
+      let matchedRule = rules.find((r: any) => r.condition_type === 'exact' && normalizeText(r.condition_value) === normalizedUserText);
+      if (!matchedRule) matchedRule = rules.find((r: any) => r.condition_type === 'keyword' && normalizedUserText.includes(normalizeText(r.condition_value)));
       if (!matchedRule) {
         // Evaluate Always rule only if not in cooldown and not fired once already if fire_once is true
-        const alwaysRules = sortedRules.filter((r: any) => r.condition_type === 'always');
+        const alwaysRules = rules.filter((r: any) => r.condition_type === 'always');
         for (const r of alwaysRules) {
           if (r.fire_once && currentChat.bot_fired_once) continue;
           if (r.cooldown_hours && currentChat.bot_cooldown_until && new Date(currentChat.bot_cooldown_until) > new Date()) continue;

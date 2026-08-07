@@ -136,7 +136,6 @@ export default function VirtualAdvisorModal({ onClose, productId }: VirtualAdvis
   const [isLoading, setIsLoading] = useState(true);
 
   // Settings state
-  const [inheritGeneral, setInheritGeneral] = useState(true);
   const [retargetingDays, setRetargetingDays] = useState<number | ''>('');
   const [retargetingMessage, setRetargetingMessage] = useState('');
   const [botReactivationHours, setBotReactivationHours] = useState<number | ''>('');
@@ -186,7 +185,6 @@ export default function VirtualAdvisorModal({ onClose, productId }: VirtualAdvis
       
       const { data: settingsData } = await query.maybeSingle();
       if (settingsData) {
-        setInheritGeneral(settingsData.inherit_general);
         setRetargetingDays(settingsData.retargeting_days || '');
         setRetargetingMessage(settingsData.retargeting_message || '');
         setBotReactivationHours(settingsData.bot_reactivation_hours || '');
@@ -226,7 +224,6 @@ export default function VirtualAdvisorModal({ onClose, productId }: VirtualAdvis
       const payload = {
         seller_id: supabaseUser.id,
         product_id: productId || null,
-        inherit_general: inheritGeneral,
         retargeting_days: retargetingDays === '' ? null : retargetingDays,
         retargeting_message: retargetingMessage || null,
         bot_reactivation_hours: botReactivationHours === '' ? null : botReactivationHours
@@ -316,13 +313,6 @@ export default function VirtualAdvisorModal({ onClose, productId }: VirtualAdvis
               {/* GLOBAL SETTINGS CARD */}
               <div style={{ background: themeColors.bgSubtle2, padding: '20px', borderRadius: 'var(--radius-md)', border: `1px solid var(--color-primary)` }}>
                 <h3 style={{ margin: '0 0 16px 0', color: 'var(--color-text-main)' }}>Configuración Avanzada</h3>
-                
-                {productId && (
-                  <div style={{ display: 'flex', alignItems: 'center', gap: '12px', marginBottom: '16px' }}>
-                    <input type="checkbox" id="inheritGen" checked={inheritGeneral} onChange={e => setInheritGeneral(e.target.checked)} />
-                    <label htmlFor="inheritGen" style={{ color: themeColors.textWhite }}>Heredar también reglas del Bot General (Si no coincide ninguna específica)</label>
-                  </div>
-                )}
 
                 <div style={{ marginBottom: '24px', padding: '16px', background: themeColors.bgSubtle3, borderRadius: 'var(--radius-sm)', border: '1px solid var(--color-border)' }}>
                   <h4 style={{ margin: '0 0 8px 0', color: 'var(--color-text-main)', fontSize: '0.95rem' }}>1. Pausa Automática (Predeterminado)</h4>
