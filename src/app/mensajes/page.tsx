@@ -467,7 +467,7 @@ export default function MensajesPage() {
 
       if (rules.length === 0) return;
 
-      const normalizeText = (t: string) => t.normalize("NFD").replace(/[\u0300-\u036f]/g, "").toLowerCase();
+      const normalizeText = (t: string) => t ? t.normalize("NFD").replace(/[\u0300-\u036f]/g, "").toLowerCase() : '';
       const normalizedUserText = normalizeText(userText);
       
       // Check Cooldown and Fire Once
