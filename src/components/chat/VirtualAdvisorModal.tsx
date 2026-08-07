@@ -524,30 +524,48 @@ export default function VirtualAdvisorModal({ onClose, productId }: VirtualAdvis
                     )}
 
                     {(responseType === 'file' || responseType === 'file_options') && (
-                      <div style={{ background: themeColors.bgSubtle3, padding: '16px', borderRadius: '8px', border: '1px dashed var(--color-primary)' }}>
-                        <label style={{ display: 'block', marginBottom: '8px', color: 'var(--color-primary)', fontWeight: 600 }}>Subir Archivo Adjunto</label>
-                        <p style={{ fontSize: '0.85rem', color: 'var(--color-text-muted)', marginBottom: '12px' }}>Selecciona el PDF, imagen o documento que el bot enviará.</p>
+                      <div style={{ background: themeColors.bgSubtle3, padding: '20px', borderRadius: '8px', border: '1px solid var(--color-border)' }}>
+                        <h4 style={{ margin: '0 0 16px 0', color: 'var(--color-text-main)' }}>Archivo Adjunto</h4>
                         
-                        <input 
-                          type="file" 
-                          onChange={e => {
-                            const file = e.target.files?.[0];
-                            if (file) {
-                              setAttachmentFile(file);
-                              setFileName(file.name);
-                            }
-                          }} 
-                          style={{ color: themeColors.textWhite, width: '100%' }} 
-                        />
+                        <div 
+                          style={{ position: 'relative', display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', padding: '24px', border: '2px dashed var(--color-primary)', borderRadius: 'var(--radius-md)', background: 'rgba(255, 115, 0, 0.05)', cursor: 'pointer', transition: 'all 0.2s ease' }}
+                          onDragOver={e => { e.preventDefault(); e.currentTarget.style.background = 'rgba(255, 115, 0, 0.1)'; }}
+                          onDragLeave={e => { e.currentTarget.style.background = 'rgba(255, 115, 0, 0.05)'; }}
+                          onDrop={e => { e.preventDefault(); e.currentTarget.style.background = 'rgba(255, 115, 0, 0.05)'; const file = e.dataTransfer.files?.[0]; if (file) { setAttachmentFile(file); setFileName(file.name); } }}
+                        >
+                          <input 
+                            type="file" 
+                            id="bot-file-upload"
+                            onChange={e => {
+                              const file = e.target.files?.[0];
+                              if (file) {
+                                setAttachmentFile(file);
+                                setFileName(file.name);
+                              }
+                            }} 
+                            style={{ position: 'absolute', top: 0, left: 0, width: '100%', height: '100%', opacity: 0, cursor: 'pointer' }} 
+                          />
+                          <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="var(--color-primary)" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" style={{ marginBottom: '12px' }}><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path><polyline points="17 8 12 3 7 8"></polyline><line x1="12" y1="3" x2="12" y2="15"></line></svg>
+                          <span style={{ color: 'var(--color-text-main)', fontWeight: 600, fontSize: '0.95rem' }}>Haz clic para subir o arrastra el archivo</span>
+                          <span style={{ color: 'var(--color-text-muted)', fontSize: '0.85rem', marginTop: '4px' }}>Soporta PDF, JPG, PNG, MP4, etc.</span>
+                        </div>
                         
-                        {fileName && !attachmentFile && (
-                          <div style={{ marginTop: '12px', fontSize: '0.85rem', color: 'var(--color-success, #4caf50)' }}>
-                            ✓ Archivo actual: {fileName} (Para cambiarlo, selecciona otro archivo)
-                          </div>
-                        )}
-                        {attachmentFile && (
-                          <div style={{ marginTop: '12px', fontSize: '0.85rem', color: 'var(--color-primary)' }}>
-                            Archivo listo para subir: {attachmentFile.name}
+                        {(fileName || attachmentFile) && (
+                          <div style={{ marginTop: '16px', display: 'flex', alignItems: 'center', gap: '12px', background: themeColors.bgSubtle2, padding: '12px', borderRadius: 'var(--radius-sm)', border: '1px solid var(--color-border)' }}>
+                            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="var(--color-success, #4caf50)" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path><polyline points="14 2 14 8 20 8"></polyline><line x1="16" y1="13" x2="8" y2="13"></line><line x1="16" y1="17" x2="8" y2="17"></line><polyline points="10 9 9 9 8 9"></polyline></svg>
+                            <div style={{ flex: 1, overflow: 'hidden' }}>
+                              <div style={{ color: 'var(--color-text-main)', fontWeight: 600, fontSize: '0.9rem', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>
+                                {attachmentFile ? attachmentFile.name : fileName}
+                              </div>
+                              <div style={{ color: 'var(--color-text-muted)', fontSize: '0.8rem' }}>
+                                {attachmentFile ? 'Listo para subirse' : 'Archivo actual guardado'}
+                              </div>
+                            </div>
+                            {attachmentFile && (
+                              <button onClick={() => { setAttachmentFile(null); setFileName(''); (document.getElementById('bot-file-upload') as HTMLInputElement).value = ''; }} style={{ background: 'transparent', border: 'none', color: 'var(--color-danger, #ff4444)', cursor: 'pointer', padding: '4px' }}>
+                                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg>
+                              </button>
+                            )}
                           </div>
                         )}
                       </div>
