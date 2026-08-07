@@ -33,6 +33,34 @@
     width: 100% !important;
   }
 
+  .virtual-advisor-overlay {
+    padding: 0 !important;
+  }
+
+  .virtual-advisor-modal {
+    border-radius: 0 !important;
+    height: 100vh !important;
+    max-height: 100vh !important;
+    border: none !important;
+  }
+
+  .virtual-advisor-content {
+    padding: 16px !important;
+  }
+
+  .nested-options-container {
+    padding-left: 8px !important;
+  }
+
+  .nested-option-node {
+    padding: 12px !important;
+  }
+
+  .nested-option-node > div:first-child {
+    flex-wrap: wrap;
+    gap: 12px;
+  }
+
   .hidden-on-mobile {
     display: none !important;
   }

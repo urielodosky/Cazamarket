@@ -47,7 +47,7 @@ function NestedOptionNode({
   const [isExpanded, setIsExpanded] = useState(true);
 
   return (
-    <div style={{ background: themeColors.bgSubtle2, padding: '16px', borderRadius: 'var(--radius-md)', border: '1px solid var(--color-border)', marginBottom: '16px' }}>
+    <div className="nested-option-node" style={{ background: themeColors.bgSubtle2, padding: '16px', borderRadius: 'var(--radius-md)', border: '1px solid var(--color-border)', marginBottom: '16px' }}>
       <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', cursor: 'pointer' }} onClick={() => setIsExpanded(!isExpanded)}>
         <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
           <span style={{ background: 'var(--color-primary)', color: '#fff', padding: '4px 8px', borderRadius: '4px', fontSize: '0.8rem', fontWeight: 'bold' }}>{currentPath}</span>
@@ -96,7 +96,7 @@ function NestedOptionNode({
             )}
 
             {opt.responseType === 'options' && (
-              <div style={{ paddingLeft: '16px', borderLeft: `2px solid ${themeColors.borderSubtle3}`, marginTop: '16px' }}>
+              <div className="nested-options-container" style={{ paddingLeft: '16px', borderLeft: `2px solid ${themeColors.borderSubtle3}`, marginTop: '16px' }}>
                 <NestedOptionsBuilder options={opt.options || []} onChange={onChangeNested} pathPrefix={`${currentPath}.`} availableGotos={availableGotos} />
               </div>
             )}
@@ -292,8 +292,8 @@ export default function VirtualAdvisorModal({ onClose, productId }: VirtualAdvis
   };
 
   return (
-    <div style={{ position: 'fixed', top: 0, left: 0, right: 0, bottom: 0, background: 'rgba(0,0,0,0.6)', zIndex: 1000, display: 'flex', alignItems: 'center', justifyContent: 'center', padding: '20px' }}>
-      <div className="glass-panel" style={{ width: '100%', maxWidth: '1100px', maxHeight: '90vh', borderRadius: 'var(--radius-lg)', display: 'flex', flexDirection: 'column', overflow: 'hidden', border: '1px solid var(--color-border)', background: themeColors.surfaceElevated, fontFamily: 'var(--font-inter), sans-serif' }}>
+    <div className="virtual-advisor-overlay" style={{ position: 'fixed', top: 0, left: 0, right: 0, bottom: 0, background: 'rgba(0,0,0,0.6)', zIndex: 1000, display: 'flex', alignItems: 'center', justifyContent: 'center', padding: '20px' }}>
+      <div className="glass-panel virtual-advisor-modal" style={{ width: '100%', maxWidth: '1100px', maxHeight: '90vh', borderRadius: 'var(--radius-lg)', display: 'flex', flexDirection: 'column', overflow: 'hidden', border: '1px solid var(--color-border)', background: themeColors.surfaceElevated, fontFamily: 'var(--font-inter), sans-serif' }}>
         
         {/* Header */}
         <div style={{ padding: '20px 24px', borderBottom: '1px solid var(--color-border)', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
@@ -302,7 +302,7 @@ export default function VirtualAdvisorModal({ onClose, productId }: VirtualAdvis
         </div>
 
         {/* Content */}
-        <div style={{ padding: '24px', overflowY: 'auto', flex: 1, display: 'flex', flexDirection: 'column', gap: '24px' }}>
+        <div className="virtual-advisor-content" style={{ padding: '24px', overflowY: 'auto', flex: 1, display: 'flex', flexDirection: 'column', gap: '24px' }}>
           
           {isLoading ? (
             <p>Cargando configuración...</p>
