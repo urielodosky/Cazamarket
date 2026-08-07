@@ -52,17 +52,6 @@ export default function Home() {
           <Link href="/productos" className="seo-btn">Ver Productos</Link>
           <Link href="/servicios" className="seo-btn">Ver Servicios</Link>
           <Link href="/registro" className="seo-btn seo-btn-primary">Crear cuenta gratuita</Link>
-          <a href="https://instagram.com/cazamarket.arg" target="_blank" rel="noopener noreferrer" className="seo-btn seo-btn-social">
-            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-              <rect x="2" y="2" width="20" height="20" rx="5" ry="5"></rect>
-              <path d="M16 11.37A4 4 0 1 1 12.63 8 4 4 0 0 1 16 11.37z"></path>
-              <line x1="17.5" y1="6.5" x2="17.51" y2="6.5"></line>
-            </svg>
-            @cazamarket.arg
-          </a>
-          <div style={{ width: '100%', height: '1px', background: 'var(--color-border)', margin: '8px 0' }}></div>
-          <Link href="/terminos-y-condiciones" className="seo-btn" style={{ border: 'none', padding: '5px 10px', fontSize: '0.85rem' }}>Términos y Condiciones</Link>
-          <Link href="/politica-de-privacidad" className="seo-btn" style={{ border: 'none', padding: '5px 10px', fontSize: '0.85rem' }}>Política de Privacidad</Link>
         </div>
       </section>
     </div>
