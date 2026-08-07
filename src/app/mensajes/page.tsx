@@ -424,6 +424,15 @@ export default function MensajesPage() {
     const confirm = window.confirm('¿Seguro que deseas eliminar este chat de forma permanente?');
     if (!confirm) return;
     
+    const chatToDelete = chats.find(c => c.id === chatId);
+    const isTestChat = chatToDelete?.dbChat?.buyer_id === chatToDelete?.dbChat?.seller_id || chatId === 'bot-test-chat';
+
+    if (isTestChat) {
+      setMessages([]);
+      await supabase.from('messages').delete().eq('chat_id', chatId);
+      return;
+    }
+
     setChats(prev => prev.filter(c => c.id !== chatId));
     if (activeChatId === chatId) setActiveChatId(null);
     
