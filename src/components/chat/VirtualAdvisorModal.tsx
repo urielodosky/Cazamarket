@@ -140,6 +140,7 @@ export default function VirtualAdvisorModal({ onClose, productId }: VirtualAdvis
   const [retargetingMessage, setRetargetingMessage] = useState('');
   const [botReactivationHours, setBotReactivationHours] = useState<number | ''>('');
   const [saveSuccess, setSaveSuccess] = useState(false);
+  const [showAdvanced, setShowAdvanced] = useState(false);
   
   // Form State
   const [conditionType, setConditionType] = useState<'exact' | 'keyword' | 'always'>('exact');
@@ -312,41 +313,51 @@ export default function VirtualAdvisorModal({ onClose, productId }: VirtualAdvis
             <>
               {/* GLOBAL SETTINGS CARD */}
               <div style={{ background: themeColors.bgSubtle2, padding: '20px', borderRadius: 'var(--radius-md)', border: `1px solid var(--color-primary)` }}>
-                <h3 style={{ margin: '0 0 16px 0', color: 'var(--color-text-main)' }}>Configuración Avanzada</h3>
-
-                <div style={{ marginBottom: '24px', padding: '16px', background: themeColors.bgSubtle3, borderRadius: 'var(--radius-sm)', border: '1px solid var(--color-border)' }}>
-                  <h4 style={{ margin: '0 0 8px 0', color: 'var(--color-text-main)', fontSize: '0.95rem' }}>1. Pausa Automática (Predeterminado)</h4>
-                  <p style={{ margin: 0, fontSize: '0.85rem', color: 'var(--color-text-muted)', lineHeight: 1.5 }}>
-                    El bot se pausa automáticamente y deja de responder cuando envías un mensaje manual para no interrumpir tu conversación.
-                  </p>
+                <div 
+                  onClick={() => setShowAdvanced(!showAdvanced)} 
+                  style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', cursor: 'pointer' }}
+                >
+                  <h3 style={{ margin: 0, color: 'var(--color-text-main)' }}>Configuración Avanzada</h3>
+                  <span style={{ fontSize: '1.2rem', color: 'var(--color-text-muted)' }}>{showAdvanced ? '▲' : '▼'}</span>
                 </div>
-                
-                <div style={{ marginBottom: '24px', padding: '16px', background: themeColors.bgSubtle3, borderRadius: 'var(--radius-sm)', border: '1px solid var(--color-border)' }}>
-                  <h4 style={{ margin: '0 0 8px 0', color: 'var(--color-text-main)', fontSize: '0.95rem' }}>2. Reactivación Automática</h4>
-                  <p style={{ margin: '0 0 12px 0', fontSize: '0.85rem', color: 'var(--color-text-muted)', lineHeight: 1.5 }}>
-                    El bot podrá volverse a utilizar de manera silenciosa para seguir escuchando luego de X horas de inactividad tras tu último mensaje manual.
-                  </p>
-                  <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
-                    <input type="number" min="1" value={botReactivationHours} onChange={e => setBotReactivationHours(Number(e.target.value) || '')} placeholder="Horas (Ej: 12)" style={{ width: '120px', padding: '10px', background: themeColors.bgSubtle2, color: themeColors.textWhite, border: '1px solid var(--color-border)', borderRadius: '4px', outline: 'none' }} />
-                    <span style={{ fontSize: '0.85rem', color: 'var(--color-text-muted)' }}>horas.</span>
+
+                {showAdvanced && (
+                  <div style={{ marginTop: '16px' }}>
+                    <div style={{ marginBottom: '24px', padding: '16px', background: themeColors.bgSubtle3, borderRadius: 'var(--radius-sm)', border: '1px solid var(--color-border)' }}>
+                      <h4 style={{ margin: '0 0 8px 0', color: 'var(--color-text-main)', fontSize: '0.95rem' }}>1. Pausa Automática (Predeterminado)</h4>
+                      <p style={{ margin: 0, fontSize: '0.85rem', color: 'var(--color-text-muted)', lineHeight: 1.5 }}>
+                        El bot se pausa automáticamente y deja de responder cuando envías un mensaje manual para no interrumpir tu conversación.
+                      </p>
+                    </div>
+                    
+                    <div style={{ marginBottom: '24px', padding: '16px', background: themeColors.bgSubtle3, borderRadius: 'var(--radius-sm)', border: '1px solid var(--color-border)' }}>
+                      <h4 style={{ margin: '0 0 8px 0', color: 'var(--color-text-main)', fontSize: '0.95rem' }}>2. Reactivación Automática</h4>
+                      <p style={{ margin: '0 0 12px 0', fontSize: '0.85rem', color: 'var(--color-text-muted)', lineHeight: 1.5 }}>
+                        El bot podrá volverse a utilizar de manera silenciosa para seguir escuchando luego de X horas de inactividad tras tu último mensaje manual.
+                      </p>
+                      <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+                        <input type="number" min="1" value={botReactivationHours} onChange={e => setBotReactivationHours(Number(e.target.value) || '')} placeholder="Horas (Ej: 12)" style={{ width: '120px', padding: '10px', background: themeColors.bgSubtle2, color: themeColors.textWhite, border: '1px solid var(--color-border)', borderRadius: '4px', outline: 'none' }} />
+                        <span style={{ fontSize: '0.85rem', color: 'var(--color-text-muted)' }}>horas.</span>
+                      </div>
+                    </div>
+
+                    <div style={{ marginBottom: '24px', padding: '16px', background: themeColors.bgSubtle3, borderRadius: 'var(--radius-sm)', border: '1px solid var(--color-border)' }}>
+                      <h4 style={{ margin: '0 0 8px 0', color: 'var(--color-text-main)', fontSize: '0.95rem' }}>3. Retargeting Automático</h4>
+                      <p style={{ fontSize: '0.85rem', color: 'var(--color-text-muted)', margin: '0 0 12px 0', lineHeight: 1.5 }}>
+                        Mensaje de no respuesta: si no hay charla en X horas, el bot tomará la iniciativa y enviará automáticamente este mensaje. ¡Perfecto para revivir leads caídos!
+                      </p>
+                      <div style={{ display: 'flex', gap: '12px', alignItems: 'flex-start', flexWrap: 'wrap' }}>
+                        <input type="number" min="1" value={retargetingDays} onChange={e => setRetargetingDays(Number(e.target.value) || '')} placeholder="Horas (Ej: 24)" style={{ width: '120px', padding: '10px', background: themeColors.bgSubtle2, color: themeColors.textWhite, border: '1px solid var(--color-border)', borderRadius: '4px', outline: 'none' }} />
+                        <input type="text" value={retargetingMessage} onChange={e => setRetargetingMessage(e.target.value)} placeholder="Ej: ¡Hola! ¿Aún sigues interesado en nuestros productos?" style={{ flex: '1 1 200px', padding: '10px', background: themeColors.bgSubtle2, color: themeColors.textWhite, border: '1px solid var(--color-border)', borderRadius: '4px', outline: 'none' }} />
+                      </div>
+                    </div>
+
+                    <div style={{ display: 'flex', alignItems: 'center', gap: '16px' }}>
+                      <button onClick={saveSettings} style={{ background: 'var(--color-primary)', color: '#fff', border: 'none', padding: '8px 16px', borderRadius: '4px', cursor: 'pointer', fontWeight: 600 }}>Guardar Configuración Avanzada</button>
+                      {saveSuccess && <span style={{ color: '#4caf50', fontWeight: 500, fontSize: '0.9rem' }}>¡Guardado correctamente!</span>}
+                    </div>
                   </div>
-                </div>
-
-                <div style={{ marginBottom: '24px', padding: '16px', background: themeColors.bgSubtle3, borderRadius: 'var(--radius-sm)', border: '1px solid var(--color-border)' }}>
-                  <h4 style={{ margin: '0 0 8px 0', color: 'var(--color-text-main)', fontSize: '0.95rem' }}>3. Retargeting Automático</h4>
-                  <p style={{ fontSize: '0.85rem', color: 'var(--color-text-muted)', margin: '0 0 12px 0', lineHeight: 1.5 }}>
-                    Mensaje de no respuesta: si no hay charla en X horas, el bot tomará la iniciativa y enviará automáticamente este mensaje. ¡Perfecto para revivir leads caídos!
-                  </p>
-                  <div style={{ display: 'flex', gap: '12px', alignItems: 'flex-start', flexWrap: 'wrap' }}>
-                    <input type="number" min="1" value={retargetingDays} onChange={e => setRetargetingDays(Number(e.target.value) || '')} placeholder="Horas (Ej: 24)" style={{ width: '120px', padding: '10px', background: themeColors.bgSubtle2, color: themeColors.textWhite, border: '1px solid var(--color-border)', borderRadius: '4px', outline: 'none' }} />
-                    <input type="text" value={retargetingMessage} onChange={e => setRetargetingMessage(e.target.value)} placeholder="Ej: ¡Hola! ¿Aún sigues interesado en nuestros productos?" style={{ flex: '1 1 200px', padding: '10px', background: themeColors.bgSubtle2, color: themeColors.textWhite, border: '1px solid var(--color-border)', borderRadius: '4px', outline: 'none' }} />
-                  </div>
-                </div>
-
-                <div style={{ display: 'flex', alignItems: 'center', gap: '16px' }}>
-                  <button onClick={saveSettings} style={{ background: 'var(--color-primary)', color: '#fff', border: 'none', padding: '8px 16px', borderRadius: '4px', cursor: 'pointer', fontWeight: 600 }}>Guardar Configuración Avanzada</button>
-                  {saveSuccess && <span style={{ color: '#4caf50', fontWeight: 500, fontSize: '0.9rem' }}>¡Guardado correctamente!</span>}
-                </div>
+                )}
               </div>
 
               {!isAdding ? (
