@@ -28,6 +28,8 @@ export type AdvisorRule = {
   reactivationText?: string;
   options?: AdvisorOption[];
   fileName?: string;
+  attachmentUrl?: string;
+  attachmentType?: string;
   whatsappText?: string;
   gotoId?: string;
   cooldownHours?: number;
