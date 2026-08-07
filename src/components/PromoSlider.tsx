@@ -2,6 +2,7 @@
 
 import { useState, useEffect } from "react";
 import Link from "next/link";
+import Image from "next/image";
 import AdCampaignModal from "./AdCampaignModal";
 import { useAuth } from "@/contexts/AuthContext";
 
@@ -200,9 +201,6 @@ export default function PromoSlider() {
                   left: 0,
                   right: 0,
                   bottom: 0,
-                  backgroundImage: `url(${ad.image})`,
-                  backgroundSize: "cover",
-                  backgroundPosition: "center",
                   display: "flex",
                   flexDirection: "column",
                   justifyContent: "flex-end",
@@ -212,6 +210,9 @@ export default function PromoSlider() {
                   pointerEvents: currentSlide === index ? "auto" : "none",
                 }}
               >
+                <div style={{ position: "absolute", top: 0, left: 0, right: 0, bottom: 0, zIndex: 0 }}>
+                  <Image src={ad.image} fill priority={index === 0} sizes="100vw" style={{ objectFit: 'cover' }} alt={ad.title} />
+                </div>
                 <div
                   style={{
                     position: "absolute",

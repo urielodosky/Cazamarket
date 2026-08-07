@@ -196,3 +196,12 @@ input[type="number"] {
     display: none !important;
   }
 }
+
+@media (max-width: 768px) { 
+  button, .btn, a.seo-btn { 
+    min-height: 44px; 
+    display: flex; 
+    align-items: center; 
+    justify-content: center; 
+  } 
+}

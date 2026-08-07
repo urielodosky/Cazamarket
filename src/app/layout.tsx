@@ -1,10 +1,11 @@
-import type { Metadata } from "next";
+import type { Metadata, Viewport } from "next";
 import { Inter } from "next/font/google";
 import Navbar from "@/components/layout/Navbar";
 import Providers from "@/components/Providers";
 import PageTransitionLoader from "@/components/ui/PageTransitionLoader";
 import MobileNav from "@/components/layout/MobileNav";
 import { Suspense } from 'react';
+import Footer from "@/components/layout/Footer";
 import "./globals.css";
 
 const inter = Inter({
@@ -12,9 +13,15 @@ const inter = Inter({
   subsets: ["latin"],
 });
 
+export const viewport: Viewport = {
+  width: 'device-width',
+  initialScale: 1,
+  maximumScale: 5,
+};
+
 export const metadata: Metadata = {
   title: "CazaMarket | Todo para el Cazador, Pescador y Campista",
-  description: "La plataforma de confianza para comercios y servicios de caza, camping y pesca.",
+  description: "CazaMarket es la plataforma web líder de Argentina para conectar a cazadores, pescadores y campistas con los mejores comercios, guías y servicios de la región. Únete hoy.",
   metadataBase: new URL('https://cazamarket.vercel.app'),
   alternates: {
     canonical: '/',
@@ -96,6 +103,7 @@ export default function RootLayout({
             <MobileNav />
           </Suspense>
           <main>{children}</main>
+          <Footer />
         </Providers>
       </body>
     </html>
