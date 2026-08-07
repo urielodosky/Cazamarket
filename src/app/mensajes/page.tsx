@@ -151,7 +151,10 @@ export default function MensajesPage() {
         table: 'messages',
         filter: `chat_id=eq.${activeChatId}`
       }, (payload) => {
-        setMessages(prev => [...prev, payload.new]);
+        setMessages(prev => {
+          if (prev.some(m => m.id === payload.new.id)) return prev;
+          return [...prev, payload.new];
+        });
       })
       .subscribe();
 
