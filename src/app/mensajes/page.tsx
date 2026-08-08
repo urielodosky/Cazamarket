@@ -510,16 +510,61 @@ export default function MensajesPage() {
       const { data: currentChat } = await supabase.from('chats').select('*').eq('id', chatId).single();
       if (!currentChat) return;
 
-      let matchedRule = rules.find((r: any) => r.condition_type === 'exact' && normalizeText(r.condition_value) === normalizedUserText);
-      if (!matchedRule) matchedRule = rules.find((r: any) => r.condition_type === 'keyword' && normalizedUserText.includes(normalizeText(r.condition_value)));
-      if (!matchedRule) {
-        // Evaluate Always rule only if not in cooldown and not fired once already if fire_once is true
-        const alwaysRules = rules.filter((r: any) => r.condition_type === 'always');
-        for (const r of alwaysRules) {
-          if (r.fire_once && currentChat.bot_fired_once) continue;
-          if (r.cooldown_hours && currentChat.bot_cooldown_until && new Date(currentChat.bot_cooldown_until) > new Date()) continue;
-          matchedRule = r;
-          break;
+      let matchedRule: any = null;
+
+      if (optionContext) {
+        if (optionContext.responseType === 'goto' && optionContext.gotoId) {
+          if (optionContext.gotoId === 'root') {
+            matchedRule = rules.find((r: any) => r.condition_type === 'always') || rules[0];
+          } else {
+            const findNode = (opts: any[]): any => {
+              for (const opt of opts) {
+                if (opt.id === optionContext.gotoId) return opt;
+                if (opt.options) {
+                  const found = findNode(opt.options);
+                  if (found) return found;
+                }
+              }
+              return null;
+            };
+            let targetNode = null;
+            for (const r of rules) {
+              if (r.options) {
+                targetNode = findNode(r.options);
+                if (targetNode) break;
+              }
+            }
+            if (targetNode) {
+              matchedRule = {
+                condition_type: 'option_click',
+                response_text: targetNode.responseText,
+                attachment_url: targetNode.fileName || null,
+                attachment_type: targetNode.responseType === 'file' || targetNode.responseType === 'file_options' ? 'document' : null,
+                options: targetNode.options || null
+              };
+            }
+          }
+        } else {
+          matchedRule = {
+            condition_type: 'option_click',
+            response_text: optionContext.responseText,
+            attachment_url: optionContext.fileName || null,
+            attachment_type: optionContext.responseType === 'file' || optionContext.responseType === 'file_options' ? 'document' : null,
+            options: optionContext.options || null
+          };
+        }
+      } else {
+        matchedRule = rules.find((r: any) => r.condition_type === 'exact' && normalizeText(r.condition_value) === normalizedUserText);
+        if (!matchedRule) matchedRule = rules.find((r: any) => r.condition_type === 'keyword' && normalizedUserText.includes(normalizeText(r.condition_value)));
+        if (!matchedRule) {
+          // Evaluate Always rule only if not in cooldown and not fired once already if fire_once is true
+          const alwaysRules = rules.filter((r: any) => r.condition_type === 'always');
+          for (const r of alwaysRules) {
+            if (r.fire_once && currentChat.bot_fired_once) continue;
+            if (r.cooldown_hours && currentChat.bot_cooldown_until && new Date(currentChat.bot_cooldown_until) > new Date()) continue;
+            matchedRule = r;
+            break;
+          }
         }
       }
 
@@ -771,7 +816,7 @@ export default function MensajesPage() {
                                       key={opt.id}
                                       onClick={(e) => {
                                         e.stopPropagation();
-                                        handleSendMessage(opt.label);
+                                        handleSendMessage(opt.label, opt);
                                       }}
                                       style={{
                                         background: 'var(--color-bg, #1a1a1a)',
