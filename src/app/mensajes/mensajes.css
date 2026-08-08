@@ -42,7 +42,33 @@
     height: calc(100vh - 60px) !important;
     min-height: 0 !important;
   }
-  
+}
+
+/* Chat List Item Styles */
+.chat-list-item {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  padding: 16px;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  border-bottom: 1px solid var(--color-border);
+}
+
+.chat-list-item:hover {
+  background: color-mix(in srgb, var(--color-bgSubtle) 50%, transparent);
+}
+
+.chat-list-item.active {
+  background: linear-gradient(90deg, color-mix(in srgb, var(--color-primary) 10%, transparent), transparent);
+  border-left: 3px solid var(--color-primary);
+}
+
+.chat-list-item:last-child {
+  border-bottom: none;
+}
+
+@media (max-width: 768px) {
   .messages-container {
     height: 100% !important;
     min-height: 0 !important;

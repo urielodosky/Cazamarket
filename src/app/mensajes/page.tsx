@@ -685,15 +685,10 @@ export default function MensajesPage() {
             ) : currentChats.map(chat => (
                 <div 
                   key={chat.id}
-                onClick={() => setActiveChatId(chat.id)}
-                style={{ 
-                  display: 'flex', alignItems: 'center', gap: '14px', padding: '14px', cursor: 'pointer', 
-                  borderRadius: 'var(--radius-lg)', marginBottom: '8px',
-                  background: activeChatId === chat.id ? 'linear-gradient(90deg, rgba(255,115,0,0.15), transparent)' : 'transparent',
-                  border: '1px solid', borderColor: activeChatId === chat.id ? 'rgba(255,115,0,0.3)' : 'transparent'
-                }}
-              >
-                <div style={{ position: 'relative', width: '48px', height: '48px', flexShrink: 0 }}>
+                  className={`chat-list-item ${activeChatId === chat.id ? 'active' : ''}`}
+                  onClick={() => setActiveChatId(chat.id)}
+                >
+                <div style={{ position: 'relative', width: '52px', height: '52px', flexShrink: 0 }}>
                   <img src={chat.avatar} alt={chat.name} style={{ width: '100%', height: '100%', borderRadius: '50%', objectFit: 'cover' }} />
                 </div>
                 <div style={{ flex: 1, minWidth: 0 }}>
