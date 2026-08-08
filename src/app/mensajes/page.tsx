@@ -1,6 +1,7 @@
 'use client';
 
 import React, { useState, useRef, useEffect } from 'react';
+import { createPortal } from 'react-dom';
 import { useAuth } from '@/contexts/AuthContext';
 import { usePlan } from '@/contexts/PlanContext';
 import VirtualAdvisorModal from '@/components/chat/VirtualAdvisorModal';
@@ -34,6 +35,7 @@ export default function MensajesPage() {
 
   const [openMessageMenu, setOpenMessageMenu] = useState<string | null>(null);
   const [openChatMenu, setOpenChatMenu] = useState<string | null>(null);
+  const [chatMenuPos, setChatMenuPos] = useState({ x: 0, y: 0 });
 
   // Close menus on click outside
   useEffect(() => {
@@ -637,11 +639,20 @@ export default function MensajesPage() {
                   <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '4px' }}>
                     <h4 style={{ margin: 0, fontSize: '1rem', color: 'var(--color-text-main)', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>{chat.name}</h4>
                     <div style={{ position: 'relative' }}>
-                      <button onClick={(e) => { e.stopPropagation(); setOpenChatMenu(openChatMenu === chat.id ? null : chat.id); }} style={{ background: 'transparent', border: 'none', color: chat.isPinned ? 'var(--color-primary)' : 'var(--color-text-muted)', cursor: 'pointer', padding: '4px' }}>
+                      <button onClick={(e) => { 
+                        e.stopPropagation(); 
+                        if (openChatMenu === chat.id) {
+                          setOpenChatMenu(null);
+                        } else {
+                          const rect = e.currentTarget.getBoundingClientRect();
+                          setChatMenuPos({ x: rect.left, y: rect.bottom + 4 });
+                          setOpenChatMenu(chat.id);
+                        }
+                      }} style={{ background: 'transparent', border: 'none', color: chat.isPinned ? 'var(--color-primary)' : 'var(--color-text-muted)', cursor: 'pointer', padding: '4px' }}>
                         <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><circle cx="12" cy="12" r="1"></circle><circle cx="12" cy="5" r="1"></circle><circle cx="12" cy="19" r="1"></circle></svg>
                       </button>
-                      {openChatMenu === chat.id && (
-                        <div className="chat-dropdown-menu" style={{ right: 0, top: '100%' }}>
+                      {openChatMenu === chat.id && typeof window !== 'undefined' && createPortal(
+                        <div className="chat-dropdown-menu" style={{ position: 'fixed', left: chatMenuPos.x, top: chatMenuPos.y, margin: 0 }}>
                           <button className="chat-dropdown-item" onClick={(e) => { e.stopPropagation(); togglePinChat(chat); setOpenChatMenu(null); }}>
                             <svg width="16" height="16" viewBox="0 0 24 24" fill={chat.isPinned ? "currentColor" : "none"} stroke="currentColor" strokeWidth="2"><line x1="12" y1="17" x2="12" y2="22"></line><path d="M5 17h14v-1.76a2 2 0 0 0-1.11-1.79l-1.78-.9A2 2 0 0 1 15 10.76V6h1a2 2 0 0 0 0-4H8a2 2 0 0 0 0 4h1v4.76a2 2 0 0 1-1.11 1.79l-1.78.9A2 2 0 0 0 5 15.24Z"></path></svg>
                             {chat.isPinned ? "Desfijar chat" : "Fijar chat"}
@@ -650,7 +661,8 @@ export default function MensajesPage() {
                             <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><polyline points="3 6 5 6 21 6"></polyline><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path></svg>
                             Eliminar chat
                           </button>
-                        </div>
+                        </div>,
+                        document.body
                       )}
                     </div>
                   </div>
