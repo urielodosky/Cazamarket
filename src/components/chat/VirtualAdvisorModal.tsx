@@ -135,6 +135,7 @@ export default function VirtualAdvisorModal({ onClose, productId }: VirtualAdvis
   
   const [rules, setRules] = useState<AdvisorRule[]>([]);
   const [isAdding, setIsAdding] = useState(false);
+  const [editingRuleId, setEditingRuleId] = useState<string | null>(null);
   const [isLoading, setIsLoading] = useState(true);
 
   // Settings state
@@ -306,32 +307,70 @@ export default function VirtualAdvisorModal({ onClose, productId }: VirtualAdvis
       fire_once: conditionType === 'always' ? fireOnce : false
     };
 
-    const { data, error } = await supabase.from('bot_rules').insert(payload).select().single();
-    
-    if (data) {
-      setRules([...rules, {
-        id: data.id,
-        conditionType: data.condition_type,
-        conditionValue: data.condition_value || '',
-        responseType: data.response_type,
-        responseText: data.response_text,
-        reactivationText: data.reactivation_text || '',
-        options: data.options,
-        fileName: data.file_name,
-        attachmentUrl: data.attachment_url,
-        attachmentType: data.attachment_type,
-        whatsappText: data.whatsapp_text,
-        gotoId: data.goto_id,
-        cooldownHours: data.cooldown_hours,
-        fireOnce: data.fire_once
-      }]);
+    if (editingRuleId) {
+      const { data, error } = await supabase.from('bot_rules').update(payload).eq('id', editingRuleId).select().single();
+      if (data) {
+        setRules(rules.map(r => r.id === editingRuleId ? {
+          id: data.id,
+          conditionType: data.condition_type,
+          conditionValue: data.condition_value || '',
+          responseType: data.response_type,
+          responseText: data.response_text,
+          reactivationText: data.reactivation_text || '',
+          options: data.options,
+          fileName: data.file_name,
+          attachmentUrl: data.attachment_url,
+          attachmentType: data.attachment_type,
+          whatsappText: data.whatsapp_text,
+          gotoId: data.goto_id,
+          cooldownHours: data.cooldown_hours,
+          fireOnce: data.fire_once
+        } : r));
+      }
+    } else {
+      const { data, error } = await supabase.from('bot_rules').insert(payload).select().single();
+      if (data) {
+        setRules([...rules, {
+          id: data.id,
+          conditionType: data.condition_type,
+          conditionValue: data.condition_value || '',
+          responseType: data.response_type,
+          responseText: data.response_text,
+          reactivationText: data.reactivation_text || '',
+          options: data.options,
+          fileName: data.file_name,
+          attachmentUrl: data.attachment_url,
+          attachmentType: data.attachment_type,
+          whatsappText: data.whatsapp_text,
+          gotoId: data.goto_id,
+          cooldownHours: data.cooldown_hours,
+          fireOnce: data.fire_once
+        }]);
+      }
     }
 
     setIsAdding(false);
+    setEditingRuleId(null);
     // Reset
     setConditionType('exact'); setConditionValue(''); setResponseType('text');
     setResponseText(''); setReactivationText(''); setOptions([]); setFileName(''); setWhatsappText(''); setGotoId('');
     setCooldownHours(''); setFireOnce(false);
+  };
+
+  const handleEditRule = (rule: AdvisorRule) => {
+    setEditingRuleId(rule.id);
+    setConditionType(rule.conditionType);
+    setConditionValue(rule.conditionValue);
+    setResponseType(rule.responseType);
+    setResponseText(rule.responseText);
+    setReactivationText(rule.reactivationText || '');
+    setOptions(rule.options || []);
+    setFileName(rule.fileName || '');
+    setWhatsappText(rule.whatsappText || '');
+    setGotoId(rule.gotoId || '');
+    setCooldownHours(rule.cooldownHours || '');
+    setFireOnce(rule.fireOnce || false);
+    setIsAdding(true);
   };
 
   const handleDeleteRule = async (id: string) => {
@@ -447,7 +486,10 @@ export default function VirtualAdvisorModal({ onClose, productId }: VirtualAdvis
                               </div>
                             )}
                           </div>
-                          <button onClick={() => handleDeleteRule(rule.id)} style={{ background: 'rgba(255,50,50,0.1)', color: '#ff4444', border: 'none', padding: '8px 12px', borderRadius: 'var(--radius-sm)', cursor: 'pointer', height: 'fit-content' }}>Eliminar</button>
+                          <div style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
+                            <button onClick={() => handleEditRule(rule)} style={{ background: 'rgba(255,255,255,0.1)', color: 'var(--color-text-main)', border: 'none', padding: '8px 12px', borderRadius: 'var(--radius-sm)', cursor: 'pointer' }}>Editar</button>
+                            <button onClick={() => handleDeleteRule(rule.id)} style={{ background: 'rgba(255,50,50,0.1)', color: '#ff4444', border: 'none', padding: '8px 12px', borderRadius: 'var(--radius-sm)', cursor: 'pointer' }}>Eliminar</button>
+                          </div>
                         </div>
                       ))}
                     </div>
@@ -580,9 +622,9 @@ export default function VirtualAdvisorModal({ onClose, productId }: VirtualAdvis
 
                     <div style={{ display: 'flex', gap: '12px', marginTop: '16px' }}>
                       <button onClick={handleAddRule} disabled={isUploading} style={{ flex: 1, background: 'var(--color-primary)', color: themeColors.textWhite, border: 'none', padding: '12px', borderRadius: 'var(--radius-sm)', cursor: isUploading ? 'not-allowed' : 'pointer', fontWeight: 600, opacity: isUploading ? 0.7 : 1 }}>
-                        {isUploading ? 'Subiendo archivo y guardando...' : 'Guardar Regla'}
+                        {isUploading ? 'Subiendo archivo y guardando...' : (editingRuleId ? 'Actualizar Regla' : 'Guardar Regla')}
                       </button>
-                      <button onClick={() => setIsAdding(false)} disabled={isUploading} style={{ flex: 1, background: themeColors.bgSubtle3, color: themeColors.textWhite, border: 'none', padding: '12px', borderRadius: 'var(--radius-sm)', cursor: isUploading ? 'not-allowed' : 'pointer', fontWeight: 600 }}>Cancelar</button>
+                      <button onClick={() => { setIsAdding(false); setEditingRuleId(null); }} disabled={isUploading} style={{ flex: 1, background: themeColors.bgSubtle3, color: themeColors.textWhite, border: 'none', padding: '12px', borderRadius: 'var(--radius-sm)', cursor: isUploading ? 'not-allowed' : 'pointer', fontWeight: 600 }}>Cancelar</button>
                     </div>
                   </div>
                 </div>
