@@ -106,12 +106,12 @@ export default function MensajesPage() {
           const isPinned = isBuyer ? c.pinned_by_buyer : c.pinned_by_seller;
           
           let lastMessage = 'Abrir chat para ver mensajes';
-          const { data: lastMsgData } = await supabase.from('messages').select('content, type, is_bot').eq('chat_id', c.id).order('created_at', { ascending: false }).limit(1);
+          const { data: lastMsgData } = await supabase.from('messages').select('content, attachment_url, bot_options, is_bot').eq('chat_id', c.id).order('created_at', { ascending: false }).limit(1);
           if (lastMsgData && lastMsgData.length > 0) {
              const m = lastMsgData[0];
-             if (m.type === 'file') lastMessage = 'Archivo adjunto';
-             else if (m.type === 'options' || m.type === 'file_options') lastMessage = m.content || 'Botón interactivo';
-             else lastMessage = m.content;
+             if (m.attachment_url) lastMessage = 'Archivo adjunto';
+             else if (m.bot_options && Object.keys(m.bot_options).length > 0) lastMessage = m.content || 'Botón interactivo';
+             else lastMessage = m.content || 'Mensaje';
           }
 
           return {
