@@ -242,7 +242,18 @@ export default function VirtualAdvisorModal({ onClose, productId }: VirtualAdvis
 
   const handleAddRule = async () => {
     if (conditionType !== 'always' && !conditionValue.trim()) { alert('Ingresa el valor de la condición.'); return; }
-    if (responseType !== 'goto' && !responseText.trim()) { alert('Ingresa el texto de respuesta.'); return; }
+    
+    if (responseType !== 'goto' && responseType !== 'whatsapp') {
+      const hasText = !!responseText.trim();
+      const hasFile = (responseType === 'file' || responseType === 'file_options') && (attachmentFile || fileName);
+      const hasOptions = (responseType === 'options' || responseType === 'file_options') && options.length > 0;
+      
+      if (!hasText && !hasFile && !hasOptions) {
+        alert('Debes ingresar al menos un texto de respuesta, opciones o un archivo adjunto.');
+        return;
+      }
+    }
+    
     if (responseType === 'goto' && !gotoId) { alert('Selecciona a qué opciones volver.'); return; }
     
     if (conditionType === 'always' && !fireOnce && cooldownHours === '') {
@@ -567,7 +578,9 @@ export default function VirtualAdvisorModal({ onClose, productId }: VirtualAdvis
                       </div>
                     ) : (
                       <div>
-                        <label style={{ display: 'block', marginBottom: '8px', color: 'var(--color-text-muted)' }}>Texto de Respuesta Inicial</label>
+                        <label style={{ display: 'block', marginBottom: '8px', color: 'var(--color-text-muted)' }}>
+                          Texto de Respuesta Inicial { (responseType === 'options' || responseType === 'file' || responseType === 'file_options') ? '(Opcional si hay opciones/archivo)' : '' }
+                        </label>
                         <textarea value={responseText} onChange={e => setResponseText(e.target.value)} style={{ width: '100%', padding: '10px', background: themeColors.bgSubtle3, color: themeColors.textWhite, border: '1px solid var(--color-border)', borderRadius: '4px', minHeight: '80px', outline: 'none', resize: 'vertical' }} />
                       </div>
                     )}
