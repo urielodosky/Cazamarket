@@ -166,6 +166,21 @@ export default function VirtualAdvisorModal({ onClose, productId }: VirtualAdvis
     const gotos: GotoOption[] = [];
     if (responseType === 'options' || responseType === 'file_options') {
       gotos.push({ value: 'root', label: 'Volver al inicio de esta regla' });
+      
+      // Añadir opciones para derivar a otras reglas
+      rules.forEach(r => {
+        if (r.id !== editingRuleId) {
+          let ruleLabel = '';
+          if (r.conditionType === 'always') ruleLabel = 'Siempre (Menú Principal)';
+          else if (r.conditionType === 'exact') ruleLabel = `Exacto: "${r.conditionValue}"`;
+          else if (r.conditionType === 'keyword') ruleLabel = `Palabra Clave: "${r.conditionValue}"`;
+          
+          if (ruleLabel) {
+            gotos.push({ value: `rule_${r.id}`, label: `Ir a -> Regla ${ruleLabel}` });
+          }
+        }
+      });
+
       const traverse = (opts: AdvisorOption[], prefix: string = '') => {
         opts.forEach((opt, idx) => {
           const currentPath = `${prefix}${idx + 1}`;
@@ -178,7 +193,7 @@ export default function VirtualAdvisorModal({ onClose, productId }: VirtualAdvis
       traverse(options);
     }
     setAvailableGotos(gotos);
-  }, [responseType, options]);
+  }, [responseType, options, rules, editingRuleId]);
 
   useEffect(() => {
     if (!supabaseUser) return;

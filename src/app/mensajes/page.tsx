@@ -542,6 +542,9 @@ export default function MensajesPage() {
               }
             }
             matchedRule = parentRule || rules.find((r: any) => r.condition_type === 'always') || rules[0];
+          } else if (optionContext.gotoId.startsWith('rule_')) {
+            const ruleId = optionContext.gotoId.replace('rule_', '');
+            matchedRule = rules.find((r: any) => r.id === ruleId) || rules.find((r: any) => r.condition_type === 'always') || rules[0];
           } else {
             const findNode = (opts: any[]): any => {
               for (const opt of opts) {
