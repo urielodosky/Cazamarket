@@ -713,78 +713,85 @@ export default function MensajesPage() {
                   const isTestChat = activeChatId === 'bot-test-chat' || (activeChat?.dbChat?.buyer_id === supabaseUser?.id && activeChat?.dbChat?.seller_id === supabaseUser?.id);
                   const isMe = isTestChat ? !msg.is_bot : msg.sender_id === supabaseUser?.id;
                   return (
-                    <div key={msg.id} className="message-item-container" style={{ display: 'flex', flexDirection: 'column', alignItems: isMe ? 'flex-end' : 'flex-start', position: 'relative', maxWidth: '100%' }}>
-                      <div style={{ display: 'flex', alignItems: 'center', gap: '8px', flexDirection: isMe ? 'row-reverse' : 'row', maxWidth: '100%', position: 'relative' }}>
-                        {msg.is_deleted ? (
-                          <div style={{ padding: '12px 16px', borderRadius: 'var(--radius-lg)', background: 'rgba(255,255,255,0.05)', color: 'var(--color-text-muted)', fontStyle: 'italic', display: 'flex', alignItems: 'center', gap: '8px' }}>
-                            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><circle cx="12" cy="12" r="10"></circle><line x1="4.93" y1="4.93" x2="19.07" y2="19.07"></line></svg>
-                            Este mensaje fue eliminado
-                          </div>
-                        ) : (
-                          <div style={{ 
-                            maxWidth: '70vw', minWidth: 0, padding: '12px 16px', borderRadius: 'var(--radius-lg)', 
-                            background: !isMe ? 'var(--color-primary)' : 'rgba(255,255,255,0.05)', color: !isMe ? '#fff' : 'var(--color-text-main)',
-                            borderBottomRightRadius: isMe ? '4px' : 'var(--radius-lg)', borderBottomLeftRadius: !isMe ? '4px' : 'var(--radius-lg)'
-                          }}>
-                            {/* Text */}
-                            {msg.content && <p style={{ margin: 0, fontSize: '0.95rem', lineHeight: 1.4, wordBreak: 'break-all', overflowWrap: 'anywhere', whiteSpace: 'pre-wrap' }}>{msg.content}</p>}
-                            
-                            {/* Bot Options Rendering */}
-                            {msg.bot_options && msg.bot_options.length > 0 && (
-                              <div style={{ marginTop: '12px', display: 'flex', flexDirection: 'column', gap: '8px', width: '100%' }}>
-                                {msg.bot_options.map((opt: any) => (
-                                  <button
-                                    key={opt.id}
-                                    onClick={(e) => {
-                                      e.stopPropagation();
-                                      handleSendMessage(opt.label);
-                                    }}
-                                    style={{
-                                      background: 'rgba(255,255,255,0.1)',
-                                      color: '#fff',
-                                      border: '1px solid rgba(255,255,255,0.3)',
-                                      padding: '10px 16px',
-                                      borderRadius: 'var(--radius-full)',
-                                      cursor: 'pointer',
-                                      fontWeight: 600,
-                                      fontSize: '0.9rem',
-                                      textAlign: 'center',
-                                      transition: 'all 0.2s ease',
-                                      width: '100%'
-                                    }}
-                                    onMouseEnter={e => { e.currentTarget.style.background = 'rgba(255,255,255,0.2)'; }}
-                                    onMouseLeave={e => { e.currentTarget.style.background = 'rgba(255,255,255,0.1)'; }}
-                                  >
-                                    {opt.label}
-                                  </button>
-                                ))}
-                              </div>
-                            )}
+                    <div key={msg.id} className="message-item-container" style={{ display: 'flex', flexDirection: 'column', alignItems: isMe ? 'flex-end' : 'flex-start', position: 'relative', maxWidth: '100%', gap: '8px' }}>
+                      <div style={{ display: 'flex', alignItems: 'flex-start', gap: '8px', flexDirection: isMe ? 'row-reverse' : 'row', maxWidth: '100%', position: 'relative' }}>
+                        
+                        <div style={{ display: 'flex', flexDirection: 'column', gap: '8px', alignItems: isMe ? 'flex-end' : 'flex-start', maxWidth: '70vw', minWidth: 0 }}>
+                          {msg.is_deleted ? (
+                            <div style={{ padding: '12px 16px', borderRadius: 'var(--radius-lg)', background: 'rgba(255,255,255,0.05)', color: 'var(--color-text-muted)', fontStyle: 'italic', display: 'flex', alignItems: 'center', gap: '8px' }}>
+                              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><circle cx="12" cy="12" r="10"></circle><line x1="4.93" y1="4.93" x2="19.07" y2="19.07"></line></svg>
+                              Este mensaje fue eliminado
+                            </div>
+                          ) : (
+                            <>
+                              {/* Text Bubble */}
+                              {msg.content && (
+                                <div style={{ 
+                                  padding: '12px 16px', borderRadius: 'var(--radius-lg)', 
+                                  background: !isMe ? 'var(--color-primary)' : 'rgba(255,255,255,0.05)', color: !isMe ? '#fff' : 'var(--color-text-main)',
+                                  borderBottomRightRadius: isMe ? '4px' : 'var(--radius-lg)', borderBottomLeftRadius: !isMe ? '4px' : 'var(--radius-lg)'
+                                }}>
+                                  <p style={{ margin: 0, fontSize: '0.95rem', lineHeight: 1.4, wordBreak: 'break-all', overflowWrap: 'anywhere', whiteSpace: 'pre-wrap' }}>{msg.content}</p>
+                                </div>
+                              )}
+                              
+                              {/* Bot Options Rendering OUTSIDE the bubble */}
+                              {msg.bot_options && msg.bot_options.length > 0 && (
+                                <div style={{ display: 'flex', flexDirection: 'column', gap: '8px', width: '100%', maxWidth: '300px' }}>
+                                  {msg.bot_options.map((opt: any) => (
+                                    <button
+                                      key={opt.id}
+                                      onClick={(e) => {
+                                        e.stopPropagation();
+                                        handleSendMessage(opt.label);
+                                      }}
+                                      style={{
+                                        background: 'var(--color-bg, #1a1a1a)',
+                                        color: 'var(--color-primary)',
+                                        border: '1px solid var(--color-primary)',
+                                        padding: '10px 16px',
+                                        borderRadius: 'var(--radius-full)',
+                                        cursor: 'pointer',
+                                        fontWeight: 600,
+                                        fontSize: '0.9rem',
+                                        textAlign: 'center',
+                                        transition: 'all 0.2s ease',
+                                        width: '100%'
+                                      }}
+                                      onMouseEnter={e => { e.currentTarget.style.background = 'var(--color-primary)'; e.currentTarget.style.color = '#fff'; }}
+                                      onMouseLeave={e => { e.currentTarget.style.background = 'var(--color-bg, #1a1a1a)'; e.currentTarget.style.color = 'var(--color-primary)'; }}
+                                    >
+                                      {opt.label}
+                                    </button>
+                                  ))}
+                                </div>
+                              )}
 
-                            {/* Attachments rendering */}
-                            {msg.attachment_url && (
-                              <div style={{ marginTop: (msg.content || (msg.bot_options && msg.bot_options.length > 0)) ? '10px' : '0' }}>
-                                {msg.attachment_type === 'image' && (
-                                  <img src={msg.attachment_url} alt="Adjunto" style={{ maxWidth: '100%', borderRadius: '8px', cursor: 'pointer' }} onClick={() => window.open(msg.attachment_url, '_blank')} />
-                                )}
-                                {msg.attachment_type === 'video' && (
-                                  <video src={msg.attachment_url} controls style={{ maxWidth: '100%', borderRadius: '8px' }} />
-                                )}
-                                {msg.attachment_type === 'audio' && (
-                                  <audio src={msg.attachment_url} controls style={{ maxWidth: '100%', borderRadius: '8px', minWidth: '250px' }} />
-                                )}
-                                {msg.attachment_type === 'document' && (
-                                  <a href={msg.attachment_url} target="_blank" rel="noopener noreferrer" style={{ display: 'flex', alignItems: 'center', gap: '8px', color: 'inherit', textDecoration: 'none', background: 'rgba(0,0,0,0.1)', padding: '10px', borderRadius: '8px' }}>
-                                    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path d="M13 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V9z"></path><polyline points="13 2 13 9 20 9"></polyline></svg>
-                                    <span>Ver Documento Adjunto</span>
-                                  </a>
-                                )}
-                              </div>
-                            )}
-                          </div>
-                        )}
+                              {/* Attachments rendering OUTSIDE the bubble */}
+                              {msg.attachment_url && (
+                                <div style={{ width: '100%' }}>
+                                  {msg.attachment_type === 'image' && (
+                                    <img src={msg.attachment_url} alt="Adjunto" style={{ maxWidth: '100%', borderRadius: '8px', cursor: 'pointer' }} onClick={() => window.open(msg.attachment_url, '_blank')} />
+                                  )}
+                                  {msg.attachment_type === 'video' && (
+                                    <video src={msg.attachment_url} controls style={{ maxWidth: '100%', borderRadius: '8px' }} />
+                                  )}
+                                  {msg.attachment_type === 'audio' && (
+                                    <audio src={msg.attachment_url} controls style={{ maxWidth: '100%', borderRadius: '8px', minWidth: '250px' }} />
+                                  )}
+                                  {msg.attachment_type === 'document' && (
+                                    <a href={msg.attachment_url} target="_blank" rel="noopener noreferrer" style={{ display: 'flex', alignItems: 'center', gap: '8px', color: 'inherit', textDecoration: 'none', background: 'rgba(0,0,0,0.1)', padding: '10px', borderRadius: '8px' }}>
+                                      <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path d="M13 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V9z"></path><polyline points="13 2 13 9 20 9"></polyline></svg>
+                                      <span>Ver Documento Adjunto</span>
+                                    </a>
+                                  )}
+                                </div>
+                              )}
+                            </>
+                          )}
+                        </div>
 
-                        <div className="msg-actions-hover">
+                        <div className="msg-actions-hover" style={{ marginTop: '8px' }}>
                           <button onClick={(e) => { e.stopPropagation(); setOpenMessageMenu(openMessageMenu === msg.id ? null : msg.id); }} style={{ background: 'transparent', border: 'none', color: 'var(--color-text-muted)', cursor: 'pointer', padding: '4px' }}>
                             <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><circle cx="12" cy="12" r="1"></circle><circle cx="12" cy="5" r="1"></circle><circle cx="12" cy="19" r="1"></circle></svg>
                           </button>
