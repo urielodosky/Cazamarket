@@ -39,13 +39,29 @@ export default function MensajesPage() {
 
   // Close menus on click outside
   useEffect(() => {
+    document.body.classList.add('mensajes-active');
     const handleClick = () => {
       setOpenMessageMenu(null);
       setOpenChatMenu(null);
     };
     window.addEventListener('click', handleClick);
-    return () => window.removeEventListener('click', handleClick);
+    return () => {
+      window.removeEventListener('click', handleClick);
+      document.body.classList.remove('mensajes-active');
+    };
   }, []);
+
+  // Manage mobile full-screen mode class
+  useEffect(() => {
+    if (activeChatId) {
+      document.body.classList.add('chat-open');
+    } else {
+      document.body.classList.remove('chat-open');
+    }
+    return () => {
+      document.body.classList.remove('chat-open');
+    };
+  }, [activeChatId]);
 
   // Fetch chats on mount
   useEffect(() => {

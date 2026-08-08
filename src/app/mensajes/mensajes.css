@@ -11,6 +11,19 @@
 }
 
 @media (max-width: 768px) {
+  body.mensajes-active.chat-open header,
+  body.mensajes-active.chat-open nav.navbar,
+  body.mensajes-active.chat-open .navbar-header,
+  body.mensajes-active.chat-open .mobile-bottom-nav,
+  body.mensajes-active.chat-open footer {
+    display: none !important;
+  }
+
+  body.mensajes-active.chat-open .mensajes-page-wrapper {
+    height: 100dvh !important;
+    height: 100vh !important;
+  }
+
   .mensajes-page-wrapper {
     padding: 0 !important;
     height: calc(100vh - 60px) !important;
