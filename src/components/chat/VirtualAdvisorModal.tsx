@@ -240,9 +240,31 @@ export default function VirtualAdvisorModal({ onClose, productId }: VirtualAdvis
     } catch(e) { console.error(e); }
   };
 
+  const validateOptions = (opts: any[]): boolean => {
+    for (const opt of opts) {
+      if (!opt.label || !opt.label.trim()) return false;
+      if ((opt.responseType === 'options' || opt.responseType === 'file_options') && opt.options) {
+        if (opt.options.length === 0) return false;
+        if (!validateOptions(opt.options)) return false;
+      }
+    }
+    return true;
+  };
+
   const handleAddRule = async () => {
     if (conditionType !== 'always' && !conditionValue.trim()) { alert('Ingresa el valor de la condición.'); return; }
     
+    if (responseType === 'options' || responseType === 'file_options') {
+      if (options.length === 0) {
+        alert('Debes agregar al menos una opción.');
+        return;
+      }
+      if (!validateOptions(options)) {
+        alert('Todas las opciones y sub-opciones deben tener un Nombre del Botón (texto visible).');
+        return;
+      }
+    }
+
     if (responseType !== 'goto' && responseType !== 'whatsapp') {
       const hasText = !!responseText.trim();
       const hasFile = (responseType === 'file' || responseType === 'file_options') && (attachmentFile || fileName);
