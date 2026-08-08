@@ -109,9 +109,8 @@ export default function MensajesPage() {
           const { data: lastMsgData } = await supabase.from('messages').select('content, type, is_bot').eq('chat_id', c.id).order('created_at', { ascending: false }).limit(1);
           if (lastMsgData && lastMsgData.length > 0) {
              const m = lastMsgData[0];
-             if (m.type === 'file') lastMessage = '📎 Archivo adjunto';
+             if (m.type === 'file') lastMessage = 'Archivo adjunto';
              else if (m.type === 'options' || m.type === 'file_options') lastMessage = m.content || 'Botón interactivo';
-             else if (m.is_bot) lastMessage = `🤖 ${m.content}`;
              else lastMessage = m.content;
           }
 
