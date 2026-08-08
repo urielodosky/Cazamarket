@@ -525,7 +525,23 @@ export default function MensajesPage() {
       if (optionContext) {
         if (optionContext.responseType === 'goto' && optionContext.gotoId) {
           if (optionContext.gotoId === 'root') {
-            matchedRule = rules.find((r: any) => r.condition_type === 'always') || rules[0];
+            let parentRule = null;
+            for (const r of rules) {
+              if (r.options) {
+                const findNode = (opts: any[]): any => {
+                  for (const opt of opts) {
+                    if (opt.id === optionContext.id) return true;
+                    if (opt.options && findNode(opt.options)) return true;
+                  }
+                  return false;
+                };
+                if (findNode(r.options)) {
+                  parentRule = r;
+                  break;
+                }
+              }
+            }
+            matchedRule = parentRule || rules.find((r: any) => r.condition_type === 'always') || rules[0];
           } else {
             const findNode = (opts: any[]): any => {
               for (const opt of opts) {

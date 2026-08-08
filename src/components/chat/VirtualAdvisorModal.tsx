@@ -165,7 +165,7 @@ export default function VirtualAdvisorModal({ onClose, productId }: VirtualAdvis
   useEffect(() => {
     const gotos: GotoOption[] = [];
     if (responseType === 'options' || responseType === 'file_options') {
-      gotos.push({ value: 'root', label: 'Menú Principal (Raíz)' });
+      gotos.push({ value: 'root', label: 'Volver al inicio de esta regla' });
       const traverse = (opts: AdvisorOption[], prefix: string = '') => {
         opts.forEach((opt, idx) => {
           const currentPath = `${prefix}${idx + 1}`;
