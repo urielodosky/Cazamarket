@@ -11,6 +11,10 @@
 }
 
 @media (max-width: 768px) {
+  body.mensajes-active.chat-open {
+    overflow: hidden !important;
+  }
+
   body.mensajes-active.chat-open header,
   body.mensajes-active.chat-open nav.navbar,
   body.mensajes-active.chat-open .navbar-header,
@@ -20,8 +24,17 @@
   }
 
   body.mensajes-active.chat-open .mensajes-page-wrapper {
+    position: fixed !important;
+    top: 0 !important;
+    left: 0 !important;
+    right: 0 !important;
+    bottom: 0 !important;
     height: 100dvh !important;
-    height: 100vh !important;
+    width: 100vw !important;
+    z-index: 9999 !important;
+    padding: 0 !important;
+    margin: 0 !important;
+    background: var(--color-bg);
   }
 
   .mensajes-page-wrapper {
