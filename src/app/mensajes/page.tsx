@@ -710,7 +710,8 @@ export default function MensajesPage() {
               {/* Messages Area */}
               <div style={{ flex: 1, padding: '24px 24px 120px 24px', overflowY: 'auto', display: 'flex', flexDirection: 'column', gap: '16px' }}>
                 {messages.map((msg: any) => {
-                  const isMe = activeChatId === 'bot-test-chat' ? !msg.is_bot : msg.sender_id === supabaseUser?.id;
+                  const isTestChat = activeChatId === 'bot-test-chat' || (activeChat?.dbChat?.buyer_id === supabaseUser?.id && activeChat?.dbChat?.seller_id === supabaseUser?.id);
+                  const isMe = isTestChat ? !msg.is_bot : msg.sender_id === supabaseUser?.id;
                   return (
                     <div key={msg.id} className="message-item-container" style={{ display: 'flex', flexDirection: 'column', alignItems: isMe ? 'flex-end' : 'flex-start', position: 'relative', maxWidth: '100%' }}>
                       <div style={{ display: 'flex', alignItems: 'center', gap: '8px', flexDirection: isMe ? 'row-reverse' : 'row', maxWidth: '100%', position: 'relative' }}>
