@@ -564,10 +564,7 @@ export default function ProductoDetailPage({ params }: { params: Promise<{ id: s
             <div style={{ position: 'relative', width: '100%' }}>
               <button 
                 onClick={(e) => {
-                  if (!isLoggedIn) {
-                    showToast('Debes iniciar sesión para contactar al vendedor', 'error');
-                    return;
-                  }
+
                   if (supabaseUser && supabaseUser.id === product.seller.id) {
                     showToast('No puedes contactarte a ti mismo', 'error');
                     return;
