@@ -36,6 +36,7 @@ export default function MensajesPage() {
   const [openMessageMenu, setOpenMessageMenu] = useState<string | null>(null);
   const [openChatMenu, setOpenChatMenu] = useState<string | null>(null);
   const [chatMenuPos, setChatMenuPos] = useState({ x: 0, y: 0 });
+  const [previewImage, setPreviewImage] = useState<string | null>(null);
 
   // Close menus on click outside
   useEffect(() => {
@@ -848,7 +849,12 @@ export default function MensajesPage() {
                               {msg.attachment_url && (
                                 <div style={{ width: '100%' }}>
                                   {msg.attachment_type === 'image' && (
-                                    <img src={msg.attachment_url} alt="Adjunto" style={{ maxWidth: '100%', borderRadius: '8px', cursor: 'pointer' }} onClick={() => window.open(msg.attachment_url, '_blank')} />
+                                    <img 
+                                      src={msg.attachment_url} 
+                                      alt="Adjunto" 
+                                      style={{ maxWidth: '250px', maxHeight: '300px', objectFit: 'cover', borderRadius: '8px', cursor: 'pointer', border: '1px solid var(--color-border)' }} 
+                                      onClick={() => setPreviewImage(msg.attachment_url)} 
+                                    />
                                   )}
                                   {msg.attachment_type === 'video' && (
                                     <video src={msg.attachment_url} controls style={{ maxWidth: '100%', borderRadius: '8px' }} />
@@ -1004,6 +1010,17 @@ export default function MensajesPage() {
             </div>
           </div>
         </div>
+      )}
+
+      {/* Image Preview Modal */}
+      {previewImage && typeof window !== 'undefined' && createPortal(
+        <div style={{ position: 'fixed', top: 0, left: 0, right: 0, bottom: 0, background: 'rgba(0,0,0,0.85)', zIndex: 10000, display: 'flex', alignItems: 'center', justifyContent: 'center', padding: '24px' }} onClick={() => setPreviewImage(null)}>
+          <button onClick={() => setPreviewImage(null)} style={{ position: 'absolute', top: '24px', right: '24px', background: 'transparent', border: 'none', color: '#fff', cursor: 'pointer', padding: '8px' }}>
+            <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg>
+          </button>
+          <img src={previewImage} alt="Preview" style={{ maxWidth: '100%', maxHeight: '100%', objectFit: 'contain', borderRadius: '8px' }} onClick={(e) => e.stopPropagation()} />
+        </div>,
+        document.body
       )}
     </div>
   );
