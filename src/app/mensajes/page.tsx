@@ -727,11 +727,23 @@ export default function MensajesPage() {
                               {/* Text Bubble */}
                               {msg.content && (
                                 <div style={{ 
-                                  padding: '12px 16px', borderRadius: 'var(--radius-lg)', 
+                                  padding: '12px 16px', paddingBottom: '8px', borderRadius: 'var(--radius-lg)', 
                                   background: !isMe ? 'var(--color-primary)' : 'rgba(255,255,255,0.05)', color: !isMe ? '#fff' : 'var(--color-text-main)',
-                                  borderBottomRightRadius: isMe ? '4px' : 'var(--radius-lg)', borderBottomLeftRadius: !isMe ? '4px' : 'var(--radius-lg)'
+                                  borderBottomRightRadius: isMe ? '4px' : 'var(--radius-lg)', borderBottomLeftRadius: !isMe ? '4px' : 'var(--radius-lg)',
+                                  display: 'flex', flexDirection: 'column'
                                 }}>
                                   <p style={{ margin: 0, fontSize: '0.95rem', lineHeight: 1.4, wordBreak: 'break-all', overflowWrap: 'anywhere', whiteSpace: 'pre-wrap' }}>{msg.content}</p>
+                                  <div style={{ alignSelf: 'flex-end', display: 'flex', alignItems: 'center', gap: '4px', marginTop: '2px' }}>
+                                    <span style={{ fontSize: '0.65rem', color: !isMe ? 'rgba(255,255,255,0.8)' : 'var(--color-text-muted)' }}>
+                                      {new Date(msg.created_at).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
+                                    </span>
+                                    {isMe && !msg.is_deleted && (
+                                       <span style={{ display: 'flex', color: msg.status === 'read' ? '#53bdeb' : 'var(--color-text-muted)' }}>
+                                         {(msg.status === 'sent' || !msg.status) && <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><polyline points="20 6 9 17 4 12"></polyline></svg>}
+                                         {(msg.status === 'delivered' || msg.status === 'read') && <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><polyline points="18 6 7 17 2 12"></polyline><polyline points="22 6 11 17 6 12"></polyline></svg>}
+                                       </span>
+                                    )}
+                                  </div>
                                 </div>
                               )}
                               
@@ -817,17 +829,21 @@ export default function MensajesPage() {
                           </div>
                         )}
                       </div>
-                      <div style={{ display: 'flex', alignItems: 'center', gap: '4px', marginTop: '4px' }}>
-                        <span style={{ fontSize: '0.7rem', color: 'var(--color-text-muted)' }}>
-                          {new Date(msg.created_at).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
-                        </span>
-                        {isMe && !msg.is_deleted && (
-                           <span style={{ display: 'flex', color: msg.status === 'read' ? '#53bdeb' : 'var(--color-text-muted)' }}>
-                             {(msg.status === 'sent' || !msg.status) && <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><polyline points="20 6 9 17 4 12"></polyline></svg>}
-                             {(msg.status === 'delivered' || msg.status === 'read') && <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><polyline points="18 6 7 17 2 12"></polyline><polyline points="22 6 11 17 6 12"></polyline></svg>}
-                           </span>
-                        )}
-                      </div>
+                      
+                      {/* Render time here ONLY if there is no text content (e.g. only attachment) */}
+                      {!msg.content && (
+                        <div style={{ display: 'flex', alignItems: 'center', gap: '4px', marginTop: '4px' }}>
+                          <span style={{ fontSize: '0.7rem', color: 'var(--color-text-muted)' }}>
+                            {new Date(msg.created_at).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
+                          </span>
+                          {isMe && !msg.is_deleted && (
+                             <span style={{ display: 'flex', color: msg.status === 'read' ? '#53bdeb' : 'var(--color-text-muted)' }}>
+                               {(msg.status === 'sent' || !msg.status) && <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><polyline points="20 6 9 17 4 12"></polyline></svg>}
+                               {(msg.status === 'delivered' || msg.status === 'read') && <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><polyline points="18 6 7 17 2 12"></polyline><polyline points="22 6 11 17 6 12"></polyline></svg>}
+                             </span>
+                          )}
+                        </div>
+                      )}
                     </div>
                   );
                 })}
