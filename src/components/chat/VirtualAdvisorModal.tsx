@@ -519,8 +519,22 @@ export default function VirtualAdvisorModal({ onClose, productId }: VirtualAdvis
                       <div style={{ background: 'rgba(255, 115, 0, 0.05)', padding: '16px', borderRadius: '8px', border: '1px solid rgba(255, 115, 0, 0.2)' }}>
                         <h4 style={{ margin: '0 0 12px 0', color: 'var(--color-primary)' }}>Configuración de Reactivación y Cooldown</h4>
                         <div style={{ display: 'flex', alignItems: 'center', gap: '12px', marginBottom: '16px' }}>
-                          <input type="checkbox" id="fireOnceCheck" checked={fireOnce} onChange={e => setFireOnce(e.target.checked)} style={{ width: '20px', height: '20px', cursor: 'pointer', margin: 0, flexShrink: 0 }} />
-                          <label htmlFor="fireOnceCheck" style={{ color: themeColors.textWhite }}>Disparar SOLO una vez y no volver a molestar</label>
+                          <div 
+                            onClick={() => setFireOnce(!fireOnce)}
+                            style={{ 
+                              width: '24px', height: '24px', 
+                              border: `2px solid ${fireOnce ? 'var(--color-primary)' : 'var(--color-border)'}`, 
+                              borderRadius: '6px', 
+                              background: fireOnce ? 'var(--color-primary)' : 'transparent',
+                              display: 'flex', alignItems: 'center', justifyContent: 'center',
+                              cursor: 'pointer', flexShrink: 0, transition: 'all 0.2s'
+                            }}
+                          >
+                            {fireOnce && <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#fff" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round"><polyline points="20 6 9 17 4 12"></polyline></svg>}
+                          </div>
+                          <label onClick={() => setFireOnce(!fireOnce)} style={{ color: themeColors.textWhite, cursor: 'pointer', userSelect: 'none', lineHeight: 1.4 }}>
+                            Disparar SOLO una vez y no volver a molestar
+                          </label>
                         </div>
                         
                         {!fireOnce && (
