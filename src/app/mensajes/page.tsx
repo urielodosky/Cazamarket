@@ -90,7 +90,7 @@ export default function MensajesPage() {
         });
 
         // Map data to UI expected format
-        const mappedChats = filteredData.map(c => {
+        const mappedChats = await Promise.all(filteredData.map(async c => {
           const isTestChat = c.buyer_id === supabaseUser.id && c.seller_id === supabaseUser.id;
           const isBuyer = c.buyer_id === supabaseUser.id;
           const otherParty = isTestChat ? c.seller : (isBuyer ? c.seller : c.buyer);
@@ -104,6 +104,16 @@ export default function MensajesPage() {
           }
 
           const isPinned = isBuyer ? c.pinned_by_buyer : c.pinned_by_seller;
+          
+          let lastMessage = 'Abrir chat para ver mensajes';
+          const { data: lastMsgData } = await supabase.from('messages').select('content, type, is_bot').eq('chat_id', c.id).order('created_at', { ascending: false }).limit(1);
+          if (lastMsgData && lastMsgData.length > 0) {
+             const m = lastMsgData[0];
+             if (m.type === 'file') lastMessage = '📎 Archivo adjunto';
+             else if (m.type === 'options' || m.type === 'file_options') lastMessage = m.content || 'Botón interactivo';
+             else if (m.is_bot) lastMessage = `🤖 ${m.content}`;
+             else lastMessage = m.content;
+          }
 
           return {
             id: c.id,
@@ -112,12 +122,12 @@ export default function MensajesPage() {
             avatar: otherParty?.avatar_url || 'https://ui-avatars.com/api/?name=User',
             online: false,
             time: new Date(c.updated_at).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
-            lastMessage: 'Abrir chat para ver mensajes',
+            lastMessage: lastMessage,
             unread: 0,
             dbChat: c,
             isPinned: isPinned
           };
-        });
+        }));
 
         // Sort mappedChats: pinned first, then by updated_at descending
         mappedChats.sort((a, b) => {
@@ -701,14 +711,14 @@ export default function MensajesPage() {
                           setOpenChatMenu(null);
                         } else {
                           const rect = e.currentTarget.getBoundingClientRect();
-                          setChatMenuPos({ x: rect.left, y: rect.bottom + 4 });
+                          setChatMenuPos({ x: typeof window !== 'undefined' ? window.innerWidth - rect.right : 0, y: rect.bottom + 4 });
                           setOpenChatMenu(chat.id);
                         }
                       }} style={{ background: 'transparent', border: 'none', color: chat.isPinned ? 'var(--color-primary)' : 'var(--color-text-muted)', cursor: 'pointer', padding: '4px' }}>
                         <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><circle cx="12" cy="12" r="1"></circle><circle cx="12" cy="5" r="1"></circle><circle cx="12" cy="19" r="1"></circle></svg>
                       </button>
                       {openChatMenu === chat.id && typeof window !== 'undefined' && createPortal(
-                        <div className="chat-dropdown-menu" style={{ position: 'fixed', left: chatMenuPos.x, top: chatMenuPos.y, margin: 0 }}>
+                        <div className="chat-dropdown-menu" style={{ position: 'fixed', right: chatMenuPos.x, top: chatMenuPos.y, margin: 0 }}>
                           <button className="chat-dropdown-item" onClick={(e) => { e.stopPropagation(); togglePinChat(chat); setOpenChatMenu(null); }}>
                             <svg width="16" height="16" viewBox="0 0 24 24" fill={chat.isPinned ? "currentColor" : "none"} stroke="currentColor" strokeWidth="2"><line x1="12" y1="17" x2="12" y2="22"></line><path d="M5 17h14v-1.76a2 2 0 0 0-1.11-1.79l-1.78-.9A2 2 0 0 1 15 10.76V6h1a2 2 0 0 0 0-4H8a2 2 0 0 0 0 4h1v4.76a2 2 0 0 1-1.11 1.79l-1.78.9A2 2 0 0 0 5 15.24Z"></path></svg>
                             {chat.isPinned ? "Desfijar chat" : "Fijar chat"}
