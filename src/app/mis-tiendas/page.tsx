@@ -11,6 +11,8 @@ import CustomSelect from '@/components/ui/CustomSelect';
 import type { SelectOption } from '@/components/ui/CustomSelect';
 import { CATEGORIES_DATA } from '@/constants/categoriesData';
 import { createClient } from '@/lib/supabase/client';
+import ImageCropperModal from '@/components/ImageCropperModal';
+import getCroppedImg from '@/utils/cropImage';
 
 const PROVINCES_MAP: Record<string, string> = {
   "02": "Ciudad Autónoma de Buenos Aires",
@@ -103,7 +105,7 @@ const ensureCategoriesArray = (raw: any, targetLen: number = 3): string[] => {
 };
 
 export default function MiNegocioPage() {
-  const { isVendorModeActive, username, email, avatar, updateUser, storeDescription, businessType: authBusinessType, storeCategories, storeTheme, phone, province, locality, street, streetNumber, branches, socialMedia } = useAuth();
+  const { isVendorModeActive, username, email, avatar, coverUrl, updateUser, storeDescription, businessType: authBusinessType, storeCategories, storeTheme, phone, province, locality, street, streetNumber, branches, socialMedia, supabaseUser } = useAuth();
   const { permissions, planTier, planDisplayName } = usePlan();
   const themeColors = useThemeColors();
   const [activeTab, setActiveTab] = useState<'productos' | 'servicios' | 'informacion' | 'apariencia'>('productos');
@@ -119,7 +121,11 @@ export default function MiNegocioPage() {
   const [description, setDescription] = useState(storeDescription || '');
   const [businessType, setBusinessType] = useState(authBusinessType || '');
   const [categories, setCategories] = useState(storeCategories?.length > 0 ? storeCategories : ['', '', '']);
-  const [storeBanner, setStoreBanner] = useState('https://images.unsplash.com/photo-1511497584788-876760111969?q=80&w=1200&auto=format&fit=crop');
+  const [storeBanner, setStoreBanner] = useState(coverUrl || null);
+
+  const [cropImageSrc, setCropImageSrc] = useState<string | null>(null);
+  const [cropType, setCropType] = useState<'avatar' | 'banner' | null>(null);
+  const [isUploadingImage, setIsUploadingImage] = useState(false);
 
   const [isEditingName, setIsEditingName] = useState(false);
   const [isEditingDesc, setIsEditingDesc] = useState(false);
@@ -135,7 +141,6 @@ export default function MiNegocioPage() {
   const [redesSociales, setRedesSociales] = useState<{ red: string, usuario: string }[]>(socialMedia || []);
 
   const supabase = createClient();
-  const { supabaseUser } = useAuth();
 
   React.useEffect(() => {
     const fetchProductsAndServices = async () => {
@@ -162,7 +167,8 @@ export default function MiNegocioPage() {
     if (phone) setTelefono(phone);
     if (socialMedia?.length > 0) setRedesSociales(socialMedia);
     if (branches?.length > 0) setSucursales(branches);
-  }, [storeTheme, storeDescription, username, authBusinessType, storeCategories, phone, socialMedia, branches]);
+    if (coverUrl) setStoreBanner(coverUrl);
+  }, [storeTheme, storeDescription, username, authBusinessType, storeCategories, phone, socialMedia, branches, coverUrl]);
 
   React.useEffect(() => {
     // Auto-select first available tab if default is not available
@@ -192,25 +198,76 @@ export default function MiNegocioPage() {
 
   const handleAvatarChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     if (e.target.files && e.target.files[0]) {
+      const file = e.target.files[0];
+      if (file.size > 10 * 1024 * 1024) {
+        alert('El archivo excede el límite de 10 MB.');
+        return;
+      }
       const reader = new FileReader();
       reader.onload = (event) => {
         if (event.target?.result) {
-          updateUser({ username: name, avatar: event.target.result as string });
+          setCropImageSrc(event.target.result as string);
+          setCropType('avatar');
         }
       };
-      reader.readAsDataURL(e.target.files[0]);
+      reader.readAsDataURL(file);
     }
+    e.target.value = '';
   };
 
   const handleBannerChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     if (e.target.files && e.target.files[0]) {
+      const file = e.target.files[0];
+      if (file.size > 10 * 1024 * 1024) {
+        alert('El archivo excede el límite de 10 MB.');
+        return;
+      }
       const reader = new FileReader();
       reader.onload = (event) => {
         if (event.target?.result) {
-          setStoreBanner(event.target.result as string);
+          setCropImageSrc(event.target.result as string);
+          setCropType('banner');
         }
       };
-      reader.readAsDataURL(e.target.files[0]);
+      reader.readAsDataURL(file);
+    }
+    e.target.value = '';
+  };
+
+  const handleCropComplete = async (croppedAreaPixels: any) => {
+    if (!cropImageSrc || !cropType || !supabaseUser) return;
+    setIsUploadingImage(true);
+    
+    try {
+      const blob = await getCroppedImg(cropImageSrc, croppedAreaPixels, 0);
+      if (!blob) throw new Error('Error al recortar la imagen');
+
+      const fileExt = 'jpg';
+      const fileName = `${cropType}_${Date.now()}.${fileExt}`;
+      const filePath = `${supabaseUser.id}/${fileName}`;
+      
+      const { error: uploadError } = await supabase.storage
+        .from('MediaCazaMarket')
+        .upload(filePath, blob, { contentType: 'image/jpeg', cacheControl: '3600', upsert: true });
+        
+      if (uploadError) throw uploadError;
+      
+      const { data } = supabase.storage.from('MediaCazaMarket').getPublicUrl(filePath);
+      
+      if (cropType === 'avatar') {
+        updateUser({ avatar: data.publicUrl });
+      } else {
+        setStoreBanner(data.publicUrl);
+        updateUser({ coverUrl: data.publicUrl });
+      }
+      
+      setCropImageSrc(null);
+      setCropType(null);
+    } catch (err: any) {
+      console.error('Error procesando imagen:', err);
+      alert('Hubo un error al subir la imagen. Por favor, intenta de nuevo.');
+    } finally {
+      setIsUploadingImage(false);
     }
   };
 
@@ -940,6 +997,25 @@ export default function MiNegocioPage() {
           </div>
         </div>
       </div>
+      
+      {cropImageSrc && cropType && (
+        <ImageCropperModal
+          imageSrc={cropImageSrc}
+          aspect={cropType === 'avatar' ? 1 : 3 / 1}
+          onCropComplete={handleCropComplete}
+          onCancel={() => {
+            setCropImageSrc(null);
+            setCropType(null);
+          }}
+          title={cropType === 'avatar' ? 'Ajustar Foto de Perfil' : 'Ajustar Portada'}
+        />
+      )}
+      
+      {isUploadingImage && (
+        <div style={{ position: 'fixed', inset: 0, background: 'rgba(0,0,0,0.8)', zIndex: 10000, display: 'flex', alignItems: 'center', justifyContent: 'center', color: '#fff', fontSize: '1.2rem' }}>
+          Subiendo imagen...
+        </div>
+      )}
     </div>
   );
 }

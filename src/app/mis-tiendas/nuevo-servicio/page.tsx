@@ -9,9 +9,10 @@ import { useAuth } from '@/contexts/AuthContext';
 import { createClient } from '@/lib/supabase/client';
 import { usePlan } from '@/contexts/PlanContext';
 import VirtualAdvisorModal from '@/components/chat/VirtualAdvisorModal';
-import BookingCalendar from '@/components/ui/BookingCalendar';
 import { SERVICE_MAIN_CATEGORIES, getSubcategoriesForCategory } from '@/constants/categoriesData';
 import { LightBulbIcon } from '@heroicons/react/24/outline';
+import ImageCropperModal from '@/components/ImageCropperModal';
+import getCroppedImg from '@/utils/cropImage';
 
 const LocationMap = dynamic(() => import('@/components/ui/LocationMap'), { ssr: false, loading: () => <div style={{height: '100%', display: 'flex', alignItems: 'center', justifyContent: 'center', color: 'var(--color-primary)'}}>Cargando satélite...</div> });
 const AreaMap = dynamic(() => import('@/components/ui/AreaMap'), { ssr: false, loading: () => <div style={{height: '100%', display: 'flex', alignItems: 'center', justifyContent: 'center', color: 'var(--color-primary)'}}>Cargando mapa de cobertura...</div> });
@@ -59,10 +60,12 @@ function NuevoServicioContent() {
   const { hasFeature, permissions } = usePlan();
   
   const canUseBot = hasFeature('botAsesor');
+  const canUseBot = hasFeature('botAsesor');
   const [isAdvisorModalOpen, setIsAdvisorModalOpen] = useState(false);
   
   const [stockMode, setStockMode] = useState<'definido' | 'no_necesario'>('no_necesario');
   const [mediaPreview, setMediaPreview] = useState<{url: string, type: string, file: File | null}[]>([]);
+  const [pendingCropQueue, setPendingCropQueue] = useState<{file: File, type: string, src: string}[]>([]);
   const [uploadError, setUploadError] = useState<string | null>(null);
   const [currency, setCurrency] = useState('USD');
   const [category, setCategory] = useState('');
@@ -144,11 +147,9 @@ function NuevoServicioContent() {
       
       let imageCount = mediaPreview.filter(m => m.type === 'image').length;
       let videoCount = mediaPreview.filter(m => m.type === 'video').length;
-      const newPreviews: {url: string, type: string, file: File}[] = [];
 
       for (const file of newFiles) {
-        if (mediaPreview.some(m => m.file?.name === file.name && m.file?.size === file.size) ||
-            newPreviews.some(m => m.file?.name === file.name && m.file?.size === file.size)) {
+        if (mediaPreview.some(m => m.file?.name === file.name && m.file?.size === file.size)) {
           errorMsg = 'El archivo ya fue subido.';
           continue;
         }
@@ -162,10 +163,9 @@ function NuevoServicioContent() {
           continue;
         }
 
-        // --- 2. Seguridad: Validación de Tamaño ---
-        const maxSize = isVideo ? 25 * 1024 * 1024 : 5 * 1024 * 1024; // 25MB video, 5MB imagen
+        const maxSize = isVideo ? 25 * 1024 * 1024 : 10 * 1024 * 1024; // 25MB video, 10MB imagen
         if (file.size > maxSize) {
-          errorMsg = `El archivo ${file.name} excede el límite de tamaño permitido (${isVideo ? '25MB' : '5MB'}).`;
+          errorMsg = `El archivo ${file.name} excede el límite de tamaño permitido (${isVideo ? '25MB' : '10MB'}).`;
           continue;
         }
         
@@ -175,21 +175,17 @@ function NuevoServicioContent() {
             continue;
           }
           videoCount++;
+          const blobUrl = URL.createObjectURL(file);
+          setMediaPreview(prev => [...prev, { url: blobUrl, type: 'video', file: file }]);
         } else {
           if (imageCount >= 8) {
             errorMsg = 'Máximo de 8 imágenes alcanzado.';
             continue;
           }
           imageCount++;
+          const blobUrl = URL.createObjectURL(file);
+          setPendingCropQueue(prev => [...prev, { file, type: 'image', src: blobUrl }]);
         }
-
-        const blobUrl = URL.createObjectURL(file);
-        
-        setMediaPreview(prev => [...prev, {
-          url: blobUrl,
-          type: isVideo ? 'video' : 'image',
-          file: file
-        }]);
       }
       
       if (errorMsg) {
@@ -210,6 +206,25 @@ function NuevoServicioContent() {
       newPreview.splice(index, 1);
       return newPreview;
     });
+  };
+
+  const handleCropComplete = async (croppedAreaPixels: any) => {
+    if (pendingCropQueue.length === 0) return;
+    const currentItem = pendingCropQueue[0];
+    
+    try {
+      const blob = await getCroppedImg(currentItem.src, croppedAreaPixels, 0);
+      if (blob) {
+        const croppedFile = new File([blob], currentItem.file.name, { type: 'image/jpeg' });
+        const croppedUrl = URL.createObjectURL(croppedFile);
+        setMediaPreview(prev => [...prev, { url: croppedUrl, type: 'image', file: croppedFile }]);
+      }
+    } catch (err) {
+      console.error("Error cropping image:", err);
+      alert("Hubo un error al recortar la imagen.");
+    }
+    
+    setPendingCropQueue(prev => prev.slice(1));
   };
 
   const [currentStep, setCurrentStep] = useState(1);
@@ -1149,6 +1164,18 @@ function NuevoServicioContent() {
         <VirtualAdvisorModal 
           onClose={() => setIsAdvisorModalOpen(false)} 
           productId={editId}
+        />
+      )}
+      
+      {pendingCropQueue.length > 0 && (
+        <ImageCropperModal
+          imageSrc={pendingCropQueue[0].src}
+          aspect={4 / 3}
+          onCropComplete={handleCropComplete}
+          onCancel={() => {
+            setPendingCropQueue(prev => prev.slice(1));
+          }}
+          title={`Ajustar Imagen de Servicio (${pendingCropQueue.length} pendiente${pendingCropQueue.length > 1 ? 's' : ''})`}
         />
       )}
     </div>

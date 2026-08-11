@@ -7,6 +7,8 @@ import { LightBulbIcon } from '@heroicons/react/24/outline';
 import CustomSelect from '@/components/ui/CustomSelect';
 import { useAuth } from '@/contexts/AuthContext';
 import { createClient } from '@/lib/supabase/client';
+import ImageCropperModal from '@/components/ImageCropperModal';
+import getCroppedImg from '@/utils/cropImage';
 import { usePlan } from '@/contexts/PlanContext';
 import VirtualAdvisorModal from '@/components/chat/VirtualAdvisorModal';
 import { PRODUCT_MAIN_CATEGORIES, getSubcategoriesForCategory } from '@/constants/categoriesData';
@@ -39,6 +41,8 @@ function NuevoProductoContent() {
   const [description, setDescription] = useState('');
   const [formError, setFormError] = useState<string | null>(null);
   const [hasFirearmsPermit, setHasFirearmsPermit] = useState(false);
+
+  const [pendingCropQueue, setPendingCropQueue] = useState<{file: File, type: string, src: string}[]>([]);
 
   const [shippingMode, setShippingMode] = useState<'gratis' | 'sin_envio' | 'costo_extra'>('gratis');
   const [shippingCost, setShippingCost] = useState('');
@@ -160,29 +164,23 @@ function NuevoProductoContent() {
       
       let imageCount = mediaPreview.filter(m => m.type === 'image').length;
       let videoCount = mediaPreview.filter(m => m.type === 'video').length;
-      const newPreviews: {url: string, type: string, file: File}[] = [];
 
       for (const file of newFiles) {
-        // Prevent duplicates
-        if (mediaPreview.some(m => m.file?.name === file.name && m.file?.size === file.size) ||
-            newPreviews.some(m => m.file?.name === file.name && m.file?.size === file.size)) {
+        if (mediaPreview.some(m => m.file?.name === file.name && m.file?.size === file.size)) {
           errorMsg = 'El archivo ya fue subido.';
           continue;
         }
 
         const isVideo = file.type.startsWith('video/');
-        
-        // --- 1. Seguridad: Validación de Tipo ---
         const validTypes = ['image/jpeg', 'image/png', 'image/webp', 'video/mp4', 'video/quicktime'];
         if (!validTypes.includes(file.type)) {
           errorMsg = `El tipo de archivo ${file.type} no es seguro o no está soportado.`;
           continue;
         }
 
-        // --- 2. Seguridad: Validación de Tamaño ---
-        const maxSize = isVideo ? 25 * 1024 * 1024 : 5 * 1024 * 1024; // 25MB video, 5MB imagen
+        const maxSize = isVideo ? 25 * 1024 * 1024 : 10 * 1024 * 1024;
         if (file.size > maxSize) {
-          errorMsg = `El archivo ${file.name} excede el límite de tamaño permitido (${isVideo ? '25MB' : '5MB'}).`;
+          errorMsg = `El archivo ${file.name} excede el límite de tamaño permitido (${isVideo ? '25MB' : '10MB'}).`;
           continue;
         }
         
@@ -192,25 +190,17 @@ function NuevoProductoContent() {
             continue;
           }
           videoCount++;
+          const blobUrl = URL.createObjectURL(file);
+          setMediaPreview(prev => [...prev, { url: blobUrl, type: 'video', file: file }]);
         } else {
           if (imageCount >= 8) {
             errorMsg = 'Máximo de 8 imágenes alcanzado.';
             continue;
           }
           imageCount++;
+          const blobUrl = URL.createObjectURL(file);
+          setPendingCropQueue(prev => [...prev, { file, type: 'image', src: blobUrl }]);
         }
-
-        // Usar URL.createObjectURL para saltarse completamente el límite de localStorage
-        // ya que esto solo genera un string corto (blob:http...) en lugar de un base64 gigante.
-        // NOTA: Las imágenes subidas así se verán rotas si el usuario recarga la página, 
-        // pero permite probar la creación de miles de productos.
-        const blobUrl = URL.createObjectURL(file);
-        
-        setMediaPreview(prev => [...prev, {
-          url: blobUrl,
-          type: isVideo ? 'video' : 'image',
-          file: file
-        }]);
       }
       
       if (errorMsg) {
@@ -218,7 +208,6 @@ function NuevoProductoContent() {
         setTimeout(() => setUploadError(null), 3000);
       }
       
-      // Reset input to allow selecting the same file after removing it
       e.target.value = '';
     }
   };
@@ -232,6 +221,25 @@ function NuevoProductoContent() {
       newPreview.splice(index, 1);
       return newPreview;
     });
+  };
+
+  const handleCropComplete = async (croppedAreaPixels: any) => {
+    if (pendingCropQueue.length === 0) return;
+    const currentItem = pendingCropQueue[0];
+    
+    try {
+      const blob = await getCroppedImg(currentItem.src, croppedAreaPixels, 0);
+      if (blob) {
+        const croppedFile = new File([blob], currentItem.file.name, { type: 'image/jpeg' });
+        const croppedUrl = URL.createObjectURL(croppedFile);
+        setMediaPreview(prev => [...prev, { url: croppedUrl, type: 'image', file: croppedFile }]);
+      }
+    } catch (err) {
+      console.error("Error cropping image:", err);
+      alert("Hubo un error al recortar la imagen.");
+    }
+    
+    setPendingCropQueue(prev => prev.slice(1));
   };
 
   const [currentStep, setCurrentStep] = useState(1);
@@ -323,7 +331,6 @@ function NuevoProductoContent() {
     setLoadingProgress(15);
 
     try {
-      // Subir archivos nuevos a Supabase Storage
       const uploadedMedia = [];
       const newFiles = mediaPreview.filter(m => m.file);
       
@@ -352,11 +359,9 @@ function NuevoProductoContent() {
           uploadedMedia.push({ url: data.publicUrl, type: m.type });
           
           uploadCount++;
-          // Anima un poco la barra por cada archivo
-          const newProgress = 30 + (uploadCount / newFiles.length) * 30; // sube del 30 al 60%
+          const newProgress = 30 + (uploadCount / newFiles.length) * 30;
           setLoadingProgress(newProgress);
         } else {
-          // Ya estaba subido o es de mockup
           uploadedMedia.push({ url: m.url, type: m.type });
         }
       }
@@ -399,7 +404,6 @@ function NuevoProductoContent() {
       setLoadingText('¡Casi listo! Ajustando últimos detalles...');
       setLoadingProgress(99);
       
-      // Simular una carga emocionante
       await new Promise(resolve => setTimeout(resolve, 800));
       setLoadingText('¡Producto publicado con éxito!');
       setLoadingProgress(100);
@@ -418,7 +422,6 @@ function NuevoProductoContent() {
   return (
     <div style={{ padding: 'var(--spacing-8) var(--spacing-4)', maxWidth: '1000px', margin: '0 auto', minHeight: '80vh' }}>
       
-      {/* Breadcrumbs */}
       <div style={{ marginBottom: '24px', display: 'flex', alignItems: 'center', gap: '8px' }}>
         <Link href="/mis-tiendas" style={{ color: 'var(--color-text-muted)', textDecoration: 'none', fontSize: '0.9rem', display: 'flex', alignItems: 'center', gap: '6px' }}>
           <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><polyline points="15 18 9 12 15 6"></polyline></svg>
@@ -433,7 +436,6 @@ function NuevoProductoContent() {
         <p style={{ color: 'var(--color-text-muted)', fontSize: '1rem', margin: 0 }}>{editId ? 'Modifica los detalles de tu artículo.' : 'Completa los detalles de tu artículo para publicarlo en la tienda.'}</p>
       </div>
 
-      {/* Progress Bar */}
       <div style={{ display: 'flex', gap: '8px', marginBottom: '32px' }}>
         {[1, 2, 3].map(step => (
           <div key={step} style={{ flex: 1, height: '4px', background: currentStep >= step ? 'var(--color-primary)' : 'rgba(255,255,255,0.1)', borderRadius: '2px', transition: 'background 0.3s' }} />
@@ -487,7 +489,6 @@ function NuevoProductoContent() {
 
           {currentStep === 1 && (
             <>
-              {/* Image/Video Upload Area */}
           <div>
             <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '12px' }}>
               <label style={{ display: 'block', color: 'var(--color-text-main)', fontWeight: 600, margin: 0 }}>
@@ -562,7 +563,6 @@ function NuevoProductoContent() {
             />
           </div>
 
-            {/* Title */}
             <div>
               <label style={{ display: 'block', color: 'var(--color-text-main)', fontWeight: 600, marginBottom: '8px' }}>
                 Título del Producto *
@@ -580,7 +580,6 @@ function NuevoProductoContent() {
               />
             </div>
 
-            {/* Description */}
             <div>
               <label style={{ display: 'block', color: 'var(--color-text-main)', fontWeight: 600, marginBottom: '8px' }}>
                 Descripción Detallada
@@ -598,7 +597,6 @@ function NuevoProductoContent() {
               />
             </div>
             
-            {/* Características */}
             <div>
               <label style={{ display: 'block', color: 'var(--color-text-main)', fontWeight: 600, marginBottom: '8px' }}>
                 Características (Features)
@@ -630,7 +628,6 @@ function NuevoProductoContent() {
               )}
             </div>
 
-            {/* Category & Subcategory */}
             <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '16px' }}>
               <div>
                 <label style={{ display: 'block', color: 'var(--color-text-main)', fontWeight: 600, marginBottom: '8px' }}>
@@ -686,7 +683,6 @@ function NuevoProductoContent() {
           {currentStep === 2 && (
             <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '24px' }}>
 
-            {/* Price */}
             <div style={{ gridColumn: '1 / -1' }}>
               <label style={{ display: 'block', color: 'var(--color-text-main)', fontWeight: 600, marginBottom: '8px' }}>
                 Precio *
@@ -733,7 +729,6 @@ function NuevoProductoContent() {
               </div>
             </div>
             
-            {/* Stock */}
             <div>
               <label style={{ display: 'block', color: 'var(--color-text-main)', fontWeight: 600, marginBottom: '8px' }}>
                 Stock disponible
@@ -781,7 +776,6 @@ function NuevoProductoContent() {
 
           {currentStep === 3 && (
             <div style={{ display: 'grid', gridTemplateColumns: '1fr', gap: '32px' }}>
-              {/* Opciones de Envío */}
             <div>
               <label style={{ display: 'block', color: 'var(--color-text-main)', fontWeight: 600, marginBottom: '8px' }}>
                 Opciones de Envío
@@ -823,7 +817,6 @@ function NuevoProductoContent() {
               )}
             </div>
 
-            {/* Retiro en Sucursal */}
             <div>
               <label style={{ display: 'block', color: 'var(--color-text-main)', fontWeight: 600, marginBottom: '8px' }}>
                 Retiro en Sucursales
@@ -862,7 +855,6 @@ function NuevoProductoContent() {
               )}
             </div>
             
-            {/* Descuentos Promocionales */}
             <div style={{ gridColumn: '1 / -1', background: 'rgba(255, 115, 0, 0.05)', padding: '20px', borderRadius: 'var(--radius-lg)', border: '1px solid rgba(255, 115, 0, 0.2)' }}>
               <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: hasDiscount ? '16px' : '0' }}>
                 <div>
@@ -951,7 +943,6 @@ function NuevoProductoContent() {
                 </div>
               )}
             </div>
-
             </div>
           )}
 
@@ -1034,7 +1025,18 @@ function NuevoProductoContent() {
         />
       )}
 
-      {/* Loading Overlay */}
+      {pendingCropQueue.length > 0 && (
+        <ImageCropperModal
+          imageSrc={pendingCropQueue[0].src}
+          aspect={4 / 3}
+          onCropComplete={handleCropComplete}
+          onCancel={() => {
+            setPendingCropQueue(prev => prev.slice(1));
+          }}
+          title={`Ajustar Imagen de Producto (${pendingCropQueue.length} pendiente${pendingCropQueue.length > 1 ? 's' : ''})`}
+        />
+      )}
+
       {showLoadingOverlay && (
         <div style={{
           position: 'fixed',
@@ -1062,7 +1064,6 @@ function NuevoProductoContent() {
             alignItems: 'center',
             gap: '24px'
           }}>
-            {/* Spinner divertido */}
             <div style={{ position: 'relative', width: '80px', height: '80px', display: 'flex', justifyContent: 'center', alignItems: 'center' }}>
               <div style={{ 
                 position: 'absolute', width: '100%', height: '100%', borderRadius: '50%', 

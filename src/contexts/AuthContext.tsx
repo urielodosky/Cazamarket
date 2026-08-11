@@ -97,6 +97,7 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
   const [contactEmail, setContactEmail] = useState('');
   const [firstName, setFirstName] = useState('');
   const [lastName, setLastName] = useState('');
+  const [coverUrl, setCoverUrl] = useState('');
   const [storeName, setStoreName] = useState('');
   const [storeDescription, setStoreDescription] = useState('');
   const [street, setStreet] = useState('');
@@ -131,6 +132,7 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
         setContactEmail('');
         setFirstName('');
         setLastName('');
+        setCoverUrl('');
         setStoreName('');
         setStoreDescription('');
         setStreet('');
@@ -180,6 +182,7 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
         setContactEmail(profile.contact_email || user.email || '');
         setFirstName(profile.first_name || '');
         setLastName(profile.last_name || '');
+        setCoverUrl(profile.cover_url || '');
         setStoreName(profile.store_name || '');
         setStoreDescription(profile.store_description || '');
         setStreet(profile.street || '');
@@ -230,13 +233,14 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
     username?: string, avatar?: string, personType?: string, birthDate?: string, cuit?: string, phone?: string, contactEmail?: string,
     firstName?: string, lastName?: string, storeName?: string, storeDescription?: string, street?: string, streetNumber?: string, province?: string, locality?: string,
     socialMedia?: any[], branches?: any[], schedules?: any[], role?: string, phone_verified?: boolean,
-    storeTheme?: any, storeCategories?: any[], businessType?: string
+    storeTheme?: any, storeCategories?: any[], businessType?: string, coverUrl?: string
   }) => {
     // Actualizar base de datos
     if (supabaseUser) {
       const updates: any = {};
       if (data.username !== undefined) updates.full_name = data.username;
       if (data.avatar !== undefined) updates.avatar_url = data.avatar;
+      if (data.coverUrl !== undefined) updates.cover_url = data.coverUrl;
       if (data.personType !== undefined) updates.person_type = data.personType;
       if (data.birthDate !== undefined) {
         if (data.birthDate.includes('/')) {
@@ -284,6 +288,7 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
       if (data.contactEmail !== undefined) setContactEmail(data.contactEmail);
       if (data.firstName !== undefined) setFirstName(data.firstName);
       if (data.lastName !== undefined) setLastName(data.lastName);
+      if (data.coverUrl !== undefined) setCoverUrl(data.coverUrl);
       if (data.storeName !== undefined) setStoreName(data.storeName);
       if (data.storeDescription !== undefined) setStoreDescription(data.storeDescription);
       if (data.street !== undefined) setStreet(data.street);
@@ -347,7 +352,7 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
 
   return (
     <AuthContext.Provider value={{ 
-      isLoggedIn, username, email, avatar, 
+      isLoggedIn, username, email, avatar, coverUrl,
       isVendor, isVendorModeActive, isMounted: mounted, 
       personType, birthDate, cuit, phone, phoneVerified, contactEmail,
       firstName, lastName, storeName, storeDescription, street, streetNumber, province, locality,
