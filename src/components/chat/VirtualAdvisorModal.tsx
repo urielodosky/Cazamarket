@@ -724,7 +724,7 @@ export default function VirtualAdvisorModal({ onClose, productId }: VirtualAdvis
                       </div>
                     )}
 
-                    {(responseType === 'options' || responseType === 'file_options') && (
+                    {(builderMode === 'visual' || responseType === 'options' || responseType === 'file_options') && (
                       <div>
                         <label style={{ display: 'block', marginBottom: '8px', color: 'var(--color-text-muted)' }}>Opciones Interactivas (Lienzo Visual)</label>
                         <Suspense fallback={<div style={{ padding: '40px', textAlign: 'center', color: 'var(--color-text-muted)' }}>Cargando constructor visual...</div>}>
@@ -732,7 +732,14 @@ export default function VirtualAdvisorModal({ onClose, productId }: VirtualAdvis
                             responseText={responseText}
                             options={options}
                             responseType={responseType}
-                            onChange={(text, opts) => { setResponseText(text); setOptions(opts); }}
+                            onChange={(text, opts, rootType, rootFile, rootWhatsapp, rootGoto) => {
+                              setResponseText(text);
+                              setOptions(opts);
+                              setResponseType(rootType as any);
+                              if (rootFile !== undefined) setFileName(rootFile);
+                              if (rootWhatsapp !== undefined) setWhatsappText(rootWhatsapp);
+                              if (rootGoto !== undefined) setGotoId(rootGoto);
+                            }}
                             allRules={rules}
                             editingRuleId={editingRuleId}
                           />

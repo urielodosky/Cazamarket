@@ -58,7 +58,7 @@ function BotMessageNode({ data, id, selected }: NodeProps) {
         <Handle
           type="target"
           position={Position.Left}
-          style={{ background: 'var(--color-primary)', width: '12px', height: '12px', left: '-6px', border: '2px solid #fff' }}
+          style={{ background: 'var(--color-primary)', width: '16px', height: '16px', left: '-8px', border: '2px solid #fff', zIndex: 10 }}
         />
       )}
 
@@ -85,10 +85,20 @@ function BotMessageNode({ data, id, selected }: NodeProps) {
       </div>
 
       <div style={{ padding: '12px', display: 'flex', flexDirection: 'column', gap: '10px' }}>
+        {/* Root node type switcher */}
+        {isRoot && (
+          <div style={{ display: 'flex', gap: '4px', marginBottom: '4px' }}>
+            <button className="nodrag" onClick={() => d.onChangeNodeType?.(id, 'message')} style={{ flex: 1, padding: '4px', fontSize: '0.7rem', background: nodeType === 'message' ? 'rgba(255,115,0,0.2)' : 'rgba(255,255,255,0.05)', color: nodeType === 'message' ? 'var(--color-primary)' : '#fff', border: 'none', borderRadius: '4px', cursor: 'pointer' }}>Mensaje</button>
+            <button className="nodrag" onClick={() => d.onChangeNodeType?.(id, 'file')} style={{ flex: 1, padding: '4px', fontSize: '0.7rem', background: nodeType === 'file' ? 'rgba(74,144,217,0.2)' : 'rgba(255,255,255,0.05)', color: nodeType === 'file' ? '#4a90d9' : '#fff', border: 'none', borderRadius: '4px', cursor: 'pointer' }}>Archivo</button>
+            <button className="nodrag" onClick={() => d.onChangeNodeType?.(id, 'whatsapp')} style={{ flex: 1, padding: '4px', fontSize: '0.7rem', background: nodeType === 'whatsapp' ? 'rgba(37,211,102,0.2)' : 'rgba(255,255,255,0.05)', color: nodeType === 'whatsapp' ? '#25d366' : '#fff', border: 'none', borderRadius: '4px', cursor: 'pointer' }}>WA</button>
+            <button className="nodrag" onClick={() => d.onChangeNodeType?.(id, 'goto')} style={{ flex: 1, padding: '4px', fontSize: '0.7rem', background: nodeType === 'goto' ? 'rgba(155,89,182,0.2)' : 'rgba(255,255,255,0.05)', color: nodeType === 'goto' ? '#9b59b6' : '#fff', border: 'none', borderRadius: '4px', cursor: 'pointer' }}>Derivar</button>
+          </div>
+        )}
+
         {/* Main text area */}
         {nodeType !== 'goto' && (
           <div>
-            <label style={{ display: 'block', fontSize: '0.7rem', color: 'var(--color-text-muted)', marginBottom: '4px', textTransform: 'uppercase', letterSpacing: '0.5px' }}>
+            <label style={{ display: 'block', fontSize: '0.7rem', color: 'var(--color-text-muted)', marginBottom: '4px', textTransform: 'uppercase', letterSpacing: '0.5px', cursor: 'grab' }}>
               {nodeType === 'whatsapp' ? 'Texto pre-llenado de WA' : nodeType === 'file' ? 'Nombre del Archivo' : 'Texto de respuesta'}
             </label>
             <textarea
@@ -172,7 +182,7 @@ function BotMessageNode({ data, id, selected }: NodeProps) {
                     type="source"
                     position={Position.Right}
                     id={opt.id}
-                    style={{ background: 'var(--color-primary)', width: '10px', height: '10px', right: '-6px', top: 'auto', border: '2px solid #fff' }}
+                    style={{ background: 'var(--color-primary)', width: '16px', height: '16px', right: '-8px', top: 'auto', border: '2px solid #fff', zIndex: 10 }}
                   />
                 </div>
               ))}
@@ -213,7 +223,7 @@ function BotMessageNode({ data, id, selected }: NodeProps) {
                     }}
                   />
                   <button className="nodrag" onClick={() => d.onOptionRemove?.(id, opt.id)} style={{ background: 'transparent', border: 'none', color: '#ff4444', cursor: 'pointer', padding: '2px', fontSize: '1rem', lineHeight: 1 }}>x</button>
-                  <Handle type="source" position={Position.Right} id={opt.id} style={{ background: '#4a90d9', width: '10px', height: '10px', right: '-6px', top: 'auto', border: '2px solid #fff' }} />
+                  <Handle type="source" position={Position.Right} id={opt.id} style={{ background: '#4a90d9', width: '16px', height: '16px', right: '-8px', top: 'auto', border: '2px solid #fff', zIndex: 10 }} />
                 </div>
               ))}
               <button
@@ -242,12 +252,17 @@ function optionsToGraph(
 
   const rootId = 'root';
   const rootNodeOptions = rootOptions.map(opt => ({ id: opt.id, label: opt.label }));
+  
+  let rootNodeType = 'message';
+  if (rootResponseType === 'whatsapp') rootNodeType = 'whatsapp';
+  else if (rootResponseType === 'file' || rootResponseType === 'file_options') rootNodeType = 'file';
+  else if (rootResponseType === 'goto') rootNodeType = 'goto';
 
   nodes.push({
     id: rootId,
     type: 'botMessage',
     position: { x: 50, y: 80 },
-    data: { text: rootText, options: rootNodeOptions, isRoot: true, nodeType: rootResponseType === 'file_options' ? 'file' : 'message' },
+    data: { text: rootText, options: rootNodeOptions, isRoot: true, nodeType: rootNodeType },
   });
 
   const traverse = (opts: AdvisorOption[], parentId: string, depth: number, startY: number) => {
@@ -302,9 +317,9 @@ function optionsToGraph(
 function graphToOptions(
   nodes: Node[],
   edges: Edge[],
-): { text: string; options: AdvisorOption[] } {
+): { text: string; options: AdvisorOption[]; rootType: string; rootFile?: string; rootWhatsapp?: string; rootGoto?: string } {
   const rootNode = nodes.find(n => (n.data as any).isRoot);
-  if (!rootNode) return { text: '', options: [] };
+  if (!rootNode) return { text: '', options: [], rootType: 'options' };
 
   const rootData = rootNode.data as any;
 
@@ -354,7 +369,22 @@ function graphToOptions(
   };
 
   const resultOptions = buildChildren(rootNode.id, rootData.options || []);
-  return { text: rootData.text || '', options: resultOptions };
+  
+  const rootNodeType = rootData.nodeType || 'message';
+  let rootType = 'options';
+  if (rootNodeType === 'whatsapp') rootType = 'whatsapp';
+  else if (rootNodeType === 'goto') rootType = 'goto';
+  else if (rootNodeType === 'file') rootType = resultOptions.length > 0 ? 'file_options' : 'file';
+  else rootType = resultOptions.length > 0 ? 'options' : 'text';
+
+  return { 
+    text: rootNodeType === 'file' ? '' : (rootData.text || ''), 
+    options: resultOptions,
+    rootType,
+    rootFile: rootNodeType === 'file' ? (rootData.text || rootData.fileName || '') : undefined,
+    rootWhatsapp: rootNodeType === 'whatsapp' ? (rootData.text || '') : undefined,
+    rootGoto: rootNodeType === 'goto' ? (rootData.gotoTarget || '') : undefined,
+  };
 }
 
 // ─── Main Visual Builder Component ─────────────────────────────────────
@@ -363,7 +393,7 @@ interface VisualBotBuilderProps {
   responseText: string;
   options: AdvisorOption[];
   responseType: string;
-  onChange: (text: string, options: AdvisorOption[]) => void;
+  onChange: (text: string, options: AdvisorOption[], rootType: string, rootFile?: string, rootWhatsapp?: string, rootGoto?: string) => void;
   allRules: AdvisorRule[];
   editingRuleId: string | null;
 }
@@ -393,7 +423,7 @@ export default function VisualBotBuilder({ responseText, options, responseType, 
   // Sync back to parent on every change
   const syncToParent = useCallback((currentNodes: Node[], currentEdges: Edge[]) => {
     const result = graphToOptions(currentNodes, currentEdges);
-    onChange(result.text, result.options);
+    onChange(result.text, result.options, result.rootType, result.rootFile, result.rootWhatsapp, result.rootGoto);
   }, [onChange]);
 
   const updateNodeData = useCallback((nodeId: string, updates: Record<string, any>) => {
@@ -465,6 +495,10 @@ export default function VisualBotBuilder({ responseText, options, responseType, 
     updateNodeData(nodeId, { gotoTarget: value });
   }, [updateNodeData]);
 
+  const onChangeNodeType = useCallback((nodeId: string, type: string) => {
+    updateNodeData(nodeId, { nodeType: type });
+  }, [updateNodeData]);
+
   // Inject callbacks into all nodes
   const nodesWithCallbacks = useMemo(() => {
     return nodes.map(n => ({
@@ -477,10 +511,11 @@ export default function VisualBotBuilder({ responseText, options, responseType, 
         onOptionRemove,
         onDeleteNode,
         onGotoChange,
+        onChangeNodeType,
         gotoOptions,
       },
     }));
-  }, [nodes, onTextChange, onOptionAdd, onOptionLabelChange, onOptionRemove, onDeleteNode, onGotoChange, gotoOptions]);
+  }, [nodes, onTextChange, onOptionAdd, onOptionLabelChange, onOptionRemove, onDeleteNode, onGotoChange, onChangeNodeType, gotoOptions]);
 
   const onConnect = useCallback((connection: Connection) => {
     setEdges(eds => {
