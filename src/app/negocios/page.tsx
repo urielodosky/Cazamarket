@@ -262,7 +262,7 @@ export default function NegociosPage() {
                 {/* Avatar Wrapper */}
                 <div style={{ 
                   width: '80px', 
-                  height: isAtLeast(negocio.planTier, 'emprendedor') ? '40px' : '80px', /* Only takes up bottom half if banner is present */
+                  height: (isAtLeast(negocio.planTier, 'emprendedor') && negocio.image) ? '40px' : '80px', /* Only takes up bottom half if banner is present */
                   position: 'relative',
                   flexShrink: 0
                 }}>

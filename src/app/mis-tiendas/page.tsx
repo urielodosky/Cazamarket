@@ -336,26 +336,39 @@ export default function MiNegocioPage() {
 
         {/* Banner */}
         {isAtLeast(planTier, 'emprendedor') ? (
-          <div style={{
-            height: '280px',
-            backgroundImage: `url(${storeBanner})`,
-            backgroundSize: 'cover',
-            backgroundPosition: 'center',
-            position: 'relative',
-            borderTopLeftRadius: 'var(--radius-lg)',
-            borderTopRightRadius: 'var(--radius-lg)'
-          }}>
-            <div style={{ position: 'absolute', inset: 0, background: 'linear-gradient(to bottom, rgba(0,0,0,0.1), rgba(0,0,0,0.8))', borderTopLeftRadius: 'var(--radius-lg)', borderTopRightRadius: 'var(--radius-lg)' }} />
-            <input
-              type="file"
-              ref={bannerInputRef}
-              onChange={handleBannerChange}
-              accept="image/*"
-              style={{ display: 'none' }}
-            />
-            <EditButton onClick={() => bannerInputRef.current?.click()} style={{ top: '16px', right: '16px' }} label="Cambiar Portada" />
-            <div style={{ position: 'absolute', top: '64px', right: '16px', color: 'rgba(255,255,255,0.9)', fontSize: '0.75rem', background: 'rgba(0,0,0,0.7)', padding: '4px 8px', borderRadius: '4px', pointerEvents: 'none' }}>Recomendado: 1200x400 px</div>
-          </div>
+          storeBanner ? (
+            <div style={{
+              height: '280px',
+              backgroundImage: `url(${storeBanner})`,
+              backgroundSize: 'cover',
+              backgroundPosition: 'center',
+              position: 'relative',
+              borderTopLeftRadius: 'var(--radius-lg)',
+              borderTopRightRadius: 'var(--radius-lg)'
+            }}>
+              <div style={{ position: 'absolute', inset: 0, background: 'linear-gradient(to bottom, rgba(0,0,0,0.1), rgba(0,0,0,0.8))', borderTopLeftRadius: 'var(--radius-lg)', borderTopRightRadius: 'var(--radius-lg)' }} />
+              <input
+                type="file"
+                ref={bannerInputRef}
+                onChange={handleBannerChange}
+                accept="image/*"
+                style={{ display: 'none' }}
+              />
+              <EditButton onClick={() => bannerInputRef.current?.click()} style={{ top: '16px', right: '16px' }} label="Cambiar Portada" />
+              <div style={{ position: 'absolute', top: '64px', right: '16px', color: 'rgba(255,255,255,0.9)', fontSize: '0.75rem', background: 'rgba(0,0,0,0.7)', padding: '4px 8px', borderRadius: '4px', pointerEvents: 'none' }}>Recomendado: 1200x400 px</div>
+            </div>
+          ) : (
+            <div style={{ height: '80px', position: 'relative', background: 'var(--color-bg-surface-elevated)', borderTopLeftRadius: 'var(--radius-lg)', borderTopRightRadius: 'var(--radius-lg)' }}>
+              <input
+                type="file"
+                ref={bannerInputRef}
+                onChange={handleBannerChange}
+                accept="image/*"
+                style={{ display: 'none' }}
+              />
+              <EditButton onClick={() => bannerInputRef.current?.click()} style={{ top: '24px', right: '16px' }} label="Añadir Portada" />
+            </div>
+          )
         ) : (
           <div style={{ height: '80px', position: 'relative', background: 'var(--color-bg-surface-elevated)', borderTopLeftRadius: 'var(--radius-lg)', borderTopRightRadius: 'var(--radius-lg)' }}>
             <Link href="/planes" style={{ position: 'absolute', top: '16px', right: '16px', padding: '6px 12px', background: 'rgba(255,115,0,0.1)', color: 'var(--color-primary)', borderRadius: 'var(--radius-full)', fontSize: '0.85rem', fontWeight: 600, textDecoration: 'none', border: '1px solid rgba(255,115,0,0.2)' }}>
@@ -371,7 +384,7 @@ export default function MiNegocioPage() {
             display: 'flex',
             gap: '32px',
             alignItems: 'flex-end',
-            marginTop: isAtLeast(planTier, 'emprendedor') ? '-60px' : '-40px',
+            marginTop: (isAtLeast(planTier, 'emprendedor') && storeBanner) ? '-60px' : '-40px',
             marginBottom: '32px',
             position: 'relative',
             zIndex: 10
