@@ -128,7 +128,7 @@ export default function ComunidadPage() {
   };
 
   return (
-    <div style={{ padding: '120px var(--spacing-4) var(--spacing-8) var(--spacing-4)', maxWidth: '1000px', margin: '0 auto', minHeight: '60vh' }}>
+    <div style={{ padding: '120px var(--spacing-4) var(--spacing-8) var(--spacing-4)', maxWidth: '1000px', margin: '0 auto', minHeight: '60vh', paddingBottom: 'var(--spacing-12)' }}>
       <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '24px', flexWrap: 'wrap', gap: '16px' }}>
         <div>
           <h1 style={{ fontSize: '2rem', margin: '0 0 6px 0', color: 'var(--color-text-main)' }}>Foro de Comunidad</h1>

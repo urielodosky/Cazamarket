@@ -342,7 +342,7 @@ export default function Navbar() {
             <div className="search-bar-animated" style={{ 
               zIndex: 10, 
               display: (isFilterablePage && !isHome && !isBusinessProfile) ? 'flex' : 'none',
-              background: '#1A1D17'
+              background: 'transparent'
             }}>
                 <button 
                   className="search-icon-btn" 

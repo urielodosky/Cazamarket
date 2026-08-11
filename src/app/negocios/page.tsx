@@ -103,7 +103,7 @@ export default function NegociosPage() {
             return {
               id: parsed.id,
               name: parsed.store_name || parsed.full_name || 'Mi Negocio',
-              rating: parsed.trust_score ? (parsed.trust_score / 20).toFixed(1) : 0,
+              rating: 0, // rating: parsed.trust_score ? (parsed.trust_score / 20).toFixed(1) : 0,
               reviews: 0,
               image: 'https://images.unsplash.com/photo-1503614472-8c93d56e92ce?q=80&w=1200&auto=format&fit=crop',
               avatar: parsed.avatar_url || 'https://ui-avatars.com/api/?name=Mi+Negocio&background=ff7300&color=fff',
@@ -160,7 +160,7 @@ export default function NegociosPage() {
   });
 
   return (
-    <div className="container-page" style={{ maxWidth: '1200px', margin: '0 auto', minHeight: '60vh' }}>
+    <div className="container-page" style={{ maxWidth: '1200px', margin: '0 auto', minHeight: '60vh', paddingBottom: 'var(--spacing-12)' }}>
       {isVendorModeActive && (
         <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 'var(--spacing-6)' }}>
           <div>
