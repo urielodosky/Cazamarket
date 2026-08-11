@@ -317,6 +317,12 @@ export default function VirtualAdvisorModal({ onClose, productId }: VirtualAdvis
     }
 
     if (responseType !== 'goto' && responseType !== 'whatsapp') {
+      // Auto-correct based on options presence (ignoring __next__ for type inference)
+      const hasRealOptions = options.some((o: any) => o.label !== '__next__');
+      if (responseType === 'text' && hasRealOptions) { /* handled in flow */ }
+      if (responseType === 'options' && !hasRealOptions) { /* handled in flow */ }
+      // Input node should stay input regardless of real options since it uses them for branches
+      
       const hasText = !!responseText.trim();
       const hasFile = (responseType === 'file') && (attachmentFile || fileName);
       const hasOptions = (responseType === 'options') && options.length > 0;
@@ -849,6 +855,7 @@ export default function VirtualAdvisorModal({ onClose, productId }: VirtualAdvis
                           <button type="button" onClick={() => visualBuilderRef.current?.addNewNode('text')} style={{ flex: '1 1 45%', background: 'rgba(243,156,18,0.2)', color: '#f39c12', border: '1px solid rgba(243,156,18,0.4)', padding: '8px 12px', borderRadius: '6px', cursor: 'pointer', fontSize: '0.8rem', fontWeight: 600 }}>+ Solo Texto</button>
                           <button type="button" onClick={() => visualBuilderRef.current?.addNewNode('options')} style={{ flex: '1 1 45%', background: 'var(--color-primary)', color: '#fff', border: 'none', padding: '8px 12px', borderRadius: '6px', cursor: 'pointer', fontSize: '0.8rem', fontWeight: 600 }}>+ Sub-Opciones</button>
                           <button type="button" onClick={() => visualBuilderRef.current?.addNewNode('file')} style={{ flex: '1 1 45%', background: 'rgba(52,152,219,0.2)', color: '#3498db', border: '1px solid rgba(52,152,219,0.4)', padding: '8px 12px', borderRadius: '6px', cursor: 'pointer', fontSize: '0.8rem', fontWeight: 600 }}>+ Archivo Adjunto</button>
+                          <button type="button" onClick={() => visualBuilderRef.current?.addNewNode('input')} style={{ flex: '1 1 45%', background: 'rgba(231,76,60,0.2)', color: '#e74c3c', border: '1px solid rgba(231,76,60,0.4)', padding: '8px 12px', borderRadius: '6px', cursor: 'pointer', fontSize: '0.8rem', fontWeight: 600 }}>+ Entrada Textual</button>
                           <button type="button" onClick={() => visualBuilderRef.current?.addNewNode('whatsapp')} style={{ flex: '1 1 45%', background: '#25d366', color: '#fff', border: 'none', padding: '8px 12px', borderRadius: '6px', cursor: 'pointer', fontSize: '0.8rem', fontWeight: 600 }}>+ WhatsApp</button>
                           <button type="button" onClick={() => visualBuilderRef.current?.addNewNode('goto')} style={{ flex: '1 1 45%', background: '#9b59b6', color: '#fff', border: 'none', padding: '8px 12px', borderRadius: '6px', cursor: 'pointer', fontSize: '0.8rem', fontWeight: 600 }}>+ Volver a Menú</button>
                         </div>
@@ -863,8 +870,19 @@ export default function VirtualAdvisorModal({ onClose, productId }: VirtualAdvis
                     </div>
                   </div>
 
+                  {/* Classic Mode - Input Disclaimer */}
+                  {builderMode === 'classic' && responseType === 'input' && (
+                    <div style={{ marginTop: '16px', background: 'rgba(231,76,60,0.1)', padding: '16px', borderRadius: '8px', border: '1px solid rgba(231,76,60,0.3)', color: '#fff' }}>
+                      <h4 style={{ margin: '0 0 8px 0', color: '#e74c3c' }}>Modo Entrada Textual</h4>
+                      <p style={{ fontSize: '0.9rem', color: 'var(--color-text-muted)', margin: 0, lineHeight: 1.5 }}>
+                        Las ramas condicionales de este nodo <strong>solo se pueden configurar usando el Modo Visual</strong> (ya que permiten encadenar flujos complejos). 
+                        Por favor, cambia a la pestaña "Constructor Visual" arriba a la derecha para ver y editar las ramas de este nodo.
+                      </p>
+                    </div>
+                  )}
+
                   {/* Main Canvas Area for Visual Mode */}
-                  {(builderMode === 'visual' || responseType === 'options') && (
+                  {(builderMode === 'visual' || responseType === 'options' || responseType === 'input') && (
                     <div style={{ flex: 1, minWidth: 0, padding: builderMode === 'visual' ? '0' : '0' }}>
                       <Suspense fallback={<div style={{ padding: '40px', textAlign: 'center', color: 'var(--color-text-muted)' }}>Cargando constructor visual...</div>}>
                         <VisualBotBuilder

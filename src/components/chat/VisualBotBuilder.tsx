@@ -222,9 +222,9 @@ function BotMessageNode({ data, id, selected }: NodeProps) {
                       onChange={(e) => d.onOptionPropChange?.(id, opt.id, 'conditionType', e.target.value)}
                       style={{ flex: 1, padding: '4px', fontSize: '0.7rem', background: 'rgba(255,255,255,0.05)', color: '#fff', border: '1px solid var(--color-border)', borderRadius: '4px', outline: 'none' }}
                     >
-                      <option value="exact">Exacto</option>
-                      <option value="keyword">Contiene</option>
-                      <option value="always">Fallback (Cualquier otra cosa)</option>
+                      <option value="exact" style={{ background: '#1a1a1a', color: '#fff' }}>Exacto</option>
+                      <option value="keyword" style={{ background: '#1a1a1a', color: '#fff' }}>Contiene</option>
+                      <option value="always" style={{ background: '#1a1a1a', color: '#fff' }}>Fallback</option>
                     </select>
                     {opt.conditionType !== 'always' && (
                       <button className="nodrag" onClick={() => d.onOptionRemove?.(id, opt.id)} style={{ background: 'transparent', border: 'none', color: '#ff4444', cursor: 'pointer', padding: '0 4px', fontSize: '1rem', lineHeight: 1 }}>x</button>
@@ -432,6 +432,8 @@ function graphToOptions(
   const hasRealOptions = resultOptions.some(o => o.label !== '__next__');
   if (rootType === 'text' && hasRealOptions) rootType = 'options';
   if (rootType === 'options' && !hasRealOptions) rootType = 'text';
+  // Input node should stay input regardless of real options since it uses them for branches
+  if (rootNodeType === 'input') rootType = 'input';
 
   return { 
     text: (rootNodeType === 'file') ? '' : (rootData.text || ''), 
