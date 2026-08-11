@@ -30,16 +30,20 @@ function BotMessageNode({ data, id, selected }: NodeProps) {
   const nodeType: string = d.nodeType || 'message'; // 'message' | 'whatsapp' | 'file' | 'goto'
 
   const headerColors: Record<string, string> = {
-    message: 'var(--color-primary)',
+    text: '#f39c12',
+    options: 'var(--color-primary)',
     whatsapp: '#25d366',
-    file: '#4a90d9',
+    file: '#3498db',
+    file_options: '#4a90d9',
     goto: '#9b59b6',
   };
 
   const headerLabels: Record<string, string> = {
-    message: isRoot ? 'Mensaje Inicial' : 'Mensaje del Bot',
+    text: 'Texto Simple',
+    options: 'Texto c/ Opciones',
     whatsapp: 'Derivar a WhatsApp',
     file: 'Archivo Adjunto',
+    file_options: 'Archivo c/ Opciones',
     goto: 'Derivar a Regla',
   };
 
@@ -87,11 +91,13 @@ function BotMessageNode({ data, id, selected }: NodeProps) {
       <div style={{ padding: '12px', display: 'flex', flexDirection: 'column', gap: '10px' }}>
         {/* Root node type switcher */}
         {isRoot && (
-          <div style={{ display: 'flex', gap: '4px', marginBottom: '4px' }}>
-            <button className="nodrag" onClick={() => d.onChangeNodeType?.(id, 'message')} style={{ flex: 1, padding: '4px', fontSize: '0.7rem', background: nodeType === 'message' ? 'rgba(255,115,0,0.2)' : 'rgba(255,255,255,0.05)', color: nodeType === 'message' ? 'var(--color-primary)' : '#fff', border: 'none', borderRadius: '4px', cursor: 'pointer' }}>Mensaje</button>
-            <button className="nodrag" onClick={() => d.onChangeNodeType?.(id, 'file')} style={{ flex: 1, padding: '4px', fontSize: '0.7rem', background: nodeType === 'file' ? 'rgba(74,144,217,0.2)' : 'rgba(255,255,255,0.05)', color: nodeType === 'file' ? '#4a90d9' : '#fff', border: 'none', borderRadius: '4px', cursor: 'pointer' }}>Archivo</button>
-            <button className="nodrag" onClick={() => d.onChangeNodeType?.(id, 'whatsapp')} style={{ flex: 1, padding: '4px', fontSize: '0.7rem', background: nodeType === 'whatsapp' ? 'rgba(37,211,102,0.2)' : 'rgba(255,255,255,0.05)', color: nodeType === 'whatsapp' ? '#25d366' : '#fff', border: 'none', borderRadius: '4px', cursor: 'pointer' }}>WA</button>
-            <button className="nodrag" onClick={() => d.onChangeNodeType?.(id, 'goto')} style={{ flex: 1, padding: '4px', fontSize: '0.7rem', background: nodeType === 'goto' ? 'rgba(155,89,182,0.2)' : 'rgba(255,255,255,0.05)', color: nodeType === 'goto' ? '#9b59b6' : '#fff', border: 'none', borderRadius: '4px', cursor: 'pointer' }}>Derivar</button>
+          <div style={{ display: 'flex', flexWrap: 'wrap', gap: '4px', marginBottom: '4px' }}>
+            <button className="nodrag" onClick={() => d.onChangeNodeType?.(id, 'text')} style={{ flex: '1 1 30%', padding: '4px', fontSize: '0.65rem', background: nodeType === 'text' ? 'rgba(243,156,18,0.2)' : 'rgba(255,255,255,0.05)', color: nodeType === 'text' ? '#f39c12' : '#fff', border: 'none', borderRadius: '4px', cursor: 'pointer' }}>Texto</button>
+            <button className="nodrag" onClick={() => d.onChangeNodeType?.(id, 'options')} style={{ flex: '1 1 30%', padding: '4px', fontSize: '0.65rem', background: nodeType === 'options' ? 'rgba(255,115,0,0.2)' : 'rgba(255,255,255,0.05)', color: nodeType === 'options' ? 'var(--color-primary)' : '#fff', border: 'none', borderRadius: '4px', cursor: 'pointer' }}>Opciones</button>
+            <button className="nodrag" onClick={() => d.onChangeNodeType?.(id, 'file')} style={{ flex: '1 1 30%', padding: '4px', fontSize: '0.65rem', background: nodeType === 'file' ? 'rgba(52,152,219,0.2)' : 'rgba(255,255,255,0.05)', color: nodeType === 'file' ? '#3498db' : '#fff', border: 'none', borderRadius: '4px', cursor: 'pointer' }}>Archivo</button>
+            <button className="nodrag" onClick={() => d.onChangeNodeType?.(id, 'file_options')} style={{ flex: '1 1 30%', padding: '4px', fontSize: '0.65rem', background: nodeType === 'file_options' ? 'rgba(74,144,217,0.2)' : 'rgba(255,255,255,0.05)', color: nodeType === 'file_options' ? '#4a90d9' : '#fff', border: 'none', borderRadius: '4px', cursor: 'pointer' }}>Arch+Opc</button>
+            <button className="nodrag" onClick={() => d.onChangeNodeType?.(id, 'whatsapp')} style={{ flex: '1 1 30%', padding: '4px', fontSize: '0.65rem', background: nodeType === 'whatsapp' ? 'rgba(37,211,102,0.2)' : 'rgba(255,255,255,0.05)', color: nodeType === 'whatsapp' ? '#25d366' : '#fff', border: 'none', borderRadius: '4px', cursor: 'pointer' }}>WA</button>
+            <button className="nodrag" onClick={() => d.onChangeNodeType?.(id, 'goto')} style={{ flex: '1 1 30%', padding: '4px', fontSize: '0.65rem', background: nodeType === 'goto' ? 'rgba(155,89,182,0.2)' : 'rgba(255,255,255,0.05)', color: nodeType === 'goto' ? '#9b59b6' : '#fff', border: 'none', borderRadius: '4px', cursor: 'pointer' }}>Derivar</button>
           </div>
         )}
 
@@ -99,14 +105,14 @@ function BotMessageNode({ data, id, selected }: NodeProps) {
         {nodeType !== 'goto' && (
           <div>
             <label style={{ display: 'block', fontSize: '0.7rem', color: 'var(--color-text-muted)', marginBottom: '4px', textTransform: 'uppercase', letterSpacing: '0.5px', cursor: 'grab' }}>
-              {nodeType === 'whatsapp' ? 'Texto pre-llenado de WA' : nodeType === 'file' ? 'Nombre del Archivo' : 'Texto de respuesta'}
+              {nodeType === 'whatsapp' ? 'Texto pre-llenado de WA' : (nodeType === 'file' || nodeType === 'file_options') ? 'Nombre del Archivo' : 'Texto de respuesta'}
             </label>
             <textarea
               className="nodrag nopan"
               value={text}
               onChange={(e) => d.onTextChange?.(id, e.target.value)}
-              placeholder={nodeType === 'whatsapp' ? 'Hola, me interesa...' : nodeType === 'file' ? 'catalogo.pdf' : 'Ej: Hola, en que te ayudo?'}
-              rows={nodeType === 'file' ? 1 : 3}
+              placeholder={nodeType === 'whatsapp' ? 'Hola, me interesa...' : (nodeType === 'file' || nodeType === 'file_options') ? 'catalogo.pdf' : 'Ej: Hola, en que te ayudo?'}
+              rows={(nodeType === 'file' || nodeType === 'file_options') ? 1 : 3}
               style={{
                 width: '100%', padding: '8px',
                 background: 'rgba(255,255,255,0.05)', color: 'var(--color-text-main, #fff)',
@@ -144,14 +150,14 @@ function BotMessageNode({ data, id, selected }: NodeProps) {
         )}
 
         {/* File upload indicator */}
-        {nodeType === 'file' && (
+        {(nodeType === 'file' || nodeType === 'file_options') && (
           <div style={{ padding: '8px', background: 'rgba(74,144,217,0.1)', borderRadius: '6px', fontSize: '0.8rem', color: '#4a90d9', textAlign: 'center' }}>
             El archivo se configura al guardar la regla
           </div>
         )}
 
         {/* Option buttons */}
-        {nodeType === 'message' && (
+        {nodeType === 'options' && (
           <>
             <hr style={{ border: 'none', borderTop: '1px solid var(--color-border)', margin: '2px 0' }} />
             <div style={{ display: 'flex', flexDirection: 'column', gap: '6px' }}>
@@ -200,12 +206,12 @@ function BotMessageNode({ data, id, selected }: NodeProps) {
         )}
 
         {/* Source handle for non-message nodes that terminate (whatsapp, file without options) */}
-        {nodeType === 'file' && (
+        {nodeType === 'file_options' && (
           <>
             <hr style={{ border: 'none', borderTop: '1px solid var(--color-border)', margin: '2px 0' }} />
             <div style={{ display: 'flex', flexDirection: 'column', gap: '6px' }}>
               <label style={{ display: 'block', fontSize: '0.7rem', color: 'var(--color-text-muted)', textTransform: 'uppercase', letterSpacing: '0.5px' }}>
-                Botones (Opcional)
+                Botones
               </label>
               {options.map((opt, index) => (
                 <div key={opt.id} style={{ display: 'flex', alignItems: 'center', gap: '6px', position: 'relative' }}>
@@ -253,10 +259,7 @@ function optionsToGraph(
   const rootId = 'root';
   const rootNodeOptions = rootOptions.map(opt => ({ id: opt.id, label: opt.label }));
   
-  let rootNodeType = 'message';
-  if (rootResponseType === 'whatsapp') rootNodeType = 'whatsapp';
-  else if (rootResponseType === 'file' || rootResponseType === 'file_options') rootNodeType = 'file';
-  else if (rootResponseType === 'goto') rootNodeType = 'goto';
+  let rootNodeType = rootResponseType || 'options';
 
   nodes.push({
     id: rootId,
@@ -271,10 +274,7 @@ function optionsToGraph(
       const x = 50 + depth * 380;
       const y = startY + idx * 250;
 
-      let nodeType = 'message';
-      if (opt.responseType === 'whatsapp') nodeType = 'whatsapp';
-      else if (opt.responseType === 'file' || opt.responseType === 'file_options') nodeType = 'file';
-      else if (opt.responseType === 'goto') nodeType = 'goto';
+      let nodeType = opt.responseType || 'text';
 
       const childOptions = (opt.options || []).map(sub => ({ id: sub.id, label: sub.label }));
 
@@ -283,7 +283,7 @@ function optionsToGraph(
         type: 'botMessage',
         position: { x, y },
         data: {
-          text: opt.responseType === 'goto' ? '' : (opt.responseType === 'file' || opt.responseType === 'file_options' ? (opt.fileName || opt.responseText || '') : opt.responseText),
+          text: opt.responseType === 'goto' ? '' : ((opt.responseType === 'file' || opt.responseType === 'file_options') ? (opt.fileName || opt.responseText || '') : opt.responseText),
           options: childOptions,
           isRoot: false,
           nodeType,
@@ -341,21 +341,19 @@ function graphToOptions(
       const childNodeType = childData.nodeType || 'message';
       const childOptions = childData.options || [];
 
-      let responseType: AdvisorOption['responseType'] = 'text';
-      if (childNodeType === 'whatsapp') responseType = 'whatsapp';
-      else if (childNodeType === 'goto') responseType = 'goto';
-      else if (childNodeType === 'file') {
-        responseType = childOptions.length > 0 ? 'file_options' : 'file';
-      } else {
-        responseType = childOptions.length > 0 ? 'options' : 'text';
-      }
+      let responseType: AdvisorOption['responseType'] = (childNodeType as AdvisorOption['responseType']) || 'text';
+      // Auto-correct if options length changed
+      if (responseType === 'text' && childOptions.length > 0) responseType = 'options';
+      if (responseType === 'options' && childOptions.length === 0) responseType = 'text';
+      if (responseType === 'file' && childOptions.length > 0) responseType = 'file_options';
+      if (responseType === 'file_options' && childOptions.length === 0) responseType = 'file';
 
       const result: AdvisorOption = {
         id: optHandle.id,
         label: optHandle.label,
         responseType,
-        responseText: childNodeType === 'file' ? '' : (childData.text || ''),
-        fileName: childNodeType === 'file' ? (childData.text || childData.fileName || '') : undefined,
+        responseText: (childNodeType === 'file' || childNodeType === 'file_options') ? '' : (childData.text || ''),
+        fileName: (childNodeType === 'file' || childNodeType === 'file_options') ? (childData.text || childData.fileName || '') : undefined,
         whatsappText: childNodeType === 'whatsapp' ? (childData.text || '') : undefined,
         gotoId: childNodeType === 'goto' ? (childData.gotoTarget || '') : undefined,
       };
@@ -370,18 +368,19 @@ function graphToOptions(
 
   const resultOptions = buildChildren(rootNode.id, rootData.options || []);
   
-  const rootNodeType = rootData.nodeType || 'message';
-  let rootType = 'options';
-  if (rootNodeType === 'whatsapp') rootType = 'whatsapp';
-  else if (rootNodeType === 'goto') rootType = 'goto';
-  else if (rootNodeType === 'file') rootType = resultOptions.length > 0 ? 'file_options' : 'file';
-  else rootType = resultOptions.length > 0 ? 'options' : 'text';
+  const rootNodeType = rootData.nodeType || 'options';
+  let rootType = rootNodeType;
+  // Auto-correct based on options presence
+  if (rootType === 'text' && resultOptions.length > 0) rootType = 'options';
+  if (rootType === 'options' && resultOptions.length === 0) rootType = 'text';
+  if (rootType === 'file' && resultOptions.length > 0) rootType = 'file_options';
+  if (rootType === 'file_options' && resultOptions.length === 0) rootType = 'file';
 
   return { 
-    text: rootNodeType === 'file' ? '' : (rootData.text || ''), 
+    text: (rootNodeType === 'file' || rootNodeType === 'file_options') ? '' : (rootData.text || ''), 
     options: resultOptions,
     rootType,
-    rootFile: rootNodeType === 'file' ? (rootData.text || rootData.fileName || '') : undefined,
+    rootFile: (rootNodeType === 'file' || rootNodeType === 'file_options') ? (rootData.text || rootData.fileName || '') : undefined,
     rootWhatsapp: rootNodeType === 'whatsapp' ? (rootData.text || '') : undefined,
     rootGoto: rootNodeType === 'goto' ? (rootData.gotoTarget || '') : undefined,
   };
