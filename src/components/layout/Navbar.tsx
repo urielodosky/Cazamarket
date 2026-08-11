@@ -357,10 +357,19 @@ export default function Navbar() {
                     alignItems: 'center',
                     justifyContent: 'center',
                     flexShrink: 0,
-                    transition: 'transform 0.2s, background-color 0.2s'
+                    background: 'var(--color-primary)',
+                    color: 'white',
+                    boxShadow: '0 2px 5px rgba(255, 115, 0, 0.4)',
+                    transition: 'transform 0.2s, background-color 0.2s, box-shadow 0.2s'
                   }}
-                  onMouseEnter={(e) => e.currentTarget.style.transform = 'scale(1.05)'}
-                  onMouseLeave={(e) => e.currentTarget.style.transform = 'scale(1)'}
+                  onMouseEnter={(e) => {
+                    e.currentTarget.style.transform = 'scale(1.05)';
+                    e.currentTarget.style.boxShadow = '0 4px 8px rgba(255, 115, 0, 0.6)';
+                  }}
+                  onMouseLeave={(e) => {
+                    e.currentTarget.style.transform = 'scale(1)';
+                    e.currentTarget.style.boxShadow = '0 2px 5px rgba(255, 115, 0, 0.4)';
+                  }}
                 >
                   <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" style={{ width: '16px', height: '16px' }}>
                     <circle cx="11" cy="11" r="8"></circle>
@@ -396,15 +405,16 @@ export default function Navbar() {
                     display: 'flex', 
                     alignItems: 'center', 
                     gap: '8px', 
-                    padding: '6px 16px',
+                    padding: '8px 16px',
                     marginLeft: 'auto',
-                    background: isFiltersOpen ? 'var(--color-primary)' : 'rgba(255,255,255,0.08)',
-                    border: isFiltersOpen ? '1px solid var(--color-primary)' : '1px solid rgba(255,255,255,0.1)',
+                    background: isFiltersOpen ? 'var(--color-primary)' : 'rgba(255,255,255,0.05)',
+                    border: 'none',
                     color: isFiltersOpen ? 'white' : themeColors.textWhite,
                     cursor: 'pointer',
                     pointerEvents: 'auto',
                     transition: 'all 0.4s cubic-bezier(0.4, 0, 0.2, 1)',
-                    flexShrink: 0
+                    flexShrink: 0,
+                    boxShadow: isFiltersOpen ? '0 4px 12px rgba(255, 115, 0, 0.4)' : 'none'
                   }}
                   onMouseEnter={(e) => {
                     if (isFiltersOpen) return;
