@@ -140,6 +140,7 @@ export default function VirtualAdvisorModal({ onClose, productId }: VirtualAdvis
   const [builderMode, setBuilderMode] = useState<'select' | 'classic' | 'visual'>('select');
   const [editingRuleId, setEditingRuleId] = useState<string | null>(null);
   const [isLoading, setIsLoading] = useState(true);
+  const visualBuilderRef = useRef<any>(null);
 
   // Settings state
   const [retargetingDays, setRetargetingDays] = useState<number | ''>('');
@@ -643,10 +644,27 @@ export default function VirtualAdvisorModal({ onClose, productId }: VirtualAdvis
                   <button onClick={() => { setIsAdding(false); setBuilderMode('select'); }} style={{ background: 'transparent', color: 'var(--color-text-muted)', border: 'none', marginTop: '16px', cursor: 'pointer', padding: '8px 16px', fontSize: '1rem' }}>Volver atrás</button>
                 </div>
               ) : (
-                <div style={{ background: 'rgba(255,255,255,0.02)', padding: '24px', borderRadius: 'var(--radius-lg)', border: '1px solid rgba(255,255,255,0.05)' }}>
-                  <h3 style={{ margin: '0 0 20px 0', color: 'var(--color-text-main)' }}>{editingRuleId ? 'Editar Regla' : 'Crear Nueva Regla'} {builderMode === 'visual' ? '(Modo Visual)' : ''}</h3>
-                  
-                  <div style={{ display: 'flex', flexDirection: 'column', gap: '16px' }}>
+                <div style={{ 
+                  background: 'rgba(255,255,255,0.02)', 
+                  padding: builderMode === 'visual' ? '0' : '24px', 
+                  borderRadius: 'var(--radius-lg)', 
+                  border: '1px solid rgba(255,255,255,0.05)', 
+                  display: builderMode === 'visual' ? 'flex' : 'block',
+                  overflow: 'hidden'
+                }}>
+                  {/* Left Column (Sidebar) */}
+                  <div style={{ 
+                    width: builderMode === 'visual' ? '320px' : '100%', 
+                    padding: builderMode === 'visual' ? '24px' : '0',
+                    borderRight: builderMode === 'visual' ? '1px solid rgba(255,255,255,0.05)' : 'none',
+                    display: 'flex', 
+                    flexDirection: 'column', 
+                    gap: '16px',
+                    overflowY: 'auto',
+                    maxHeight: builderMode === 'visual' ? '700px' : 'auto'
+                  }}>
+                    <h3 style={{ margin: '0 0 4px 0', color: 'var(--color-text-main)' }}>{editingRuleId ? 'Editar Regla' : 'Crear Nueva Regla'} {builderMode === 'visual' ? '(Modo Visual)' : ''}</h3>
+                    
                     <div>
                       <label style={{ display: 'block', marginBottom: '8px', color: 'var(--color-text-muted)' }}>Condición de Activación</label>
                       <CustomSelect 
@@ -724,30 +742,9 @@ export default function VirtualAdvisorModal({ onClose, productId }: VirtualAdvis
                       </div>
                     )}
 
-                    {(builderMode === 'visual' || responseType === 'options' || responseType === 'file_options') && (
-                      <div>
-                        <label style={{ display: 'block', marginBottom: '8px', color: 'var(--color-text-muted)' }}>Opciones Interactivas (Lienzo Visual)</label>
-                        <Suspense fallback={<div style={{ padding: '40px', textAlign: 'center', color: 'var(--color-text-muted)' }}>Cargando constructor visual...</div>}>
-                          <VisualBotBuilder
-                            responseText={responseText}
-                            options={options}
-                            responseType={responseType}
-                            onChange={(text, opts, rootType, rootFile, rootWhatsapp, rootGoto) => {
-                              setResponseText(text);
-                              setOptions(opts);
-                              setResponseType(rootType as any);
-                              if (rootFile !== undefined) setFileName(rootFile);
-                              if (rootWhatsapp !== undefined) setWhatsappText(rootWhatsapp);
-                              if (rootGoto !== undefined) setGotoId(rootGoto);
-                            }}
-                            allRules={rules}
-                            editingRuleId={editingRuleId}
-                          />
-                        </Suspense>
-                      </div>
                     )}
 
-                    {(responseType === 'file' || responseType === 'file_options') && (
+                    {builderMode === 'classic' && (responseType === 'file' || responseType === 'file_options') && (
                       <div style={{ background: themeColors.bgSubtle3, padding: '20px', borderRadius: '8px', border: '1px solid var(--color-border)' }}>
                         <h4 style={{ margin: '0 0 16px 0', color: 'var(--color-text-main)' }}>Archivo Adjunto</h4>
                         
@@ -795,20 +792,59 @@ export default function VirtualAdvisorModal({ onClose, productId }: VirtualAdvis
                       </div>
                     )}
 
-                    {responseType === 'whatsapp' && (
+                    {builderMode === 'classic' && responseType === 'whatsapp' && (
                       <div>
                         <label style={{ display: 'block', marginBottom: '8px', color: 'var(--color-text-muted)' }}>Mensaje de WA</label>
                         <textarea value={whatsappText} onChange={e => setWhatsappText(e.target.value)} style={{ width: '100%', padding: '10px', background: themeColors.bgSubtle3, color: themeColors.textWhite, border: '1px solid var(--color-border)', borderRadius: '4px', minHeight: '80px', outline: 'none', resize: 'vertical' }} />
                       </div>
                     )}
 
-                    <div style={{ display: 'flex', gap: '12px', marginTop: '16px' }}>
+                    {builderMode === 'visual' && (
+                      <div style={{ marginTop: '16px', background: 'rgba(255,255,255,0.02)', padding: '16px', borderRadius: '8px', border: '1px dashed rgba(255,255,255,0.1)' }}>
+                        <h4 style={{ margin: '0 0 12px 0', color: 'var(--color-text-main)' }}>Añadir Cajita (Respuesta)</h4>
+                        <div style={{ display: 'flex', gap: '8px', flexWrap: 'wrap' }}>
+                          <button onClick={() => visualBuilderRef.current?.addNewNode('message')} style={{ flex: 1, background: 'var(--color-primary)', color: '#fff', border: 'none', padding: '8px 12px', borderRadius: '6px', cursor: 'pointer', fontSize: '0.8rem', fontWeight: 600 }}>+ Mensaje</button>
+                          <button onClick={() => visualBuilderRef.current?.addNewNode('file')} style={{ flex: 1, background: '#4a90d9', color: '#fff', border: 'none', padding: '8px 12px', borderRadius: '6px', cursor: 'pointer', fontSize: '0.8rem', fontWeight: 600 }}>+ Archivo</button>
+                          <button onClick={() => visualBuilderRef.current?.addNewNode('whatsapp')} style={{ flex: 1, background: '#25d366', color: '#fff', border: 'none', padding: '8px 12px', borderRadius: '6px', cursor: 'pointer', fontSize: '0.8rem', fontWeight: 600 }}>+ WhatsApp</button>
+                          <button onClick={() => visualBuilderRef.current?.addNewNode('goto')} style={{ flex: 1, background: '#9b59b6', color: '#fff', border: 'none', padding: '8px 12px', borderRadius: '6px', cursor: 'pointer', fontSize: '0.8rem', fontWeight: 600 }}>+ Derivar</button>
+                        </div>
+                      </div>
+                    )}
+
+                    <div style={{ display: 'flex', gap: '12px', marginTop: 'auto', paddingTop: '16px' }}>
                       <button onClick={handleAddRule} disabled={isUploading} style={{ flex: 1, background: 'var(--color-primary)', color: themeColors.textWhite, border: 'none', padding: '12px', borderRadius: '100px', cursor: isUploading ? 'not-allowed' : 'pointer', fontWeight: 600, opacity: isUploading ? 0.7 : 1 }}>
-                        {isUploading ? 'Subiendo archivo y guardando...' : (editingRuleId ? 'Actualizar Regla' : 'Guardar Regla')}
+                        {isUploading ? 'Guardando...' : (editingRuleId ? 'Actualizar Regla' : 'Guardar Regla')}
                       </button>
                       <button onClick={() => { setIsAdding(false); setEditingRuleId(null); setBuilderMode('select'); }} disabled={isUploading} style={{ flex: 1, background: 'rgba(255,255,255,0.05)', color: themeColors.textWhite, border: '1px solid rgba(255,255,255,0.1)', padding: '12px', borderRadius: '100px', cursor: isUploading ? 'not-allowed' : 'pointer', fontWeight: 600 }}>Cancelar</button>
                     </div>
                   </div>
+
+                  {/* Main Canvas Area for Visual Mode */}
+                  {(builderMode === 'visual' || responseType === 'options' || responseType === 'file_options') && (
+                    <div style={{ flex: 1, minWidth: 0, padding: builderMode === 'visual' ? '0' : '0' }}>
+                      <Suspense fallback={<div style={{ padding: '40px', textAlign: 'center', color: 'var(--color-text-muted)' }}>Cargando constructor visual...</div>}>
+                        <VisualBotBuilder
+                          ref={visualBuilderRef}
+                            responseText={responseText}
+                            options={options}
+                            responseType={responseType}
+                            onChange={(text, opts, rootType, rootFile, rootWhatsapp, rootGoto) => {
+                              setResponseText(text);
+                              setOptions(opts);
+                              setResponseType(rootType as any);
+                              if (rootFile !== undefined) setFileName(rootFile);
+                              if (rootWhatsapp !== undefined) setWhatsappText(rootWhatsapp);
+                              if (rootGoto !== undefined) setGotoId(rootGoto);
+                            }}
+                            allRules={rules}
+                            editingRuleId={editingRuleId}
+                          />
+                        </Suspense>
+                      </div>
+                    )}
+                  
+                  {/* End of layout wrappers */}
+                  {builderMode !== 'visual' && </div>}
                 </div>
               )}
             </>

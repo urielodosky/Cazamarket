@@ -398,7 +398,8 @@ interface VisualBotBuilderProps {
   editingRuleId: string | null;
 }
 
-export default function VisualBotBuilder({ responseText, options, responseType, onChange, allRules, editingRuleId }: VisualBotBuilderProps) {
+const VisualBotBuilder = forwardRef((props: VisualBotBuilderProps, ref) => {
+  const { responseText, options, responseType, onChange, allRules, editingRuleId } = props;
   const nodeTypes: NodeTypes = useMemo(() => ({ botMessage: BotMessageNode }), []);
 
   const initial = useMemo(() => optionsToGraph(responseText, options, responseType), []);
@@ -537,12 +538,16 @@ export default function VisualBotBuilder({ responseText, options, responseType, 
     setNodes(nds => [...nds, newNode]);
   }, [setNodes]);
 
+  React.useImperativeHandle(ref, () => ({
+    addNewNode
+  }));
+
   return (
     <div style={{ width: '100%', height: '550px', borderRadius: '8px', overflow: 'hidden', border: '1px solid var(--color-border)', position: 'relative' }}>
       {/* Toolbar */}
       <div style={{
         position: 'absolute', top: '12px', left: '12px', zIndex: 10,
-        display: 'flex', gap: '8px', flexWrap: 'wrap',
+        display: 'none', gap: '8px', flexWrap: 'wrap',
       }}>
         <button onClick={() => addNewNode('message')} style={{ background: 'var(--color-primary)', color: '#fff', border: 'none', padding: '6px 12px', borderRadius: '6px', cursor: 'pointer', fontSize: '0.8rem', fontWeight: 600 }}>
           + Mensaje
@@ -581,4 +586,6 @@ export default function VisualBotBuilder({ responseText, options, responseType, 
       </ReactFlow>
     </div>
   );
-}
+});
+
+export default VisualBotBuilder;
