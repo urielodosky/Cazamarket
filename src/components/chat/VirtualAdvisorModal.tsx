@@ -74,7 +74,7 @@ function NestedOptionNode({
 
           <div>
             <label style={{ display: 'block', marginBottom: '4px', color: 'var(--color-text-muted)', fontSize: '0.85rem' }}>¿Qué responderá al tocar este botón?</label>
-              <CustomSelect options={[{ value: 'text', label: 'Solo Texto' }, { value: 'options', label: 'Sub-Opciones' }, { value: 'file', label: 'Archivo Adjunto' }, { value: 'whatsapp', label: 'Derivar a WhatsApp' }, { value: 'goto', label: 'Volver a un Menú / Reenviar Opciones' }]} value={opt.responseType} onChange={(val: any) => handleUpdateOption(index, { responseType: val })} />
+              <CustomSelect options={[{ value: 'text', label: 'Solo Texto' }, { value: 'options', label: 'Sub-Opciones' }, { value: 'file', label: 'Archivo Adjunto' }, { value: 'input', label: 'Esperar Respuesta Textual' }, { value: 'whatsapp', label: 'Derivar a WhatsApp' }, { value: 'goto', label: 'Volver a un Menú / Reenviar Opciones' }]} value={opt.responseType} onChange={(val: any) => handleUpdateOption(index, { responseType: val })} />
 
             {opt.responseType === 'goto' ? (
               <div style={{ marginBottom: '12px' }}>
@@ -105,6 +105,12 @@ function NestedOptionNode({
               </div>
             )}
 
+            {(opt.responseType === 'input') && (
+              <div className="nested-options-container" style={{ paddingLeft: '16px', borderLeft: `2px solid rgba(231,76,60,0.5)`, marginTop: '16px' }}>
+                <NestedConditionsBuilder options={opt.options || []} onChange={onChangeNested} pathPrefix={`${currentPath}.`} availableGotos={availableGotos} />
+              </div>
+            )}
+
             {(opt.responseType === 'text' || opt.responseType === 'file') && (
               <div className="nested-options-container" style={{ paddingLeft: '16px', borderLeft: `2px solid ${themeColors.borderSubtle3}`, marginTop: '16px' }}>
                 <NestedNextBuilder opt={opt} onChangeNested={onChangeNested} availableGotos={availableGotos} currentPath={currentPath} />
@@ -132,6 +138,62 @@ function NestedOptionsBuilder({ options, onChange, pathPrefix = "", availableGot
         <NestedOptionNode key={opt.id} opt={opt} index={index} currentPath={`${pathPrefix}${index + 1}`} handleUpdateOption={handleUpdateOption} handleRemoveOption={handleRemoveOption} availableGotos={availableGotos} onChangeNested={(newNested: any) => handleUpdateOption(index, { options: newNested })} />
       ))}
       <button onClick={handleAddOption} style={{ background: 'transparent', color: 'var(--color-primary)', border: '1px dashed var(--color-primary)', padding: '10px', borderRadius: '4px', cursor: 'pointer', fontWeight: 600, fontSize: '0.9rem', alignSelf: 'flex-start', marginTop: '8px' }}>+ Agregar Opción</button>
+    </div>
+  );
+}
+
+function NestedConditionsBuilder({ options, onChange, pathPrefix = "", availableGotos }: any) {
+  const handleAddCondition = () => onChange([...options, { id: Date.now().toString() + Math.random().toString(), label: '', conditionType: 'exact', conditionValue: '', responseType: 'text', responseText: '' }]);
+  const handleUpdateCondition = (index: number, updates: any) => {
+    const newOptions = [...options];
+    newOptions[index] = { ...newOptions[index], ...updates };
+    onChange(newOptions);
+  };
+  const handleRemoveCondition = (index: number) => onChange(options.filter((_: any, i: number) => i !== index));
+
+  return (
+    <div style={{ display: 'flex', flexDirection: 'column', gap: '16px' }}>
+      {options.map((opt: any, index: number) => (
+        <div key={opt.id} style={{ background: 'var(--color-bg-subtle, rgba(0,0,0,0.2))', padding: '16px', borderRadius: '8px', border: '1px solid var(--color-border)' }}>
+          <div style={{ display: 'flex', gap: '8px', alignItems: 'center', marginBottom: '12px' }}>
+            <div style={{ flex: 1 }}>
+              <label style={{ display: 'block', marginBottom: '4px', color: 'var(--color-text-muted)', fontSize: '0.8rem' }}>Tipo de Condición</label>
+              <CustomSelect
+                options={[{ value: 'exact', label: 'Exacto' }, { value: 'keyword', label: 'Contiene' }, { value: 'always', label: 'Fallback (Siempre)' }]}
+                value={opt.conditionType || 'exact'}
+                onChange={(val: any) => handleUpdateCondition(index, { conditionType: val })}
+              />
+            </div>
+            {opt.conditionType !== 'always' && (
+              <div style={{ flex: 2 }}>
+                <label style={{ display: 'block', marginBottom: '4px', color: 'var(--color-text-muted)', fontSize: '0.8rem' }}>Valor</label>
+                <input
+                  type="text"
+                  value={opt.conditionValue || ''}
+                  onChange={(e) => handleUpdateCondition(index, { conditionValue: e.target.value, label: e.target.value })}
+                  style={{ width: '100%', padding: '10px', background: 'var(--color-bg-subtle3, rgba(255,255,255,0.05))', color: '#fff', border: '1px solid var(--color-border)', borderRadius: '4px', outline: 'none' }}
+                />
+              </div>
+            )}
+            {opt.conditionType !== 'always' && (
+              <button onClick={() => handleRemoveCondition(index)} style={{ background: 'rgba(255,50,50,0.1)', color: '#ff4444', border: 'none', padding: '10px', borderRadius: '4px', cursor: 'pointer', alignSelf: 'flex-end', height: '39px' }}>X</button>
+            )}
+          </div>
+          
+          <div style={{ paddingLeft: '16px', borderLeft: '2px solid var(--color-border)', marginTop: '16px' }}>
+            <NestedOptionNode 
+              opt={opt} 
+              index={index} 
+              currentPath={`${pathPrefix}${index + 1}`} 
+              handleUpdateOption={handleUpdateCondition} 
+              handleRemoveOption={handleRemoveCondition} 
+              availableGotos={availableGotos} 
+              onChangeNested={(newNested: any) => handleUpdateCondition(index, { options: newNested })} 
+            />
+          </div>
+        </div>
+      ))}
+      <button onClick={handleAddCondition} style={{ background: 'transparent', color: '#e74c3c', border: '1px dashed #e74c3c', padding: '10px', borderRadius: '4px', cursor: 'pointer', fontWeight: 600, fontSize: '0.9rem', alignSelf: 'flex-start' }}>+ Agregar Condición</button>
     </div>
   );
 }
@@ -325,7 +387,7 @@ export default function VirtualAdvisorModal({ onClose, productId }: VirtualAdvis
       
       const hasText = !!responseText.trim();
       const hasFile = (responseType === 'file') && (attachmentFile || fileName);
-      const hasOptions = (responseType === 'options') && options.length > 0;
+      const hasOptions = (responseType === 'options' || responseType === 'input') && options.length > 0;
       
       if (!hasText && !hasFile && !hasOptions) {
         alert('Debes ingresar al menos un texto de respuesta, opciones o un archivo adjunto.');
@@ -870,14 +932,11 @@ export default function VirtualAdvisorModal({ onClose, productId }: VirtualAdvis
                     </div>
                   </div>
 
-                  {/* Classic Mode - Input Disclaimer */}
+                  {/* Classic Mode - Input Editor */}
                   {builderMode === 'classic' && responseType === 'input' && (
-                    <div style={{ marginTop: '16px', background: 'rgba(231,76,60,0.1)', padding: '16px', borderRadius: '8px', border: '1px solid rgba(231,76,60,0.3)', color: '#fff' }}>
-                      <h4 style={{ margin: '0 0 8px 0', color: '#e74c3c' }}>Modo Entrada Textual</h4>
-                      <p style={{ fontSize: '0.9rem', color: 'var(--color-text-muted)', margin: 0, lineHeight: 1.5 }}>
-                        Las ramas condicionales de este nodo <strong>solo se pueden configurar usando el Modo Visual</strong> (ya que permiten encadenar flujos complejos). 
-                        Por favor, cambia a la pestaña "Constructor Visual" arriba a la derecha para ver y editar las ramas de este nodo.
-                      </p>
+                    <div style={{ marginTop: '16px' }}>
+                      <label style={{ display: 'block', marginBottom: '8px', color: 'var(--color-text-muted)' }}>Ramas Condicionales</label>
+                      <NestedConditionsBuilder options={options} onChange={setOptions} availableGotos={availableGotos} />
                     </div>
                   )}
 
