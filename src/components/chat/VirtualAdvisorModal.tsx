@@ -218,7 +218,7 @@ export default function VirtualAdvisorModal({ onClose, productId }: VirtualAdvis
       const traverse = (opts: AdvisorOption[], prefix: string = '') => {
         opts.forEach((opt, idx) => {
           const currentPath = `${prefix}${idx + 1}`;
-          if (opt.responseType === 'options' || opt.responseType === 'file_options') {
+          if (opt.responseType === 'options') {
             gotos.push({ value: opt.id, label: `Opciones de Opción ${currentPath} (${opt.label})` });
             if (opt.options) traverse(opt.options, `${currentPath}.`);
           }
@@ -316,8 +316,8 @@ export default function VirtualAdvisorModal({ onClose, productId }: VirtualAdvis
 
     if (responseType !== 'goto' && responseType !== 'whatsapp') {
       const hasText = !!responseText.trim();
-      const hasFile = (responseType === 'file' || responseType === 'file_options') && (attachmentFile || fileName);
-      const hasOptions = (responseType === 'options' || responseType === 'file_options') && options.length > 0;
+      const hasFile = (responseType === 'file') && (attachmentFile || fileName);
+      const hasOptions = (responseType === 'options') && options.length > 0;
       
       if (!hasText && !hasFile && !hasOptions) {
         alert('Debes ingresar al menos un texto de respuesta, opciones o un archivo adjunto.');
@@ -338,7 +338,7 @@ export default function VirtualAdvisorModal({ onClose, productId }: VirtualAdvis
     let finalAttachmentType = null;
     let finalFileName = fileName;
 
-    if ((responseType === 'file' || responseType === 'file_options') && attachmentFile) {
+    if ((responseType === 'file') && attachmentFile) {
       setIsUploading(true);
       try {
         const fileExt = attachmentFile.name.split('.').pop();
@@ -379,8 +379,8 @@ export default function VirtualAdvisorModal({ onClose, productId }: VirtualAdvis
       response_type: responseType,
       response_text: responseText.trim(),
       reactivation_text: reactivationText.trim() || null,
-      options: (responseType === 'options' || responseType === 'file_options') ? options : null,
-      file_name: (responseType === 'file' || responseType === 'file_options') ? (finalFileName.trim() || 'documento') : null,
+      options: (responseType === 'options') ? options : null,
+      file_name: (responseType === 'file') ? (finalFileName.trim() || 'documento') : null,
       attachment_url: finalAttachmentUrl,
       attachment_type: finalAttachmentType,
       whatsapp_text: responseType === 'whatsapp' ? (whatsappText.trim() || 'Hola') : null,
@@ -454,7 +454,7 @@ export default function VirtualAdvisorModal({ onClose, productId }: VirtualAdvis
     setCooldownHours(rule.cooldownHours || '');
     setFireOnce(rule.fireOnce || false);
     setIsAdding(true);
-    setBuilderMode(rule.responseType === 'options' || rule.responseType === 'file_options' ? 'visual' : 'classic');
+    setBuilderMode(rule.responseType === 'options' ? 'visual' : 'classic');
   };
 
   const handleDeleteRule = async (id: string) => {
@@ -464,7 +464,7 @@ export default function VirtualAdvisorModal({ onClose, productId }: VirtualAdvis
 
   return (
     <div className="virtual-advisor-overlay" style={{ position: 'fixed', top: 0, left: 0, right: 0, bottom: 0, background: 'rgba(0,0,0,0.6)', zIndex: 1000, display: 'flex', alignItems: 'center', justifyContent: 'center', padding: '20px' }}>
-      <div className="glass-panel virtual-advisor-modal" style={{ width: '100%', maxWidth: isAdding && (responseType === 'options' || responseType === 'file_options') ? '95vw' : '1100px', maxHeight: '95vh', borderRadius: 'var(--radius-lg)', display: 'flex', flexDirection: 'column', overflow: 'hidden', border: '1px solid var(--color-border)', background: themeColors.surfaceElevated, fontFamily: 'var(--font-inter), sans-serif', transition: 'max-width 0.3s ease' }}>
+      <div className="glass-panel virtual-advisor-modal" style={{ width: '100%', maxWidth: isAdding && (responseType === 'options') ? '95vw' : '1100px', maxHeight: '95vh', borderRadius: 'var(--radius-lg)', display: 'flex', flexDirection: 'column', overflow: 'hidden', border: '1px solid var(--color-border)', background: themeColors.surfaceElevated, fontFamily: 'var(--font-inter), sans-serif', transition: 'max-width 0.3s ease' }}>
         
         {/* Header */}
         <div style={{ padding: '20px 24px', borderBottom: '1px solid var(--color-border)', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
@@ -847,7 +847,6 @@ export default function VirtualAdvisorModal({ onClose, productId }: VirtualAdvis
                           <button type="button" onClick={() => visualBuilderRef.current?.addNewNode('text')} style={{ flex: '1 1 45%', background: 'rgba(243,156,18,0.2)', color: '#f39c12', border: '1px solid rgba(243,156,18,0.4)', padding: '8px 12px', borderRadius: '6px', cursor: 'pointer', fontSize: '0.8rem', fontWeight: 600 }}>+ Solo Texto</button>
                           <button type="button" onClick={() => visualBuilderRef.current?.addNewNode('options')} style={{ flex: '1 1 45%', background: 'var(--color-primary)', color: '#fff', border: 'none', padding: '8px 12px', borderRadius: '6px', cursor: 'pointer', fontSize: '0.8rem', fontWeight: 600 }}>+ Sub-Opciones</button>
                           <button type="button" onClick={() => visualBuilderRef.current?.addNewNode('file')} style={{ flex: '1 1 45%', background: 'rgba(52,152,219,0.2)', color: '#3498db', border: '1px solid rgba(52,152,219,0.4)', padding: '8px 12px', borderRadius: '6px', cursor: 'pointer', fontSize: '0.8rem', fontWeight: 600 }}>+ Archivo Adjunto</button>
-                          <button type="button" onClick={() => visualBuilderRef.current?.addNewNode('file_options')} style={{ flex: '1 1 45%', background: '#4a90d9', color: '#fff', border: 'none', padding: '8px 12px', borderRadius: '6px', cursor: 'pointer', fontSize: '0.8rem', fontWeight: 600 }}>+ Arch + Opciones</button>
                           <button type="button" onClick={() => visualBuilderRef.current?.addNewNode('whatsapp')} style={{ flex: '1 1 45%', background: '#25d366', color: '#fff', border: 'none', padding: '8px 12px', borderRadius: '6px', cursor: 'pointer', fontSize: '0.8rem', fontWeight: 600 }}>+ WhatsApp</button>
                           <button type="button" onClick={() => visualBuilderRef.current?.addNewNode('goto')} style={{ flex: '1 1 45%', background: '#9b59b6', color: '#fff', border: 'none', padding: '8px 12px', borderRadius: '6px', cursor: 'pointer', fontSize: '0.8rem', fontWeight: 600 }}>+ Volver a Menú</button>
                         </div>
@@ -863,7 +862,7 @@ export default function VirtualAdvisorModal({ onClose, productId }: VirtualAdvis
                   </div>
 
                   {/* Main Canvas Area for Visual Mode */}
-                  {(builderMode === 'visual' || responseType === 'options' || responseType === 'file_options') && (
+                  {(builderMode === 'visual' || responseType === 'options') && (
                     <div style={{ flex: 1, minWidth: 0, padding: builderMode === 'visual' ? '0' : '0' }}>
                       <Suspense fallback={<div style={{ padding: '40px', textAlign: 'center', color: 'var(--color-text-muted)' }}>Cargando constructor visual...</div>}>
                         <VisualBotBuilder
