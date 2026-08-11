@@ -105,7 +105,7 @@ export default function NegociosPage() {
               name: parsed.store_name || parsed.full_name || 'Mi Negocio',
               rating: 0, // rating: parsed.trust_score ? (parsed.trust_score / 20).toFixed(1) : 0,
               reviews: 0,
-              image: 'https://images.unsplash.com/photo-1503614472-8c93d56e92ce?q=80&w=1200&auto=format&fit=crop',
+              image: parsed.cover_url || parsed.banner_url || parsed.store_image || null,
               avatar: parsed.avatar_url || 'https://ui-avatars.com/api/?name=Mi+Negocio&background=ff7300&color=fff',
               planTier: planTierStr,
               description: parsed.store_description || 'Bienvenido a mi tienda oficial en CazaMarket.',
@@ -236,7 +236,7 @@ export default function NegociosPage() {
             
             {/* Rating removed */}
 
-            {isAtLeast(negocio.planTier, 'emprendedor') && (
+            {(isAtLeast(negocio.planTier, 'emprendedor') && negocio.image) && (
               <div className="aspect-image-16-9" style={{ minHeight: '120px', height: '120px', borderTopLeftRadius: 'var(--radius-lg)', borderTopRightRadius: 'var(--radius-lg)', position: 'relative', overflow: 'hidden' }}>
                 <img 
                   src={negocio.image} 
@@ -248,7 +248,7 @@ export default function NegociosPage() {
               </div>
             )}
 
-            <div className="card-content-fluid" style={{ paddingTop: isAtLeast(negocio.planTier, 'emprendedor') ? '0px' : '24px', display: 'flex', flexDirection: 'column', flex: 1 }}>
+            <div className="card-content-fluid" style={{ paddingTop: (isAtLeast(negocio.planTier, 'emprendedor') && negocio.image) ? '0px' : '24px', display: 'flex', flexDirection: 'column', flex: 1 }}>
               
               {/* Avatar and Username */}
               <div style={{ 

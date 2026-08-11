@@ -68,7 +68,7 @@ const BLANK_NEGOCIO = {
   name: 'Mi Negocio',
   rating: 0,
   reviews: 0,
-  image: 'https://images.unsplash.com/photo-1503614472-8c93d56e92ce?q=80&w=1200&auto=format&fit=crop',
+  image: null,
   avatar: 'https://ui-avatars.com/api/?name=Mi+Negocio&background=ff7300&color=fff',
   planTier: 'basico' as PlanTier,
   description: 'Bienvenido a mi tienda oficial en CazaMarket.',
@@ -222,6 +222,7 @@ export default function NegocioDetailPage({ params }: { params: Promise<{ id: st
             rating: avgRating,
             reviews: totalReviews,
             reviewsList: reviewList,
+            image: profile.cover_url || profile.banner_url || profile.store_image || null,
             description: profile.store_description || 'Bienvenido a mi tienda oficial en CazaMarket.',
             avatar: profile.avatar_url || 'https://images.unsplash.com/photo-1511497584788-876760111969?q=80&w=200&auto=format&fit=crop',
             phone: profile.phone || 'No especificado',
@@ -272,6 +273,7 @@ export default function NegocioDetailPage({ params }: { params: Promise<{ id: st
           ...prev,
           name: parsed.storeName || parsed.username || parsed.nombre || prev.name,
           description: parsed.storeDescription || prev.description,
+          image: parsed.cover_url || parsed.banner_url || parsed.store_image || parsed.image || prev.image,
           avatar: parsed.avatar || prev.avatar,
           phone: parsed.telefono || prev.phone,
           locations: parsedLocations,
@@ -443,7 +445,7 @@ export default function NegocioDetailPage({ params }: { params: Promise<{ id: st
       <div className="container-page" style={customStyles}>
       <div ref={panelRef} className="glass-panel" style={{ borderRadius: 'var(--radius-lg)', padding: 0, position: 'relative' }}>
         {/* Banner */}
-        {(isOwnProfile ? hasFeature('banner') : isAtLeast(negocio.planTier, 'emprendedor')) ? (
+        {((isOwnProfile ? hasFeature('banner') : isAtLeast(negocio.planTier, 'emprendedor')) && negocio.image) ? (
           <div style={{ 
             height: '280px', 
             backgroundImage: `url(${negocio.image})`, 
@@ -466,7 +468,7 @@ export default function NegocioDetailPage({ params }: { params: Promise<{ id: st
             display: 'flex', 
             gap: '32px', 
             alignItems: 'flex-end',
-            marginTop: (isOwnProfile ? hasFeature('banner') : isAtLeast(negocio.planTier, 'emprendedor')) ? '-60px' : '-40px',
+            marginTop: ((isOwnProfile ? hasFeature('banner') : isAtLeast(negocio.planTier, 'emprendedor')) && negocio.image) ? '-60px' : '-40px',
             marginBottom: '32px',
             position: 'relative',
             zIndex: 10
