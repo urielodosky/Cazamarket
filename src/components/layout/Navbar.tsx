@@ -341,8 +341,7 @@ export default function Navbar() {
           <div className={`navbar-center glass-panel ${navbarModeClass}`}>
             <div className="search-bar-animated" style={{ 
               zIndex: 10, 
-              display: (isFilterablePage && !isHome && !isBusinessProfile) ? 'flex' : 'none',
-              background: 'transparent'
+              display: (isFilterablePage && !isHome && !isBusinessProfile) ? 'flex' : 'none'
             }}>
                 <button 
                   className="search-icon-btn" 
