@@ -557,10 +557,14 @@ export default function MensajesPage() {
               return null;
             };
             let targetNode = null;
+            let parentRuleForNode = null;
             for (const r of rules) {
               if (r.options) {
                 targetNode = findNode(r.options);
-                if (targetNode) break;
+                if (targetNode) {
+                  parentRuleForNode = r;
+                  break;
+                }
               }
             }
             if (targetNode) {
@@ -572,7 +576,7 @@ export default function MensajesPage() {
                 options: targetNode.options || null,
                 response_type: targetNode.responseType,
                 id: targetNode.id,
-                parent_rule_id: r.id
+                parent_rule_id: parentRuleForNode ? parentRuleForNode.id : null
               };
             }
           }
