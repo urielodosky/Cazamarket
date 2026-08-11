@@ -8,6 +8,7 @@ type AuthContextType = {
   username: string;
   email: string;
   avatar: string;
+  coverUrl: string;
   isVendor: boolean;
   isVendorModeActive: boolean;
   isMounted: boolean;
@@ -37,7 +38,7 @@ type AuthContextType = {
     username?: string, avatar?: string, personType?: string, birthDate?: string, cuit?: string, phone?: string, contactEmail?: string,
     firstName?: string, lastName?: string, storeName?: string, storeDescription?: string, street?: string, streetNumber?: string, province?: string, locality?: string,
     socialMedia?: any[], branches?: any[], schedules?: any[], role?: string, phone_verified?: boolean,
-    storeTheme?: any, storeCategories?: any[], businessType?: string
+    storeTheme?: any, storeCategories?: any[], businessType?: string, coverUrl?: string
   }) => Promise<void>;
   toggleVendorMode: () => void;
   upgradeToVendor: () => Promise<void>;
@@ -49,6 +50,7 @@ const AuthContext = createContext<AuthContextType>({
   username: '',
   email: '',
   avatar: '',
+  coverUrl: '',
   isVendor: false,
   isVendorModeActive: false,
   isMounted: false,

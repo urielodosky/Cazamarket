@@ -13,6 +13,7 @@ import { SERVICE_MAIN_CATEGORIES, getSubcategoriesForCategory } from '@/constant
 import { LightBulbIcon } from '@heroicons/react/24/outline';
 import ImageCropperModal from '@/components/ImageCropperModal';
 import getCroppedImg from '@/utils/cropImage';
+import BookingCalendar from '@/components/ui/BookingCalendar';
 
 const LocationMap = dynamic(() => import('@/components/ui/LocationMap'), { ssr: false, loading: () => <div style={{height: '100%', display: 'flex', alignItems: 'center', justifyContent: 'center', color: 'var(--color-primary)'}}>Cargando satélite...</div> });
 const AreaMap = dynamic(() => import('@/components/ui/AreaMap'), { ssr: false, loading: () => <div style={{height: '100%', display: 'flex', alignItems: 'center', justifyContent: 'center', color: 'var(--color-primary)'}}>Cargando mapa de cobertura...</div> });
@@ -59,7 +60,6 @@ function NuevoServicioContent() {
   const { username, avatar: userAvatar, supabaseUser } = useAuth();
   const { hasFeature, permissions } = usePlan();
   
-  const canUseBot = hasFeature('botAsesor');
   const canUseBot = hasFeature('botAsesor');
   const [isAdvisorModalOpen, setIsAdvisorModalOpen] = useState(false);
   
