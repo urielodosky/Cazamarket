@@ -446,13 +446,20 @@ export default function VirtualAdvisorModal({ onClose, productId }: VirtualAdvis
           ) : (
             <>
               {/* GLOBAL SETTINGS CARD */}
-              <div style={{ background: themeColors.bgSubtle2, padding: '20px', borderRadius: 'var(--radius-md)', border: `1px solid var(--color-primary)` }}>
+              <div style={{ background: 'rgba(255, 255, 255, 0.02)', padding: '20px', borderRadius: 'var(--radius-lg)', border: `1px solid rgba(255, 255, 255, 0.05)`, transition: 'all 0.3s ease' }}>
                 <div 
                   onClick={() => setShowAdvanced(!showAdvanced)} 
-                  style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', cursor: 'pointer' }}
+                  style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', cursor: 'pointer', paddingBottom: showAdvanced ? '16px' : '0', borderBottom: showAdvanced ? '1px solid rgba(255,255,255,0.05)' : 'none' }}
                 >
-                  <h3 style={{ margin: 0, color: 'var(--color-text-main)' }}>Configuración Avanzada</h3>
-                  <span style={{ fontSize: '1.2rem', color: 'var(--color-text-muted)' }}>{showAdvanced ? '▲' : '▼'}</span>
+                  <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
+                    <div style={{ width: '32px', height: '32px', borderRadius: '50%', background: 'rgba(255, 115, 0, 0.1)', display: 'flex', alignItems: 'center', justifyContent: 'center', color: 'var(--color-primary)' }}>
+                      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><circle cx="12" cy="12" r="3"></circle><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z"></path></svg>
+                    </div>
+                    <h3 style={{ margin: 0, color: 'var(--color-text-main)', fontSize: '1.1rem', fontWeight: 600 }}>Configuración Avanzada</h3>
+                  </div>
+                  <div style={{ transition: 'transform 0.3s ease', transform: showAdvanced ? 'rotate(180deg)' : 'rotate(0deg)', color: 'var(--color-text-muted)', display: 'flex', alignItems: 'center', justifyContent: 'center', width: '32px', height: '32px', borderRadius: '50%', background: 'rgba(255,255,255,0.05)' }}>
+                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><polyline points="6 9 12 15 18 9"></polyline></svg>
+                  </div>
                 </div>
 
                 {showAdvanced && (
@@ -496,49 +503,95 @@ export default function VirtualAdvisorModal({ onClose, productId }: VirtualAdvis
 
               {!isAdding ? (
                 <>
-                  <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-                    <h3 style={{ margin: 0 }}>Reglas Activas</h3>
-                    <button onClick={() => setIsAdding(true)} style={{ background: 'var(--color-primary)', color: themeColors.textWhite, border: 'none', padding: '8px 16px', borderRadius: 'var(--radius-sm)', cursor: 'pointer', fontWeight: 600 }}>+ Nueva Regla</button>
+                  <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', paddingBottom: '12px', borderBottom: '1px solid rgba(255,255,255,0.05)' }}>
+                    <h3 style={{ margin: 0, fontSize: '1.2rem', fontWeight: 700, display: 'flex', alignItems: 'center', gap: '8px' }}>
+                      <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="var(--color-primary)" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path><polyline points="14 2 14 8 20 8"></polyline><line x1="16" y1="13" x2="8" y2="13"></line><line x1="16" y1="17" x2="8" y2="17"></line><polyline points="10 9 9 9 8 9"></polyline></svg>
+                      Reglas Activas
+                    </h3>
+                    <button 
+                      onClick={() => setIsAdding(true)} 
+                      style={{ background: 'var(--color-primary)', color: '#fff', border: 'none', padding: '10px 20px', borderRadius: '100px', cursor: 'pointer', fontWeight: 600, display: 'flex', alignItems: 'center', gap: '6px', boxShadow: '0 4px 12px rgba(255, 115, 0, 0.3)', transition: 'all 0.2s' }}
+                      onMouseEnter={(e) => { e.currentTarget.style.transform = 'translateY(-2px)'; e.currentTarget.style.boxShadow = '0 6px 16px rgba(255, 115, 0, 0.4)'; }}
+                      onMouseLeave={(e) => { e.currentTarget.style.transform = 'translateY(0)'; e.currentTarget.style.boxShadow = '0 4px 12px rgba(255, 115, 0, 0.3)'; }}
+                    >
+                      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round"><line x1="12" y1="5" x2="12" y2="19"></line><line x1="5" y1="12" x2="19" y2="12"></line></svg>
+                      Nueva Regla
+                    </button>
                   </div>
 
                   {rules.length === 0 ? (
-                    <div style={{ textAlign: 'center', padding: '40px', color: 'var(--color-text-muted)', background: themeColors.bgSubtle2, borderRadius: 'var(--radius-md)' }}>No tienes reglas.</div>
+                    <div style={{ textAlign: 'center', padding: '60px 20px', color: 'var(--color-text-muted)', background: 'rgba(255,255,255,0.02)', borderRadius: 'var(--radius-lg)', border: '1px dashed rgba(255,255,255,0.1)', display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '16px' }}>
+                      <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="rgba(255,255,255,0.1)" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path><polyline points="17 8 12 3 7 8"></polyline><line x1="12" y1="3" x2="12" y2="15"></line></svg>
+                      <div>
+                        <h4 style={{ margin: '0 0 8px 0', color: 'var(--color-text-main)' }}>Aún no hay reglas configuradas</h4>
+                        <p style={{ margin: 0, fontSize: '0.9rem' }}>El bot no responderá a ningún mensaje hasta que agregues una regla.</p>
+                      </div>
+                      <button onClick={() => setIsAdding(true)} style={{ background: 'transparent', color: 'var(--color-primary)', border: '1px solid var(--color-primary)', padding: '8px 16px', borderRadius: '100px', cursor: 'pointer', fontWeight: 600, marginTop: '8px' }}>Crear la primera regla</button>
+                    </div>
                   ) : (
-                    <div style={{ display: 'flex', flexDirection: 'column', gap: '12px' }}>
+                    <div style={{ display: 'flex', flexDirection: 'column', gap: '16px' }}>
                       {rules.map(rule => (
-                        <div key={rule.id} style={{ background: themeColors.bgSubtle2, padding: '16px', borderRadius: 'var(--radius-md)', border: '1px solid var(--color-border)', display: 'flex', justifyContent: 'space-between' }}>
-                          <div>
-                            <div style={{ marginBottom: '8px' }}>
-                              <span style={{ color: 'var(--color-primary)', fontWeight: 600 }}>SI RECIBE </span>
-                              <span style={{ color: themeColors.textWhite }}>
-                                {rule.conditionType === 'always' ? 'Cualquier mensaje inicial (Activar siempre)' : rule.conditionType === 'keyword' ? `Palabra clave: "${rule.conditionValue}"` : `Mensaje exacto: "${rule.conditionValue}"`}
+                        <div 
+                          key={rule.id} 
+                          style={{ background: 'rgba(255,255,255,0.03)', padding: '20px', borderRadius: 'var(--radius-lg)', border: '1px solid rgba(255,255,255,0.06)', display: 'flex', justifyContent: 'space-between', transition: 'all 0.3s ease' }}
+                          onMouseEnter={(e) => { e.currentTarget.style.background = 'rgba(255,255,255,0.05)'; e.currentTarget.style.borderColor = 'rgba(255,255,255,0.1)'; e.currentTarget.style.transform = 'translateX(4px)'; }}
+                          onMouseLeave={(e) => { e.currentTarget.style.background = 'rgba(255,255,255,0.03)'; e.currentTarget.style.borderColor = 'rgba(255,255,255,0.06)'; e.currentTarget.style.transform = 'translateX(0)'; }}
+                        >
+                          <div style={{ flex: 1, paddingRight: '20px' }}>
+                            <div style={{ display: 'flex', alignItems: 'center', gap: '12px', marginBottom: '12px' }}>
+                              <span style={{ background: 'rgba(255, 115, 0, 0.1)', color: 'var(--color-primary)', padding: '4px 10px', borderRadius: '6px', fontSize: '0.75rem', fontWeight: 700, letterSpacing: '0.5px' }}>SI RECIBE</span>
+                              <span style={{ color: themeColors.textWhite, fontSize: '1rem', fontWeight: 500 }}>
+                                {rule.conditionType === 'always' ? 'Cualquier mensaje inicial (Activar siempre)' : rule.conditionType === 'keyword' ? <span>Palabra clave: <b style={{ color: 'var(--color-primary)' }}>"{rule.conditionValue}"</b></span> : <span>Mensaje exacto: <b style={{ color: 'var(--color-primary)' }}>"{rule.conditionValue}"</b></span>}
                               </span>
                             </div>
-                            <div>
-                              <span style={{ color: 'var(--color-primary)', fontWeight: 600 }}>ENTONCES </span>
-                              <span style={{ color: 'var(--color-text-muted)' }}>
+                            
+                            <div style={{ display: 'flex', alignItems: 'center', gap: '12px', paddingLeft: '8px', borderLeft: '2px solid rgba(255,255,255,0.1)' }}>
+                              <span style={{ color: 'var(--color-text-muted)', fontSize: '0.75rem', fontWeight: 700, letterSpacing: '0.5px', background: 'rgba(255,255,255,0.05)', padding: '4px 10px', borderRadius: '6px' }}>ENTONCES</span>
+                              <span style={{ color: 'var(--color-text-main)', fontSize: '0.95rem' }}>
                                 {rule.responseType === 'goto' ? (
-                                  <span>Volver a menú {rule.gotoId === 'root' ? 'Principal' : rule.gotoId}</span>
+                                  <span style={{ display: 'flex', alignItems: 'center', gap: '6px' }}><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><polyline points="9 10 4 15 9 20"></polyline><path d="M20 4v7a4 4 0 0 1-4 4H4"></path></svg> Volver a menú <b style={{ color: 'var(--color-primary)' }}>{rule.gotoId === 'root' ? 'Principal' : rule.gotoId}</b></span>
                                 ) : (
-                                  <>
-                                    Responder: "{rule.responseText}"
-                                    {rule.options && ` [${rule.options.length} opciones]`}
-                                    {rule.fileName && ` [Archivo: ${rule.fileName}]`}
-                                    {rule.responseType === 'whatsapp' && ` [Derivar a WA]`}
-                                  </>
+                                  <div style={{ display: 'flex', flexDirection: 'column', gap: '4px' }}>
+                                    {rule.responseText && <div style={{ fontStyle: 'italic', color: 'var(--color-text-muted)' }}>"{rule.responseText}"</div>}
+                                    <div style={{ display: 'flex', gap: '8px', flexWrap: 'wrap', marginTop: '4px' }}>
+                                      {rule.options && rule.options.length > 0 && <span style={{ fontSize: '0.75rem', background: 'rgba(255, 115, 0, 0.1)', color: 'var(--color-primary)', padding: '2px 8px', borderRadius: '100px' }}>{rule.options.length} opciones</span>}
+                                      {rule.fileName && <span style={{ fontSize: '0.75rem', background: 'rgba(255,255,255,0.1)', color: 'var(--color-text-main)', padding: '2px 8px', borderRadius: '100px', display: 'flex', alignItems: 'center', gap: '4px' }}><svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path><polyline points="14 2 14 8 20 8"></polyline></svg> {rule.fileName}</span>}
+                                      {rule.responseType === 'whatsapp' && <span style={{ fontSize: '0.75rem', background: 'rgba(76, 175, 80, 0.1)', color: '#4caf50', padding: '2px 8px', borderRadius: '100px' }}>Derivar a WA</span>}
+                                    </div>
+                                  </div>
                                 )}
                               </span>
                             </div>
+                            
                             {rule.conditionType === 'always' && (
-                              <div style={{ marginTop: '8px', fontSize: '0.85rem', color: '#ff9900' }}>
-                                <i>{rule.fireOnce ? '⚠️ Se dispara SOLO UNA VEZ' : `⏱️ Cooldown de ${rule.cooldownHours}hs`}</i>
-                                {rule.reactivationText && <div style={{ marginTop: '4px' }}><b>Al reactivarse:</b> "{rule.reactivationText}"</div>}
+                              <div style={{ marginTop: '16px', padding: '10px 14px', background: 'rgba(255, 153, 0, 0.05)', borderRadius: '8px', border: '1px solid rgba(255, 153, 0, 0.2)', fontSize: '0.85rem', color: '#ff9900', display: 'flex', flexDirection: 'column', gap: '6px' }}>
+                                <div style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
+                                  {rule.fireOnce ? <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"></path><line x1="12" y1="9" x2="12" y2="13"></line><line x1="12" y1="17" x2="12.01" y2="17"></line></svg> : <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><circle cx="12" cy="12" r="10"></circle><polyline points="12 6 12 12 16 14"></polyline></svg>}
+                                  <span style={{ fontWeight: 600 }}>{rule.fireOnce ? 'Se dispara SOLO UNA VEZ' : `Cooldown de ${rule.cooldownHours}hs`}</span>
+                                </div>
+                                {rule.reactivationText && <div><span style={{ color: 'var(--color-text-muted)' }}>Al reactivarse:</span> "{rule.reactivationText}"</div>}
                               </div>
                             )}
                           </div>
-                          <div style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
-                            <button onClick={() => handleEditRule(rule)} style={{ background: 'rgba(255,255,255,0.1)', color: 'var(--color-text-main)', border: 'none', padding: '8px 12px', borderRadius: 'var(--radius-sm)', cursor: 'pointer' }}>Editar</button>
-                            <button onClick={() => handleDeleteRule(rule.id)} style={{ background: 'rgba(255,50,50,0.1)', color: '#ff4444', border: 'none', padding: '8px 12px', borderRadius: 'var(--radius-sm)', cursor: 'pointer' }}>Eliminar</button>
+                          <div style={{ display: 'flex', flexDirection: 'column', gap: '8px', justifyContent: 'center', borderLeft: '1px solid rgba(255,255,255,0.05)', paddingLeft: '20px' }}>
+                            <button 
+                              onClick={() => handleEditRule(rule)} 
+                              style={{ background: 'rgba(255,255,255,0.05)', color: 'var(--color-text-main)', border: 'none', width: '36px', height: '36px', borderRadius: '50%', cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center', transition: 'all 0.2s' }}
+                              onMouseEnter={(e) => { e.currentTarget.style.background = 'rgba(255,255,255,0.15)'; e.currentTarget.style.color = '#fff'; }}
+                              onMouseLeave={(e) => { e.currentTarget.style.background = 'rgba(255,255,255,0.05)'; e.currentTarget.style.color = 'var(--color-text-main)'; }}
+                              title="Editar Regla"
+                            >
+                              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"></path><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"></path></svg>
+                            </button>
+                            <button 
+                              onClick={() => handleDeleteRule(rule.id)} 
+                              style={{ background: 'rgba(255,50,50,0.05)', color: '#ff4444', border: 'none', width: '36px', height: '36px', borderRadius: '50%', cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center', transition: 'all 0.2s' }}
+                              onMouseEnter={(e) => { e.currentTarget.style.background = '#ff4444'; e.currentTarget.style.color = '#fff'; }}
+                              onMouseLeave={(e) => { e.currentTarget.style.background = 'rgba(255,50,50,0.05)'; e.currentTarget.style.color = '#ff4444'; }}
+                              title="Eliminar Regla"
+                            >
+                              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><polyline points="3 6 5 6 21 6"></polyline><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path><line x1="10" y1="11" x2="10" y2="17"></line><line x1="14" y1="11" x2="14" y2="17"></line></svg>
+                            </button>
                           </div>
                         </div>
                       ))}
