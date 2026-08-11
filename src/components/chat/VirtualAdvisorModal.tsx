@@ -1,10 +1,12 @@
 'use client';
 
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, lazy, Suspense } from 'react';
 import CustomSelect from '@/components/ui/CustomSelect';
 import { useThemeColors } from '@/hooks/useThemeColors';
 import { createClient } from '@/lib/supabase/client';
 import { useAuth } from '@/contexts/AuthContext';
+
+const VisualBotBuilder = lazy(() => import('./VisualBotBuilder'));
 
 export type GotoOption = { value: string; label: string };
 
@@ -428,7 +430,7 @@ export default function VirtualAdvisorModal({ onClose, productId }: VirtualAdvis
 
   return (
     <div className="virtual-advisor-overlay" style={{ position: 'fixed', top: 0, left: 0, right: 0, bottom: 0, background: 'rgba(0,0,0,0.6)', zIndex: 1000, display: 'flex', alignItems: 'center', justifyContent: 'center', padding: '20px' }}>
-      <div className="glass-panel virtual-advisor-modal" style={{ width: '100%', maxWidth: '1100px', maxHeight: '90vh', borderRadius: 'var(--radius-lg)', display: 'flex', flexDirection: 'column', overflow: 'hidden', border: '1px solid var(--color-border)', background: themeColors.surfaceElevated, fontFamily: 'var(--font-inter), sans-serif' }}>
+      <div className="glass-panel virtual-advisor-modal" style={{ width: '100%', maxWidth: isAdding && (responseType === 'options' || responseType === 'file_options') ? '95vw' : '1100px', maxHeight: '95vh', borderRadius: 'var(--radius-lg)', display: 'flex', flexDirection: 'column', overflow: 'hidden', border: '1px solid var(--color-border)', background: themeColors.surfaceElevated, fontFamily: 'var(--font-inter), sans-serif', transition: 'max-width 0.3s ease' }}>
         
         {/* Header */}
         <div style={{ padding: '20px 24px', borderBottom: '1px solid var(--color-border)', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
@@ -624,8 +626,17 @@ export default function VirtualAdvisorModal({ onClose, productId }: VirtualAdvis
 
                     {(responseType === 'options' || responseType === 'file_options') && (
                       <div>
-                        <label style={{ display: 'block', marginBottom: '8px', color: 'var(--color-text-muted)' }}>Opciones Interactivas</label>
-                        <NestedOptionsBuilder options={options} onChange={setOptions} availableGotos={availableGotos} />
+                        <label style={{ display: 'block', marginBottom: '8px', color: 'var(--color-text-muted)' }}>Opciones Interactivas (Lienzo Visual)</label>
+                        <Suspense fallback={<div style={{ padding: '40px', textAlign: 'center', color: 'var(--color-text-muted)' }}>Cargando constructor visual...</div>}>
+                          <VisualBotBuilder
+                            responseText={responseText}
+                            options={options}
+                            responseType={responseType}
+                            onChange={(text, opts) => { setResponseText(text); setOptions(opts); }}
+                            allRules={rules}
+                            editingRuleId={editingRuleId}
+                          />
+                        </Suspense>
                       </div>
                     )}
 

@@ -7,7 +7,7 @@ import Link from 'next/link';
 const LocationMap = dynamic(() => import('@/components/ui/LocationMap'), { ssr: false });
 const AreaMap = dynamic(() => import('@/components/ui/AreaMap'), { ssr: false });
 import LoadingScreen from '@/components/ui/LoadingScreen';
-import BookingCalendar from '@/components/ui/BookingCalendar';
+import BookingCalendar, { DateRange } from '@/components/ui/BookingCalendar';
 import { useCart } from '@/contexts/CartContext';
 import { usePlan } from '@/contexts/PlanContext';
 import { useThemeColors } from '@/hooks/useThemeColors';
@@ -73,7 +73,9 @@ export default function ServicioDetailPage({ params }: { params: Promise<{ id: s
   const serviceId = unwrappedParams.id;
   const router = useRouter();
   const [service, setService] = useState<any>(null);
+  const [rangeValue, setRangeValue] = useState<DateRange>({ startDate: null, endDate: null });
   const [selectedDates, setSelectedDates] = useState<string[]>([]);
+  const [blockedDates, setBlockedDates] = useState<string[]>([]);
   const [activeImage, setActiveImage] = useState(0);
   const [isHoveringImage, setIsHoveringImage] = useState(false);
   const [copiedSocial, setCopiedSocial] = useState<string | null>(null);
@@ -157,8 +159,32 @@ export default function ServicioDetailPage({ params }: { params: Promise<{ id: s
               avatar: sellerProfile.avatar_url || '',
               phone: sellerProfile.phone || '',
               planTier: sellerProfile.service_plan_tier || 'gratis'
-            }
+            },
+            pricePerDay: data.price_per_day || 0,
+            weeklyDiscountPercent: data.weekly_discount_percent || 0,
+            monthlyDiscountPercent: data.monthly_discount_percent || 0
           });
+
+          // Fetch bookings for this service
+          const { data: bookingsData } = await supabase
+            .from('bookings')
+            .select('start_date, end_date')
+            .eq('service_id', serviceId)
+            .in('status', ['pending', 'confirmed']);
+          
+          if (bookingsData && bookingsData.length > 0) {
+            const blocked: string[] = [];
+            bookingsData.forEach((b: any) => {
+              let current = new Date(b.start_date + 'T00:00:00');
+              const end = new Date(b.end_date + 'T00:00:00');
+              while (current <= end) {
+                blocked.push(`${current.getFullYear()}-${String(current.getMonth() + 1).padStart(2, '0')}-${String(current.getDate()).padStart(2, '0')}`);
+                current.setDate(current.getDate() + 1);
+              }
+            });
+            setBlockedDates(blocked);
+          }
+
           setIsLoading(false);
           return;
         }
@@ -265,34 +291,21 @@ export default function ServicioDetailPage({ params }: { params: Promise<{ id: s
   let finalPrice = discountedBasePrice;
 
   if (selectedDates.length > 0) {
-    finalPrice = 0;
-    // 2. Reglas de Temporada por Día
-    selectedDates.forEach(dateStr => {
-      let dailyPrice = discountedBasePrice;
-      if (service.seasonRules && service.seasonRules.length > 0) {
-        const dateObj = new Date(dateStr);
-        const matchedRule = service.seasonRules.find((rule: any) => {
-          const start = new Date(rule.startDate);
-          const end = new Date(rule.endDate);
-          return dateObj >= start && dateObj <= end;
-        });
+    const baseP = service.pricePerDay || rawBasePrice;
+    let subtotal = baseP * selectedDates.length;
+    let discountPercent = 0;
 
-        if (matchedRule) {
-          const val = parseFloat(matchedRule.value);
-          const adjustment = matchedRule.type === 'porcentaje' ? (discountedBasePrice * (val / 100)) : val;
-          if (matchedRule.adjustmentType === 'aumento') dailyPrice += adjustment;
-          else dailyPrice -= adjustment;
-          if (!activeRules.some((r: any) => r.name === matchedRule.name)) {
-            activeRules.push({
-              name: matchedRule.name,
-              adjustmentType: matchedRule.adjustmentType,
-              badgeText: `${matchedRule.adjustmentType === 'aumento' ? 'Temp. Alta:' : 'Temp. Baja:'} ${matchedRule.name}`
-            });
-          }
-        }
-      }
-      finalPrice += dailyPrice;
-    });
+    if (service.monthlyDiscountPercent > 0 && selectedDates.length >= 28) {
+      discountPercent = service.monthlyDiscountPercent;
+    } else if (service.weeklyDiscountPercent > 0 && selectedDates.length >= 7) {
+      discountPercent = service.weeklyDiscountPercent;
+    }
+
+    if (discountPercent > 0) {
+      subtotal = subtotal * (1 - (discountPercent / 100));
+    }
+
+    finalPrice = subtotal;
 
     // 3. Descuento por Cantidad de Días (Time Discounts)
     if (service.timeDiscounts && service.timeDiscounts.length > 0) {
@@ -501,24 +514,36 @@ export default function ServicioDetailPage({ params }: { params: Promise<{ id: s
             {/* Calendario */}
             {service.usesCalendar !== false && (
               <div style={{ display: 'flex', flexDirection: 'column', gap: '16px', marginBottom: '8px' }}>
-                <label style={{ fontSize: '0.95rem', color: 'color-mix(in srgb, var(--color-text-main) 70%, transparent)', fontWeight: 600, textAlign: 'center' }}>Selecciona tu Fecha o Fechas en el Calendario</label>
+                <label style={{ fontSize: '0.95rem', color: 'color-mix(in srgb, var(--color-text-main) 70%, transparent)', fontWeight: 600, textAlign: 'center' }}>Selecciona tu Fecha o Rango de Fechas en el Calendario</label>
                 <BookingCalendar
-                  mode="client"
-                  value={selectedDates}
-                  onChange={(val) => {
-                    if (service.pricePeriod === 'único') {
-                      setSelectedDates(typeof val === 'string' ? [val] : (val.length > 0 ? [val[val.length - 1]] : []));
+                  mode="range"
+                  rangeValue={rangeValue}
+                  onRangeChange={(val) => {
+                    setRangeValue(val);
+                    if (val.startDate) {
+                      if (!val.endDate) {
+                        setSelectedDates([val.startDate]);
+                      } else {
+                        const start = new Date(val.startDate + 'T00:00:00');
+                        const end = new Date(val.endDate + 'T00:00:00');
+                        const dates: string[] = [];
+                        let current = new Date(start);
+                        while (current <= end) {
+                          dates.push(`${current.getFullYear()}-${String(current.getMonth() + 1).padStart(2, '0')}-${String(current.getDate()).padStart(2, '0')}`);
+                          current.setDate(current.getDate() + 1);
+                        }
+                        setSelectedDates(dates);
+                      }
                     } else {
-                      setSelectedDates(Array.isArray(val) ? val : [val]);
+                      setSelectedDates([]);
                     }
                   }}
-                  blockedDates={service.blockedDates || []}
-                  allowMultiple={service.pricePeriod !== 'único'}
+                  blockedDates={blockedDates || []}
                 />
               </div>
             )}
 
-            {/* Precio */}
+            {/* Precio & Desglose */}
             <div style={{ display: 'flex', flexDirection: 'column', gap: '12px' }}>
               <div>
                 <div style={{ display: 'flex', alignItems: 'flex-end', gap: '16px' }}>
@@ -526,16 +551,44 @@ export default function ServicioDetailPage({ params }: { params: Promise<{ id: s
                     $ {finalPrice.toLocaleString('es-AR')}
                   </span>
                   <span style={{ fontSize: '1.2rem', color: 'color-mix(in srgb, var(--color-text-main) 60%, transparent)', paddingBottom: '4px' }}>
-                    / {service.pricePeriod || 'jornada'} {activeRules.length > 0 ? '(Ajustado)' : 'base'} {selectedDates.length > 1 && `(x${selectedDates.length})`}
+                    {selectedDates.length > 0 ? 'Total' : `/ ${service.pricePeriod || 'jornada'} base`}
                   </span>
                 </div>
-                {activeRules.length > 0 && (
-                  <div style={{ marginTop: '8px', display: 'flex', flexWrap: 'wrap', gap: '8px' }}>
-                    {activeRules.map((rule, idx) => (
-                      <div key={idx} style={{ display: 'inline-flex', padding: '4px 10px', background: rule.adjustmentType === 'aumento' ? 'rgba(239, 68, 68, 0.1)' : 'rgba(37,211,102,0.1)', color: rule.adjustmentType === 'aumento' ? '#ef4444' : '#25D366', borderRadius: '4px', fontSize: '0.85rem', fontWeight: 600, border: `1px solid ${rule.adjustmentType === 'aumento' ? 'rgba(239, 68, 68, 0.3)' : 'rgba(37,211,102,0.3)'}` }}>
-                        {rule.badgeText || rule.name}
+                
+                {/* AIRBNB STYLE BREAKDOWN */}
+                {selectedDates.length > 0 && (
+                  <div style={{ marginTop: '16px', padding: '16px', borderRadius: '12px', border: '1px solid var(--color-border)', background: 'var(--color-bg-surface-elevated)' }}>
+                    <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '8px', fontSize: '0.95rem', color: 'var(--color-text-main)' }}>
+                      <span>$ {service.pricePerDay || rawBasePrice} x {selectedDates.length} días</span>
+                      <span>$ {((service.pricePerDay || rawBasePrice) * selectedDates.length).toLocaleString('es-AR')}</span>
+                    </div>
+                    
+                    {service.weeklyDiscountPercent > 0 && selectedDates.length >= 7 && selectedDates.length < 28 && (
+                      <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '8px', fontSize: '0.95rem', color: '#25D366', fontWeight: 600 }}>
+                        <span>Descuento semanal ({service.weeklyDiscountPercent}%)</span>
+                        <span>-$ {(((service.pricePerDay || rawBasePrice) * selectedDates.length) * (service.weeklyDiscountPercent / 100)).toLocaleString('es-AR')}</span>
+                      </div>
+                    )}
+
+                    {service.monthlyDiscountPercent > 0 && selectedDates.length >= 28 && (
+                      <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '8px', fontSize: '0.95rem', color: '#25D366', fontWeight: 600 }}>
+                        <span>Descuento mensual ({service.monthlyDiscountPercent}%)</span>
+                        <span>-$ {(((service.pricePerDay || rawBasePrice) * selectedDates.length) * (service.monthlyDiscountPercent / 100)).toLocaleString('es-AR')}</span>
+                      </div>
+                    )}
+                    
+                    {activeRules.filter(r => r.adjustmentType === 'descuento' && !r.name.includes('semanal') && !r.name.includes('mensual')).map((rule, idx) => (
+                      <div key={idx} style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '8px', fontSize: '0.95rem', color: '#25D366', fontWeight: 600 }}>
+                        <span>{rule.name}</span>
+                        <span>Aplicado al total</span>
                       </div>
                     ))}
+                    
+                    <div style={{ height: '1px', background: 'var(--color-border)', margin: '12px 0' }}></div>
+                    <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: '1.1rem', fontWeight: 700, color: 'var(--color-text-main)' }}>
+                      <span>Total a Pagar</span>
+                      <span>$ {finalPrice.toLocaleString('es-AR')}</span>
+                    </div>
                   </div>
                 )}
               </div>

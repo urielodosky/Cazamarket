@@ -2,15 +2,30 @@
 
 import React, { useState } from 'react';
 
+export interface DateRange {
+  startDate: string | null;
+  endDate: string | null;
+}
+
 interface BookingCalendarProps {
-  mode?: 'client' | 'admin';
-  value: string | string[]; // string for client (single), string[] for client(multiple) or admin
-  onChange: (val: any) => void;
+  mode?: 'client' | 'admin' | 'range';
+  value?: string | string[]; // for client/admin
+  rangeValue?: DateRange;    // for range mode
+  onChange?: (val: any) => void;
+  onRangeChange?: (val: DateRange) => void;
   blockedDates?: string[];
   allowMultiple?: boolean;
 }
 
-export default function BookingCalendar({ mode = 'client', value, onChange, blockedDates = [], allowMultiple = false }: BookingCalendarProps) {
+export default function BookingCalendar({ 
+  mode = 'client', 
+  value, 
+  onChange, 
+  rangeValue = { startDate: null, endDate: null }, 
+  onRangeChange, 
+  blockedDates = [], 
+  allowMultiple = false 
+}: BookingCalendarProps) {
   const [currentDate, setCurrentDate] = useState(new Date());
 
   const year = currentDate.getFullYear();
@@ -34,6 +49,12 @@ export default function BookingCalendar({ mode = 'client', value, onChange, bloc
   const today = new Date();
   today.setHours(0, 0, 0, 0);
 
+  // Helper to parse "YYYY-MM-DD" to Date
+  const parseDate = (d: string) => new Date(d + 'T00:00:00');
+
+  const startD = rangeValue.startDate ? parseDate(rangeValue.startDate) : null;
+  const endD = rangeValue.endDate ? parseDate(rangeValue.endDate) : null;
+
   for (let i = 1; i <= daysInMonth; i++) {
     const cellDate = new Date(year, month, i);
     const dateString = `${cellDate.getFullYear()}-${String(cellDate.getMonth() + 1).padStart(2, '0')}-${String(cellDate.getDate()).padStart(2, '0')}`;
@@ -42,29 +63,86 @@ export default function BookingCalendar({ mode = 'client', value, onChange, bloc
     const isBlocked = blockedDates.includes(dateString);
     
     let isSelected = false;
-    if (mode === 'admin' || allowMultiple) {
-      isSelected = Array.isArray(value) && value.includes(dateString);
+    let isInRange = false;
+    let isRangeStart = false;
+    let isRangeEnd = false;
+
+    if (mode === 'range') {
+      if (startD && cellDate.getTime() === startD.getTime()) {
+        isSelected = true;
+        isRangeStart = true;
+      }
+      if (endD && cellDate.getTime() === endD.getTime()) {
+        isSelected = true;
+        isRangeEnd = true;
+      }
+      if (startD && endD && cellDate > startD && cellDate < endD) {
+        isInRange = true;
+      }
     } else {
-      isSelected = value === dateString || (Array.isArray(value) && value.length > 0 && value[0] === dateString);
+      if (mode === 'admin' || allowMultiple) {
+        isSelected = Array.isArray(value) && value.includes(dateString);
+      } else {
+        isSelected = value === dateString || (Array.isArray(value) && value.length > 0 && value[0] === dateString);
+      }
     }
 
-    const isDisabled = mode === 'client' && (isPast || isBlocked);
+    const isDisabled = (mode === 'client' || mode === 'range') && (isPast || isBlocked);
     const isAdminDisabled = mode === 'admin' && isPast;
 
     const handleClick = () => {
       if (isDisabled || isAdminDisabled) return;
 
-      if (mode === 'admin' || allowMultiple) {
-        const arr = Array.isArray(value) ? value : [];
-        if (arr.includes(dateString)) {
-          onChange(arr.filter(d => d !== dateString));
-        } else {
-          onChange([...arr, dateString]);
+      if (mode === 'range' && onRangeChange) {
+        if (!rangeValue.startDate || (rangeValue.startDate && rangeValue.endDate)) {
+          // Empezar nuevo rango
+          onRangeChange({ startDate: dateString, endDate: null });
+        } else if (rangeValue.startDate && !rangeValue.endDate) {
+          const selectedStart = parseDate(rangeValue.startDate);
+          if (cellDate < selectedStart) {
+            // Si elige fecha anterior, resetear inicio
+            onRangeChange({ startDate: dateString, endDate: null });
+          } else {
+            // Validar que no haya bloqueadas en el medio
+            let hasBlockedInBetween = false;
+            let current = new Date(selectedStart);
+            while (current <= cellDate) {
+              const str = `${current.getFullYear()}-${String(current.getMonth() + 1).padStart(2, '0')}-${String(current.getDate()).padStart(2, '0')}`;
+              if (blockedDates.includes(str)) {
+                hasBlockedInBetween = true;
+                break;
+              }
+              current.setDate(current.getDate() + 1);
+            }
+
+            if (hasBlockedInBetween) {
+              // Reset
+              onRangeChange({ startDate: dateString, endDate: null });
+            } else {
+              onRangeChange({ startDate: rangeValue.startDate, endDate: dateString });
+            }
+          }
         }
-      } else {
-        onChange(dateString);
+      } else if (onChange) {
+        if (mode === 'admin' || allowMultiple) {
+          const arr = Array.isArray(value) ? value : [];
+          if (arr.includes(dateString)) {
+            onChange(arr.filter(d => d !== dateString));
+          } else {
+            onChange([...arr, dateString]);
+          }
+        } else {
+          onChange(dateString);
+        }
       }
     };
+
+    let bg = 'transparent';
+    if (isSelected) {
+      bg = mode === 'admin' ? 'rgba(239, 68, 68, 0.15)' : 'var(--color-primary)';
+    } else if (isInRange) {
+      bg = 'color-mix(in srgb, var(--color-primary) 20%, transparent)';
+    }
 
     cells.push(
       <div 
@@ -75,41 +153,36 @@ export default function BookingCalendar({ mode = 'client', value, onChange, bloc
           alignItems: 'center',
           justifyContent: 'center',
           height: '42px',
-          width: '42px',
-          margin: '0 auto',
-          borderRadius: '50%',
+          width: '100%',
+          margin: '0',
+          borderRadius: isRangeStart ? '21px 0 0 21px' : (isRangeEnd ? '0 21px 21px 0' : (isSelected && mode !== 'range' ? '50%' : (isInRange ? '0' : '50%'))),
           cursor: (isDisabled || isAdminDisabled) ? 'not-allowed' : 'pointer',
-          background: isSelected 
-            ? (mode === 'admin' ? 'rgba(239, 68, 68, 0.15)' : 'linear-gradient(135deg, var(--color-primary), #ff9500)') 
-            : 'transparent',
+          background: bg,
           border: isSelected && mode === 'admin' 
             ? `1.5px solid #ef4444` 
             : '1.5px solid transparent',
           color: (isDisabled || isAdminDisabled) 
             ? 'rgba(255, 255, 255, 0.15)' 
-            : (isSelected ? '#fff' : 'rgba(255, 255, 255, 0.85)'),
+            : (isSelected ? '#fff' : (isInRange ? 'var(--color-primary)' : 'rgba(255, 255, 255, 0.85)')),
           fontWeight: isSelected ? 700 : 500,
           fontSize: '0.95rem',
-          transition: 'all 0.3s cubic-bezier(0.4, 0, 0.2, 1)',
+          transition: 'all 0.2s ease',
           position: 'relative',
-          boxShadow: isSelected && mode !== 'admin' ? '0 4px 12px rgba(255, 115, 0, 0.4)' : 'none',
-          transform: isSelected && mode !== 'admin' ? 'scale(1.05)' : 'scale(1)'
         }}
         onMouseEnter={(e) => {
-          if (!isDisabled && !isAdminDisabled && !isSelected) {
+          if (!isDisabled && !isAdminDisabled && !isSelected && !isInRange) {
             e.currentTarget.style.background = 'rgba(255, 255, 255, 0.08)';
-            e.currentTarget.style.transform = 'scale(1.1)';
+            e.currentTarget.style.borderRadius = '50%';
           }
         }}
         onMouseLeave={(e) => {
-          if (!isDisabled && !isAdminDisabled && !isSelected) {
+          if (!isDisabled && !isAdminDisabled && !isSelected && !isInRange) {
             e.currentTarget.style.background = 'transparent';
-            e.currentTarget.style.transform = 'scale(1)';
           }
         }}
       >
         {i}
-        {mode === 'client' && isBlocked && (
+        {(mode === 'client' || mode === 'range') && isBlocked && (
           <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#ef4444" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" style={{ position: 'absolute', top: '50%', left: '50%', transform: 'translate(-50%, -50%)', opacity: 0.8 }}>
             <line x1="18" y1="6" x2="6" y2="18"></line>
             <line x1="6" y1="6" x2="18" y2="18"></line>
@@ -157,7 +230,7 @@ export default function BookingCalendar({ mode = 'client', value, onChange, bloc
       </div>
 
       {/* Días de la semana */}
-      <div style={{ display: 'grid', gridTemplateColumns: 'repeat(7, 1fr)', gap: '8px', marginBottom: '16px' }}>
+      <div style={{ display: 'grid', gridTemplateColumns: 'repeat(7, 1fr)', gap: '0px', marginBottom: '16px' }}>
         {dayNames.map(day => (
           <div key={day} style={{ textAlign: 'center', fontSize: '0.75rem', fontWeight: 700, color: 'rgba(255,255,255,0.4)', textTransform: 'uppercase', letterSpacing: '1px' }}>
             {day}
@@ -166,7 +239,7 @@ export default function BookingCalendar({ mode = 'client', value, onChange, bloc
       </div>
 
       {/* Cuadrícula del mes */}
-      <div style={{ display: 'grid', gridTemplateColumns: 'repeat(7, 1fr)', gap: '8px' }}>
+      <div style={{ display: 'grid', gridTemplateColumns: 'repeat(7, 1fr)', gap: '0px', rowGap: '8px' }}>
         {cells}
       </div>
       
