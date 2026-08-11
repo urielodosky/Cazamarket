@@ -349,9 +349,9 @@ export default function Navbar() {
                   title="Buscar"
                   style={{ 
                     border: 'none', 
-                    width: '44px',
+                    width: '48px',
                     height: '44px',
-                    borderRadius: '50%',
+                    borderRadius: '100px 0 0 100px',
                     cursor: 'pointer', 
                     display: 'flex', 
                     alignItems: 'center',
