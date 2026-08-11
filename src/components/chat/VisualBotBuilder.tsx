@@ -25,7 +25,7 @@ import type { AdvisorOption, AdvisorRule, GotoOption } from './VirtualAdvisorMod
 function BotMessageNode({ data, id, selected }: NodeProps) {
   const d = data as any;
   const text: string = d.text || '';
-  const options: { id: string; label: string }[] = d.options || [];
+  const options: { id: string; label: string; conditionType?: string; conditionValue?: string }[] = d.options || [];
   const isRoot: boolean = d.isRoot || false;
   const nodeType: string = d.nodeType || 'message'; // 'message' | 'whatsapp' | 'file' | 'goto'
 
@@ -34,7 +34,7 @@ function BotMessageNode({ data, id, selected }: NodeProps) {
     options: 'var(--color-primary)',
     whatsapp: '#25d366',
     file: '#3498db',
-    file_options: '#4a90d9',
+    input: '#e74c3c',
     goto: '#9b59b6',
   };
 
@@ -43,7 +43,7 @@ function BotMessageNode({ data, id, selected }: NodeProps) {
     options: 'Texto c/ Opciones',
     whatsapp: 'Derivar a WhatsApp',
     file: 'Archivo Adjunto',
-    file_options: 'Archivo c/ Opciones',
+    input: 'Entrada Textual',
     goto: 'Derivar a Regla',
   };
 
@@ -95,7 +95,7 @@ function BotMessageNode({ data, id, selected }: NodeProps) {
             <button className="nodrag" onClick={() => d.onChangeNodeType?.(id, 'text')} style={{ flex: '1 1 30%', padding: '4px', fontSize: '0.65rem', background: nodeType === 'text' ? 'rgba(243,156,18,0.2)' : 'rgba(255,255,255,0.05)', color: nodeType === 'text' ? '#f39c12' : '#fff', border: 'none', borderRadius: '4px', cursor: 'pointer' }}>Texto</button>
             <button className="nodrag" onClick={() => d.onChangeNodeType?.(id, 'options')} style={{ flex: '1 1 30%', padding: '4px', fontSize: '0.65rem', background: nodeType === 'options' ? 'rgba(255,115,0,0.2)' : 'rgba(255,255,255,0.05)', color: nodeType === 'options' ? 'var(--color-primary)' : '#fff', border: 'none', borderRadius: '4px', cursor: 'pointer' }}>Opciones</button>
             <button className="nodrag" onClick={() => d.onChangeNodeType?.(id, 'file')} style={{ flex: '1 1 30%', padding: '4px', fontSize: '0.65rem', background: nodeType === 'file' ? 'rgba(52,152,219,0.2)' : 'rgba(255,255,255,0.05)', color: nodeType === 'file' ? '#3498db' : '#fff', border: 'none', borderRadius: '4px', cursor: 'pointer' }}>Archivo</button>
-            <button className="nodrag" onClick={() => d.onChangeNodeType?.(id, 'file_options')} style={{ flex: '1 1 30%', padding: '4px', fontSize: '0.65rem', background: nodeType === 'file_options' ? 'rgba(74,144,217,0.2)' : 'rgba(255,255,255,0.05)', color: nodeType === 'file_options' ? '#4a90d9' : '#fff', border: 'none', borderRadius: '4px', cursor: 'pointer' }}>Arch+Opc</button>
+            <button className="nodrag" onClick={() => d.onChangeNodeType?.(id, 'input')} style={{ flex: '1 1 30%', padding: '4px', fontSize: '0.65rem', background: nodeType === 'input' ? 'rgba(231,76,60,0.2)' : 'rgba(255,255,255,0.05)', color: nodeType === 'input' ? '#e74c3c' : '#fff', border: 'none', borderRadius: '4px', cursor: 'pointer' }}>Entrada</button>
             <button className="nodrag" onClick={() => d.onChangeNodeType?.(id, 'whatsapp')} style={{ flex: '1 1 30%', padding: '4px', fontSize: '0.65rem', background: nodeType === 'whatsapp' ? 'rgba(37,211,102,0.2)' : 'rgba(255,255,255,0.05)', color: nodeType === 'whatsapp' ? '#25d366' : '#fff', border: 'none', borderRadius: '4px', cursor: 'pointer' }}>WA</button>
             <button className="nodrag" onClick={() => d.onChangeNodeType?.(id, 'goto')} style={{ flex: '1 1 30%', padding: '4px', fontSize: '0.65rem', background: nodeType === 'goto' ? 'rgba(155,89,182,0.2)' : 'rgba(255,255,255,0.05)', color: nodeType === 'goto' ? '#9b59b6' : '#fff', border: 'none', borderRadius: '4px', cursor: 'pointer' }}>Derivar</button>
           </div>
@@ -205,6 +205,56 @@ function BotMessageNode({ data, id, selected }: NodeProps) {
           </>
         )}
 
+        {/* Conditional Branches */}
+        {nodeType === 'input' && (
+          <>
+            <hr style={{ border: 'none', borderTop: '1px solid var(--color-border)', margin: '2px 0' }} />
+            <div style={{ display: 'flex', flexDirection: 'column', gap: '6px' }}>
+              <label style={{ display: 'block', fontSize: '0.7rem', color: 'var(--color-text-muted)', textTransform: 'uppercase', letterSpacing: '0.5px' }}>
+                Ramas Condicionales
+              </label>
+              {options.map((opt, index) => (
+                <div key={opt.id} style={{ display: 'flex', flexDirection: 'column', gap: '4px', background: 'rgba(0,0,0,0.1)', padding: '6px', borderRadius: '6px', border: '1px solid rgba(255,255,255,0.05)', position: 'relative' }}>
+                  <div style={{ display: 'flex', gap: '4px' }}>
+                    <select
+                      className="nodrag nopan"
+                      value={opt.conditionType || 'exact'}
+                      onChange={(e) => d.onOptionPropChange?.(id, opt.id, 'conditionType', e.target.value)}
+                      style={{ flex: 1, padding: '4px', fontSize: '0.7rem', background: 'rgba(255,255,255,0.05)', color: '#fff', border: '1px solid var(--color-border)', borderRadius: '4px', outline: 'none' }}
+                    >
+                      <option value="exact">Exacto</option>
+                      <option value="keyword">Contiene</option>
+                      <option value="always">Fallback (Cualquier otra cosa)</option>
+                    </select>
+                    {opt.conditionType !== 'always' && (
+                      <button className="nodrag" onClick={() => d.onOptionRemove?.(id, opt.id)} style={{ background: 'transparent', border: 'none', color: '#ff4444', cursor: 'pointer', padding: '0 4px', fontSize: '1rem', lineHeight: 1 }}>x</button>
+                    )}
+                  </div>
+                  {opt.conditionType !== 'always' && (
+                    <input
+                      className="nodrag nopan"
+                      type="text"
+                      value={opt.conditionValue || ''}
+                      onChange={(e) => {
+                        d.onOptionPropChange?.(id, opt.id, 'conditionValue', e.target.value);
+                        d.onOptionLabelChange?.(id, opt.id, e.target.value); // Keep label in sync for debugging
+                      }}
+                      placeholder="Valor esperado"
+                      style={{ width: '100%', padding: '4px', fontSize: '0.75rem', background: 'rgba(0,0,0,0.2)', color: 'var(--color-primary)', border: '1px solid var(--color-primary)', borderRadius: '4px', outline: 'none' }}
+                    />
+                  )}
+                  <Handle type="source" position={Position.Right} id={opt.id} style={{ background: 'var(--color-primary)', width: '16px', height: '16px', right: '-12px', top: '50%', transform: 'translateY(-50%)', border: '2px solid #fff', zIndex: 10 }} />
+                </div>
+              ))}
+              <button
+                className="nodrag"
+                onClick={() => d.onOptionAdd?.(id, { conditionType: 'exact', conditionValue: '' })}
+                style={{ background: 'rgba(255,255,255,0.03)', color: 'var(--color-primary)', border: '1px dashed var(--color-border)', padding: '5px', borderRadius: '6px', cursor: 'pointer', fontSize: '0.78rem', marginTop: '2px' }}
+              >+ Agregar Condición</button>
+            </div>
+          </>
+        )}
+
         {/* Source handle for sequential nodes (text, file) */}
         {(nodeType === 'text' || nodeType === 'file') && (
           <>
@@ -237,7 +287,7 @@ function optionsToGraph(
   let yOffset = 0;
 
   const rootId = 'root';
-  const rootNodeOptions = rootOptions.map(opt => ({ id: opt.id, label: opt.label }));
+  const rootNodeOptions = rootOptions.map(opt => ({ id: opt.id, label: opt.label, conditionType: opt.conditionType, conditionValue: opt.conditionValue }));
   
   let rootNodeType = rootResponseType || 'options';
 
@@ -256,7 +306,7 @@ function optionsToGraph(
 
       let nodeType = opt.responseType || 'text';
 
-      const childOptions = (opt.options || []).map(sub => ({ id: sub.id, label: sub.label }));
+      const childOptions = (opt.options || []).map(sub => ({ id: sub.id, label: sub.label, conditionType: sub.conditionType, conditionValue: sub.conditionValue }));
 
       nodes.push({
         id: nodeId,
@@ -308,7 +358,7 @@ function graphToOptions(
 
   const rootData = rootNode.data as any;
 
-  const buildChildren = (parentId: string, parentOptions: { id: string; label: string }[]): AdvisorOption[] => {
+  const buildChildren = (parentId: string, parentOptions: { id: string; label: string; conditionType?: any; conditionValue?: any }[]): AdvisorOption[] => {
     return parentOptions.map(optHandle => {
       const edge = edges.find(e => e.source === parentId && e.sourceHandle === optHandle.id);
       const childNode = edge ? nodes.find(n => n.id === edge.target) : null;
@@ -319,6 +369,8 @@ function graphToOptions(
           label: optHandle.label,
           responseType: 'text' as const,
           responseText: '',
+          conditionType: optHandle.conditionType,
+          conditionValue: optHandle.conditionValue,
         };
       }
 
@@ -330,8 +382,6 @@ function graphToOptions(
       // Auto-correct if options length changed
       if (responseType === 'text' && childOptions.length > 0) responseType = 'options';
       if (responseType === 'options' && childOptions.length === 0) responseType = 'text';
-      if (responseType === 'file' && childOptions.length > 0) responseType = 'file_options';
-      if (responseType === 'file_options' && childOptions.length === 0) responseType = 'file';
 
       const result: AdvisorOption = {
         id: optHandle.id,
@@ -341,6 +391,8 @@ function graphToOptions(
         fileName: (childNodeType === 'file') ? (childData.text || childData.fileName || '') : undefined,
         whatsappText: childNodeType === 'whatsapp' ? (childData.text || '') : undefined,
         gotoId: childNodeType === 'goto' ? (childData.gotoTarget || '') : undefined,
+        conditionType: optHandle.conditionType,
+        conditionValue: optHandle.conditionValue,
       };
 
       if (childOptions.length > 0 && childNodeType !== 'goto' && childNodeType !== 'whatsapp') {
@@ -380,8 +432,6 @@ function graphToOptions(
   const hasRealOptions = resultOptions.some(o => o.label !== '__next__');
   if (rootType === 'text' && hasRealOptions) rootType = 'options';
   if (rootType === 'options' && !hasRealOptions) rootType = 'text';
-  if (rootType === 'file' && hasRealOptions) rootType = 'file_options';
-  if (rootType === 'file_options' && !hasRealOptions) rootType = 'file';
 
   return { 
     text: (rootNodeType === 'file') ? '' : (rootData.text || ''), 
@@ -446,13 +496,27 @@ const VisualBotBuilder = forwardRef((props: VisualBotBuilderProps, ref) => {
     updateNodeData(nodeId, { text });
   }, [updateNodeData]);
 
-  const onOptionAdd = useCallback((nodeId: string) => {
+  const onOptionAdd = useCallback((nodeId: string, extraProps?: any) => {
     const newOptId = `opt_${Date.now()}_${Math.random().toString(36).substring(2, 7)}`;
     setNodes(nds => {
       const updated = nds.map(n => {
         if (n.id === nodeId) {
           const currentOpts = ((n.data as any).options || []) as { id: string; label: string }[];
-          return { ...n, data: { ...n.data, options: [...currentOpts, { id: newOptId, label: '' }] } };
+          return { ...n, data: { ...n.data, options: [...currentOpts, { id: newOptId, label: '', ...extraProps }] } };
+        }
+        return n;
+      });
+      setTimeout(() => syncToParent(updated, edges), 0);
+      return updated;
+    });
+  }, [setNodes, edges, syncToParent]);
+
+  const onOptionPropChange = useCallback((nodeId: string, optId: string, prop: string, value: any) => {
+    setNodes(nds => {
+      const updated = nds.map(n => {
+        if (n.id === nodeId) {
+          const opts = ((n.data as any).options || []).map((o: any) => o.id === optId ? { ...o, [prop]: value } : o);
+          return { ...n, data: { ...n.data, options: opts } };
         }
         return n;
       });
@@ -514,6 +578,7 @@ const VisualBotBuilder = forwardRef((props: VisualBotBuilderProps, ref) => {
         ...n.data,
         onTextChange,
         onOptionAdd,
+        onOptionPropChange,
         onOptionLabelChange,
         onOptionRemove,
         onDeleteNode,
@@ -522,7 +587,7 @@ const VisualBotBuilder = forwardRef((props: VisualBotBuilderProps, ref) => {
         gotoOptions,
       },
     }));
-  }, [nodes, onTextChange, onOptionAdd, onOptionLabelChange, onOptionRemove, onDeleteNode, onGotoChange, onChangeNodeType, gotoOptions]);
+  }, [nodes, onTextChange, onOptionAdd, onOptionPropChange, onOptionLabelChange, onOptionRemove, onDeleteNode, onGotoChange, onChangeNodeType, gotoOptions]);
 
   const onConnect = useCallback((connection: Connection) => {
     setEdges(eds => {
@@ -533,13 +598,13 @@ const VisualBotBuilder = forwardRef((props: VisualBotBuilderProps, ref) => {
   }, [setEdges, nodes, syncToParent]);
 
   // Toolbar: add new node
-  const addNewNode = useCallback((type: 'message' | 'whatsapp' | 'file' | 'goto') => {
+  const addNewNode = useCallback((type: 'message' | 'whatsapp' | 'file' | 'goto' | 'input') => {
     const newId = `node_${Date.now()}_${Math.random().toString(36).substring(2, 7)}`;
     const newNode: Node = {
       id: newId,
       type: 'botMessage',
       position: { x: Math.random() * 300 + 200, y: Math.random() * 200 + 100 },
-      data: { text: '', options: [], isRoot: false, nodeType: type, gotoTarget: '' },
+      data: { text: '', options: type === 'input' ? [{ id: `opt_${Date.now()}`, label: '', conditionType: 'always', conditionValue: '' }] : [], isRoot: false, nodeType: type, gotoTarget: '' },
     };
     setNodes(nds => [...nds, newNode]);
   }, [setNodes]);

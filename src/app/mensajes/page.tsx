@@ -568,8 +568,11 @@ export default function MensajesPage() {
                 condition_type: 'option_click',
                 response_text: targetNode.responseText,
                 attachment_url: targetNode.fileName || null,
-                attachment_type: targetNode.responseType === 'file' || targetNode.responseType === 'file_options' ? 'document' : null,
-                options: targetNode.options || null
+                attachment_type: targetNode.responseType === 'file' ? 'document' : null,
+                options: targetNode.options || null,
+                response_type: targetNode.responseType,
+                id: targetNode.id,
+                parent_rule_id: r.id
               };
             }
           }
@@ -578,21 +581,69 @@ export default function MensajesPage() {
             condition_type: 'option_click',
             response_text: optionContext.responseText,
             attachment_url: optionContext.fileName || null,
-            attachment_type: optionContext.responseType === 'file' || optionContext.responseType === 'file_options' ? 'document' : null,
-            options: optionContext.options || null
+            attachment_type: optionContext.responseType === 'file' ? 'document' : null,
+            options: optionContext.options || null,
+            response_type: optionContext.responseType,
+            id: optionContext.id,
+            parent_rule_id: optionContext.parent_rule_id
           };
         }
       } else {
-        matchedRule = rules.find((r: any) => r.condition_type === 'exact' && normalizeText(r.condition_value) === normalizedUserText);
-        if (!matchedRule) matchedRule = rules.find((r: any) => r.condition_type === 'keyword' && normalizedUserText.includes(normalizeText(r.condition_value)));
-        if (!matchedRule) {
-          // Evaluate Always rule only if not in cooldown and not fired once already if fire_once is true
-          const alwaysRules = rules.filter((r: any) => r.condition_type === 'always');
-          for (const r of alwaysRules) {
-            if (r.fire_once && currentChat.bot_fired_once) continue;
-            if (r.cooldown_hours && currentChat.bot_cooldown_until && new Date(currentChat.bot_cooldown_until) > new Date()) continue;
-            matchedRule = r;
-            break;
+        const emergencyRule = rules.find((r: any) => r.condition_type === 'exact' && normalizeText(r.condition_value) === normalizedUserText) 
+                           || rules.find((r: any) => r.condition_type === 'keyword' && normalizedUserText.includes(normalizeText(r.condition_value)));
+
+        if (currentChat.bot_waiting_node_id && currentChat.bot_waiting_rule_id) {
+          if (emergencyRule) {
+            matchedRule = emergencyRule;
+          } else {
+            const waitingRule = rules.find((r: any) => r.id === currentChat.bot_waiting_rule_id);
+            if (waitingRule && waitingRule.options) {
+              const findNode = (opts: any[]): any => {
+                for (const opt of opts) {
+                  if (opt.id === currentChat.bot_waiting_node_id) return opt;
+                  if (opt.options) {
+                    const found = findNode(opt.options);
+                    if (found) return found;
+                  }
+                }
+                return null;
+              };
+              const waitingNode = findNode(waitingRule.options);
+              if (waitingNode && waitingNode.options) {
+                let matchedBranch = waitingNode.options.find((opt: any) => opt.conditionType === 'exact' && normalizeText(opt.conditionValue) === normalizedUserText);
+                if (!matchedBranch) matchedBranch = waitingNode.options.find((opt: any) => opt.conditionType === 'keyword' && normalizedUserText.includes(normalizeText(opt.conditionValue)));
+                if (!matchedBranch) matchedBranch = waitingNode.options.find((opt: any) => opt.conditionType === 'always');
+
+                if (matchedBranch) {
+                  matchedRule = {
+                    condition_type: 'option_click',
+                    response_text: matchedBranch.responseText,
+                    attachment_url: matchedBranch.fileName || null,
+                    attachment_type: matchedBranch.responseType === 'file' ? 'document' : null,
+                    options: matchedBranch.options || null,
+                    response_type: matchedBranch.responseType,
+                    id: matchedBranch.id,
+                    parent_rule_id: currentChat.bot_waiting_rule_id
+                  };
+                }
+              }
+            }
+          }
+          if (matchedRule) {
+             await supabase.from('chats').update({ bot_waiting_node_id: null, bot_waiting_rule_id: null }).eq('id', chatId);
+          }
+        }
+
+        if (!matchedRule && !currentChat.bot_waiting_node_id) {
+          matchedRule = emergencyRule;
+          if (!matchedRule) {
+            const alwaysRules = rules.filter((r: any) => r.condition_type === 'always');
+            for (const r of alwaysRules) {
+              if (r.fire_once && currentChat.bot_fired_once) continue;
+              if (r.cooldown_hours && currentChat.bot_cooldown_until && new Date(currentChat.bot_cooldown_until) > new Date()) continue;
+              matchedRule = r;
+              break;
+            }
           }
         }
       }
@@ -639,11 +690,17 @@ export default function MensajesPage() {
           });
 
           // Update chat tracking
-          const isFlowEnd = !actualOptions || actualOptions.length === 0;
+          const isInputNode = rule.response_type === 'input';
+          const isFlowEnd = (!actualOptions || actualOptions.length === 0) && !isInputNode;
           let updateData: any = { 
             bot_status: (isFlowEnd && !nextRule) ? 'active' : 'waiting_user_response',
             bot_last_message_at: new Date().toISOString()
           };
+
+          if (isInputNode) {
+             updateData.bot_waiting_rule_id = rule.parent_rule_id || rule.id;
+             updateData.bot_waiting_node_id = rule.id;
+          }
 
           if (rule.condition_type === 'always' && iterationCount === 1) {
             updateData.bot_fired_once = true;

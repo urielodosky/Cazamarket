@@ -13,8 +13,10 @@ export type GotoOption = { value: string; label: string };
 export type AdvisorOption = {
   id: string;
   label: string;
-  responseType: 'text' | 'options' | 'file' | 'whatsapp' | 'goto';
+  responseType: 'text' | 'options' | 'file' | 'whatsapp' | 'goto' | 'input';
   responseText: string;
+  conditionType?: 'exact' | 'keyword' | 'always';
+  conditionValue?: string;
   options?: AdvisorOption[];
   fileName?: string;
   whatsappText?: string;
@@ -25,7 +27,7 @@ export type AdvisorRule = {
   id: string;
   conditionType: 'exact' | 'keyword' | 'always';
   conditionValue: string;
-  responseType: 'text' | 'options' | 'file' | 'whatsapp' | 'goto';
+  responseType: 'text' | 'options' | 'file' | 'whatsapp' | 'goto' | 'input';
   responseText: string;
   reactivationText?: string;
   options?: AdvisorOption[];
@@ -182,7 +184,7 @@ export default function VirtualAdvisorModal({ onClose, productId }: VirtualAdvis
   // Form State
   const [conditionType, setConditionType] = useState<'exact' | 'keyword' | 'always'>('exact');
   const [conditionValue, setConditionValue] = useState('');
-  const [responseType, setResponseType] = useState<'text' | 'options' | 'file' | 'whatsapp' | 'goto'>('text');
+  const [responseType, setResponseType] = useState<'text' | 'options' | 'file' | 'whatsapp' | 'goto' | 'input'>('text');
   const [responseText, setResponseText] = useState('');
   const [reactivationText, setReactivationText] = useState('');
   const [options, setOptions] = useState<AdvisorOption[]>([]);
@@ -753,7 +755,7 @@ export default function VirtualAdvisorModal({ onClose, productId }: VirtualAdvis
                         <hr style={{ border: 'none', borderTop: '1px solid rgba(255,255,255,0.1)', margin: '8px 0' }} />
                         <div>
                           <label style={{ display: 'block', marginBottom: '8px', color: 'var(--color-text-muted)' }}>Tipo de Respuesta Principal</label>
-                          <CustomSelect options={[{ value: 'text', label: 'Solo Texto' }, { value: 'options', label: 'Sub-Opciones' }, { value: 'file', label: 'Archivo Adjunto' }, { value: 'whatsapp', label: 'Derivar a WhatsApp' }, { value: 'goto', label: 'Volver a un Menú / Reenviar Opciones' }]} value={responseType} onChange={(val: any) => setResponseType(val)} />
+                          <CustomSelect options={[{ value: 'text', label: 'Solo Texto' }, { value: 'options', label: 'Sub-Opciones' }, { value: 'file', label: 'Archivo Adjunto' }, { value: 'input', label: 'Esperar Respuesta Textual' }, { value: 'whatsapp', label: 'Derivar a WhatsApp' }, { value: 'goto', label: 'Volver a un Menú / Reenviar Opciones' }]} value={responseType} onChange={(val: any) => setResponseType(val)} />
                         </div>
                       </>
                     )}
