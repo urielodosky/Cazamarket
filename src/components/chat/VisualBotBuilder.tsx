@@ -205,38 +205,18 @@ function BotMessageNode({ data, id, selected }: NodeProps) {
           </>
         )}
 
-        {/* Source handle for non-message nodes that terminate (whatsapp, file without options) */}
-        {nodeType === 'file_options' && (
+        {/* Source handle for sequential nodes (text, file) */}
+        {(nodeType === 'text' || nodeType === 'file') && (
           <>
-            <hr style={{ border: 'none', borderTop: '1px solid var(--color-border)', margin: '2px 0' }} />
-            <div style={{ display: 'flex', flexDirection: 'column', gap: '6px' }}>
-              <label style={{ display: 'block', fontSize: '0.7rem', color: 'var(--color-text-muted)', textTransform: 'uppercase', letterSpacing: '0.5px' }}>
-                Botones
-              </label>
-              {options.map((opt, index) => (
-                <div key={opt.id} style={{ display: 'flex', alignItems: 'center', gap: '6px', position: 'relative' }}>
-                  <input
-                    className="nodrag nopan"
-                    type="text"
-                    value={opt.label}
-                    onChange={(e) => d.onOptionLabelChange?.(id, opt.id, e.target.value)}
-                    placeholder={`Boton ${index + 1}`}
-                    style={{
-                      flex: 1, padding: '5px 8px', fontSize: '0.78rem',
-                      background: 'rgba(0,0,0,0.2)', color: '#4a90d9',
-                      border: '1px solid #4a90d9', borderRadius: '16px',
-                      outline: 'none', textAlign: 'center',
-                    }}
-                  />
-                  <button className="nodrag" onClick={() => d.onOptionRemove?.(id, opt.id)} style={{ background: 'transparent', border: 'none', color: '#ff4444', cursor: 'pointer', padding: '2px', fontSize: '1rem', lineHeight: 1 }}>x</button>
-                  <Handle type="source" position={Position.Right} id={opt.id} style={{ background: '#4a90d9', width: '16px', height: '16px', right: '-8px', top: 'auto', border: '2px solid #fff', zIndex: 10 }} />
-                </div>
-              ))}
-              <button
-                className="nodrag"
-                onClick={() => d.onOptionAdd?.(id)}
-                style={{ background: 'rgba(255,255,255,0.03)', color: '#4a90d9', border: '1px dashed var(--color-border)', padding: '5px', borderRadius: '6px', cursor: 'pointer', fontSize: '0.78rem', marginTop: '2px' }}
-              >+ Agregar Boton</button>
+            <hr style={{ border: 'none', borderTop: '1px solid var(--color-border)', margin: '4px 0' }} />
+            <div style={{ display: 'flex', justifyContent: 'flex-end', alignItems: 'center', position: 'relative', paddingRight: '12px' }}>
+              <span style={{ fontSize: '0.65rem', color: 'var(--color-text-muted)', textTransform: 'uppercase' }}>Siguiente Paso</span>
+              <Handle
+                type="source"
+                position={Position.Right}
+                id="__next__"
+                style={{ background: '#7f8c8d', width: '14px', height: '14px', right: '-7px', top: 'auto', border: '2px solid #fff', zIndex: 10 }}
+              />
             </div>
           </>
         )}
@@ -283,7 +263,7 @@ function optionsToGraph(
         type: 'botMessage',
         position: { x, y },
         data: {
-          text: opt.responseType === 'goto' ? '' : ((opt.responseType === 'file' || opt.responseType === 'file_options') ? (opt.fileName || opt.responseText || '') : opt.responseText),
+          text: opt.responseType === 'goto' ? '' : ((opt.responseType === 'file') ? (opt.fileName || opt.responseText || '') : opt.responseText),
           options: childOptions,
           isRoot: false,
           nodeType,
@@ -292,10 +272,15 @@ function optionsToGraph(
         },
       });
 
+      let sourceHandleId = opt.id;
+      if (opt.label === '__next__') {
+        sourceHandleId = '__next__';
+      }
+
       edges.push({
         id: `e-${parentId}-${opt.id}`,
         source: parentId,
-        sourceHandle: opt.id,
+        sourceHandle: sourceHandleId,
         target: nodeId,
         animated: true,
         style: { stroke: 'var(--color-primary)', strokeWidth: 2 },
@@ -352,14 +337,24 @@ function graphToOptions(
         id: optHandle.id,
         label: optHandle.label,
         responseType,
-        responseText: (childNodeType === 'file' || childNodeType === 'file_options') ? '' : (childData.text || ''),
-        fileName: (childNodeType === 'file' || childNodeType === 'file_options') ? (childData.text || childData.fileName || '') : undefined,
+        responseText: (childNodeType === 'file') ? '' : (childData.text || ''),
+        fileName: (childNodeType === 'file') ? (childData.text || childData.fileName || '') : undefined,
         whatsappText: childNodeType === 'whatsapp' ? (childData.text || '') : undefined,
         gotoId: childNodeType === 'goto' ? (childData.gotoTarget || '') : undefined,
       };
 
       if (childOptions.length > 0 && childNodeType !== 'goto' && childNodeType !== 'whatsapp') {
         result.options = buildChildren(childNode.id, childOptions);
+      }
+
+      if ((childNodeType === 'text' || childNodeType === 'file') && childNodeType !== 'whatsapp' && childNodeType !== 'goto') {
+        const nextEdge = edges.find(e => e.source === childNode.id && e.sourceHandle === '__next__');
+        if (nextEdge) {
+          const nextChildren = buildChildren(childNode.id, [{ id: nextEdge.target, label: '__next__' }]);
+          if (nextChildren.length > 0) {
+            result.options = nextChildren;
+          }
+        }
       }
 
       return result;
@@ -370,17 +365,29 @@ function graphToOptions(
   
   const rootNodeType = rootData.nodeType || 'options';
   let rootType = rootNodeType;
-  // Auto-correct based on options presence
-  if (rootType === 'text' && resultOptions.length > 0) rootType = 'options';
-  if (rootType === 'options' && resultOptions.length === 0) rootType = 'text';
-  if (rootType === 'file' && resultOptions.length > 0) rootType = 'file_options';
-  if (rootType === 'file_options' && resultOptions.length === 0) rootType = 'file';
+  // Root node also can have a __next__ edge if it's text or file
+  if ((rootNodeType === 'text' || rootNodeType === 'file') && rootNodeType !== 'whatsapp' && rootNodeType !== 'goto') {
+    const nextEdge = edges.find(e => e.source === rootNode.id && e.sourceHandle === '__next__');
+    if (nextEdge && resultOptions.length === 0) {
+      const nextChildren = buildChildren(rootNode.id, [{ id: nextEdge.target, label: '__next__' }]);
+      if (nextChildren.length > 0) {
+        resultOptions.push(...nextChildren);
+      }
+    }
+  }
+
+  // Auto-correct based on options presence (ignoring __next__ for type inference)
+  const hasRealOptions = resultOptions.some(o => o.label !== '__next__');
+  if (rootType === 'text' && hasRealOptions) rootType = 'options';
+  if (rootType === 'options' && !hasRealOptions) rootType = 'text';
+  if (rootType === 'file' && hasRealOptions) rootType = 'file_options';
+  if (rootType === 'file_options' && !hasRealOptions) rootType = 'file';
 
   return { 
-    text: (rootNodeType === 'file' || rootNodeType === 'file_options') ? '' : (rootData.text || ''), 
+    text: (rootNodeType === 'file') ? '' : (rootData.text || ''), 
     options: resultOptions,
     rootType,
-    rootFile: (rootNodeType === 'file' || rootNodeType === 'file_options') ? (rootData.text || rootData.fileName || '') : undefined,
+    rootFile: (rootNodeType === 'file') ? (rootData.text || rootData.fileName || '') : undefined,
     rootWhatsapp: rootNodeType === 'whatsapp' ? (rootData.text || '') : undefined,
     rootGoto: rootNodeType === 'goto' ? (rootData.gotoTarget || '') : undefined,
   };

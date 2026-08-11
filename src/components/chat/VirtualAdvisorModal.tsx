@@ -13,7 +13,7 @@ export type GotoOption = { value: string; label: string };
 export type AdvisorOption = {
   id: string;
   label: string;
-  responseType: 'text' | 'options' | 'file' | 'file_options' | 'whatsapp' | 'goto';
+  responseType: 'text' | 'options' | 'file' | 'whatsapp' | 'goto';
   responseText: string;
   options?: AdvisorOption[];
   fileName?: string;
@@ -25,7 +25,7 @@ export type AdvisorRule = {
   id: string;
   conditionType: 'exact' | 'keyword' | 'always';
   conditionValue: string;
-  responseType: 'text' | 'options' | 'file' | 'file_options' | 'whatsapp' | 'goto';
+  responseType: 'text' | 'options' | 'file' | 'whatsapp' | 'goto';
   responseText: string;
   reactivationText?: string;
   options?: AdvisorOption[];
@@ -72,9 +72,7 @@ function NestedOptionNode({
 
           <div>
             <label style={{ display: 'block', marginBottom: '4px', color: 'var(--color-text-muted)', fontSize: '0.85rem' }}>¿Qué responderá al tocar este botón?</label>
-            <div style={{ marginBottom: '12px' }}>
-              <CustomSelect options={[{ value: 'text', label: 'Solo Texto' }, { value: 'options', label: 'Sub-Opciones' }, { value: 'file', label: 'Archivo Adjunto' }, { value: 'file_options', label: 'Archivo + Sub-Opciones' }, { value: 'whatsapp', label: 'Derivar a WhatsApp' }, { value: 'goto', label: 'Volver a un Menú / Reenviar Opciones' }]} value={opt.responseType} onChange={(val: any) => handleUpdateOption(index, { responseType: val })} />
-            </div>
+              <CustomSelect options={[{ value: 'text', label: 'Solo Texto' }, { value: 'options', label: 'Sub-Opciones' }, { value: 'file', label: 'Archivo Adjunto' }, { value: 'whatsapp', label: 'Derivar a WhatsApp' }, { value: 'goto', label: 'Volver a un Menú / Reenviar Opciones' }]} value={opt.responseType} onChange={(val: any) => handleUpdateOption(index, { responseType: val })} />
 
             {opt.responseType === 'goto' ? (
               <div style={{ marginBottom: '12px' }}>
@@ -87,7 +85,7 @@ function NestedOptionNode({
               </div>
             )}
 
-            {(opt.responseType === 'file' || opt.responseType === 'file_options') && (
+            {(opt.responseType === 'file') && (
               <div style={{ marginBottom: '12px' }}>
                 <input type="text" value={opt.fileName || ''} onChange={e => handleUpdateOption(index, { fileName: e.target.value })} placeholder="Ej: catalogo.pdf" style={{ width: '100%', padding: '10px', background: themeColors.bgSubtle3, color: themeColors.textWhite, border: '1px solid var(--color-border)', borderRadius: '4px', fontFamily: 'inherit', fontSize: '0.9rem', outline: 'none' }} />
               </div>
@@ -99,9 +97,15 @@ function NestedOptionNode({
               </div>
             )}
 
-            {(opt.responseType === 'options' || opt.responseType === 'file_options') && (
+            {(opt.responseType === 'options') && (
               <div className="nested-options-container" style={{ paddingLeft: '16px', borderLeft: `2px solid ${themeColors.borderSubtle3}`, marginTop: '16px' }}>
                 <NestedOptionsBuilder options={opt.options || []} onChange={onChangeNested} pathPrefix={`${currentPath}.`} availableGotos={availableGotos} />
+              </div>
+            )}
+
+            {(opt.responseType === 'text' || opt.responseType === 'file') && (
+              <div className="nested-options-container" style={{ paddingLeft: '16px', borderLeft: `2px solid ${themeColors.borderSubtle3}`, marginTop: '16px' }}>
+                <NestedNextBuilder opt={opt} onChangeNested={onChangeNested} availableGotos={availableGotos} currentPath={currentPath} />
               </div>
             )}
           </div>
@@ -130,6 +134,32 @@ function NestedOptionsBuilder({ options, onChange, pathPrefix = "", availableGot
   );
 }
 
+function NestedNextBuilder({ opt, onChangeNested, availableGotos, currentPath }: any) {
+  const hasNext = opt.options && opt.options.length > 0 && opt.options[0].label === '__next__';
+  const handleAddNext = () => onChangeNested([{ id: Date.now().toString() + Math.random().toString(), label: '__next__', responseType: 'text', responseText: '' }]);
+  const handleRemoveNext = () => onChangeNested([]);
+  const handleUpdateNext = (updates: any) => {
+    const newOptions = [{ ...opt.options[0], ...updates }];
+    onChangeNested(newOptions);
+  };
+
+  return (
+    <div style={{ display: 'flex', flexDirection: 'column' }}>
+      {hasNext ? (
+        <>
+          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '8px' }}>
+            <span style={{ fontSize: '0.8rem', color: 'var(--color-primary)', fontWeight: 'bold' }}>Siguiente Paso ⤵</span>
+            <button onClick={handleRemoveNext} style={{ background: 'transparent', color: '#ff4444', border: 'none', cursor: 'pointer', fontSize: '0.8rem' }}>Quitar Paso</button>
+          </div>
+          <NestedOptionNode opt={opt.options[0]} index={0} currentPath={`${currentPath} (Sig)`} handleUpdateOption={(_: number, updates: any) => handleUpdateNext(updates)} handleRemoveOption={handleRemoveNext} availableGotos={availableGotos} onChangeNested={(newNested: any) => handleUpdateNext({ options: newNested })} />
+        </>
+      ) : (
+        <button onClick={handleAddNext} style={{ background: 'transparent', color: 'var(--color-primary)', border: '1px dashed var(--color-primary)', padding: '10px', borderRadius: '4px', cursor: 'pointer', fontWeight: 600, fontSize: '0.9rem', alignSelf: 'flex-start', marginTop: '8px' }}>+ Enviar otro mensaje después</button>
+      )}
+    </div>
+  );
+}
+
 export default function VirtualAdvisorModal({ onClose, productId }: VirtualAdvisorModalProps) {
   const themeColors = useThemeColors();
   const { supabaseUser } = useAuth();
@@ -152,7 +182,7 @@ export default function VirtualAdvisorModal({ onClose, productId }: VirtualAdvis
   // Form State
   const [conditionType, setConditionType] = useState<'exact' | 'keyword' | 'always'>('exact');
   const [conditionValue, setConditionValue] = useState('');
-  const [responseType, setResponseType] = useState<'text' | 'options' | 'file' | 'file_options' | 'whatsapp' | 'goto'>('text');
+  const [responseType, setResponseType] = useState<'text' | 'options' | 'file' | 'whatsapp' | 'goto'>('text');
   const [responseText, setResponseText] = useState('');
   const [reactivationText, setReactivationText] = useState('');
   const [options, setOptions] = useState<AdvisorOption[]>([]);
@@ -168,7 +198,7 @@ export default function VirtualAdvisorModal({ onClose, productId }: VirtualAdvis
 
   useEffect(() => {
     const gotos: GotoOption[] = [];
-    if (responseType === 'options' || responseType === 'file_options') {
+    if (responseType === 'options') {
       gotos.push({ value: 'root', label: 'Volver al inicio de esta regla' });
       
       // Añadir opciones para derivar a otras reglas
@@ -273,7 +303,7 @@ export default function VirtualAdvisorModal({ onClose, productId }: VirtualAdvis
   const handleAddRule = async () => {
     if (conditionType !== 'always' && !conditionValue.trim()) { alert('Ingresa el valor de la condición.'); return; }
     
-    if (responseType === 'options' || responseType === 'file_options') {
+    if (responseType === 'options') {
       if (options.length === 0) {
         alert('Debes agregar al menos una opción.');
         return;
@@ -723,7 +753,7 @@ export default function VirtualAdvisorModal({ onClose, productId }: VirtualAdvis
                         <hr style={{ border: 'none', borderTop: '1px solid rgba(255,255,255,0.1)', margin: '8px 0' }} />
                         <div>
                           <label style={{ display: 'block', marginBottom: '8px', color: 'var(--color-text-muted)' }}>Tipo de Respuesta Principal</label>
-                          <CustomSelect options={[{ value: 'text', label: 'Solo Texto' }, { value: 'options', label: 'Sub-Opciones' }, { value: 'file', label: 'Archivo Adjunto' }, { value: 'file_options', label: 'Archivo + Sub-Opciones' }, { value: 'whatsapp', label: 'Derivar a WhatsApp' }, { value: 'goto', label: 'Volver a un Menú / Reenviar Opciones' }]} value={responseType} onChange={(val: any) => setResponseType(val)} />
+                          <CustomSelect options={[{ value: 'text', label: 'Solo Texto' }, { value: 'options', label: 'Sub-Opciones' }, { value: 'file', label: 'Archivo Adjunto' }, { value: 'whatsapp', label: 'Derivar a WhatsApp' }, { value: 'goto', label: 'Volver a un Menú / Reenviar Opciones' }]} value={responseType} onChange={(val: any) => setResponseType(val)} />
                         </div>
                       </>
                     )}
@@ -736,20 +766,26 @@ export default function VirtualAdvisorModal({ onClose, productId }: VirtualAdvis
                     ) : (
                       <div>
                         <label style={{ display: 'block', marginBottom: '8px', color: 'var(--color-text-muted)' }}>
-                          Texto de Respuesta Inicial { (responseType === 'options' || responseType === 'file' || responseType === 'file_options') ? '(Opcional si hay opciones/archivo)' : '' }
+                          Texto de Respuesta Inicial { (responseType === 'options' || responseType === 'file') ? '(Opcional si hay opciones/archivo)' : '' }
                         </label>
                         <textarea value={responseText} onChange={e => setResponseText(e.target.value)} style={{ width: '100%', padding: '10px', background: themeColors.bgSubtle3, color: themeColors.textWhite, border: '1px solid var(--color-border)', borderRadius: '4px', minHeight: '80px', outline: 'none', resize: 'vertical' }} />
                       </div>
                     )}
 
-                    {builderMode === 'classic' && (responseType === 'options' || responseType === 'file_options') && (
+                    {builderMode === 'classic' && (responseType === 'options') && (
                       <div>
                         <label style={{ display: 'block', marginBottom: '8px', color: 'var(--color-text-muted)' }}>Opciones Interactivas</label>
                         <NestedOptionsBuilder options={options} onChange={setOptions} availableGotos={availableGotos} />
                       </div>
                     )}
 
-                    {builderMode === 'classic' && (responseType === 'file' || responseType === 'file_options') && (
+                    {builderMode === 'classic' && (responseType === 'text' || responseType === 'file') && (
+                      <div style={{ marginTop: '8px' }}>
+                        <NestedNextBuilder opt={{ options }} onChangeNested={setOptions} availableGotos={availableGotos} currentPath="Paso 2" />
+                      </div>
+                    )}
+
+                    {builderMode === 'classic' && (responseType === 'file') && (
                       <div style={{ background: themeColors.bgSubtle3, padding: '20px', borderRadius: '8px', border: '1px solid var(--color-border)' }}>
                         <h4 style={{ margin: '0 0 16px 0', color: 'var(--color-text-main)' }}>Archivo Adjunto</h4>
                         

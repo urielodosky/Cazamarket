@@ -598,11 +598,33 @@ export default function MensajesPage() {
       }
 
       if (matchedRule) {
-        setTimeout(async () => {
+        let iterationCount = 0;
+        const executeSequence = async (rule: any) => {
+          if (!rule || iterationCount >= 20) return;
+          iterationCount++;
+
           // Check if Reactivation message should be used
-          let responseText = matchedRule.response_text;
-          if (matchedRule.condition_type === 'always' && currentChat.bot_fired_once && matchedRule.reactivation_text) {
-             responseText = matchedRule.reactivation_text;
+          let responseText = rule.response_text;
+          if (rule.condition_type === 'always' && currentChat.bot_fired_once && rule.reactivation_text) {
+             responseText = rule.reactivation_text;
+          }
+
+          // Handle sequential __next__
+          let nextRule = null;
+          let actualOptions = rule.options;
+
+          if (rule.options && rule.options.length > 0) {
+            const nextOpt = rule.options.find((o: any) => o.label === '__next__');
+            if (nextOpt) {
+              nextRule = {
+                condition_type: 'option_click',
+                response_text: nextOpt.responseText,
+                attachment_url: nextOpt.fileName || null,
+                attachment_type: nextOpt.responseType === 'file' ? 'document' : null,
+                options: nextOpt.options || null
+              };
+              actualOptions = null; // Do not show buttons if it automatically continues
+            }
           }
 
           // Insert bot response
@@ -610,31 +632,41 @@ export default function MensajesPage() {
             chat_id: chatId,
             sender_id: sellerId,
             content: responseText,
-            attachment_url: matchedRule.attachment_url || null,
-            attachment_type: matchedRule.attachment_type || null,
+            attachment_url: rule.attachment_url || null,
+            attachment_type: rule.attachment_type || null,
             is_bot: true,
-            bot_options: matchedRule.options || null
+            bot_options: actualOptions || null
           });
 
           // Update chat tracking
-          const isFlowEnd = !matchedRule.options || matchedRule.options.length === 0;
+          const isFlowEnd = !actualOptions || actualOptions.length === 0;
           let updateData: any = { 
-            bot_status: isFlowEnd ? 'active' : 'waiting_user_response',
+            bot_status: (isFlowEnd && !nextRule) ? 'active' : 'waiting_user_response',
             bot_last_message_at: new Date().toISOString()
           };
 
-          if (matchedRule.condition_type === 'always') {
+          if (rule.condition_type === 'always' && iterationCount === 1) {
             updateData.bot_fired_once = true;
-            if (isFlowEnd && matchedRule.cooldown_hours) {
+            if (isFlowEnd && !nextRule && rule.cooldown_hours) {
               const cooldownDate = new Date();
-              cooldownDate.setHours(cooldownDate.getHours() + matchedRule.cooldown_hours);
+              cooldownDate.setHours(cooldownDate.getHours() + rule.cooldown_hours);
               updateData.bot_cooldown_until = cooldownDate.toISOString();
               updateData.bot_status = 'cooldown';
             }
           }
 
           await supabase.from('chats').update(updateData).eq('id', chatId);
-        }, 1000);
+
+          if (nextRule) {
+            setTimeout(() => {
+              executeSequence(nextRule);
+            }, 600); // 600ms delay between sequential messages
+          }
+        };
+
+        setTimeout(() => {
+          executeSequence(matchedRule);
+        }, 800); // Initial delay
       }
     } catch(e) {}
   };
