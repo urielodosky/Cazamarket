@@ -297,6 +297,7 @@ export default function MiNegocioPage() {
               style={{ display: 'none' }}
             />
             <EditButton onClick={() => bannerInputRef.current?.click()} style={{ top: '16px', right: '16px' }} label="Cambiar Portada" />
+            <div style={{ position: 'absolute', top: '64px', right: '16px', color: 'rgba(255,255,255,0.9)', fontSize: '0.75rem', background: 'rgba(0,0,0,0.7)', padding: '4px 8px', borderRadius: '4px', pointerEvents: 'none' }}>Recomendado: 1200x400 px</div>
           </div>
         ) : (
           <div style={{ height: '80px', position: 'relative', background: 'var(--color-bg-surface-elevated)', borderTopLeftRadius: 'var(--radius-lg)', borderTopRightRadius: 'var(--radius-lg)' }}>
@@ -353,6 +354,7 @@ export default function MiNegocioPage() {
                     onChange={handleAvatarChange}
                   />
                   <EditButton onClick={() => fileInputRef.current?.click()} style={{ bottom: '24px', left: '50%', transform: 'translateX(-50%)', padding: '8px', background: 'rgba(0,0,0,0.8)' }} />
+                  <div style={{ position: 'absolute', bottom: '-28px', left: '50%', transform: 'translateX(-50%)', width: '150px', textAlign: 'center', fontSize: '0.75rem', color: 'rgba(255,255,255,0.9)', background: 'rgba(0,0,0,0.8)', padding: '4px 8px', borderRadius: '4px', zIndex: 30, pointerEvents: 'none', whiteSpace: 'nowrap' }}>Recomendado: 400x400 px</div>
                 </>
               )}
             </div>
@@ -567,9 +569,73 @@ export default function MiNegocioPage() {
                   </div>
                 </div>
 
-                <div style={{ marginTop: '40px', padding: '20px', background: theme.bgColor, color: theme.textColor, borderRadius: 'var(--radius-md)', border: `1px solid ${theme.primaryColor}`, textAlign: 'center' }}>
-                  <h4 style={{ margin: '0 0 12px 0' }}>Vista Previa de Tienda</h4>
-                  <button style={{ background: theme.primaryColor, color: '#fff', border: 'none', padding: '10px 24px', borderRadius: 'var(--radius-full)', fontWeight: 'bold' }}>Botón Principal</button>
+                <div style={{ marginTop: '40px' }}>
+                  <h4 style={{ margin: '0 0 16px 0', fontSize: '1.2rem', color: 'var(--color-text-main)' }}>Vista Previa de Tarjeta Pública</h4>
+                  <div style={{ 
+                    maxWidth: '400px', 
+                    margin: '0 auto',
+                    '--color-primary': theme.primaryColor,
+                    '--color-text-main': theme.textColor,
+                    '--color-bg-base': theme.bgColor
+                  } as any}>
+                    <div className="glass-panel" style={{ backgroundColor: theme.bgColor, position: 'relative', borderRadius: 'var(--radius-lg)', display: 'flex', flexDirection: 'column', textAlign: 'left', padding: 0 }}>
+                      
+                      {(isAtLeast(planTier, 'emprendedor') && storeBanner) && (
+                        <div className="aspect-image-16-9" style={{ minHeight: '120px', height: '120px', borderTopLeftRadius: 'var(--radius-lg)', borderTopRightRadius: 'var(--radius-lg)', position: 'relative', overflow: 'hidden' }}>
+                          <img src={storeBanner} alt="Banner" style={{ position: 'absolute', top: 0, left: 0, width: '100%', height: '100%', objectFit: 'cover' }} />
+                          <div style={{ position: 'absolute', inset: 0, background: 'linear-gradient(to bottom, rgba(0,0,0,0.1), rgba(0,0,0,0.6))' }} />
+                        </div>
+                      )}
+
+                      <div className="card-content-fluid" style={{ paddingTop: (isAtLeast(planTier, 'emprendedor') && storeBanner) ? '0px' : '24px', display: 'flex', flexDirection: 'column', flex: 1, padding: '0 24px 24px 24px' }}>
+                        
+                        <div style={{ display: 'flex', gap: '16px', marginBottom: '16px', position: 'relative', zIndex: 20, alignItems: 'center' }}>
+                          <div style={{ 
+                            width: (isAtLeast(planTier, 'emprendedor') && storeBanner) ? '64px' : '48px', 
+                            height: (isAtLeast(planTier, 'emprendedor') && storeBanner) ? '64px' : '48px', 
+                            borderRadius: '50%',
+                            border: '3px solid var(--color-bg-base)',
+                            backgroundImage: `url(${avatar || 'https://images.unsplash.com/photo-1511497584788-876760111969?q=80&w=200&auto=format&fit=crop'})`,
+                            backgroundSize: 'cover',
+                            backgroundPosition: 'center',
+                            backgroundColor: 'var(--color-bg-surface-elevated)',
+                            flexShrink: 0,
+                            position: 'relative',
+                            marginTop: (isAtLeast(planTier, 'emprendedor') && storeBanner) ? '-32px' : '0'
+                          }}>
+                            {permissions.insigniaVerificada && (
+                              <span style={{ position: 'absolute', bottom: '-2px', right: '-2px', width: '20px', height: '20px', borderRadius: '50%', background: 'var(--color-primary)', display: 'flex', alignItems: 'center', justifyContent: 'center', border: '2px solid var(--color-bg-base)' }}>
+                                <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="#fff" strokeWidth="4" strokeLinecap="round" strokeLinejoin="round"><polyline points="20 6 9 17 4 12"></polyline></svg>
+                              </span>
+                            )}
+                          </div>
+
+                          <div style={{ flex: 1, minWidth: 0, marginTop: (isAtLeast(planTier, 'emprendedor') && storeBanner) ? '8px' : '0' }}>
+                            <h3 style={{ fontSize: '1.25rem', margin: '0 0 4px 0', color: 'var(--color-text-main)', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>{name}</h3>
+                            {businessType && <span style={{ fontSize: '0.8rem', color: 'var(--color-primary)', fontWeight: 'bold', textTransform: 'uppercase' }}>{businessType}</span>}
+                          </div>
+                        </div>
+
+                        <p style={{ color: 'var(--color-text-main)', opacity: 0.8, fontSize: '0.9rem', lineHeight: 1.5, marginBottom: '20px', display: '-webkit-box', WebkitLineClamp: 2, WebkitBoxOrient: 'vertical', overflow: 'hidden' }}>
+                          {description || 'Sin descripción'}
+                        </p>
+
+                        <div style={{ display: 'flex', flexWrap: 'wrap', gap: '6px', marginBottom: '16px' }}>
+                          {categories.filter(c => c).map((cat, idx) => (
+                            <span key={idx} style={{ background: 'rgba(255,115,0,0.1)', color: 'var(--color-primary)', padding: '4px 10px', borderRadius: 'var(--radius-full)', fontSize: '0.8rem', fontWeight: 600 }}>
+                              {cat}
+                            </span>
+                          ))}
+                        </div>
+
+                        <div style={{ marginTop: 'auto', paddingTop: '16px', borderTop: '1px solid rgba(255,255,255,0.1)' }}>
+                          <button style={{ width: '100%', background: 'transparent', border: '1px solid var(--color-primary)', color: 'var(--color-text-main)', padding: '8px', borderRadius: 'var(--radius-full)', fontSize: '0.9rem', fontWeight: 600 }}>
+                            Visitar Tienda
+                          </button>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
                 </div>
               </div>
             )}
