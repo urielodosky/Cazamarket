@@ -7,6 +7,7 @@ import { useRouter, useSearchParams } from 'next/navigation';
 
 import { useFavorites } from '@/contexts/FavoritesContext';
 import { PlanTier, isAtLeast } from '@/types/planTypes';
+import SkeletonCard from '@/components/ui/SkeletonCard';
 
 import { useThemeColors } from '@/hooks/useThemeColors';
 import { createClient } from '@/lib/supabase/client';
@@ -20,6 +21,7 @@ export default function NegociosPage() {
   const searchParams = useSearchParams();
   const themeColors = useThemeColors();
   const [negocios, setNegocios] = useState<any[]>([]);
+  const [isLoading, setIsLoading] = useState(true);
 
   useEffect(() => {
     const loadBusinesses = async () => {
@@ -31,29 +33,44 @@ export default function NegociosPage() {
 
         if (error) {
           console.error('Error fetching businesses:', error);
+          setIsLoading(false);
           return;
         }
 
         if (profiles) {
-          // Filter businesses that have a paid plan
           const paidBusinesses = profiles.filter(p => 
             p.product_plan_tier !== 'gratis' || p.service_plan_tier !== 'gratis'
           );
 
-          // Obtener conteos para cada negocio (optimizado: agrupamos en paralelo si es posible, pero para simplificar lo hacemos en bloque)
-          // Podríamos hacer un count agrupado pero supabase rpc es mejor. Para mantenerlo simple:
+          // Optimized: fetch all product/service counts in 2 queries instead of 2*N
+          const userIds = paidBusinesses.map(p => p.id);
           
-          const mappedBusinesses = await Promise.all(paidBusinesses.map(async (parsed) => {
-            let pCount = 0;
-            let sCount = 0;
-            try {
-              const { count: prodsCount } = await supabase.from('products').select('*', { count: 'exact', head: true }).eq('user_id', parsed.id);
-              const { count: servsCount } = await supabase.from('services').select('*', { count: 'exact', head: true }).eq('user_id', parsed.id);
-              pCount = prodsCount || 0;
-              sCount = servsCount || 0;
-            } catch (e) {
-              console.error(e);
-            }
+          const [{ data: prodCounts }, { data: servCounts }] = await Promise.all([
+            supabase.rpc('count_by_user', { table_name: 'products', user_ids: userIds }).catch(() => ({ data: null })) as any,
+            supabase.rpc('count_by_user', { table_name: 'services', user_ids: userIds }).catch(() => ({ data: null })) as any,
+          ]);
+
+          // If RPC doesn't exist, fallback to individual counts in parallel
+          let prodCountMap: Record<string, number> = {};
+          let servCountMap: Record<string, number> = {};
+          
+          if (!prodCounts || !servCounts) {
+            const results = await Promise.all(paidBusinesses.map(async (p) => {
+              const [{ count: pc }, { count: sc }] = await Promise.all([
+                supabase.from('products').select('*', { count: 'exact', head: true }).eq('user_id', p.id),
+                supabase.from('services').select('*', { count: 'exact', head: true }).eq('user_id', p.id),
+              ]);
+              return { id: p.id, pc: pc || 0, sc: sc || 0 };
+            }));
+            results.forEach(r => { prodCountMap[r.id] = r.pc; servCountMap[r.id] = r.sc; });
+          } else {
+            (prodCounts as any[]).forEach((r: any) => { prodCountMap[r.user_id] = r.count; });
+            (servCounts as any[]).forEach((r: any) => { servCountMap[r.user_id] = r.count; });
+          }
+          
+          const mappedBusinesses = paidBusinesses.map((parsed) => {
+            const pCount = prodCountMap[parsed.id] || 0;
+            const sCount = servCountMap[parsed.id] || 0;
 
             const parsedLocations: any[] = [];
             if (parsed.province || parsed.locality) {
@@ -67,7 +84,6 @@ export default function NegociosPage() {
               });
             }
 
-            // Determine highest plan tier for display purposes
             const pTier = parsed.product_plan_tier || 'gratis';
             const sTier = parsed.service_plan_tier || 'gratis';
             const isEmprendedorOrHigher = pTier === 'empresarial' || pTier === 'comercial' || pTier === 'emprendedor' ||
@@ -90,15 +106,16 @@ export default function NegociosPage() {
               productsCount: pCount,
               servicesCount: sCount,
               theme: parsed.store_theme || null,
-              verified: true // Todos los que están aquí tienen un plan pago, ergo están verificados.
+              verified: true
             };
-          }));
+          });
           
           setNegocios(mappedBusinesses);
         }
       } catch (err) {
         console.error("Unexpected error loading businesses:", err);
       }
+      setIsLoading(false);
     };
     
     loadBusinesses();
@@ -163,7 +180,9 @@ export default function NegociosPage() {
         }
       `}} />
       <div className="responsive-grid-300">
-        {filteredNegocios.length === 0 ? (
+        {isLoading ? (
+          <>{Array.from({ length: 6 }).map((_, i) => <SkeletonCard key={i} />)}</>
+        ) : filteredNegocios.length === 0 ? (
           <div style={{ gridColumn: '1 / -1', textAlign: 'center', padding: '60px 20px', background: 'rgba(255,255,255,0.02)', borderRadius: 'var(--radius-lg)', border: '1px dashed var(--color-border)' }}>
             <div style={{ marginBottom: '16px', display: 'flex', justifyContent: 'center', opacity: 0.5 }}>
               <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"></path><polyline points="9 22 9 12 15 12 15 22"></polyline></svg>
@@ -208,9 +227,14 @@ export default function NegociosPage() {
             
             {/* Rating removed */}
 
-            {/* Banner (conditional - requires Emprendedor+) */}
             {isAtLeast(negocio.planTier, 'emprendedor') && (
-              <div className="aspect-image-16-9" style={{ backgroundImage: `url(${negocio.image})`, minHeight: '120px', height: '120px', borderTopLeftRadius: 'var(--radius-lg)', borderTopRightRadius: 'var(--radius-lg)', overflow: 'hidden' }}>
+              <div className="aspect-image-16-9" style={{ minHeight: '120px', height: '120px', borderTopLeftRadius: 'var(--radius-lg)', borderTopRightRadius: 'var(--radius-lg)', position: 'relative', overflow: 'hidden' }}>
+                <img 
+                  src={negocio.image} 
+                  alt={negocio.name || "Negocio"} 
+                  loading="lazy" 
+                  style={{ position: 'absolute', top: 0, left: 0, width: '100%', height: '100%', objectFit: 'cover' }} 
+                />
                 <div style={{ position: 'absolute', top: 0, left: 0, right: 0, bottom: 0, background: 'linear-gradient(to bottom, rgba(0,0,0,0.1), rgba(0,0,0,0.6))' }} />
               </div>
             )}
@@ -403,6 +427,7 @@ export default function NegociosPage() {
                 </div>
               </div>
             </div>
+          </div>
           </div>
         )})}
       </div>
