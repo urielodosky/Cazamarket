@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useState, useEffect, lazy, Suspense } from 'react';
+import React, { useState, useEffect, lazy, Suspense, useRef } from 'react';
 import CustomSelect from '@/components/ui/CustomSelect';
 import { useThemeColors } from '@/hooks/useThemeColors';
 import { createClient } from '@/lib/supabase/client';
@@ -742,6 +742,11 @@ export default function VirtualAdvisorModal({ onClose, productId }: VirtualAdvis
                       </div>
                     )}
 
+                    {builderMode === 'classic' && (responseType === 'options' || responseType === 'file_options') && (
+                      <div>
+                        <label style={{ display: 'block', marginBottom: '8px', color: 'var(--color-text-muted)' }}>Opciones Interactivas</label>
+                        <NestedOptionsBuilder options={options} onChange={setOptions} availableGotos={availableGotos} />
+                      </div>
                     )}
 
                     {builderMode === 'classic' && (responseType === 'file' || responseType === 'file_options') && (
@@ -828,7 +833,7 @@ export default function VirtualAdvisorModal({ onClose, productId }: VirtualAdvis
                             responseText={responseText}
                             options={options}
                             responseType={responseType}
-                            onChange={(text, opts, rootType, rootFile, rootWhatsapp, rootGoto) => {
+                            onChange={(text: string, opts: any[], rootType: string, rootFile?: string, rootWhatsapp?: string, rootGoto?: string) => {
                               setResponseText(text);
                               setOptions(opts);
                               setResponseType(rootType as any);
@@ -844,7 +849,6 @@ export default function VirtualAdvisorModal({ onClose, productId }: VirtualAdvis
                     )}
                   
                   {/* End of layout wrappers */}
-                  {builderMode !== 'visual' && </div>}
                 </div>
               )}
             </>
