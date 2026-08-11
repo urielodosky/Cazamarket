@@ -349,8 +349,8 @@ export default function Navbar() {
                   title="Buscar"
                   style={{ 
                     border: 'none', 
-                    width: '32px',
-                    height: '32px',
+                    width: '44px',
+                    height: '44px',
                     borderRadius: '50%',
                     cursor: 'pointer', 
                     display: 'flex', 
@@ -359,16 +359,13 @@ export default function Navbar() {
                     flexShrink: 0,
                     background: 'var(--color-primary)',
                     color: 'white',
-                    boxShadow: '0 2px 5px rgba(255, 115, 0, 0.4)',
                     transition: 'transform 0.2s, background-color 0.2s, box-shadow 0.2s'
                   }}
                   onMouseEnter={(e) => {
-                    e.currentTarget.style.transform = 'scale(1.05)';
-                    e.currentTarget.style.boxShadow = '0 4px 8px rgba(255, 115, 0, 0.6)';
+                    e.currentTarget.style.filter = 'brightness(1.1)';
                   }}
                   onMouseLeave={(e) => {
-                    e.currentTarget.style.transform = 'scale(1)';
-                    e.currentTarget.style.boxShadow = '0 2px 5px rgba(255, 115, 0, 0.4)';
+                    e.currentTarget.style.filter = 'brightness(1)';
                   }}
                 >
                   <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" style={{ width: '16px', height: '16px' }}>
@@ -387,7 +384,7 @@ export default function Navbar() {
                   }}
                   placeholder={searchPlaceholder} 
                   onKeyDown={(e) => { if (e.key === 'Enter') executeSearch(); }}
-                  style={{ marginLeft: '8px', color: themeColors.textWhite, width: '100%', background: 'transparent', border: 'none', outline: 'none' }}
+                  style={{ marginLeft: '12px', color: themeColors.textWhite, width: '100%', background: 'transparent', border: 'none', outline: 'none', height: '100%' }}
                 />
                 {isFilterablePage && <button 
                   suppressHydrationWarning
@@ -405,7 +402,8 @@ export default function Navbar() {
                     display: 'flex', 
                     alignItems: 'center', 
                     gap: '8px', 
-                    padding: '8px 16px',
+                    padding: '0 20px',
+                    height: '44px',
                     marginLeft: 'auto',
                     background: isFiltersOpen ? 'var(--color-primary)' : 'rgba(255,255,255,0.05)',
                     border: 'none',
@@ -413,20 +411,15 @@ export default function Navbar() {
                     cursor: 'pointer',
                     pointerEvents: 'auto',
                     transition: 'all 0.4s cubic-bezier(0.4, 0, 0.2, 1)',
-                    flexShrink: 0,
-                    boxShadow: isFiltersOpen ? '0 4px 12px rgba(255, 115, 0, 0.4)' : 'none'
+                    flexShrink: 0
                   }}
                   onMouseEnter={(e) => {
                     if (isFiltersOpen) return;
-                    e.currentTarget.style.background = themeColors.bgSubtle4;
-                    e.currentTarget.style.borderColor = themeColors.borderSubtle;
-                    e.currentTarget.style.transform = 'translateY(-1px)';
+                    e.currentTarget.style.background = 'rgba(255,255,255,0.08)';
                   }}
                   onMouseLeave={(e) => {
                     if (isFiltersOpen) return;
-                    e.currentTarget.style.background = themeColors.bgSubtle3;
-                    e.currentTarget.style.borderColor = themeColors.borderSubtle3;
-                    e.currentTarget.style.transform = 'translateY(0)';
+                    e.currentTarget.style.background = 'rgba(255,255,255,0.05)';
                   }}
                 >
                   <svg 
