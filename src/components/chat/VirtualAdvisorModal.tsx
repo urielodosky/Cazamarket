@@ -137,6 +137,7 @@ export default function VirtualAdvisorModal({ onClose, productId }: VirtualAdvis
   
   const [rules, setRules] = useState<AdvisorRule[]>([]);
   const [isAdding, setIsAdding] = useState(false);
+  const [builderMode, setBuilderMode] = useState<'select' | 'classic' | 'visual'>('select');
   const [editingRuleId, setEditingRuleId] = useState<string | null>(null);
   const [isLoading, setIsLoading] = useState(true);
 
@@ -401,6 +402,7 @@ export default function VirtualAdvisorModal({ onClose, productId }: VirtualAdvis
 
     setIsAdding(false);
     setEditingRuleId(null);
+    setBuilderMode('select');
     // Reset
     setConditionType('exact'); setConditionValue(''); setResponseType('text');
     setResponseText(''); setReactivationText(''); setOptions([]); setFileName(''); setWhatsappText(''); setGotoId('');
@@ -421,6 +423,7 @@ export default function VirtualAdvisorModal({ onClose, productId }: VirtualAdvis
     setCooldownHours(rule.cooldownHours || '');
     setFireOnce(rule.fireOnce || false);
     setIsAdding(true);
+    setBuilderMode(rule.responseType === 'options' || rule.responseType === 'file_options' ? 'visual' : 'classic');
   };
 
   const handleDeleteRule = async (id: string) => {
@@ -509,7 +512,7 @@ export default function VirtualAdvisorModal({ onClose, productId }: VirtualAdvis
                       Reglas Activas
                     </h3>
                     <button 
-                      onClick={() => setIsAdding(true)} 
+                      onClick={() => { setIsAdding(true); setBuilderMode('select'); setResponseType('text'); }} 
                       style={{ background: 'var(--color-primary)', color: '#fff', border: 'none', padding: '10px 20px', borderRadius: '100px', cursor: 'pointer', fontWeight: 600, display: 'flex', alignItems: 'center', gap: '6px', boxShadow: '0 4px 12px rgba(255, 115, 0, 0.3)', transition: 'all 0.2s' }}
                       onMouseEnter={(e) => { e.currentTarget.style.transform = 'translateY(-2px)'; e.currentTarget.style.boxShadow = '0 6px 16px rgba(255, 115, 0, 0.4)'; }}
                       onMouseLeave={(e) => { e.currentTarget.style.transform = 'translateY(0)'; e.currentTarget.style.boxShadow = '0 4px 12px rgba(255, 115, 0, 0.3)'; }}
@@ -526,7 +529,7 @@ export default function VirtualAdvisorModal({ onClose, productId }: VirtualAdvis
                         <h4 style={{ margin: '0 0 8px 0', color: 'var(--color-text-main)' }}>Aún no hay reglas configuradas</h4>
                         <p style={{ margin: 0, fontSize: '0.9rem' }}>El bot no responderá a ningún mensaje hasta que agregues una regla.</p>
                       </div>
-                      <button onClick={() => setIsAdding(true)} style={{ background: 'transparent', color: 'var(--color-primary)', border: '1px solid var(--color-primary)', padding: '8px 16px', borderRadius: '100px', cursor: 'pointer', fontWeight: 600, marginTop: '8px' }}>Crear la primera regla</button>
+                      <button onClick={() => { setIsAdding(true); setBuilderMode('select'); setResponseType('text'); }} style={{ background: 'transparent', color: 'var(--color-primary)', border: '1px solid var(--color-primary)', padding: '8px 16px', borderRadius: '100px', cursor: 'pointer', fontWeight: 600, marginTop: '8px' }}>Crear la primera regla</button>
                     </div>
                   ) : (
                     <div style={{ display: 'flex', flexDirection: 'column', gap: '16px' }}>
@@ -598,9 +601,50 @@ export default function VirtualAdvisorModal({ onClose, productId }: VirtualAdvis
                     </div>
                   )}
                 </>
+              ) : builderMode === 'select' ? (
+                <div style={{ background: 'rgba(255,255,255,0.02)', padding: '40px', borderRadius: 'var(--radius-lg)', border: '1px solid rgba(255,255,255,0.05)', display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '32px' }}>
+                  <div style={{ textAlign: 'center' }}>
+                    <h3 style={{ margin: '0 0 12px 0', color: 'var(--color-text-main)', fontSize: '1.5rem' }}>¿Cómo quieres crear esta regla?</h3>
+                    <p style={{ color: 'var(--color-text-muted)', margin: 0 }}>Elige el formato de edición que prefieras.</p>
+                  </div>
+                  
+                  <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(300px, 1fr))', gap: '24px', width: '100%', maxWidth: '800px' }}>
+                    
+                    {/* Modo Visual */}
+                    <div 
+                      onClick={() => { setResponseType('options'); setBuilderMode('visual'); }}
+                      style={{ background: 'rgba(255, 115, 0, 0.05)', border: '1px solid rgba(255, 115, 0, 0.2)', padding: '32px', borderRadius: 'var(--radius-lg)', cursor: 'pointer', transition: 'all 0.3s ease', display: 'flex', flexDirection: 'column', alignItems: 'center', textAlign: 'center', gap: '16px' }}
+                      onMouseEnter={(e) => { e.currentTarget.style.transform = 'translateY(-4px)'; e.currentTarget.style.background = 'rgba(255, 115, 0, 0.1)'; e.currentTarget.style.boxShadow = '0 12px 24px rgba(255, 115, 0, 0.15)'; }}
+                      onMouseLeave={(e) => { e.currentTarget.style.transform = 'translateY(0)'; e.currentTarget.style.background = 'rgba(255, 115, 0, 0.05)'; e.currentTarget.style.boxShadow = 'none'; }}
+                    >
+                      <div style={{ width: '64px', height: '64px', borderRadius: '16px', background: 'var(--color-primary)', display: 'flex', alignItems: 'center', justifyContent: 'center', color: '#fff', marginBottom: '8px' }}>
+                        <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><rect x="3" y="3" width="18" height="18" rx="2" ry="2"></rect><line x1="3" y1="9" x2="21" y2="9"></line><line x1="9" y1="21" x2="9" y2="9"></line></svg>
+                      </div>
+                      <h4 style={{ margin: 0, fontSize: '1.2rem', color: 'var(--color-primary)' }}>Modo Visual (Cajitas)</h4>
+                      <p style={{ margin: 0, fontSize: '0.9rem', color: 'var(--color-text-muted)' }}>Crea árboles de decisión arrastrando y conectando cajitas en un lienzo interactivo.</p>
+                    </div>
+
+                    {/* Modo Clásico */}
+                    <div 
+                      onClick={() => setBuilderMode('classic')}
+                      style={{ background: 'rgba(255, 255, 255, 0.03)', border: '1px solid rgba(255, 255, 255, 0.1)', padding: '32px', borderRadius: 'var(--radius-lg)', cursor: 'pointer', transition: 'all 0.3s ease', display: 'flex', flexDirection: 'column', alignItems: 'center', textAlign: 'center', gap: '16px' }}
+                      onMouseEnter={(e) => { e.currentTarget.style.transform = 'translateY(-4px)'; e.currentTarget.style.background = 'rgba(255, 255, 255, 0.06)'; e.currentTarget.style.boxShadow = '0 12px 24px rgba(0, 0, 0, 0.2)'; }}
+                      onMouseLeave={(e) => { e.currentTarget.style.transform = 'translateY(0)'; e.currentTarget.style.background = 'rgba(255, 255, 255, 0.03)'; e.currentTarget.style.boxShadow = 'none'; }}
+                    >
+                      <div style={{ width: '64px', height: '64px', borderRadius: '16px', background: 'rgba(255,255,255,0.1)', display: 'flex', alignItems: 'center', justifyContent: 'center', color: 'var(--color-text-main)', marginBottom: '8px' }}>
+                        <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path><polyline points="14 2 14 8 20 8"></polyline><line x1="16" y1="13" x2="8" y2="13"></line><line x1="16" y1="17" x2="8" y2="17"></line><polyline points="10 9 9 9 8 9"></polyline></svg>
+                      </div>
+                      <h4 style={{ margin: 0, fontSize: '1.2rem', color: 'var(--color-text-main)' }}>Formato Clásico</h4>
+                      <p style={{ margin: 0, fontSize: '0.9rem', color: 'var(--color-text-muted)' }}>Utiliza el formulario estándar para configurar la respuesta de texto simple, archivos, etc.</p>
+                    </div>
+
+                  </div>
+                  
+                  <button onClick={() => { setIsAdding(false); setBuilderMode('select'); }} style={{ background: 'transparent', color: 'var(--color-text-muted)', border: 'none', marginTop: '16px', cursor: 'pointer', padding: '8px 16px', fontSize: '1rem' }}>Volver atrás</button>
+                </div>
               ) : (
-                <div style={{ background: themeColors.bgSubtle2, padding: '24px', borderRadius: 'var(--radius-md)', border: '1px solid var(--color-border)' }}>
-                  <h3 style={{ margin: '0 0 20px 0', color: 'var(--color-text-main)' }}>Crear Nueva Regla</h3>
+                <div style={{ background: 'rgba(255,255,255,0.02)', padding: '24px', borderRadius: 'var(--radius-lg)', border: '1px solid rgba(255,255,255,0.05)' }}>
+                  <h3 style={{ margin: '0 0 20px 0', color: 'var(--color-text-main)' }}>{editingRuleId ? 'Editar Regla' : 'Crear Nueva Regla'} {builderMode === 'visual' ? '(Modo Visual)' : ''}</h3>
                   
                   <div style={{ display: 'flex', flexDirection: 'column', gap: '16px' }}>
                     <div>
@@ -656,12 +700,15 @@ export default function VirtualAdvisorModal({ onClose, productId }: VirtualAdvis
                       </div>
                     )}
 
-                    <hr style={{ border: 'none', borderTop: '1px solid var(--color-border)', margin: '8px 0' }} />
-
-                    <div>
-                      <label style={{ display: 'block', marginBottom: '8px', color: 'var(--color-text-muted)' }}>Tipo de Respuesta Principal</label>
-                      <CustomSelect options={[{ value: 'text', label: 'Solo Texto' }, { value: 'options', label: 'Sub-Opciones' }, { value: 'file', label: 'Archivo Adjunto' }, { value: 'file_options', label: 'Archivo + Sub-Opciones' }, { value: 'whatsapp', label: 'Derivar a WhatsApp' }, { value: 'goto', label: 'Volver a un Menú / Reenviar Opciones' }]} value={responseType} onChange={(val: any) => setResponseType(val)} />
-                    </div>
+                    {builderMode === 'classic' && (
+                      <>
+                        <hr style={{ border: 'none', borderTop: '1px solid rgba(255,255,255,0.1)', margin: '8px 0' }} />
+                        <div>
+                          <label style={{ display: 'block', marginBottom: '8px', color: 'var(--color-text-muted)' }}>Tipo de Respuesta Principal</label>
+                          <CustomSelect options={[{ value: 'text', label: 'Solo Texto' }, { value: 'options', label: 'Sub-Opciones' }, { value: 'file', label: 'Archivo Adjunto' }, { value: 'file_options', label: 'Archivo + Sub-Opciones' }, { value: 'whatsapp', label: 'Derivar a WhatsApp' }, { value: 'goto', label: 'Volver a un Menú / Reenviar Opciones' }]} value={responseType} onChange={(val: any) => setResponseType(val)} />
+                        </div>
+                      </>
+                    )}
 
                     {responseType === 'goto' ? (
                       <div>
@@ -749,10 +796,10 @@ export default function VirtualAdvisorModal({ onClose, productId }: VirtualAdvis
                     )}
 
                     <div style={{ display: 'flex', gap: '12px', marginTop: '16px' }}>
-                      <button onClick={handleAddRule} disabled={isUploading} style={{ flex: 1, background: 'var(--color-primary)', color: themeColors.textWhite, border: 'none', padding: '12px', borderRadius: 'var(--radius-sm)', cursor: isUploading ? 'not-allowed' : 'pointer', fontWeight: 600, opacity: isUploading ? 0.7 : 1 }}>
+                      <button onClick={handleAddRule} disabled={isUploading} style={{ flex: 1, background: 'var(--color-primary)', color: themeColors.textWhite, border: 'none', padding: '12px', borderRadius: '100px', cursor: isUploading ? 'not-allowed' : 'pointer', fontWeight: 600, opacity: isUploading ? 0.7 : 1 }}>
                         {isUploading ? 'Subiendo archivo y guardando...' : (editingRuleId ? 'Actualizar Regla' : 'Guardar Regla')}
                       </button>
-                      <button onClick={() => { setIsAdding(false); setEditingRuleId(null); }} disabled={isUploading} style={{ flex: 1, background: themeColors.bgSubtle3, color: themeColors.textWhite, border: 'none', padding: '12px', borderRadius: 'var(--radius-sm)', cursor: isUploading ? 'not-allowed' : 'pointer', fontWeight: 600 }}>Cancelar</button>
+                      <button onClick={() => { setIsAdding(false); setEditingRuleId(null); setBuilderMode('select'); }} disabled={isUploading} style={{ flex: 1, background: 'rgba(255,255,255,0.05)', color: themeColors.textWhite, border: '1px solid rgba(255,255,255,0.1)', padding: '12px', borderRadius: '100px', cursor: isUploading ? 'not-allowed' : 'pointer', fontWeight: 600 }}>Cancelar</button>
                     </div>
                   </div>
                 </div>
