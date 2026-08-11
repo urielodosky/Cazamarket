@@ -141,9 +141,9 @@ function BotMessageNode({ data, id, selected }: NodeProps) {
                 fontSize: '0.82rem', fontFamily: 'inherit', outline: 'none',
               }}
             >
-              <option value="">Seleccionar destino...</option>
+              <option value="" style={{ background: '#1a1a1a', color: '#fff' }}>Seleccionar destino...</option>
               {(d.gotoOptions || []).map((go: GotoOption) => (
-                <option key={go.value} value={go.value}>{go.label}</option>
+                <option key={go.value} value={go.value} style={{ background: '#1a1a1a', color: '#fff' }}>{go.label}</option>
               ))}
             </select>
           </div>
