@@ -23,6 +23,7 @@ import type { AdvisorOption, AdvisorRule, GotoOption } from './VirtualAdvisorMod
 
 // ─── Custom Node: Bot Message ──────────────────────────────────────────
 function BotMessageNode({ data, id, selected }: NodeProps) {
+  const [openDropdown, setOpenDropdown] = useState<string | null>(null);
   const d = data as any;
   const text: string = d.text || '';
   const options: { id: string; label: string; conditionType?: string; conditionValue?: string }[] = d.options || [];
@@ -202,17 +203,48 @@ function BotMessageNode({ data, id, selected }: NodeProps) {
               {textOptions.map((opt, index) => (
                 <div key={opt.id} style={{ display: 'flex', flexDirection: 'column', gap: '6px', background: 'rgba(0,0,0,0.25)', padding: '8px', borderRadius: '8px', border: '1px solid rgba(255,255,255,0.08)', position: 'relative' }}>
                   <div style={{ display: 'flex', gap: '8px', alignItems: 'center' }}>
-                    <select
-                      className="nodrag nopan"
-                      value={opt.conditionType || 'exact'}
-                      onChange={(e) => d.onOptionPropChange?.(id, opt.id, 'conditionType', e.target.value)}
-                      style={{ flex: 1, padding: '6px 8px', fontSize: '0.75rem', background: '#222', color: '#fff', border: '1px solid rgba(255,255,255,0.15)', borderRadius: '6px', outline: 'none', cursor: 'pointer' }}
-                    >
-                      <option value="exact">Exacto</option>
-                      <option value="keyword">Contiene</option>
-                      <option value="always">Fallback</option>
-                    </select>
-                    <button className="nodrag" onClick={() => d.onOptionRemove?.(id, opt.id)} style={{ background: 'rgba(255,68,68,0.1)', border: '1px solid rgba(255,68,68,0.3)', color: '#ff4444', cursor: 'pointer', width: '24px', height: '24px', borderRadius: '4px', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '0.85rem', fontWeight: 'bold' }}>✕</button>
+                    
+                    <div style={{ position: 'relative', flex: 1 }}>
+                      <div 
+                        className="nodrag nopan"
+                        onClick={() => setOpenDropdown(openDropdown === opt.id ? null : opt.id)}
+                        style={{ padding: '6px 8px', fontSize: '0.75rem', background: '#222', color: '#fff', border: '1px solid rgba(255,255,255,0.15)', borderRadius: '6px', cursor: 'pointer', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}
+                      >
+                        <span style={{ overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
+                          {opt.conditionType === 'keyword' ? 'Si el mensaje contiene...' : 
+                           opt.conditionType === 'always' ? 'Cualquier otro mensaje' : 'Mensaje idéntico a...'}
+                        </span>
+                        <span style={{ fontSize: '0.6rem', opacity: 0.7, marginLeft: '4px' }}>▼</span>
+                      </div>
+                      
+                      {openDropdown === opt.id && (
+                        <div 
+                          className="nodrag nopan" 
+                          style={{ position: 'absolute', top: '100%', left: 0, right: 0, marginTop: '4px', background: '#2a2a2a', border: '1px solid rgba(255,255,255,0.15)', borderRadius: '6px', overflow: 'hidden', zIndex: 50, boxShadow: '0 4px 12px rgba(0,0,0,0.5)' }}
+                        >
+                           {[
+                             { val: 'exact', label: 'Mensaje idéntico a...' },
+                             { val: 'keyword', label: 'Si el mensaje contiene...' },
+                             { val: 'always', label: 'Cualquier otro mensaje' }
+                           ].map((item) => (
+                              <div
+                                key={item.val}
+                                onClick={() => {
+                                  d.onOptionPropChange?.(id, opt.id, 'conditionType', item.val);
+                                  setOpenDropdown(null);
+                                }}
+                                style={{ padding: '8px', fontSize: '0.75rem', color: '#fff', cursor: 'pointer', borderBottom: '1px solid rgba(255,255,255,0.05)', background: opt.conditionType === item.val ? 'rgba(255,115,0,0.2)' : 'transparent' }}
+                                onMouseEnter={(e) => e.currentTarget.style.background = 'rgba(255,255,255,0.1)'}
+                                onMouseLeave={(e) => e.currentTarget.style.background = opt.conditionType === item.val ? 'rgba(255,115,0,0.2)' : 'transparent'}
+                              >
+                                {item.label}
+                              </div>
+                           ))}
+                        </div>
+                      )}
+                    </div>
+
+                    <button className="nodrag" onClick={() => d.onOptionRemove?.(id, opt.id)} style={{ background: 'rgba(255,68,68,0.1)', border: '1px solid rgba(255,68,68,0.3)', color: '#ff4444', cursor: 'pointer', width: '24px', height: '24px', borderRadius: '4px', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '0.85rem', fontWeight: 'bold', flexShrink: 0 }}>✕</button>
                   </div>
                   {opt.conditionType !== 'always' && (
                     <input
@@ -223,7 +255,7 @@ function BotMessageNode({ data, id, selected }: NodeProps) {
                         d.onOptionPropChange?.(id, opt.id, 'conditionValue', e.target.value);
                         d.onOptionLabelChange?.(id, opt.id, e.target.value); // Keep label in sync for debugging
                       }}
-                      placeholder="Valor esperado"
+                      placeholder={opt.conditionType === 'keyword' ? "Ej: precio, costo, valor" : "Ej: Menu"}
                       style={{ width: '100%', padding: '6px 8px', fontSize: '0.75rem', background: 'rgba(0,0,0,0.4)', color: 'var(--color-text-main, #fff)', border: '1px solid rgba(255,255,255,0.15)', borderRadius: '6px', outline: 'none' }}
                     />
                   )}
