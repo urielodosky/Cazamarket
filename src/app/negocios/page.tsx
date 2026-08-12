@@ -42,40 +42,19 @@ export default function NegociosPage() {
             p.product_plan_tier !== 'gratis' || p.service_plan_tier !== 'gratis'
           );
 
-          // Optimized: fetch all product/service counts in 2 queries instead of 2*N
-          const userIds = paidBusinesses.map(p => p.id);
-          
-          const fetchCounts = async (table: string) => {
-            try {
-              const res = await supabase.rpc('count_by_user', { table_name: table, user_ids: userIds });
-              return res;
-            } catch (e) {
-              return { data: null };
-            }
-          };
-
-          const [{ data: prodCounts }, { data: servCounts }] = await Promise.all([
-            fetchCounts('products'),
-            fetchCounts('services'),
-          ]);
-
-          // If RPC doesn't exist, fallback to individual counts in parallel
+          // Optimized parallel individual counting
           let prodCountMap: Record<string, number> = {};
           let servCountMap: Record<string, number> = {};
           
-          if (!prodCounts || !servCounts) {
-            const results = await Promise.all(paidBusinesses.map(async (p) => {
-              const [{ count: pc }, { count: sc }] = await Promise.all([
-                supabase.from('products').select('*', { count: 'exact', head: true }).eq('user_id', p.id),
-                supabase.from('services').select('*', { count: 'exact', head: true }).eq('user_id', p.id),
-              ]);
-              return { id: p.id, pc: pc || 0, sc: sc || 0 };
-            }));
-            results.forEach(r => { prodCountMap[r.id] = r.pc; servCountMap[r.id] = r.sc; });
-          } else {
-            (prodCounts as any[]).forEach((r: any) => { prodCountMap[r.user_id] = r.count; });
-            (servCounts as any[]).forEach((r: any) => { servCountMap[r.user_id] = r.count; });
-          }
+          const results = await Promise.all(paidBusinesses.map(async (p) => {
+            const [{ count: pc }, { count: sc }] = await Promise.all([
+              supabase.from('products').select('*', { count: 'exact', head: true }).eq('user_id', p.id),
+              supabase.from('services').select('*', { count: 'exact', head: true }).eq('user_id', p.id),
+            ]);
+            return { id: p.id, pc: pc || 0, sc: sc || 0 };
+          }));
+          
+          results.forEach(r => { prodCountMap[r.id] = r.pc; servCountMap[r.id] = r.sc; });
           
           const mappedBusinesses = paidBusinesses.map((parsed) => {
             const pCount = prodCountMap[parsed.id] || 0;
