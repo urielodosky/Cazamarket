@@ -1,4 +1,3 @@
-import { NEGOCIOS_DATA } from '@/data/mock';
 
 export interface UserBusinessInfo {
   isBusiness: boolean;
@@ -47,19 +46,7 @@ export function getUserBusinessInfo(authorName: string): UserBusinessInfo {
     }
   }
 
-  // Check NEGOCIOS_DATA mock stores
-  const mockMatch = NEGOCIOS_DATA.find(n => 
-    n.name?.toLowerCase() === nameLow || 
-    n.storeName?.toLowerCase() === nameLow ||
-    n.id?.toString() === nameLow
-  );
-  if (mockMatch) {
-    return {
-      isBusiness: true,
-      storeUrl: `/negocios/${mockMatch.id}`,
-      badgeLabel: 'Negocio'
-    };
-  }
+
 
   // Fallback check for business keywords in name
   const businessKeywords = ['armerí', 'armeria', 'store', 'shop', 'deportes', 'outfit', 'market', 'outdoor'];

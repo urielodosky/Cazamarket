@@ -6,6 +6,7 @@ import PageTransitionLoader from "@/components/ui/PageTransitionLoader";
 import MobileNav from "@/components/layout/MobileNav";
 import { Suspense } from 'react';
 import Footer from "@/components/layout/Footer";
+import { Toaster } from 'react-hot-toast';
 import "./globals.css";
 
 const inter = Inter({
@@ -104,6 +105,17 @@ export default function RootLayout({
           </Suspense>
           <main>{children}</main>
           <Footer />
+          <Toaster 
+            position="top-right"
+            toastOptions={{
+              style: {
+                background: 'var(--color-bg-elevated)',
+                color: 'var(--color-text-main)',
+                border: '1px solid var(--color-border)',
+                borderRadius: '8px',
+              }
+            }}
+          />
         </Providers>
       </body>
     </html>

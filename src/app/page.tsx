@@ -2,7 +2,6 @@ import Link from 'next/link';
 import PromoSlider from '@/components/PromoSlider';
 import TrendingSection from '@/components/TrendingSection';
 import PlanesPreview from '@/components/PlanesPreview';
-import SponsoredAds from '@/components/SponsoredAds';
 import './home.css';
 
 export default function Home() {
@@ -11,8 +10,6 @@ export default function Home() {
       <h1 className="sr-only">CazaMarket | Todo para el Cazador, Pescador y Campista</h1>
 
       <PromoSlider />
-
-      <SponsoredAds />
 
       <TrendingSection />
       

@@ -1,7 +1,7 @@
 'use client';
 
 import React, { createContext, useContext, useState, useEffect } from 'react';
-import { NEGOCIOS_DATA } from '@/data/mock';
+
 import { isAtLeast } from '@/types/planTypes';
 import { usePlan } from './PlanContext';
 
@@ -56,30 +56,32 @@ export function CartProvider({ children }: { children: React.ReactNode }) {
     }
   }, [cart, isLoaded]);
 
-  const canAddToCart = (storeId: number | string) => {
+  const canAddToCart = (storeId: number | string, storePlanTier?: string) => {
     if (storeId === 1 || storeId === '1') {
       return hasFeature('carritoWhatsApp');
     }
-    const store = NEGOCIOS_DATA.find(n => n.id === storeId);
-    if (store) {
-      return store.planTier !== 'gratis';
+    if (storePlanTier && storePlanTier === 'gratis') {
+      return false;
     }
-    // If store is not found in mock data, it's a DB product. Allow by default since paid plans have cart.
+    // We assume true if plan is unknown, relying on the UI to hide the add to cart button for free plans.
     return true;
   };
 
-  const addToCart = (newItem: Omit<CartItem, 'quantity'>) => {
-    if (!canAddToCart(newItem.storeId)) {
+  const addToCart = (newItem: Omit<CartItem, 'quantity'> & { storePlanTier?: string }) => {
+    if (!canAddToCart(newItem.storeId, newItem.storePlanTier)) {
       alert("Este vendedor tiene el plan Gratis, el cual no incluye carrito de compras. Por favor, contáctalo mediante el botón de WhatsApp.");
       return;
     }
 
+    const itemToAdd = { ...newItem };
+    delete itemToAdd.storePlanTier; // Don't store this in cart state
+
     setCart(prev => {
-      const existing = prev.find(item => item.id === newItem.id);
+      const existing = prev.find(item => item.id === itemToAdd.id);
       if (existing) {
-        return prev.map(item => item.id === newItem.id ? { ...item, quantity: item.quantity + 1 } : item);
+        return prev.map(item => item.id === itemToAdd.id ? { ...item, quantity: item.quantity + 1 } : item);
       }
-      return [...prev, { ...newItem, quantity: 1 }];
+      return [...prev, { ...itemToAdd, quantity: 1 } as CartItem];
     });
   };
 

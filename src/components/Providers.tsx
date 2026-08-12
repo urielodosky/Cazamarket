@@ -5,6 +5,7 @@ import { FavoritesProvider } from '@/contexts/FavoritesContext';
 import { CartProvider } from '@/contexts/CartContext';
 import { PlanProvider } from '@/contexts/PlanContext';
 import { ThemeProvider } from '@/contexts/ThemeContext';
+import ToastNotifications from './ToastNotifications';
 import { ReactNode } from 'react';
 
 export default function Providers({ children }: { children: ReactNode }) {
@@ -14,6 +15,7 @@ export default function Providers({ children }: { children: ReactNode }) {
         <PlanProvider>
           <FavoritesProvider>
             <CartProvider>
+              <ToastNotifications />
               {children}
             </CartProvider>
           </FavoritesProvider>
