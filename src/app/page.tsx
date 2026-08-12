@@ -3,7 +3,6 @@ import PromoSlider from '@/components/PromoSlider';
 import TrendingSection from '@/components/TrendingSection';
 import PlanesPreview from '@/components/PlanesPreview';
 import SponsoredAds from '@/components/SponsoredAds';
-import OutdoorAdventureHubDirectory from '@/components/OutdoorAdventureHubDirectory';
 import './home.css';
 
 export default function Home() {
@@ -18,8 +17,6 @@ export default function Home() {
       <TrendingSection />
       
       <PlanesPreview />
-
-      <OutdoorAdventureHubDirectory />
     </div>
   );
 }
