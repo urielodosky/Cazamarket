@@ -28,21 +28,63 @@ export default async function AdminLayout({
   }
 
   return (
-    <div className="admin-layout" style={{ display: 'flex', minHeight: '100vh', background: 'var(--color-bg-base)' }}>
-      {/* Sidebar Admin (Simplificado) */}
-      <aside style={{ width: '250px', background: 'var(--color-bg-surface)', borderRight: '1px solid var(--color-border)', padding: '20px' }}>
-        <h2 style={{ color: 'var(--color-primary)', fontSize: '1.25rem', marginBottom: '24px' }}>CazaMarket Admin</h2>
-        <nav style={{ display: 'flex', flexDirection: 'column', gap: '12px' }}>
-          <a href="/admin" style={{ color: 'var(--color-text-main)', textDecoration: 'none', padding: '10px', borderRadius: '8px', background: 'var(--color-bg-elevated)' }}>Dashboard</a>
-          <a href="/admin/denuncias" style={{ color: 'var(--color-text-main)', textDecoration: 'none', padding: '10px', borderRadius: '8px' }}>Denuncias</a>
-          <a href="/admin/usuarios" style={{ color: 'var(--color-text-main)', textDecoration: 'none', padding: '10px', borderRadius: '8px' }}>Usuarios</a>
-        </nav>
-      </aside>
+    <>
+      <style>{`
+        .admin-layout-container {
+          display: flex;
+          min-height: 100vh;
+          background: var(--color-bg-base);
+          flex-direction: column;
+        }
+        .admin-sidebar {
+          width: 100%;
+          background: var(--color-bg-surface);
+          border-bottom: 1px solid var(--color-border);
+          padding: 20px;
+        }
+        .admin-nav {
+          display: flex;
+          flex-direction: row;
+          gap: 12px;
+          overflow-x: auto;
+        }
+        .admin-main {
+          flex: 1;
+          padding: 20px;
+        }
+        @media (min-width: 768px) {
+          .admin-layout-container {
+            flex-direction: row;
+          }
+          .admin-sidebar {
+            width: 250px;
+            border-bottom: none;
+            border-right: 1px solid var(--color-border);
+          }
+          .admin-nav {
+            flex-direction: column;
+          }
+          .admin-main {
+            padding: 40px;
+          }
+        }
+      `}</style>
+      <div className="admin-layout-container">
+        {/* Sidebar Admin */}
+        <aside className="admin-sidebar">
+          <h2 style={{ color: 'var(--color-primary)', fontSize: '1.25rem', marginBottom: '24px' }}>CazaMarket Admin</h2>
+          <nav className="admin-nav">
+            <a href="/admin" style={{ color: 'var(--color-text-main)', textDecoration: 'none', padding: '10px', borderRadius: '8px', background: 'var(--color-bg-elevated)', whiteSpace: 'nowrap' }}>Dashboard</a>
+            <a href="/admin/denuncias" style={{ color: 'var(--color-text-main)', textDecoration: 'none', padding: '10px', borderRadius: '8px', whiteSpace: 'nowrap' }}>Denuncias</a>
+            <a href="/admin/usuarios" style={{ color: 'var(--color-text-main)', textDecoration: 'none', padding: '10px', borderRadius: '8px', whiteSpace: 'nowrap' }}>Usuarios</a>
+          </nav>
+        </aside>
 
-      {/* Contenido Principal */}
-      <main style={{ flex: 1, padding: '40px' }}>
-        {children}
-      </main>
-    </div>
+        {/* Contenido Principal */}
+        <main className="admin-main">
+          {children}
+        </main>
+      </div>
+    </>
   );
 }
