@@ -225,7 +225,8 @@ function BotMessageNode({ data, id, selected }: NodeProps) {
                            {[
                              { val: 'exact', label: 'Mensaje idéntico a...' },
                              { val: 'keyword', label: 'Si el mensaje contiene...' },
-                             { val: 'always', label: 'Cualquier otro mensaje' }
+                             { val: 'always', label: 'Cualquier otro mensaje' },
+                             { val: 'next', label: 'Enviar inmediatamente (sin esperar)' }
                            ].map((item) => (
                               <div
                                 key={item.val}
@@ -246,7 +247,7 @@ function BotMessageNode({ data, id, selected }: NodeProps) {
 
                     <button className="nodrag" onClick={() => d.onOptionRemove?.(id, opt.id)} style={{ background: 'rgba(255,68,68,0.1)', border: '1px solid rgba(255,68,68,0.3)', color: '#ff4444', cursor: 'pointer', width: '24px', height: '24px', borderRadius: '4px', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '0.85rem', fontWeight: 'bold', flexShrink: 0 }}>✕</button>
                   </div>
-                  {opt.conditionType !== 'always' && (
+                  {opt.conditionType !== 'always' && opt.conditionType !== 'next' && (
                     <input
                       className="nodrag nopan"
                       type="text"
@@ -271,21 +272,7 @@ function BotMessageNode({ data, id, selected }: NodeProps) {
           </>
         )}
 
-        {/* Source handle for sequential nodes (message, file) */}
-        {(nodeType === 'message' || nodeType === 'file') && (
-          <>
-            <hr style={{ border: 'none', borderTop: '1px solid var(--color-border)', margin: '4px 0' }} />
-            <div style={{ display: 'flex', justifyContent: 'flex-end', alignItems: 'center', position: 'relative', paddingRight: '12px' }}>
-              <span style={{ fontSize: '0.65rem', color: 'var(--color-text-muted)', textTransform: 'uppercase', marginRight: '4px' }}>Siguiente Paso ⤵</span>
-              <Handle
-                type="source"
-                position={Position.Right}
-                id="__next__"
-                style={{ background: '#7f8c8d', width: '14px', height: '14px', right: '-7px', top: 'auto', border: '2px solid #fff', zIndex: 10 }}
-              />
-            </div>
-          </>
-        )}
+        {/* Source handle for sequential nodes is removed, we use 'next' condition now */}
       </div>
     </div>
   );
@@ -303,7 +290,12 @@ function optionsToGraph(
   let yOffset = 0;
 
   const rootId = 'root';
-  const rootNodeOptions = rootOptions.map(opt => ({ id: opt.id, label: opt.label, conditionType: opt.conditionType, conditionValue: opt.conditionValue }));
+  const rootNodeOptions = rootOptions.map(opt => {
+    if (opt.label === '__next__') {
+       return { id: opt.id, label: '', conditionType: 'next', conditionValue: opt.conditionValue };
+    }
+    return { id: opt.id, label: opt.label, conditionType: opt.conditionType, conditionValue: opt.conditionValue };
+  });
   
   let rootNodeType: string = rootResponseType || 'message';
   if (['text', 'options', 'input'].includes(rootNodeType)) rootNodeType = 'message';
@@ -324,7 +316,12 @@ function optionsToGraph(
       let nodeType: string = opt.responseType || 'message';
       if (['text', 'options', 'input'].includes(nodeType)) nodeType = 'message';
 
-      const childOptions = (opt.options || []).map(sub => ({ id: sub.id, label: sub.label, conditionType: sub.conditionType, conditionValue: sub.conditionValue }));
+      const childOptions = (opt.options || []).map(sub => {
+        if (sub.label === '__next__') {
+           return { id: sub.id, label: '', conditionType: 'next', conditionValue: sub.conditionValue };
+        }
+        return { id: sub.id, label: sub.label, conditionType: sub.conditionType, conditionValue: sub.conditionValue };
+      });
 
       nodes.push({
         id: nodeId,
@@ -341,9 +338,6 @@ function optionsToGraph(
       });
 
       let sourceHandleId = opt.id;
-      if (opt.label === '__next__') {
-        sourceHandleId = '__next__';
-      }
 
       edges.push({
         id: `e-${parentId}-${opt.id}`,
@@ -408,7 +402,7 @@ function graphToOptions(
 
       const result: AdvisorOption = {
         id: optHandle.id,
-        label: optHandle.label,
+        label: optHandle.conditionType === 'next' ? '__next__' : optHandle.label,
         responseType,
         responseText: (childNodeType === 'file') ? '' : (childData.text || ''),
         fileName: (childNodeType === 'file') ? (childData.text || childData.fileName || '') : undefined,
@@ -422,16 +416,6 @@ function graphToOptions(
         result.options = buildChildren(childNode.id, childOptions);
       }
 
-      if ((childNodeType === 'message' || childNodeType === 'file') && childNodeType !== 'whatsapp' && childNodeType !== 'goto') {
-        const nextEdge = edges.find(e => e.source === childNode.id && e.sourceHandle === '__next__');
-        if (nextEdge) {
-          const nextChildren = buildChildren(childNode.id, [{ id: nextEdge.target, label: '__next__' }]);
-          if (nextChildren.length > 0) {
-            result.options = nextChildren;
-          }
-        }
-      }
-
       return result;
     });
   };
@@ -440,16 +424,6 @@ function graphToOptions(
   
   const rootNodeType = rootData.nodeType || 'options';
   let rootType = rootNodeType;
-  // Root node also can have a __next__ edge if it's message or file
-  if ((rootNodeType === 'message' || rootNodeType === 'file') && rootNodeType !== 'whatsapp' && rootNodeType !== 'goto') {
-    const nextEdge = edges.find(e => e.source === rootNode.id && e.sourceHandle === '__next__');
-    if (nextEdge && resultOptions.length === 0) {
-      const nextChildren = buildChildren(rootNode.id, [{ id: nextEdge.target, label: '__next__' }]);
-      if (nextChildren.length > 0) {
-        resultOptions.push(...nextChildren);
-      }
-    }
-  }
 
   // Auto-correct unified message types
   if (rootNodeType === 'message') {
