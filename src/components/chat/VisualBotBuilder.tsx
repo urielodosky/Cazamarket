@@ -643,12 +643,6 @@ const VisualBotBuilder = forwardRef((props: VisualBotBuilderProps, ref) => {
       >
         <Background variant={BackgroundVariant.Dots} gap={20} size={1} color="rgba(255,255,255,0.05)" />
         <Controls style={{ background: 'var(--color-bg, #1a1a1a)', border: '1px solid var(--color-border)', borderRadius: '8px' }} />
-        <MiniMap
-          nodeStrokeColor="var(--color-primary)"
-          nodeColor="var(--color-bg, #1a1a1a)"
-          maskColor="rgba(0,0,0,0.7)"
-          style={{ background: 'var(--color-bg, #111)', border: '1px solid var(--color-border)', borderRadius: '8px' }}
-        />
       </ReactFlow>
     </div>
   );
