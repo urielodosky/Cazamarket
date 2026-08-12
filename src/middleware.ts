@@ -70,7 +70,22 @@ export default async function proxy(request: NextRequest) {
     }
   }
 
-  // 3. Session handling
+  // 3. Admin Sudo Mode Protection
+  if (request.nextUrl.pathname.startsWith('/admin') && !request.nextUrl.pathname.startsWith('/admin/login-sudo')) {
+    // 3.1 Verify Supabase Auth Cookie exists
+    // The name of the cookie depends on the project reference ID. Usually it starts with sb- and ends with -auth-token
+    const hasAuthCookie = request.cookies.getAll().some(cookie => cookie.name.startsWith('sb-') && cookie.name.endsWith('-auth-token'));
+    
+    // 3.2 Verify Sudo Mode Cookie exists
+    const sudoCookie = request.cookies.get('admin_sudo_session');
+    
+    if (!hasAuthCookie || !sudoCookie || sudoCookie.value !== 'active') {
+      const loginUrl = new URL('/admin/login-sudo', request.url);
+      return NextResponse.redirect(loginUrl);
+    }
+  }
+
+  // 4. Session handling
   return await updateSession(request)
 }
 
