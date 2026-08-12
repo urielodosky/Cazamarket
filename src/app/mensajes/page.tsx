@@ -614,8 +614,16 @@ export default function MensajesPage() {
               };
               const waitingNode = findNode(waitingRule.options);
               if (waitingNode && waitingNode.options) {
-                let matchedBranch = waitingNode.options.find((opt: any) => opt.conditionType === 'exact' && normalizeText(opt.conditionValue) === normalizedUserText);
+                // Priority 1: Exact match with a button label (if user typed the button text instead of clicking)
+                let matchedBranch = waitingNode.options.find((opt: any) => !opt.conditionType && normalizeText(opt.label) === normalizedUserText);
+                
+                // Priority 2: Exact condition match
+                if (!matchedBranch) matchedBranch = waitingNode.options.find((opt: any) => opt.conditionType === 'exact' && normalizeText(opt.conditionValue) === normalizedUserText);
+                
+                // Priority 3: Keyword condition match
                 if (!matchedBranch) matchedBranch = waitingNode.options.find((opt: any) => opt.conditionType === 'keyword' && normalizedUserText.includes(normalizeText(opt.conditionValue)));
+                
+                // Priority 4: Fallback
                 if (!matchedBranch) matchedBranch = waitingNode.options.find((opt: any) => opt.conditionType === 'always');
 
                 if (matchedBranch) {

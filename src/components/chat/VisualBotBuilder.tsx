@@ -30,22 +30,21 @@ function BotMessageNode({ data, id, selected }: NodeProps) {
   const nodeType: string = d.nodeType || 'message'; // 'message' | 'whatsapp' | 'file' | 'goto'
 
   const headerColors: Record<string, string> = {
-    text: '#f39c12',
-    options: 'var(--color-primary)',
+    message: 'var(--color-primary)',
     whatsapp: '#25d366',
     file: '#3498db',
-    input: '#e74c3c',
     goto: '#9b59b6',
   };
 
   const headerLabels: Record<string, string> = {
-    text: 'Texto Simple',
-    options: 'Texto c/ Opciones',
+    message: 'Mensaje del Bot',
     whatsapp: 'Derivar a WhatsApp',
     file: 'Archivo Adjunto',
-    input: 'Entrada Textual',
     goto: 'Derivar a Regla',
   };
+
+  const buttonOptions = options.filter(o => !o.conditionType && o.label !== '__next__');
+  const textOptions = options.filter(o => o.conditionType);
 
   return (
     <div style={{
@@ -89,18 +88,6 @@ function BotMessageNode({ data, id, selected }: NodeProps) {
       </div>
 
       <div style={{ padding: '12px', display: 'flex', flexDirection: 'column', gap: '10px' }}>
-        {/* Root node type switcher */}
-        {isRoot && (
-          <div style={{ display: 'flex', flexWrap: 'wrap', gap: '4px', marginBottom: '4px' }}>
-            <button className="nodrag" onClick={() => d.onChangeNodeType?.(id, 'text')} style={{ flex: '1 1 30%', padding: '4px', fontSize: '0.65rem', background: nodeType === 'text' ? 'rgba(243,156,18,0.2)' : 'rgba(255,255,255,0.05)', color: nodeType === 'text' ? '#f39c12' : '#fff', border: 'none', borderRadius: '4px', cursor: 'pointer' }}>Texto</button>
-            <button className="nodrag" onClick={() => d.onChangeNodeType?.(id, 'options')} style={{ flex: '1 1 30%', padding: '4px', fontSize: '0.65rem', background: nodeType === 'options' ? 'rgba(255,115,0,0.2)' : 'rgba(255,255,255,0.05)', color: nodeType === 'options' ? 'var(--color-primary)' : '#fff', border: 'none', borderRadius: '4px', cursor: 'pointer' }}>Opciones</button>
-            <button className="nodrag" onClick={() => d.onChangeNodeType?.(id, 'file')} style={{ flex: '1 1 30%', padding: '4px', fontSize: '0.65rem', background: nodeType === 'file' ? 'rgba(52,152,219,0.2)' : 'rgba(255,255,255,0.05)', color: nodeType === 'file' ? '#3498db' : '#fff', border: 'none', borderRadius: '4px', cursor: 'pointer' }}>Archivo</button>
-            <button className="nodrag" onClick={() => d.onChangeNodeType?.(id, 'input')} style={{ flex: '1 1 30%', padding: '4px', fontSize: '0.65rem', background: nodeType === 'input' ? 'rgba(231,76,60,0.2)' : 'rgba(255,255,255,0.05)', color: nodeType === 'input' ? '#e74c3c' : '#fff', border: 'none', borderRadius: '4px', cursor: 'pointer' }}>Entrada</button>
-            <button className="nodrag" onClick={() => d.onChangeNodeType?.(id, 'whatsapp')} style={{ flex: '1 1 30%', padding: '4px', fontSize: '0.65rem', background: nodeType === 'whatsapp' ? 'rgba(37,211,102,0.2)' : 'rgba(255,255,255,0.05)', color: nodeType === 'whatsapp' ? '#25d366' : '#fff', border: 'none', borderRadius: '4px', cursor: 'pointer' }}>WA</button>
-            <button className="nodrag" onClick={() => d.onChangeNodeType?.(id, 'goto')} style={{ flex: '1 1 30%', padding: '4px', fontSize: '0.65rem', background: nodeType === 'goto' ? 'rgba(155,89,182,0.2)' : 'rgba(255,255,255,0.05)', color: nodeType === 'goto' ? '#9b59b6' : '#fff', border: 'none', borderRadius: '4px', cursor: 'pointer' }}>Derivar</button>
-          </div>
-        )}
-
         {/* Main text area */}
         {nodeType !== 'goto' && (
           <div>
@@ -156,15 +143,17 @@ function BotMessageNode({ data, id, selected }: NodeProps) {
           </div>
         )}
 
-        {/* Option buttons */}
-        {nodeType === 'options' && (
+        {/* Unified message options/conditions */}
+        {nodeType === 'message' && (
           <>
             <hr style={{ border: 'none', borderTop: '1px solid var(--color-border)', margin: '2px 0' }} />
+            
+            {/* Buttons Section */}
             <div style={{ display: 'flex', flexDirection: 'column', gap: '6px' }}>
               <label style={{ display: 'block', fontSize: '0.7rem', color: 'var(--color-text-muted)', textTransform: 'uppercase', letterSpacing: '0.5px' }}>
-                Botones
+                Opciones (Botones)
               </label>
-              {options.map((opt, index) => (
+              {buttonOptions.map((opt, index) => (
                 <div key={opt.id} style={{ display: 'flex', alignItems: 'center', gap: '6px', position: 'relative' }}>
                   <input
                     className="nodrag nopan"
@@ -200,20 +189,17 @@ function BotMessageNode({ data, id, selected }: NodeProps) {
                   border: '1px dashed var(--color-border)', padding: '5px',
                   borderRadius: '6px', cursor: 'pointer', fontSize: '0.78rem', marginTop: '2px',
                 }}
-              >+ Agregar Boton</button>
+              >+ Agregar Botón</button>
             </div>
-          </>
-        )}
 
-        {/* Conditional Branches */}
-        {nodeType === 'input' && (
-          <>
-            <hr style={{ border: 'none', borderTop: '1px solid var(--color-border)', margin: '2px 0' }} />
+            <hr style={{ border: 'none', borderTop: '1px solid rgba(255,255,255,0.05)', margin: '4px 0' }} />
+
+            {/* Text Conditions Section */}
             <div style={{ display: 'flex', flexDirection: 'column', gap: '6px' }}>
               <label style={{ display: 'block', fontSize: '0.7rem', color: 'var(--color-text-muted)', textTransform: 'uppercase', letterSpacing: '0.5px' }}>
-                Ramas Condicionales
+                Condiciones de Texto Libre
               </label>
-              {options.map((opt, index) => (
+              {textOptions.map((opt, index) => (
                 <div key={opt.id} style={{ display: 'flex', flexDirection: 'column', gap: '4px', background: 'rgba(0,0,0,0.1)', padding: '6px', borderRadius: '6px', border: '1px solid rgba(255,255,255,0.05)', position: 'relative' }}>
                   <div style={{ display: 'flex', gap: '4px' }}>
                     <select
@@ -240,7 +226,7 @@ function BotMessageNode({ data, id, selected }: NodeProps) {
                         d.onOptionLabelChange?.(id, opt.id, e.target.value); // Keep label in sync for debugging
                       }}
                       placeholder="Valor esperado"
-                      style={{ width: '100%', padding: '4px', fontSize: '0.75rem', background: 'rgba(0,0,0,0.2)', color: 'var(--color-primary)', border: '1px solid var(--color-primary)', borderRadius: '4px', outline: 'none' }}
+                      style={{ width: '100%', padding: '4px', fontSize: '0.75rem', background: 'rgba(0,0,0,0.2)', color: 'var(--color-text-main, #fff)', border: '1px solid rgba(255,255,255,0.2)', borderRadius: '4px', outline: 'none' }}
                     />
                   )}
                   <Handle type="source" position={Position.Right} id={opt.id} style={{ background: 'var(--color-primary)', width: '16px', height: '16px', right: '-12px', top: '50%', transform: 'translateY(-50%)', border: '2px solid #fff', zIndex: 10 }} />
@@ -249,18 +235,18 @@ function BotMessageNode({ data, id, selected }: NodeProps) {
               <button
                 className="nodrag"
                 onClick={() => d.onOptionAdd?.(id, { conditionType: 'exact', conditionValue: '' })}
-                style={{ background: 'rgba(255,255,255,0.03)', color: 'var(--color-primary)', border: '1px dashed var(--color-border)', padding: '5px', borderRadius: '6px', cursor: 'pointer', fontSize: '0.78rem', marginTop: '2px' }}
-              >+ Agregar Condición</button>
+                style={{ background: 'rgba(255,255,255,0.03)', color: '#e74c3c', border: '1px dashed rgba(231,76,60,0.5)', padding: '5px', borderRadius: '6px', cursor: 'pointer', fontSize: '0.78rem', marginTop: '2px' }}
+              >+ Agregar Condición Textual</button>
             </div>
           </>
         )}
 
-        {/* Source handle for sequential nodes (text, file) */}
-        {(nodeType === 'text' || nodeType === 'file') && (
+        {/* Source handle for sequential nodes (message, file) */}
+        {(nodeType === 'message' || nodeType === 'file') && (
           <>
             <hr style={{ border: 'none', borderTop: '1px solid var(--color-border)', margin: '4px 0' }} />
             <div style={{ display: 'flex', justifyContent: 'flex-end', alignItems: 'center', position: 'relative', paddingRight: '12px' }}>
-              <span style={{ fontSize: '0.65rem', color: 'var(--color-text-muted)', textTransform: 'uppercase' }}>Siguiente Paso</span>
+              <span style={{ fontSize: '0.65rem', color: 'var(--color-text-muted)', textTransform: 'uppercase', marginRight: '4px' }}>Siguiente Paso ⤵</span>
               <Handle
                 type="source"
                 position={Position.Right}
@@ -289,7 +275,8 @@ function optionsToGraph(
   const rootId = 'root';
   const rootNodeOptions = rootOptions.map(opt => ({ id: opt.id, label: opt.label, conditionType: opt.conditionType, conditionValue: opt.conditionValue }));
   
-  let rootNodeType = rootResponseType || 'options';
+  let rootNodeType: string = rootResponseType || 'message';
+  if (['text', 'options', 'input'].includes(rootNodeType)) rootNodeType = 'message';
 
   nodes.push({
     id: rootId,
@@ -304,7 +291,8 @@ function optionsToGraph(
       const x = 50 + depth * 380;
       const y = startY + idx * 250;
 
-      let nodeType = opt.responseType || 'text';
+      let nodeType: string = opt.responseType || 'message';
+      if (['text', 'options', 'input'].includes(nodeType)) nodeType = 'message';
 
       const childOptions = (opt.options || []).map(sub => ({ id: sub.id, label: sub.label, conditionType: sub.conditionType, conditionValue: sub.conditionValue }));
 
@@ -379,9 +367,14 @@ function graphToOptions(
       const childOptions = childData.options || [];
 
       let responseType: AdvisorOption['responseType'] = (childNodeType as AdvisorOption['responseType']) || 'text';
-      // Auto-correct if options length changed
-      if (responseType === 'text' && childOptions.length > 0) responseType = 'options';
-      if (responseType === 'options' && childOptions.length === 0) responseType = 'text';
+      // Auto-correct unified message types
+      if (childNodeType === 'message') {
+        const hasConditions = childOptions.some((o: any) => o.conditionType);
+        const hasButtons = childOptions.some((o: any) => !o.conditionType && o.label !== '__next__');
+        if (hasConditions) responseType = 'input';
+        else if (hasButtons) responseType = 'options';
+        else responseType = 'text';
+      }
 
       const result: AdvisorOption = {
         id: optHandle.id,
@@ -399,7 +392,7 @@ function graphToOptions(
         result.options = buildChildren(childNode.id, childOptions);
       }
 
-      if ((childNodeType === 'text' || childNodeType === 'file') && childNodeType !== 'whatsapp' && childNodeType !== 'goto') {
+      if ((childNodeType === 'message' || childNodeType === 'file') && childNodeType !== 'whatsapp' && childNodeType !== 'goto') {
         const nextEdge = edges.find(e => e.source === childNode.id && e.sourceHandle === '__next__');
         if (nextEdge) {
           const nextChildren = buildChildren(childNode.id, [{ id: nextEdge.target, label: '__next__' }]);
@@ -417,8 +410,8 @@ function graphToOptions(
   
   const rootNodeType = rootData.nodeType || 'options';
   let rootType = rootNodeType;
-  // Root node also can have a __next__ edge if it's text or file
-  if ((rootNodeType === 'text' || rootNodeType === 'file') && rootNodeType !== 'whatsapp' && rootNodeType !== 'goto') {
+  // Root node also can have a __next__ edge if it's message or file
+  if ((rootNodeType === 'message' || rootNodeType === 'file') && rootNodeType !== 'whatsapp' && rootNodeType !== 'goto') {
     const nextEdge = edges.find(e => e.source === rootNode.id && e.sourceHandle === '__next__');
     if (nextEdge && resultOptions.length === 0) {
       const nextChildren = buildChildren(rootNode.id, [{ id: nextEdge.target, label: '__next__' }]);
@@ -428,12 +421,14 @@ function graphToOptions(
     }
   }
 
-  // Auto-correct based on options presence (ignoring __next__ for type inference)
-  const hasRealOptions = resultOptions.some(o => o.label !== '__next__');
-  if (rootType === 'text' && hasRealOptions) rootType = 'options';
-  if (rootType === 'options' && !hasRealOptions) rootType = 'text';
-  // Input node should stay input regardless of real options since it uses them for branches
-  if (rootNodeType === 'input') rootType = 'input';
+  // Auto-correct unified message types
+  if (rootNodeType === 'message') {
+    const hasConditions = resultOptions.some((o: any) => o.conditionType);
+    const hasButtons = resultOptions.some((o: any) => !o.conditionType && o.label !== '__next__');
+    if (hasConditions) rootType = 'input';
+    else if (hasButtons) rootType = 'options';
+    else rootType = 'text';
+  }
 
   return { 
     text: (rootNodeType === 'file') ? '' : (rootData.text || ''), 
@@ -600,13 +595,13 @@ const VisualBotBuilder = forwardRef((props: VisualBotBuilderProps, ref) => {
   }, [setEdges, nodes, syncToParent]);
 
   // Toolbar: add new node
-  const addNewNode = useCallback((type: 'message' | 'whatsapp' | 'file' | 'goto' | 'input') => {
+  const addNewNode = useCallback((type: 'message' | 'whatsapp' | 'file' | 'goto') => {
     const newId = `node_${Date.now()}_${Math.random().toString(36).substring(2, 7)}`;
     const newNode: Node = {
       id: newId,
       type: 'botMessage',
       position: { x: Math.random() * 300 + 200, y: Math.random() * 200 + 100 },
-      data: { text: '', options: type === 'input' ? [{ id: `opt_${Date.now()}`, label: '', conditionType: 'always', conditionValue: '' }] : [], isRoot: false, nodeType: type, gotoTarget: '' },
+      data: { text: '', options: [], isRoot: false, nodeType: type, gotoTarget: '' },
     };
     setNodes(nds => [...nds, newNode]);
   }, [setNodes]);

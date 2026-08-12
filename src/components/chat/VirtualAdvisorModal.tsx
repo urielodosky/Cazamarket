@@ -912,14 +912,15 @@ export default function VirtualAdvisorModal({ onClose, productId }: VirtualAdvis
 
                     {builderMode === 'visual' && (
                       <div style={{ marginTop: '16px', background: 'rgba(255,255,255,0.02)', padding: '16px', borderRadius: '8px', border: '1px dashed rgba(255,255,255,0.1)' }}>
-                        <h4 style={{ margin: '0 0 12px 0', color: 'var(--color-text-main)' }}>Añadir Cajita (Respuesta)</h4>
+                        <h4 style={{ margin: '0 0 12px 0', color: 'var(--color-text-main)' }}>Añadir Nodo al Flujo</h4>
                         <div style={{ display: 'flex', gap: '8px', flexWrap: 'wrap' }}>
-                          <button type="button" onClick={() => visualBuilderRef.current?.addNewNode('text')} style={{ flex: '1 1 45%', background: 'rgba(243,156,18,0.2)', color: '#f39c12', border: '1px solid rgba(243,156,18,0.4)', padding: '8px 12px', borderRadius: '6px', cursor: 'pointer', fontSize: '0.8rem', fontWeight: 600 }}>+ Solo Texto</button>
-                          <button type="button" onClick={() => visualBuilderRef.current?.addNewNode('options')} style={{ flex: '1 1 45%', background: 'var(--color-primary)', color: '#fff', border: 'none', padding: '8px 12px', borderRadius: '6px', cursor: 'pointer', fontSize: '0.8rem', fontWeight: 600 }}>+ Sub-Opciones</button>
+                          <button type="button" onClick={() => visualBuilderRef.current?.addNewNode('message')} style={{ flex: '1 1 100%', background: 'var(--color-primary)', color: '#fff', border: 'none', padding: '10px 12px', borderRadius: '6px', cursor: 'pointer', fontSize: '0.85rem', fontWeight: 600 }}>+ Agregar Cajita de Mensaje</button>
+                          
+                          <div style={{ width: '100%', height: '1px', background: 'rgba(255,255,255,0.05)', margin: '4px 0' }}></div>
+                          
                           <button type="button" onClick={() => visualBuilderRef.current?.addNewNode('file')} style={{ flex: '1 1 45%', background: 'rgba(52,152,219,0.2)', color: '#3498db', border: '1px solid rgba(52,152,219,0.4)', padding: '8px 12px', borderRadius: '6px', cursor: 'pointer', fontSize: '0.8rem', fontWeight: 600 }}>+ Archivo Adjunto</button>
-                          <button type="button" onClick={() => visualBuilderRef.current?.addNewNode('input')} style={{ flex: '1 1 45%', background: 'rgba(231,76,60,0.2)', color: '#e74c3c', border: '1px solid rgba(231,76,60,0.4)', padding: '8px 12px', borderRadius: '6px', cursor: 'pointer', fontSize: '0.8rem', fontWeight: 600 }}>+ Entrada Textual</button>
-                          <button type="button" onClick={() => visualBuilderRef.current?.addNewNode('whatsapp')} style={{ flex: '1 1 45%', background: '#25d366', color: '#fff', border: 'none', padding: '8px 12px', borderRadius: '6px', cursor: 'pointer', fontSize: '0.8rem', fontWeight: 600 }}>+ WhatsApp</button>
-                          <button type="button" onClick={() => visualBuilderRef.current?.addNewNode('goto')} style={{ flex: '1 1 45%', background: '#9b59b6', color: '#fff', border: 'none', padding: '8px 12px', borderRadius: '6px', cursor: 'pointer', fontSize: '0.8rem', fontWeight: 600 }}>+ Volver a Menú</button>
+                          <button type="button" onClick={() => visualBuilderRef.current?.addNewNode('whatsapp')} style={{ flex: '1 1 45%', background: 'rgba(37,211,102,0.2)', color: '#25d366', border: '1px solid rgba(37,211,102,0.4)', padding: '8px 12px', borderRadius: '6px', cursor: 'pointer', fontSize: '0.8rem', fontWeight: 600 }}>+ WhatsApp</button>
+                          <button type="button" onClick={() => visualBuilderRef.current?.addNewNode('goto')} style={{ flex: '1 1 45%', background: 'rgba(155,89,182,0.2)', color: '#9b59b6', border: '1px solid rgba(155,89,182,0.4)', padding: '8px 12px', borderRadius: '6px', cursor: 'pointer', fontSize: '0.8rem', fontWeight: 600 }}>+ Derivar a Regla</button>
                         </div>
                       </div>
                     )}
