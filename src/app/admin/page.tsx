@@ -38,10 +38,13 @@ export default async function AdminDashboardPage() {
   // a) Obtener todos los usuarios para la tabla y métricas
   const { data: usersData, error: usersError } = await supabase
     .from('profiles')
-    .select('id, email, full_name, person_type, plan_tier, created_at')
+    .select('id, contact_email, full_name, person_type, plan_tier, created_at')
     .order('created_at', { ascending: false });
 
-  const users = usersData || [];
+  const users = usersData?.map(u => ({
+    ...u,
+    email: u.contact_email // mapeamos a email para que la tabla lo entienda
+  })) || [];
   
   // b) Contar denuncias pendientes
   const { count: reportsCount } = await supabase
