@@ -1,0 +1,174 @@
+.outdoor-hub-section {
+  padding: 4rem 1rem;
+  background-color: var(--color-bg, #0f1115);
+  color: var(--color-text-main, #ffffff);
+  font-family: 'Inter', sans-serif; /* Fallback if global not applied */
+  overflow: hidden;
+  position: relative;
+}
+
+.outdoor-hub-container {
+  max-width: 1200px;
+  margin: 0 auto;
+  position: relative;
+  z-index: 2;
+}
+
+.outdoor-hub-header {
+  text-align: center;
+  margin-bottom: 3.5rem;
+}
+
+.outdoor-hub-title {
+  font-size: 2.25rem;
+  font-weight: 800;
+  margin-bottom: 1rem;
+  color: var(--color-text-main, #ffffff);
+  line-height: 1.2;
+}
+
+.outdoor-hub-subtitle {
+  font-size: 1.125rem;
+  color: var(--color-text-muted, #9ca3af);
+  max-width: 600px;
+  margin: 0 auto;
+  line-height: 1.5;
+}
+
+.outdoor-hub-grid {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 2rem;
+}
+
+@media (min-width: 768px) {
+  .outdoor-hub-grid {
+    grid-template-columns: repeat(3, 1fr);
+    gap: 2rem;
+  }
+}
+
+.outdoor-card {
+  background: rgba(255, 255, 255, 0.03);
+  border: 1px solid rgba(255, 255, 255, 0.05);
+  border-radius: 16px;
+  padding: 2.5rem 1.5rem;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  position: relative;
+  overflow: hidden;
+}
+
+.outdoor-card::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 4px;
+  background: var(--color-primary, #ea580c);
+  opacity: 0;
+  transition: opacity 0.3s ease;
+}
+
+.outdoor-card:hover {
+  transform: translateY(-8px);
+  background: rgba(255, 255, 255, 0.05);
+  border-color: rgba(255, 255, 255, 0.1);
+  box-shadow: 0 20px 40px rgba(0, 0, 0, 0.4);
+}
+
+.outdoor-card:hover::before {
+  opacity: 1;
+}
+
+/* Icon Wrappers with nature themes */
+.outdoor-card-icon-wrapper {
+  width: 64px;
+  height: 64px;
+  border-radius: 12px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin-bottom: 1.5rem;
+  transition: transform 0.3s ease;
+}
+
+.outdoor-card:hover .outdoor-card-icon-wrapper {
+  transform: scale(1.1);
+}
+
+.outdoor-icon {
+  width: 32px;
+  height: 32px;
+}
+
+/* Theme Colors */
+.hunting-theme {
+  background: rgba(34, 197, 94, 0.1); /* Forest Green tint */
+  color: #22c55e;
+}
+.outdoor-card:hover .hunting-btn {
+  background: #22c55e;
+  border-color: #22c55e;
+  color: #000;
+}
+
+.fishing-theme {
+  background: rgba(59, 130, 246, 0.1); /* Deep Water Blue tint */
+  color: #3b82f6;
+}
+.outdoor-card:hover .fishing-btn {
+  background: #3b82f6;
+  border-color: #3b82f6;
+  color: #fff;
+}
+
+.camping-theme {
+  background: rgba(234, 88, 12, 0.1); /* Campfire Orange tint */
+  color: #ea580c;
+}
+.outdoor-card:hover .camping-btn {
+  background: #ea580c;
+  border-color: #ea580c;
+  color: #fff;
+}
+
+.outdoor-card-title {
+  font-size: 1.25rem;
+  font-weight: 700;
+  margin-bottom: 1rem;
+  color: var(--color-text-main, #ffffff);
+}
+
+.outdoor-card-text {
+  font-size: 0.95rem;
+  color: var(--color-text-muted, #9ca3af);
+  line-height: 1.6;
+  margin-bottom: 2rem;
+  flex-grow: 1;
+}
+
+.outdoor-card-btn {
+  display: inline-block;
+  width: 100%;
+  padding: 0.75rem 1.5rem;
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  border-radius: 8px;
+  font-size: 0.95rem;
+  font-weight: 600;
+  color: var(--color-text-main, #ffffff);
+  text-decoration: none;
+  transition: all 0.2s ease;
+  background: rgba(255, 255, 255, 0.02);
+}
+
+/* Global button hover fallback if specific themes don't apply */
+.outdoor-card-btn:hover {
+  background: var(--color-primary, #ea580c);
+  border-color: var(--color-primary, #ea580c);
+  color: #ffffff;
+}
