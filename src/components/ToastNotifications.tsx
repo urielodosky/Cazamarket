@@ -48,7 +48,7 @@ export default function ToastNotifications() {
           const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
 
           if (diffDays <= 3 && diffDays > 0) {
-            toast('Tu plan vence en ' + diffDays + ' día' + (diffDays > 1 ? 's' : '') + '. Renovalo pronto para no perder visibilidad.', {
+            toast('Tu plan vence en ' + diffDays + ' día' + (diffDays > 1 ? 's' : '') + '. ¡Renovalo para mantener tus beneficios!', {
               icon: '⚠️',
               duration: 6000,
               style: {

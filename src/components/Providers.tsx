@@ -6,6 +6,7 @@ import { CartProvider } from '@/contexts/CartContext';
 import { PlanProvider } from '@/contexts/PlanContext';
 import { ThemeProvider } from '@/contexts/ThemeContext';
 import ToastNotifications from './ToastNotifications';
+import TermsAcceptanceModal from './TermsAcceptanceModal';
 import { ReactNode } from 'react';
 
 export default function Providers({ children }: { children: ReactNode }) {
@@ -16,6 +17,7 @@ export default function Providers({ children }: { children: ReactNode }) {
           <FavoritesProvider>
             <CartProvider>
               <ToastNotifications />
+              <TermsAcceptanceModal />
               {children}
             </CartProvider>
           </FavoritesProvider>
