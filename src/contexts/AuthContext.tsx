@@ -161,6 +161,12 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
         .single();
 
       if (profile) {
+        // Bloqueo estricto
+        if (profile.is_blocked && window.location.pathname !== '/suspendido') {
+          window.location.href = '/suspendido';
+          return;
+        }
+
         setUsername(profile.full_name || user.email?.split('@')[0] || '');
         setAvatar(profile.avatar_url || '');
         setIsVendor(profile.role === 'negocio');

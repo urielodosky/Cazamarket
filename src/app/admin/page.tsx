@@ -1,6 +1,7 @@
 import { cookies } from 'next/headers';
 import { redirect } from 'next/navigation';
 import { createClient } from '@/lib/supabase/server';
+import { createClient as createAdminClient } from '@supabase/supabase-js';
 import AdminUsersTable from '@/components/AdminUsersTable';
 
 // Precios de los planes en USD (Según configuración en planTypes.ts)
@@ -34,11 +35,17 @@ export default async function AdminDashboardPage() {
 
   if (!profile?.is_superadmin) redirect('/');
 
+  // Instanciamos supabaseAdmin para saltar el RLS y obtener los datos de métricas
+  const supabaseAdmin = createAdminClient(
+    process.env.NEXT_PUBLIC_SUPABASE_URL!,
+    process.env.SUPABASE_SERVICE_ROLE_KEY!
+  );
+
   // 2. Fetch de Métricas (Server-side)
   // a) Obtener todos los usuarios para la tabla y métricas
-  const { data: usersData, error: usersError } = await supabase
+  const { data: usersData, error: usersError } = await supabaseAdmin
     .from('profiles')
-    .select('id, contact_email, full_name, person_type, plan_tier, created_at')
+    .select('id, contact_email, full_name, person_type, plan_tier, created_at, is_superadmin, is_blocked')
     .order('created_at', { ascending: false });
 
   const users = usersData?.map(u => ({
@@ -47,13 +54,13 @@ export default async function AdminDashboardPage() {
   })) || [];
   
   // b) Contar denuncias pendientes
-  const { count: reportsCount } = await supabase
+  const { count: reportsCount } = await supabaseAdmin
     .from('reports')
     .select('*', { count: 'exact', head: true })
     .eq('status', 'pending');
 
   // c) Denuncias recientes (para la lista de alertas)
-  const { data: recentReports } = await supabase
+  const { data: recentReports } = await supabaseAdmin
     .from('reports')
     .select('id, reason, reported_type, created_at')
     .eq('status', 'pending')
@@ -67,7 +74,8 @@ export default async function AdminDashboardPage() {
 
   users.forEach(u => {
     const tier = u.plan_tier || 'gratis';
-    if (tier !== 'gratis') {
+    // Ignoramos a los superadmins del conteo de MRR
+    if (tier !== 'gratis' && !u.is_superadmin) {
       paidUsersCount++;
       mrrUSD += (PLAN_PRICES[tier] || 0);
     }

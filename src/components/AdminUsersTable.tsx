@@ -1,6 +1,8 @@
 'use client';
 
 import { useState, useMemo } from 'react';
+import { adminChangePlan, adminToggleBlock } from '@/app/actions/userManagementAction';
+import toast from 'react-hot-toast';
 
 type Profile = {
   id: string;
@@ -9,11 +11,15 @@ type Profile = {
   person_type?: string;
   plan_tier?: string;
   created_at?: string;
+  is_superadmin?: boolean;
+  is_blocked?: boolean;
 };
 
-export default function AdminUsersTable({ users }: { users: Profile[] }) {
+export default function AdminUsersTable({ users: initialUsers }: { users: Profile[] }) {
+  const [users, setUsers] = useState<Profile[]>(initialUsers);
   const [searchTerm, setSearchTerm] = useState('');
   const [currentPage, setCurrentPage] = useState(1);
+  const [isUpdating, setIsUpdating] = useState(false);
   const itemsPerPage = 10;
 
   const filteredUsers = useMemo(() => {
@@ -90,13 +96,22 @@ export default function AdminUsersTable({ users }: { users: Profile[] }) {
               <th style={{ padding: '16px 20px', color: 'var(--color-text-muted)', fontSize: '0.85rem', fontWeight: 600, borderBottom: '1px solid var(--color-border)' }}>Tipo</th>
               <th style={{ padding: '16px 20px', color: 'var(--color-text-muted)', fontSize: '0.85rem', fontWeight: 600, borderBottom: '1px solid var(--color-border)' }}>Plan</th>
               <th style={{ padding: '16px 20px', color: 'var(--color-text-muted)', fontSize: '0.85rem', fontWeight: 600, borderBottom: '1px solid var(--color-border)' }}>Registro</th>
+              <th style={{ padding: '16px 20px', color: 'var(--color-text-muted)', fontSize: '0.85rem', fontWeight: 600, borderBottom: '1px solid var(--color-border)', textAlign: 'right' }}>Acciones</th>
             </tr>
           </thead>
           <tbody>
             {paginatedUsers.length > 0 ? paginatedUsers.map((user) => (
               <tr key={user.id} style={{ borderBottom: '1px solid var(--color-border)', transition: 'background 0.2s' }} onMouseEnter={e => e.currentTarget.style.background = 'rgba(255,255,255,0.03)'} onMouseLeave={e => e.currentTarget.style.background = 'transparent'}>
                 <td style={{ padding: '16px 20px', color: 'var(--color-text-main)', fontSize: '0.95rem', fontWeight: 500 }}>
-                  {user.full_name || '-'}
+                  <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+                    {user.full_name || '-'}
+                    {user.is_superadmin && (
+                      <span style={{ padding: '2px 6px', borderRadius: '4px', background: 'rgba(239, 68, 68, 0.15)', border: '1px solid rgba(239, 68, 68, 0.5)', fontSize: '0.7rem', color: '#ef4444', fontWeight: 700, textTransform: 'uppercase' }}>Admin</span>
+                    )}
+                    {user.is_blocked && (
+                      <span style={{ padding: '2px 6px', borderRadius: '4px', background: 'rgba(239, 68, 68, 0.15)', border: '1px solid rgba(239, 68, 68, 0.5)', fontSize: '0.7rem', color: '#ef4444', fontWeight: 700, textTransform: 'uppercase' }}>Bloqueado</span>
+                    )}
+                  </div>
                 </td>
                 <td style={{ padding: '16px 20px', color: 'var(--color-text-muted)', fontSize: '0.9rem' }}>
                   {user.email}
@@ -111,6 +126,54 @@ export default function AdminUsersTable({ users }: { users: Profile[] }) {
                 </td>
                 <td style={{ padding: '16px 20px', color: 'var(--color-text-muted)', fontSize: '0.85rem' }}>
                   {user.created_at ? new Date(user.created_at).toLocaleDateString('es-AR') : '-'}
+                </td>
+                <td style={{ padding: '16px 20px', textAlign: 'right' }}>
+                  <div style={{ display: 'flex', gap: '8px', justifyContent: 'flex-end' }}>
+                    <select 
+                      disabled={isUpdating || user.is_superadmin}
+                      value={user.plan_tier || 'gratis'}
+                      onChange={async (e) => {
+                        setIsUpdating(true);
+                        const newPlan = e.target.value;
+                        const res = await adminChangePlan(user.id, newPlan);
+                        if (res.success) {
+                          setUsers(prev => prev.map(u => u.id === user.id ? { ...u, plan_tier: newPlan } : u));
+                          toast.success('Plan actualizado con éxito');
+                        } else {
+                          toast.error(res.error || 'Error al cambiar el plan');
+                        }
+                        setIsUpdating(false);
+                      }}
+                      style={{ padding: '6px', borderRadius: '6px', background: 'var(--color-bg-base)', border: '1px solid var(--color-border)', color: 'var(--color-text-main)', fontSize: '0.8rem', cursor: 'pointer' }}
+                    >
+                      <option value="gratis">Gratis</option>
+                      <option value="basico">Básico</option>
+                      <option value="emprendedor">Emprendedor</option>
+                      <option value="comercial">Comercial</option>
+                      <option value="empresarial">Empresarial</option>
+                    </select>
+                    
+                    {!user.is_superadmin && (
+                      <button
+                        disabled={isUpdating}
+                        onClick={async () => {
+                          if (!confirm(`¿Estás seguro de que quieres ${user.is_blocked ? 'desbloquear' : 'bloquear'} a este usuario?`)) return;
+                          setIsUpdating(true);
+                          const res = await adminToggleBlock(user.id, user.is_blocked || false);
+                          if (res.success) {
+                            setUsers(prev => prev.map(u => u.id === user.id ? { ...u, is_blocked: !user.is_blocked } : u));
+                            toast.success(user.is_blocked ? 'Usuario desbloqueado' : 'Usuario bloqueado');
+                          } else {
+                            toast.error(res.error || 'Error al modificar estado');
+                          }
+                          setIsUpdating(false);
+                        }}
+                        style={{ padding: '6px 12px', borderRadius: '6px', background: user.is_blocked ? 'rgba(34, 197, 94, 0.1)' : 'rgba(239, 68, 68, 0.1)', border: `1px solid ${user.is_blocked ? 'rgba(34, 197, 94, 0.5)' : 'rgba(239, 68, 68, 0.5)'}`, color: user.is_blocked ? '#22c55e' : '#ef4444', fontSize: '0.8rem', fontWeight: 600, cursor: 'pointer' }}
+                      >
+                        {user.is_blocked ? 'Desbloquear' : 'Bloquear'}
+                      </button>
+                    )}
+                  </div>
                 </td>
               </tr>
             )) : (
