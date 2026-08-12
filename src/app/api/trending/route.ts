@@ -17,7 +17,7 @@ export async function GET() {
     // Fetch all published interactions from the last 7 days that have a 'concreto' review
     const { data: sales, error } = await supabase
       .from('interactions')
-      .select('product_id, service_id, seller_id, reviews!inner(purchase_outcome)')
+      .select('product_id, service_id, seller_id, reviews!inner(purchase_outcome, seller_rating, product_rating)')
       .eq('status', 'published')
       .gte('created_at', oneWeekAgo.toISOString())
       .eq('reviews.purchase_outcome', 'concreto');
@@ -26,19 +26,48 @@ export async function GET() {
 
     const salesData = sales || [];
     
-    const prodCounts: Record<string, number> = {};
-    const servCounts: Record<string, number> = {};
-    const sellerCounts: Record<string, number> = {};
+    type Agg = { count: number; ratingSum: number };
+    const prodAgg: Record<string, Agg> = {};
+    const servAgg: Record<string, Agg> = {};
+    const sellerAgg: Record<string, Agg> = {};
 
     salesData.forEach(s => {
-      if (s.seller_id) sellerCounts[s.seller_id] = (sellerCounts[s.seller_id] || 0) + 1;
-      if (s.product_id) prodCounts[s.product_id] = (prodCounts[s.product_id] || 0) + 1;
-      if (s.service_id) servCounts[s.service_id] = (servCounts[s.service_id] || 0) + 1;
+      // Use any to bypass TS complaints since reviews could be array or object in postgrest response
+      const review = Array.isArray(s.reviews) ? s.reviews[0] : s.reviews;
+      const sRating = review?.seller_rating || 0;
+      const pRating = review?.product_rating || sRating; // Fallback to seller rating if product rating is missing
+
+      if (s.seller_id) {
+        if (!sellerAgg[s.seller_id]) sellerAgg[s.seller_id] = { count: 0, ratingSum: 0 };
+        sellerAgg[s.seller_id].count += 1;
+        sellerAgg[s.seller_id].ratingSum += sRating;
+      }
+      if (s.product_id) {
+        if (!prodAgg[s.product_id]) prodAgg[s.product_id] = { count: 0, ratingSum: 0 };
+        prodAgg[s.product_id].count += 1;
+        prodAgg[s.product_id].ratingSum += pRating;
+      }
+      if (s.service_id) {
+        if (!servAgg[s.service_id]) servAgg[s.service_id] = { count: 0, ratingSum: 0 };
+        servAgg[s.service_id].count += 1;
+        servAgg[s.service_id].ratingSum += pRating;
+      }
     });
 
-    const topProdIds = Object.entries(prodCounts).sort((a,b) => b[1] - a[1]).slice(0, 10).map(e => e[0]);
-    const topServIds = Object.entries(servCounts).sort((a,b) => b[1] - a[1]).slice(0, 10).map(e => e[0]);
-    const topSellerIds = Object.entries(sellerCounts).sort((a,b) => b[1] - a[1]).slice(0, 10).map(e => e[0]);
+    const getAvg = (agg: Agg) => agg.count > 0 ? agg.ratingSum / agg.count : 0;
+
+    // Pre-sort IDs by count then avgRating to pick the top 30 candidates to fetch clicks for
+    const getTopIds = (agg: Record<string, Agg>) => Object.entries(agg)
+      .sort((a,b) => {
+        if (b[1].count !== a[1].count) return b[1].count - a[1].count;
+        return getAvg(b[1]) - getAvg(a[1]);
+      })
+      .slice(0, 30)
+      .map(e => e[0]);
+
+    const topProdIds = getTopIds(prodAgg);
+    const topServIds = getTopIds(servAgg);
+    const topSellerIds = getTopIds(sellerAgg);
 
     let topNegocios = [];
     if (topSellerIds.length > 0) {
@@ -52,10 +81,18 @@ export async function GET() {
             name: p.name || 'Negocio',
             type: p.type || 'Tienda',
             image: p.profile_image_url || '/placeholder.jpg',
-            ventas_concretadas: sellerCounts[p.id] || 0,
-            clicks: 0
+            ventas_concretadas: sellerAgg[p.id]?.count || 0,
+            avgRating: getAvg(sellerAgg[p.id] || { count: 0, ratingSum: 0 }),
+            clicks: p.clicks || 0
           };
         }).filter(Boolean) as any[];
+
+        topNegocios.sort((a, b) => {
+          if (b.ventas_concretadas !== a.ventas_concretadas) return b.ventas_concretadas - a.ventas_concretadas;
+          if (b.avgRating !== a.avgRating) return b.avgRating - a.avgRating;
+          return a.clicks - b.clicks;
+        });
+        topNegocios = topNegocios.slice(0, 10);
       }
     } else {
       // Fallback if no sales
@@ -83,10 +120,18 @@ export async function GET() {
             id: p.id,
             name: p.name,
             image: (p.image_urls && p.image_urls.length > 0) ? p.image_urls[0] : '/placeholder.jpg',
-            ventas_concretadas: prodCounts[p.id] || 0,
+            ventas_concretadas: prodAgg[p.id]?.count || 0,
+            avgRating: getAvg(prodAgg[p.id] || { count: 0, ratingSum: 0 }),
             clicks: p.clicks || 0
           };
         }).filter(Boolean) as any[];
+
+        topProductos.sort((a, b) => {
+          if (b.ventas_concretadas !== a.ventas_concretadas) return b.ventas_concretadas - a.ventas_concretadas;
+          if (b.avgRating !== a.avgRating) return b.avgRating - a.avgRating;
+          return a.clicks - b.clicks;
+        });
+        topProductos = topProductos.slice(0, 10);
       }
     } else {
       // Fallback to most clicked
@@ -114,10 +159,18 @@ export async function GET() {
             name: p.name,
             location: p.location || 'Argentina',
             image: (p.image_urls && p.image_urls.length > 0) ? p.image_urls[0] : '/placeholder.jpg',
-            ventas_concretadas: servCounts[p.id] || 0,
+            ventas_concretadas: servAgg[p.id]?.count || 0,
+            avgRating: getAvg(servAgg[p.id] || { count: 0, ratingSum: 0 }),
             clicks: p.clicks || 0
           };
         }).filter(Boolean) as any[];
+
+        topServicios.sort((a, b) => {
+          if (b.ventas_concretadas !== a.ventas_concretadas) return b.ventas_concretadas - a.ventas_concretadas;
+          if (b.avgRating !== a.avgRating) return b.avgRating - a.avgRating;
+          return a.clicks - b.clicks;
+        });
+        topServicios = topServicios.slice(0, 10);
       }
     } else {
       // Fallback to most clicked
