@@ -26,58 +26,13 @@ export default function TrendingSection() {
     const fetchTopData = async () => {
       setIsLoading(true);
       try {
-        // Fallback for Negocios (recently joined or most clicks if available)
-        const { data: nData } = await supabase
-          .from('profiles')
-          .select('id, name, type, profile_image_url, role')
-          .eq('role', 'negocio')
-          .limit(10);
+        const response = await fetch('/api/trending');
+        if (!response.ok) throw new Error('Failed to fetch trending data');
+        const { negocios, productos, servicios } = await response.json();
         
-        if (nData) {
-          setTopNegocios(nData.map(n => ({
-            id: n.id,
-            name: n.name || 'Negocio',
-            type: n.type || 'Tienda',
-            image: n.profile_image_url || '/placeholder.jpg',
-            ventas_concretadas: 0,
-            clicks: 0
-          })));
-        }
-
-        // Fallback for Productos (most clicks)
-        const { data: pData } = await supabase
-          .from('products')
-          .select('id, name, image_urls, clicks')
-          .order('clicks', { ascending: false })
-          .limit(10);
-        
-        if (pData) {
-          setTopProductos(pData.map(p => ({
-            id: p.id,
-            name: p.name,
-            image: (p.image_urls && p.image_urls.length > 0) ? p.image_urls[0] : '/placeholder.jpg',
-            ventas_concretadas: 0,
-            clicks: p.clicks || 0
-          })));
-        }
-
-        // Fallback for Servicios (most clicks)
-        const { data: sData } = await supabase
-          .from('services')
-          .select('id, name, image_urls, location, clicks')
-          .order('clicks', { ascending: false })
-          .limit(10);
-          
-        if (sData) {
-          setTopServicios(sData.map(s => ({
-            id: s.id,
-            name: s.name,
-            location: s.location || 'Argentina',
-            image: (s.image_urls && s.image_urls.length > 0) ? s.image_urls[0] : '/placeholder.jpg',
-            ventas_concretadas: 0,
-            clicks: s.clicks || 0
-          })));
-        }
+        if (negocios) setTopNegocios(negocios);
+        if (productos) setTopProductos(productos);
+        if (servicios) setTopServicios(servicios);
       } catch (err) {
         console.error('Error fetching top data:', err);
       }
