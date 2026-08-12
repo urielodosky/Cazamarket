@@ -42,6 +42,7 @@ export default function ProductoDetailPage({ params }: { params: Promise<{ id: s
   const [isHoveringImage, setIsHoveringImage] = useState(false);
   const [isContactMenuOpen, setIsContactMenuOpen] = useState(false);
   const [isLoading, setIsLoading] = useState(true);
+  const [isReportModalOpen, setIsReportModalOpen] = useState(false);
   const { cart, addToCart, canAddToCart } = useCart();
   const { hasFeature } = usePlan();
   const { username, isLoggedIn, supabaseUser } = useAuth();
@@ -827,6 +828,24 @@ export default function ProductoDetailPage({ params }: { params: Promise<{ id: s
               </ul>
             </div>
           )}
+
+          {/* Report Button */}
+          <div style={{ marginTop: '24px', textAlign: 'right' }}>
+            <button 
+              onClick={() => setIsReportModalOpen(true)}
+              style={{
+                background: 'transparent',
+                border: 'none',
+                color: 'var(--color-text-muted)',
+                fontSize: '0.85rem',
+                cursor: 'pointer',
+                textDecoration: 'underline',
+                padding: '4px 8px'
+              }}
+            >
+              Denunciar publicación
+            </button>
+          </div>
           
           {/* RESEÑAS DEL PRODUCTO */}
           <div style={{ marginTop: '48px', borderTop: '1px solid var(--color-border)', paddingTop: '32px' }}>
@@ -906,6 +925,13 @@ export default function ProductoDetailPage({ params }: { params: Promise<{ id: s
         </div>
         </div>
       </div>
+      
+      <ReportModal 
+        isOpen={isReportModalOpen}
+        onClose={() => setIsReportModalOpen(false)}
+        reportedType="product"
+        reportedId={productId}
+      />
     </div>
   );
 }

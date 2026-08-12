@@ -8,6 +8,7 @@ import { ForumPost, ForumReply } from '../../page';
 import { formatTimeAgo } from '@/utils/formatTime';
 import { getUserBusinessInfo } from '@/utils/userBusiness';
 import { useThemeColors } from '@/hooks/useThemeColors';
+import ReportModal, { ReportType } from '@/components/ReportModal';
 import '../../comunidad.css';
 
 const INITIAL_POSTS: ForumPost[] = [];
@@ -23,6 +24,7 @@ export default function TemaPage({ params }: { params: Promise<{ id: string }> }
   const [isLoading, setIsLoading] = useState(true);
   const [reportedIds, setReportedIds] = useState<Record<string, boolean>>({});
   const [toast, setToast] = useState<{ text: string; type: 'success' | 'info' } | null>(null);
+  const [reportModalData, setReportModalData] = useState<{ isOpen: boolean, type: ReportType, id: string }>({ isOpen: false, type: 'community_post', id: '' });
 
   // Modal de confirmación propio en React (para no usar window.confirm nativo)
   const [confirmModal, setConfirmModal] = useState<{
@@ -243,8 +245,7 @@ export default function TemaPage({ params }: { params: Promise<{ id: string }> }
   };
 
   const handleReport = (itemType: 'tema' | 'respuesta', targetId: string) => {
-    setReportedIds(prev => ({ ...prev, [targetId]: true }));
-    showToast(`Reporte de ${itemType} enviado. Nuestro equipo lo revisará a la brevedad.`, 'info');
+    setReportModalData({ isOpen: true, type: 'community_post', id: targetId });
   };
 
   const handleDeletePost = () => {
@@ -525,24 +526,23 @@ export default function TemaPage({ params }: { params: Promise<{ id: string }> }
             ) : (
               <button 
                 onClick={() => handleReport('tema', post.id)}
-                disabled={reportedIds[post.id]}
                 style={{ 
                   display: 'inline-flex', 
                   alignItems: 'center', 
                   gap: '6px', 
-                  background: reportedIds[post.id] ? 'rgba(239, 68, 68, 0.15)' : 'rgba(255, 255, 255, 0.05)', 
-                  color: reportedIds[post.id] ? '#ef4444' : 'rgba(255, 255, 255, 0.5)', 
-                  border: `1px solid ${reportedIds[post.id] ? 'rgba(239, 68, 68, 0.3)' : 'rgba(255, 255, 255, 0.1)'}`, 
+                  background: 'rgba(255, 255, 255, 0.05)', 
+                  color: 'rgba(255, 255, 255, 0.5)', 
+                  border: '1px solid rgba(255, 255, 255, 0.1)', 
                   padding: '6px 12px', 
                   borderRadius: '8px', 
                   fontSize: '0.8rem', 
                   fontWeight: 500, 
-                  cursor: reportedIds[post.id] ? 'default' : 'pointer',
+                  cursor: 'pointer',
                   transition: 'all 0.2s'
                 }}
               >
                 <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M4 15s1-1 4-1 5 2 8 2 4-1 4-1V3s-1 1-4 1-5-2-8-2-4 1-4 1z"></path><line x1="4" y1="22" x2="4" y2="15"></line></svg>
-                <span>{reportedIds[post.id] ? 'Reportado' : 'Denunciar'}</span>
+                <span>Denunciar</span>
               </button>
             )}
           </div>
@@ -713,7 +713,6 @@ export default function TemaPage({ params }: { params: Promise<{ id: string }> }
             {filteredReplies.map(reply => {
               const replyAvatar = getAuthorAvatar(reply.author, reply.authorAvatar);
               let replyBiz = getUserBusinessInfo(reply.author);
-              const isReported = reportedIds[reply.id];
               const isOwnerOfReply = isAuthor(reply.author);
               
               if (isOwnerOfReply && isVendor) {
@@ -832,27 +831,26 @@ export default function TemaPage({ params }: { params: Promise<{ id: string }> }
                         ) : (
                           <button
                             onClick={() => handleReport('respuesta', reply.id)}
-                            disabled={isReported}
                             style={{
                               display: 'inline-flex',
                               alignItems: 'center',
                               gap: '6px',
-                              background: isReported ? 'rgba(239, 68, 68, 0.15)' : 'rgba(255, 255, 255, 0.05)',
-                              color: isReported ? '#ef4444' : 'rgba(255, 255, 255, 0.5)',
-                              border: `1px solid ${isReported ? 'rgba(239, 68, 68, 0.3)' : 'rgba(255, 255, 255, 0.1)'}`,
+                              background: 'rgba(255, 255, 255, 0.05)',
+                              color: 'rgba(255, 255, 255, 0.5)',
+                              border: '1px solid rgba(255, 255, 255, 0.1)',
                               padding: '6px 12px',
                               borderRadius: '8px',
                               fontSize: '0.8rem',
                               fontWeight: 500,
-                              cursor: isReported ? 'default' : 'pointer',
+                              cursor: 'pointer',
                               transition: 'all 0.2s ease'
                             }}
-                            onMouseEnter={e => !isReported && (e.currentTarget.style.color = '#ef4444')}
-                            onMouseLeave={e => !isReported && (e.currentTarget.style.color = 'rgba(255, 255, 255, 0.5)')}
+                            onMouseEnter={e => (e.currentTarget.style.color = '#ef4444')}
+                            onMouseLeave={e => (e.currentTarget.style.color = 'rgba(255, 255, 255, 0.5)')}
                             title="Denunciar respuesta inapropiada"
                           >
                             <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M4 15s1-1 4-1 5 2 8 2 4-1 4-1V3s-1 1-4 1-5-2-8-2-4 1-4 1z"></path><line x1="4" y1="22" x2="4" y2="15"></line></svg>
-                            <span>{isReported ? 'Reportado' : 'Denunciar'}</span>
+                            <span>Denunciar</span>
                           </button>
                         )}
                       </div>
@@ -945,7 +943,6 @@ export default function TemaPage({ params }: { params: Promise<{ id: string }> }
                       {reply.subReplies.map(sub => {
                         const subAvatar = getAuthorAvatar(sub.author, sub.authorAvatar);
                         let subBiz = getUserBusinessInfo(sub.author);
-                        const isSubReported = reportedIds[sub.id];
                         const isOwnerOfSub = isAuthor(sub.author);
                         
                         if (isOwnerOfSub && isVendor) {
@@ -1047,19 +1044,18 @@ export default function TemaPage({ params }: { params: Promise<{ id: string }> }
                                 ) : (
                                   <button
                                     onClick={() => handleReport('respuesta', sub.id)}
-                                    disabled={isSubReported}
                                     style={{
-                                      background: isSubReported ? 'rgba(239, 68, 68, 0.15)' : 'rgba(255, 255, 255, 0.5)',
-                                      color: isSubReported ? '#ef4444' : 'rgba(255, 255, 255, 0.5)',
-                                      border: `1px solid ${isSubReported ? 'rgba(239, 68, 68, 0.3)' : 'rgba(255, 255, 255, 0.1)'}`,
+                                      background: 'rgba(255, 255, 255, 0.5)',
+                                      color: 'rgba(255, 255, 255, 0.5)',
+                                      border: '1px solid rgba(255, 255, 255, 0.1)',
                                       padding: '4px 10px',
                                       borderRadius: '6px',
                                       fontSize: '0.75rem',
                                       fontWeight: 500,
-                                      cursor: isSubReported ? 'default' : 'pointer'
+                                      cursor: 'pointer'
                                     }}
                                   >
-                                    {isSubReported ? 'Reportado' : 'Denunciar'}
+                                    Denunciar
                                   </button>
                                 )}
                               </div>
@@ -1082,7 +1078,12 @@ export default function TemaPage({ params }: { params: Promise<{ id: string }> }
           </div>
         )}
       </div>
-
+      <ReportModal 
+        isOpen={reportModalData.isOpen}
+        onClose={() => setReportModalData({ ...reportModalData, isOpen: false })}
+        reportedType={reportModalData.type}
+        reportedId={reportModalData.id}
+      />
     </div>
   );
 }

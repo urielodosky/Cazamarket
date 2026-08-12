@@ -3,6 +3,7 @@
 import React, { useState, use, useEffect } from 'react';
 import dynamic from 'next/dynamic';
 import Link from 'next/link';
+import ReportModal from '@/components/ReportModal';
 
 const LocationMap = dynamic(() => import('@/components/ui/LocationMap'), { ssr: false });
 const AreaMap = dynamic(() => import('@/components/ui/AreaMap'), { ssr: false });
@@ -76,6 +77,7 @@ export default function ServicioDetailPage({ params }: { params: Promise<{ id: s
   const [rangeValue, setRangeValue] = useState<DateRange>({ startDate: null, endDate: null });
   const [selectedDates, setSelectedDates] = useState<string[]>([]);
   const [blockedDates, setBlockedDates] = useState<string[]>([]);
+  const [isReportModalOpen, setIsReportModalOpen] = useState(false);
   const [activeImage, setActiveImage] = useState(0);
   const [isHoveringImage, setIsHoveringImage] = useState(false);
   const [copiedSocial, setCopiedSocial] = useState<string | null>(null);
@@ -880,6 +882,24 @@ export default function ServicioDetailPage({ params }: { params: Promise<{ id: s
             </div>
           )}
 
+          {/* Report Button */}
+          <div style={{ marginTop: '24px', textAlign: 'right' }}>
+            <button 
+              onClick={() => setIsReportModalOpen(true)}
+              style={{
+                background: 'transparent',
+                border: 'none',
+                color: 'var(--color-text-muted)',
+                fontSize: '0.85rem',
+                cursor: 'pointer',
+                textDecoration: 'underline',
+                padding: '4px 8px'
+              }}
+            >
+              Denunciar publicación
+            </button>
+          </div>
+
           {/* Ubicación y Mapa */}
           {((service.showServiceArea || service.serviceLocationCoords || service.serviceAreaCoords || service.serviceLocation || service.location) && hasFeature('mapasTerritorio')) && (
             <div style={{ marginTop: '40px' }}>
@@ -966,6 +986,12 @@ export default function ServicioDetailPage({ params }: { params: Promise<{ id: s
       )}
 
       </div>
+      <ReportModal 
+        isOpen={isReportModalOpen}
+        onClose={() => setIsReportModalOpen(false)}
+        reportedType="service"
+        reportedId={serviceId}
+      />
     </div>
   );
 }
