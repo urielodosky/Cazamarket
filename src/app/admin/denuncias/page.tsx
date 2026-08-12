@@ -42,7 +42,18 @@ export default async function AdminReportsPage() {
     console.error('Error fetching reports:', error);
   }
 
-  const reports = reportsData || [];
+  // Fetch de perfiles para mapear quién denuncia
+  const { data: profiles } = await supabaseAdmin
+    .from('profiles')
+    .select('id, full_name, contact_email');
+
+  const reports = (reportsData || []).map(r => {
+    const reporter = profiles?.find(p => p.id === r.reporter_id);
+    return {
+      ...r,
+      reporter_name: reporter?.full_name || reporter?.contact_email || 'Usuario Desconocido'
+    };
+  });
 
   return (
     <div>
