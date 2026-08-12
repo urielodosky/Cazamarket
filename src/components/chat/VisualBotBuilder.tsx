@@ -200,21 +200,19 @@ function BotMessageNode({ data, id, selected }: NodeProps) {
                 Condiciones de Texto Libre
               </label>
               {textOptions.map((opt, index) => (
-                <div key={opt.id} style={{ display: 'flex', flexDirection: 'column', gap: '4px', background: 'rgba(0,0,0,0.1)', padding: '6px', borderRadius: '6px', border: '1px solid rgba(255,255,255,0.05)', position: 'relative' }}>
-                  <div style={{ display: 'flex', gap: '4px' }}>
+                <div key={opt.id} style={{ display: 'flex', flexDirection: 'column', gap: '6px', background: 'rgba(0,0,0,0.25)', padding: '8px', borderRadius: '8px', border: '1px solid rgba(255,255,255,0.08)', position: 'relative' }}>
+                  <div style={{ display: 'flex', gap: '8px', alignItems: 'center' }}>
                     <select
                       className="nodrag nopan"
                       value={opt.conditionType || 'exact'}
                       onChange={(e) => d.onOptionPropChange?.(id, opt.id, 'conditionType', e.target.value)}
-                      style={{ flex: 1, padding: '4px', fontSize: '0.7rem', background: 'rgba(255,255,255,0.05)', color: '#fff', border: '1px solid var(--color-border)', borderRadius: '4px', outline: 'none' }}
+                      style={{ flex: 1, padding: '6px 8px', fontSize: '0.75rem', background: '#222', color: '#fff', border: '1px solid rgba(255,255,255,0.15)', borderRadius: '6px', outline: 'none', cursor: 'pointer' }}
                     >
-                      <option value="exact" style={{ background: '#1a1a1a', color: '#fff' }}>Exacto</option>
-                      <option value="keyword" style={{ background: '#1a1a1a', color: '#fff' }}>Contiene</option>
-                      <option value="always" style={{ background: '#1a1a1a', color: '#fff' }}>Fallback</option>
+                      <option value="exact">Exacto</option>
+                      <option value="keyword">Contiene</option>
+                      <option value="always">Fallback</option>
                     </select>
-                    {opt.conditionType !== 'always' && (
-                      <button className="nodrag" onClick={() => d.onOptionRemove?.(id, opt.id)} style={{ background: 'transparent', border: 'none', color: '#ff4444', cursor: 'pointer', padding: '0 4px', fontSize: '1rem', lineHeight: 1 }}>x</button>
-                    )}
+                    <button className="nodrag" onClick={() => d.onOptionRemove?.(id, opt.id)} style={{ background: 'rgba(255,68,68,0.1)', border: '1px solid rgba(255,68,68,0.3)', color: '#ff4444', cursor: 'pointer', width: '24px', height: '24px', borderRadius: '4px', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '0.85rem', fontWeight: 'bold' }}>✕</button>
                   </div>
                   {opt.conditionType !== 'always' && (
                     <input
@@ -226,10 +224,10 @@ function BotMessageNode({ data, id, selected }: NodeProps) {
                         d.onOptionLabelChange?.(id, opt.id, e.target.value); // Keep label in sync for debugging
                       }}
                       placeholder="Valor esperado"
-                      style={{ width: '100%', padding: '4px', fontSize: '0.75rem', background: 'rgba(0,0,0,0.2)', color: 'var(--color-text-main, #fff)', border: '1px solid rgba(255,255,255,0.2)', borderRadius: '4px', outline: 'none' }}
+                      style={{ width: '100%', padding: '6px 8px', fontSize: '0.75rem', background: 'rgba(0,0,0,0.4)', color: 'var(--color-text-main, #fff)', border: '1px solid rgba(255,255,255,0.15)', borderRadius: '6px', outline: 'none' }}
                     />
                   )}
-                  <Handle type="source" position={Position.Right} id={opt.id} style={{ background: 'var(--color-primary)', width: '16px', height: '16px', right: '-12px', top: '50%', transform: 'translateY(-50%)', border: '2px solid #fff', zIndex: 10 }} />
+                  <Handle type="source" position={Position.Right} id={opt.id} style={{ background: 'var(--color-primary)', width: '16px', height: '16px', right: '-16px', top: '50%', transform: 'translateY(-50%)', border: '2px solid #fff', zIndex: 10 }} />
                 </div>
               ))}
               <button
