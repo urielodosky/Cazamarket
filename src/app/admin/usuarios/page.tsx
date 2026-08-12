@@ -21,12 +21,13 @@ export default async function AdminUsuariosPage() {
   // 2. Fetch de todos los usuarios
   const { data: usersData, error: usersError } = await supabaseAdmin
     .from('profiles')
-    .select('id, contact_email, full_name, person_type, plan_tier, created_at, is_superadmin, is_blocked')
+    .select('id, contact_email, full_name, person_type, product_plan_tier, created_at, is_superadmin, is_blocked')
     .order('created_at', { ascending: false });
 
   const users = usersData?.map(u => ({
     ...u,
-    email: u.contact_email // mapeamos a email para que la tabla lo entienda
+    email: u.contact_email, // mapeamos a email para que la tabla lo entienda
+    plan_tier: u.product_plan_tier // mapeamos a plan_tier
   })) || [];
 
   return (

@@ -25,7 +25,8 @@ export async function adminChangePlan(userId: string, newPlanTier: string) {
     expirationDate.setFullYear(expirationDate.getFullYear() + 10);
 
     const updates: any = {
-      plan_tier: newPlanTier,
+      product_plan_tier: newPlanTier,
+      service_plan_tier: newPlanTier
     };
 
     if (newPlanTier !== 'gratis') {
