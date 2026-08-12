@@ -71,7 +71,7 @@ export async function GET() {
 
     let topNegocios = [];
     if (topSellerIds.length > 0) {
-      const { data } = await supabase.from('profiles').select('id, name, type, profile_image_url').in('id', topSellerIds);
+      const { data } = await supabase.from('profiles').select('id, name, type, profile_image_url, clicks').in('id', topSellerIds);
       if (data) {
         topNegocios = topSellerIds.map(id => {
           const p = data.find(d => d.id === id);
