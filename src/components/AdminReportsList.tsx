@@ -14,6 +14,7 @@ type Report = {
   status: 'pending' | 'resolved' | 'dismissed';
   created_at: string;
   reporter_name?: string;
+  reported_name?: string;
 };
 
 export default function AdminReportsList({ initialReports }: { initialReports: Report[] }) {
@@ -113,13 +114,25 @@ export default function AdminReportsList({ initialReports }: { initialReports: R
                 </div>
 
                 <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '12px', marginBottom: '16px', fontSize: '0.85rem' }}>
-                  <div>
-                    <span style={{ color: 'var(--color-text-muted)' }}>Denunciado por: </span>
-                    <span style={{ color: 'var(--color-text-main)', fontWeight: 600 }}>{report.reporter_name || 'Desconocido'}</span>
+                  <div style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
+                    <div>
+                      <span style={{ color: 'var(--color-text-muted)' }}>Denunciado por: </span>
+                      <span style={{ color: 'var(--color-text-main)', fontWeight: 600 }}>{report.reporter_name || 'Desconocido'}</span>
+                    </div>
+                    <div>
+                      <span style={{ color: 'var(--color-text-muted)' }}>Contra: </span>
+                      <span style={{ color: 'var(--color-text-main)', fontWeight: 600 }}>{report.reported_name || 'Contenido Desconocido'}</span>
+                    </div>
                   </div>
-                  <div>
-                    <span style={{ color: 'var(--color-text-muted)' }}>Fecha: </span>
-                    <span style={{ color: 'var(--color-text-main)', fontWeight: 600 }}>{new Date(report.created_at).toLocaleDateString()}</span>
+                  <div style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
+                    <div>
+                      <span style={{ color: 'var(--color-text-muted)' }}>Fecha: </span>
+                      <span style={{ color: 'var(--color-text-main)', fontWeight: 600 }}>{new Date(report.created_at).toLocaleDateString()}</span>
+                    </div>
+                    <div>
+                      <span style={{ color: 'var(--color-text-muted)' }}>Tipo: </span>
+                      <span style={{ color: 'var(--color-text-main)', fontWeight: 600, textTransform: 'capitalize' }}>{report.reported_type}</span>
+                    </div>
                   </div>
                 </div>
 

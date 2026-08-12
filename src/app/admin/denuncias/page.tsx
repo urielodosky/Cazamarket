@@ -42,16 +42,48 @@ export default async function AdminReportsPage() {
     console.error('Error fetching reports:', error);
   }
 
-  // Fetch de perfiles para mapear quién denuncia
+  // Fetch de perfiles para mapear quién denuncia y a quién denuncia (si es un perfil)
   const { data: profiles } = await supabaseAdmin
     .from('profiles')
-    .select('id, full_name, contact_email');
+    .select('id, full_name, contact_email, store_name');
+
+  // Obtener IDs reportados por categoría
+  const reportedProductIds = (reportsData || []).filter(r => r.reported_type === 'product').map(r => r.reported_id);
+  const reportedServiceIds = (reportsData || []).filter(r => r.reported_type === 'service').map(r => r.reported_id);
+
+  // Fetch de productos reportados
+  let products: any[] = [];
+  if (reportedProductIds.length > 0) {
+    const { data } = await supabaseAdmin.from('products').select('id, title').in('id', reportedProductIds);
+    if (data) products = data;
+  }
+
+  // Fetch de servicios reportados
+  let services: any[] = [];
+  if (reportedServiceIds.length > 0) {
+    const { data } = await supabaseAdmin.from('services').select('id, title').in('id', reportedServiceIds);
+    if (data) services = data;
+  }
 
   const reports = (reportsData || []).map(r => {
     const reporter = profiles?.find(p => p.id === r.reporter_id);
+    let reportedName = 'Contenido Desconocido';
+    
+    if (r.reported_type === 'product') {
+      reportedName = products.find(p => p.id === r.reported_id)?.title || 'Producto Eliminado';
+    } else if (r.reported_type === 'service') {
+      reportedName = services.find(s => s.id === r.reported_id)?.title || 'Servicio Eliminado';
+    } else if (r.reported_type === 'profile' || r.reported_type === 'user') {
+      const p = profiles?.find(p => p.id === r.reported_id);
+      reportedName = p?.store_name || p?.full_name || p?.contact_email || 'Usuario Eliminado';
+    } else if (r.reported_type === 'community_post' || r.reported_type === 'post') {
+      reportedName = 'Posteo de Comunidad';
+    }
+
     return {
       ...r,
-      reporter_name: reporter?.full_name || reporter?.contact_email || 'Usuario Desconocido'
+      reporter_name: reporter?.full_name || reporter?.contact_email || 'Usuario Desconocido',
+      reported_name: reportedName
     };
   });
 
