@@ -36,8 +36,8 @@ export async function loginSudoMode(password: string) {
 
     // Si todo está correcto, establecemos la cookie Sudo Mode (1 hora = 3600 seg)
     const MAX_AGE = 3600;
-    
-    cookies().set('admin_sudo_session', 'active', {
+    const cookieStore = await cookies();
+    cookieStore.set('admin_sudo_session', 'active', {
       httpOnly: true,
       secure: process.env.NODE_ENV === 'production',
       sameSite: 'strict',

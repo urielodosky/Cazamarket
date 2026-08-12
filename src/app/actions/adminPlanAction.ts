@@ -13,7 +13,8 @@ const supabaseAdmin = createAdminClient(
 export async function grantFreePlan(targetUserId: string, planTier: string) {
   try {
     // 1. Verificar la cookie del Sudo Mode
-    const sudoCookie = cookies().get('admin_sudo_session');
+    const cookieStore = await cookies();
+    const sudoCookie = cookieStore.get('admin_sudo_session');
     if (!sudoCookie || sudoCookie.value !== 'active') {
       return { success: false, error: 'Sudo mode requerido. La sesión segura ha expirado.' };
     }
