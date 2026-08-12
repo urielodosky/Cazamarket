@@ -19,9 +19,11 @@ const supabaseAdmin = createClient(
 
 async function testQuery() {
   const { data, error } = await supabaseAdmin
-    .from('profiles')
-    .select('id, contact_email, full_name, person_type, product_plan_tier, created_at, is_superadmin, is_blocked')
-    .order('created_at', { ascending: false });
+    .from('sponsored_ads')
+    .select('*, profiles(store_name, full_name, contact_email)')
+    .eq('status', 'active')
+    .gte('end_date', new Date().toISOString())
+    .order('end_date', { ascending: true });
 
   if (error) {
     console.error('SUPABASE ERROR:', error.message);
