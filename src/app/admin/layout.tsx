@@ -1,3 +1,4 @@
+import Link from 'next/link';
 import { redirect } from 'next/navigation';
 import { createClient } from '@/lib/supabase/server';
 
@@ -74,9 +75,9 @@ export default async function AdminLayout({
         <aside className="admin-sidebar">
           <h2 style={{ color: 'var(--color-primary)', fontSize: '1.25rem', marginBottom: '24px' }}>CazaMarket Admin</h2>
           <nav className="admin-nav">
-            <a href="/admin" style={{ color: 'var(--color-text-main)', textDecoration: 'none', padding: '10px', borderRadius: '8px', background: 'var(--color-bg-elevated)', whiteSpace: 'nowrap' }}>Dashboard</a>
-            <a href="/admin/denuncias" style={{ color: 'var(--color-text-main)', textDecoration: 'none', padding: '10px', borderRadius: '8px', whiteSpace: 'nowrap' }}>Denuncias</a>
-            <a href="/admin/usuarios" style={{ color: 'var(--color-text-main)', textDecoration: 'none', padding: '10px', borderRadius: '8px', whiteSpace: 'nowrap' }}>Usuarios</a>
+            <Link href="/admin" style={{ color: 'var(--color-text-main)', textDecoration: 'none', padding: '10px', borderRadius: '8px', background: 'var(--color-bg-elevated)', whiteSpace: 'nowrap' }}>Dashboard</Link>
+            <Link href="/admin/denuncias" style={{ color: 'var(--color-text-main)', textDecoration: 'none', padding: '10px', borderRadius: '8px', whiteSpace: 'nowrap' }}>Denuncias</Link>
+            <Link href="/admin/usuarios" style={{ color: 'var(--color-text-main)', textDecoration: 'none', padding: '10px', borderRadius: '8px', whiteSpace: 'nowrap' }}>Usuarios</Link>
           </nav>
         </aside>
 

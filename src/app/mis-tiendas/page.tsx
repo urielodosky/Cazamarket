@@ -1068,7 +1068,7 @@ export default function MiNegocioPage() {
 
                     {(!ubicacionPrincipal || (!ubicacionPrincipal.provincia && !ubicacionPrincipal.calle)) && sucursales.length === 0 && (
                       <div style={{ color: 'var(--color-text-muted)', padding: '20px', border: '1px dashed rgba(255,255,255,0.1)', borderRadius: 'var(--radius-md)' }}>
-                        No has configurado ninguna ubicación. <a href="/configuracion" style={{ color: 'var(--color-primary)' }}>Configurar ahora</a>
+                        No has configurado ninguna ubicación. <Link href="/configuracion" style={{ color: 'var(--color-primary)' }}>Configurar ahora</Link>
                       </div>
                     )}
                   </div>

@@ -1,3 +1,4 @@
+import Link from 'next/link';
 import { cookies } from 'next/headers';
 import { redirect } from 'next/navigation';
 import { createClient } from '@/lib/supabase/server';
@@ -216,7 +217,7 @@ export default async function AdminDashboardPage() {
                     <div style={{ fontSize: '0.8rem', color: 'var(--color-text-muted)' }}>Hace {Math.floor((new Date().getTime() - new Date(report.created_at).getTime()) / (1000 * 3600 * 24))} días</div>
                   </div>
                 ))}
-                <a href="/admin/denuncias" style={{ display: 'block', textAlign: 'center', padding: '8px', color: 'var(--color-primary)', textDecoration: 'none', fontSize: '0.9rem', fontWeight: 600, marginTop: '8px' }}>Ver todas las denuncias →</a>
+                <Link href="/admin/denuncias" style={{ display: 'block', textAlign: 'center', padding: '8px', color: 'var(--color-primary)', textDecoration: 'none', fontSize: '0.9rem', fontWeight: 600, marginTop: '8px' }}>Ver todas las denuncias →</Link>
               </div>
             ) : (
               <div style={{ padding: '20px', textAlign: 'center', color: 'var(--color-text-muted)', fontSize: '0.9rem', background: 'var(--color-bg-base)', borderRadius: '8px', border: '1px dashed var(--color-border)' }}>
