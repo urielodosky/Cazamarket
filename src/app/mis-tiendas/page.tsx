@@ -11,9 +11,9 @@ import CustomSelect from '@/components/ui/CustomSelect';
 import type { SelectOption } from '@/components/ui/CustomSelect';
 import { CATEGORIES_DATA } from '@/constants/categoriesData';
 import { createClient } from '@/lib/supabase/client';
-import ImageCropperModal from '@/components/ImageCropperModal';
 import getCroppedImg from '@/utils/cropImage';
 import BusinessTagInput, { BusinessTag } from '@/components/BusinessTagInput';
+import toast from 'react-hot-toast';
 
 const PROVINCES_MAP: Record<string, string> = {
   "02": "Ciudad Autónoma de Buenos Aires",
@@ -113,6 +113,20 @@ export default function MiNegocioPage() {
   const router = useRouter();
   const fileInputRef = React.useRef<HTMLInputElement>(null);
   const bannerInputRef = React.useRef<HTMLInputElement>(null);
+
+  const handleCreateNew = (type: 'product' | 'service') => {
+    if (!businessType) {
+      toast.error('Debes seleccionar el "Tipo de Negocio" en Información antes de publicar.');
+      setActiveTab('informacion');
+      return;
+    }
+    if (!categories[0]) {
+      toast.error('Debes seleccionar al menos 1 Categoría en Información antes de publicar.');
+      setActiveTab('informacion');
+      return;
+    }
+    router.push(`/mis-tiendas/${type === 'product' ? 'nuevo-producto' : 'nuevo-servicio'}`);
+  };
 
   // Appearance State
   const [theme, setTheme] = useState({ primaryColor: '#ff7300', textColor: '#ffffff', bgColor: '#111310' });
@@ -533,10 +547,14 @@ export default function MiNegocioPage() {
                 title="Clic para editar la descripción"
                 style={{ color: description ? 'var(--color-text-muted)' : 'var(--color-text-muted)', fontSize: '1.05rem', lineHeight: 1.6, maxWidth: '900px', margin: 0, cursor: 'pointer', borderBottom: '1px dashed rgba(255,255,255,0.2)', paddingBottom: '4px', display: 'inline-block', opacity: description ? 1 : 0.6 }}
               >
-                {description || 'Haz clic aquí para añadir una descripción a tu tienda...'}
+                {description || (
+                  <span style={{ display: 'inline-flex', alignItems: 'center', gap: '8px' }}>
+                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"></path><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"></path></svg>
+                    Añadir descripción a tu tienda...
+                  </span>
+                )}
               </p>
             )}
-            <EditButton onClick={() => setIsEditingDesc(true)} style={{ top: '24px', right: '24px' }} label={description ? 'Editar Descripción' : 'Añadir Descripción'} />
           </div>
           
           {/* Business Relations (Proveedores y Distribuidores) */}
@@ -757,9 +775,9 @@ export default function MiNegocioPage() {
               <div>
                 <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '24px', flexWrap: 'wrap', gap: '16px' }}>
                   <h3 style={{ margin: 0, fontSize: '1.5rem' }}>Catálogo de Productos</h3>
-                  <Link href="/mis-tiendas/nuevo-producto" className="btn btn-primary" style={{ padding: '12px 24px', fontSize: '1rem', fontWeight: 600, borderRadius: 'var(--radius-full)', background: 'var(--color-primary)', color: '#fff', border: 'none', textDecoration: 'none' }}>
+                  <button onClick={() => handleCreateNew('product')} className="btn btn-primary" style={{ padding: '12px 24px', fontSize: '1rem', fontWeight: 600, borderRadius: 'var(--radius-full)', background: 'var(--color-primary)', color: '#fff', border: 'none', cursor: 'pointer' }}>
                     + Nuevo Producto
-                  </Link>
+                  </button>
                 </div>
 
                 {myProducts.length === 0 ? (
@@ -853,9 +871,16 @@ export default function MiNegocioPage() {
               <div>
                 <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '24px', flexWrap: 'wrap', gap: '16px' }}>
                   <h3 style={{ margin: 0, fontSize: '1.5rem' }}>Catálogo de Servicios</h3>
-                  <Link href="/mis-tiendas/nuevo-servicio" className="btn btn-primary" style={{ padding: '12px 24px', fontSize: '1rem', fontWeight: 600, borderRadius: 'var(--radius-full)', background: 'var(--color-primary)', color: '#fff', border: 'none', textDecoration: 'none' }}>
-                    + Nuevo Servicio
-                  </Link>
+                  {isAtLeast(planTier, 'emprendedor') ? (
+                    <button onClick={() => handleCreateNew('service')} className="btn btn-primary" style={{ padding: '12px 24px', fontSize: '1rem', fontWeight: 600, borderRadius: 'var(--radius-full)', background: 'var(--color-primary)', color: '#fff', border: 'none', cursor: 'pointer' }}>
+                      + Nuevo Servicio
+                    </button>
+                  ) : (
+                    <button onClick={() => router.push('/planes')} className="btn btn-primary" style={{ padding: '12px 24px', fontSize: '1rem', fontWeight: 600, borderRadius: 'var(--radius-full)', background: 'var(--color-border)', color: 'var(--color-text-muted)', border: 'none', cursor: 'pointer', display: 'flex', alignItems: 'center', gap: '8px' }}>
+                      <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><rect x="3" y="11" width="18" height="11" rx="2" ry="2"></rect><path d="M7 11V7a5 5 0 0 1 10 0v4"></path></svg>
+                      Bloqueado
+                    </button>
+                  )}
                 </div>
 
                 {myServices.length === 0 ? (
