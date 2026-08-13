@@ -11,6 +11,7 @@ import CustomSelect from '@/components/ui/CustomSelect';
 import type { SelectOption } from '@/components/ui/CustomSelect';
 import { CATEGORIES_DATA } from '@/constants/categoriesData';
 import { createClient } from '@/lib/supabase/client';
+import ImageCropperModal from '@/components/ImageCropperModal';
 import getCroppedImg from '@/utils/cropImage';
 import BusinessTagInput, { BusinessTag } from '@/components/BusinessTagInput';
 import toast from 'react-hot-toast';
