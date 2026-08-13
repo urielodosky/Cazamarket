@@ -8,6 +8,8 @@ import { ForumPost, ForumReply } from '../../page';
 import { formatTimeAgo } from '@/utils/formatTime';
 import { getUserBusinessInfo } from '@/utils/userBusiness';
 import { useThemeColors } from '@/hooks/useThemeColors';
+import useSWR, { mutate } from 'swr';
+import { createClient } from '@/lib/supabase/client';
 import ReportModal, { ReportType } from '@/components/ReportModal';
 import '../../comunidad.css';
 
@@ -83,40 +85,87 @@ export default function TemaPage({ params }: { params: Promise<{ id: string }> }
     return null;
   };
 
+  const fetcher = async () => {
+    const supabase = createClient();
+    const { data: topic, error: topicError } = await supabase
+      .from('forum_topics')
+      .select('*, author:profiles!author_id(store_name, avatar_url, first_name, last_name, username)')
+      .eq('id', id)
+      .single();
+    
+    if (topicError || !topic) throw topicError;
+    
+    const { data: repliesData, error: repliesError } = await supabase
+      .from('forum_replies')
+      .select('*, author:profiles!author_id(store_name, avatar_url, first_name, last_name, username)')
+      .eq('topic_id', id)
+      .order('created_at', { ascending: true });
+      
+    const builtReplies: ForumReply[] = [];
+    const replyMap = new Map();
+    
+    if (repliesData) {
+      repliesData.forEach((r: any) => {
+        let authorName = 'Usuario';
+        if (r.author) {
+          authorName = r.author.store_name || r.author.username || `${r.author.first_name || ''} ${r.author.last_name || ''}`.trim() || 'Usuario';
+        }
+        const formattedReply: ForumReply = {
+          id: r.id,
+          author: authorName,
+          authorAvatar: r.author?.avatar_url || null,
+          content: r.content,
+          createdAt: r.created_at,
+          subReplies: []
+        };
+        replyMap.set(r.id, formattedReply);
+        
+        if (r.parent_reply_id) {
+          const parent = replyMap.get(r.parent_reply_id);
+          if (parent) {
+            parent.subReplies.push(formattedReply);
+          }
+        } else {
+          builtReplies.push(formattedReply);
+        }
+      });
+    }
+
+    let authorName = 'Usuario';
+    if (topic.author) {
+      authorName = topic.author.store_name || topic.author.username || `${topic.author.first_name || ''} ${topic.author.last_name || ''}`.trim() || 'Usuario';
+    }
+
+    const viewKey = `cazamarket_viewed_post_${id}`;
+    if (!sessionStorage.getItem(viewKey)) {
+      sessionStorage.setItem(viewKey, 'true');
+      supabase.from('forum_topics').update({ views_count: (topic.views_count || 0) + 1 }).eq('id', id).then();
+    }
+
+    return {
+      id: topic.id,
+      title: topic.title,
+      author: authorName,
+      authorAvatar: topic.author?.avatar_url || null,
+      category: topic.category,
+      subcategory: topic.subcategory,
+      content: topic.content,
+      repliesCount: repliesData ? repliesData.length : 0,
+      viewsCount: (topic.views_count || 0) + (sessionStorage.getItem(viewKey) ? 0 : 1),
+      createdAt: topic.created_at,
+      lastActive: topic.updated_at || topic.created_at,
+      replies: builtReplies
+    };
+  };
+
+  const { data: postData, error, isLoading: isPostLoading } = useSWR(`topic_${id}`, fetcher);
+
   useEffect(() => {
-    let postsList: ForumPost[] = INITIAL_POSTS;
-    const saved = localStorage.getItem('cazamarket_forum_posts');
-    if (saved) {
-      try {
-        postsList = JSON.parse(saved);
-      } catch (e) {
-        postsList = INITIAL_POSTS;
-      }
+    if (postData) {
+      setPost(postData);
     }
-
-    const found = postsList.find(p => p.id === id);
-    if (found) {
-      const viewKey = `cazamarket_viewed_post_${id}`;
-      let updatedPost = found;
-
-      // Incrementar vistas solo 1 vez por sesión
-      if (!sessionStorage.getItem(viewKey)) {
-        sessionStorage.setItem(viewKey, 'true');
-        updatedPost = { ...found, viewsCount: (found.viewsCount || 0) + 1 };
-
-        // Guardar vistas en localStorage
-        const updatedList = postsList.map(p => p.id === id ? updatedPost : p);
-        localStorage.setItem('cazamarket_forum_posts', JSON.stringify(updatedList));
-      }
-
-      setPost(updatedPost);
-    }
-
-    const timer = setTimeout(() => {
-      setIsLoading(false);
-    }, 400);
-    return () => clearTimeout(timer);
-  }, [id]);
+    setIsLoading(isPostLoading);
+  }, [postData, isPostLoading]);
 
   const countTotalReplies = (replies?: ForumReply[]): number => {
     if (!replies) return 0;
@@ -141,91 +190,60 @@ export default function TemaPage({ params }: { params: Promise<{ id: string }> }
     }
   };
 
-  const handleSendReply = (e: React.FormEvent) => {
+  const handleSendReply = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!replyText || replyText.trim().length < 2 || !post) return;
 
-    let authorName = username || 'CazadorAnonimo';
-    let userAvatar = avatar || '';
-
-    const profileSaved = localStorage.getItem('cazamarket_profile');
-    if (profileSaved) {
-      try {
-        const parsed = JSON.parse(profileSaved);
-        if (parsed.storeName) authorName = parsed.storeName;
-        if (!userAvatar && parsed.storeLogo) userAvatar = parsed.storeLogo;
-        if (!userAvatar && parsed.avatar) userAvatar = parsed.avatar;
-      } catch (e) {}
+    const supabase = createClient();
+    const { data: { user } } = await supabase.auth.getUser();
+    if (!user) {
+      showToast('Debes iniciar sesión para responder', 'info');
+      return;
     }
 
-    const nowTs = Date.now().toString();
-    const newReply: ForumReply = {
-      id: nowTs,
-      author: authorName,
-      authorAvatar: userAvatar || undefined,
+    const { error } = await supabase.from('forum_replies').insert({
+      topic_id: id,
       content: replyText.trim(),
-      createdAt: nowTs,
-      subReplies: []
-    };
+      author_id: user.id
+    });
 
-    const currentReplies = post.replies || [];
-    const updatedPost: ForumPost = {
-      ...post,
-      replies: [...currentReplies, newReply],
-      repliesCount: countTotalReplies([...currentReplies, newReply]),
-      lastActive: nowTs
-    };
+    if (error) {
+      console.error(error);
+      showToast('Error al publicar respuesta', 'info');
+      return;
+    }
 
-    saveUpdatedPost(updatedPost);
     setReplyText('');
+    mutate(`topic_${id}`);
     showToast('¡Respuesta publicada con éxito!', 'success');
   };
 
-  const handleSendSubReply = (parentReplyId: string) => {
+  const handleSendSubReply = async (parentReplyId: string) => {
     if (!inlineReplyText || inlineReplyText.trim().length < 2 || !post) return;
 
-    let authorName = username || 'CazadorAnonimo';
-    let userAvatar = avatar || '';
-
-    const profileSaved = localStorage.getItem('cazamarket_profile');
-    if (profileSaved) {
-      try {
-        const parsed = JSON.parse(profileSaved);
-        if (parsed.storeName) authorName = parsed.storeName;
-        if (!userAvatar && parsed.storeLogo) userAvatar = parsed.storeLogo;
-        if (!userAvatar && parsed.avatar) userAvatar = parsed.avatar;
-      } catch (e) {}
+    const supabase = createClient();
+    const { data: { user } } = await supabase.auth.getUser();
+    if (!user) {
+      showToast('Debes iniciar sesión para responder', 'info');
+      return;
     }
 
-    const nowTs = Date.now().toString();
-    const newSubReply: ForumReply = {
-      id: nowTs,
-      author: authorName,
-      authorAvatar: userAvatar || undefined,
+    const { error } = await supabase.from('forum_replies').insert({
+      topic_id: id,
+      parent_reply_id: parentReplyId,
       content: inlineReplyText.trim(),
-      createdAt: nowTs
-    };
-
-    const updatedReplies = (post.replies || []).map(r => {
-      if (r.id === parentReplyId) {
-        return {
-          ...r,
-          subReplies: [...(r.subReplies || []), newSubReply]
-        };
-      }
-      return r;
+      author_id: user.id
     });
 
-    const updatedPost: ForumPost = {
-      ...post,
-      replies: updatedReplies,
-      repliesCount: countTotalReplies(updatedReplies),
-      lastActive: nowTs
-    };
+    if (error) {
+      console.error(error);
+      showToast('Error al publicar respuesta', 'info');
+      return;
+    }
 
-    saveUpdatedPost(updatedPost);
     setActiveInlineReplyId(null);
     setInlineReplyText('');
+    mutate(`topic_${id}`);
     showToast('¡Respuesta enviada!', 'success');
   };
 
@@ -252,15 +270,16 @@ export default function TemaPage({ params }: { params: Promise<{ id: string }> }
     setConfirmModal({
       title: 'Eliminar Tema',
       message: '¿Estás seguro de que deseas eliminar este tema? Esta acción no se puede deshacer.',
-      onConfirm: () => {
-        const saved = localStorage.getItem('cazamarket_forum_posts');
-        if (saved) {
-          try {
-            const postsList: ForumPost[] = JSON.parse(saved);
-            const updatedList = postsList.filter(p => p.id !== id);
-            localStorage.setItem('cazamarket_forum_posts', JSON.stringify(updatedList));
-          } catch (e) {}
+      onConfirm: async () => {
+        const supabase = createClient();
+        const { error } = await supabase.from('forum_topics').delete().eq('id', id);
+        
+        if (error) {
+          console.error(error);
+          showToast('Error al eliminar el tema.', 'info');
+          return;
         }
+
         showToast('Tema eliminado correctamente.', 'info');
         setTimeout(() => {
           router.push('/comunidad');
@@ -274,32 +293,18 @@ export default function TemaPage({ params }: { params: Promise<{ id: string }> }
     setConfirmModal({
       title: 'Eliminar Respuesta',
       message: '¿Estás seguro de que deseas eliminar esta respuesta?',
-      onConfirm: () => {
-        let updatedReplies: ForumReply[] = [];
+      onConfirm: async () => {
+        const supabase = createClient();
+        const targetId = subReplyId || parentReplyId;
+        const { error } = await supabase.from('forum_replies').delete().eq('id', targetId);
 
-        if (subReplyId) {
-          // Eliminar una sub-respuesta
-          updatedReplies = (post.replies || []).map(r => {
-            if (r.id === parentReplyId) {
-              return {
-                ...r,
-                subReplies: (r.subReplies || []).filter(sub => sub.id !== subReplyId)
-              };
-            }
-            return r;
-          });
-        } else {
-          // Eliminar una respuesta principal
-          updatedReplies = (post.replies || []).filter(r => r.id !== parentReplyId);
+        if (error) {
+          console.error(error);
+          showToast('Error al eliminar respuesta.', 'info');
+          return;
         }
 
-        const updatedPost: ForumPost = {
-          ...post,
-          replies: updatedReplies,
-          repliesCount: countTotalReplies(updatedReplies)
-        };
-
-        saveUpdatedPost(updatedPost);
+        mutate(`topic_${id}`);
         showToast('Respuesta eliminada.', 'info');
       }
     });

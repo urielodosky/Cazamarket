@@ -6,6 +6,8 @@ import { useAuth } from '@/contexts/AuthContext';
 import { formatTimeAgo } from '@/utils/formatTime';
 import { getUserBusinessInfo } from '@/utils/userBusiness';
 import { useThemeColors } from '@/hooks/useThemeColors';
+import useSWR from 'swr';
+import { createClient } from '@/lib/supabase/client';
 import './comunidad.css';
 
 export interface ForumReply {
@@ -76,28 +78,45 @@ export default function ComunidadPage() {
     return null;
   };
 
-  useEffect(() => {
-    const saved = localStorage.getItem('cazamarket_forum_posts');
-    if (saved) {
-      try {
-        const parsed: ForumPost[] = JSON.parse(saved);
-        // Filter out old test posts
-        const cleanPosts = parsed.filter(p => !['1', '2', '3', '4'].includes(p.id) && p.author !== 'CazadorExperto99' && p.author !== 'PescadorUrbano');
-        setPosts(cleanPosts);
-        localStorage.setItem('cazamarket_forum_posts', JSON.stringify(cleanPosts));
-      } catch (e) {
-        setPosts([]);
-        localStorage.setItem('cazamarket_forum_posts', JSON.stringify([]));
+  const fetcher = async () => {
+    const supabase = createClient();
+    const { data, error } = await supabase
+      .from('forum_topics')
+      .select('*, author:profiles!author_id(store_name, avatar_url, first_name, last_name, username), forum_replies(id)')
+      .order('created_at', { ascending: false });
+    
+    if (error) throw error;
+    
+    return data.map((t: any) => {
+      let authorName = 'CazadorAnonimo';
+      if (t.author) {
+        authorName = t.author.store_name || t.author.username || `${t.author.first_name || ''} ${t.author.last_name || ''}`.trim() || 'Usuario';
       }
-    } else {
-      localStorage.setItem('cazamarket_forum_posts', JSON.stringify([]));
-      setPosts([]);
+      return {
+        id: t.id,
+        title: t.title,
+        author: authorName,
+        authorAvatar: t.author?.avatar_url || null,
+        category: t.category,
+        subcategory: t.subcategory,
+        content: t.content,
+        repliesCount: t.forum_replies ? t.forum_replies.length : 0,
+        viewsCount: t.views_count || 0,
+        createdAt: t.created_at,
+        lastActive: t.updated_at || t.created_at,
+        replies: []
+      };
+    });
+  };
+
+  const { data: postsData, error: postsError, isLoading: isPostsLoading } = useSWR('forum_topics', fetcher);
+
+  useEffect(() => {
+    if (postsData) {
+      setPosts(postsData);
     }
-    const timer = setTimeout(() => {
-      setIsLoading(false);
-    }, 400);
-    return () => clearTimeout(timer);
-  }, []);
+    setIsLoading(isPostsLoading);
+  }, [postsData, isPostsLoading]);
 
   const filteredPosts = posts.filter(post => {
     // Filter by search query

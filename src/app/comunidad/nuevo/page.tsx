@@ -4,6 +4,7 @@ import Link from 'next/link';
 import { useAuth } from '@/contexts/AuthContext';
 import { ForumPost } from '../page';
 import CustomSelect from '@/components/ui/CustomSelect';
+import { createClient } from '@/lib/supabase/client';
 import { CATEGORIES_DATA } from '@/constants/categoriesData';
 
 export default function CrearTemaPage() {
@@ -30,7 +31,7 @@ export default function CrearTemaPage() {
       ]
     : [{ value: '', label: 'Seleccionar Subcategoría (Selecciona categoría primero)' }];
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!titulo || titulo.trim().length < 5) {
       setErrorMsg('El título debe tener al menos 5 caracteres.');
@@ -41,49 +42,29 @@ export default function CrearTemaPage() {
       return;
     }
 
-    let currentPosts: ForumPost[] = [];
-    const saved = localStorage.getItem('cazamarket_forum_posts');
-    if (saved) {
-      try {
-        currentPosts = JSON.parse(saved);
-      } catch (e) {
-        currentPosts = [];
-      }
+    const supabase = createClient();
+    const { data: { user } } = await supabase.auth.getUser();
+    
+    if (!user) {
+      setErrorMsg('Debes iniciar sesión para publicar en la comunidad.');
+      return;
     }
 
-    let authorName = username || 'CazadorAnonimo';
-    let userAvatar = avatar || '';
-
-    const profileSaved = localStorage.getItem('cazamarket_profile');
-    if (profileSaved) {
-      try {
-        const parsed = JSON.parse(profileSaved);
-        if (parsed.storeName) authorName = parsed.storeName;
-        if (!userAvatar && parsed.storeLogo) userAvatar = parsed.storeLogo;
-        if (!userAvatar && parsed.avatar) userAvatar = parsed.avatar;
-      } catch (e) {}
-    }
-
-    const nowTimestamp = Date.now().toString();
-    const newPost: ForumPost = {
-      id: nowTimestamp,
+    const { data, error } = await supabase.from('forum_topics').insert({
       title: titulo.trim(),
-      author: authorName,
-      authorAvatar: userAvatar || undefined,
       content: contenido.trim(),
-      category: categoria || undefined,
-      subcategory: subcategoria || undefined,
-      repliesCount: 0,
-      viewsCount: 1,
-      createdAt: nowTimestamp,
-      lastActive: nowTimestamp,
-      replies: []
-    };
+      category: categoria || null,
+      subcategory: subcategoria || null,
+      author_id: user.id
+    }).select('id').single();
 
-    const updatedPosts = [newPost, ...currentPosts];
-    localStorage.setItem('cazamarket_forum_posts', JSON.stringify(updatedPosts));
+    if (error) {
+      console.error(error);
+      setErrorMsg('Hubo un error al publicar el tema. Intenta nuevamente.');
+      return;
+    }
 
-    window.location.href = `/comunidad/tema/${newPost.id}`;
+    window.location.href = `/comunidad/tema/${data.id}`;
   };
 
   return (
