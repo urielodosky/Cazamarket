@@ -47,54 +47,60 @@ export default function ResenasPage() {
     const fetchInteractions = async () => {
       setIsLoadingData(true);
       
+      const augmentWithProfiles = async (items: any[], isBuyerProfile: boolean) => {
+        if (!items || items.length === 0) return [];
+        const ids = [...new Set(items.map(i => isBuyerProfile ? i.buyer_id : i.seller_id))].filter(Boolean);
+        if (ids.length === 0) return items;
+        const { data: profiles } = await supabase.from('profiles').select('id, first_name, last_name, store_name, avatar_url').in('id', ids);
+        const profileMap = new Map((profiles || []).map(p => [p.id, p]));
+        return items.map(i => ({
+          ...i,
+          profiles: profileMap.get(isBuyerProfile ? i.buyer_id : i.seller_id) || {}
+        }));
+      };
+
       if (activeMainTab === 'mis-resenas' && isVendor) {
-        // Fetch Pendientes (pending_time)
         const { data: pend } = await supabase.from('interactions')
-          .select('*, profiles!buyer_id(first_name, last_name, avatar_url), products(name, image)')
+          .select('*, products(name, image)')
           .eq('seller_id', supabaseUser.id)
           .eq('status', 'pending_time')
           .order('created_at', { ascending: false });
-        setSellerPendientes(pend || []);
+        setSellerPendientes(await augmentWithProfiles(pend || [], true));
 
-        // Fetch Recibidas (published) with reviews
         const { data: rec } = await supabase.from('interactions')
-          .select('*, profiles!buyer_id(first_name, last_name, avatar_url), products(name, image), reviews(seller_rating, product_rating, comment, created_at)')
+          .select('*, products(name, image), reviews(seller_rating, product_rating, comment, created_at)')
           .eq('seller_id', supabaseUser.id)
           .eq('status', 'published')
           .order('created_at', { ascending: false });
-        setSellerRecibidas(rec || []);
+        setSellerRecibidas(await augmentWithProfiles(rec || [], true));
 
-        // Fetch Canceladas (rejected_by_seller, appealed)
         const { data: canc } = await supabase.from('interactions')
-          .select('*, profiles!buyer_id(first_name, last_name, avatar_url), products(name, image)')
+          .select('*, products(name, image)')
           .eq('seller_id', supabaseUser.id)
           .in('status', ['rejected_by_seller', 'appealed'])
           .order('created_at', { ascending: false });
-        setSellerCanceladas(canc || []);
+        setSellerCanceladas(await augmentWithProfiles(canc || [], true));
       } else if (activeMainTab === 'resenas-dadas') {
-        // Fetch Pendientes (ready_to_review)
         const { data: pend } = await supabase.from('interactions')
-          .select('*, profiles!seller_id(first_name, last_name, store_name, avatar_url), products(name, image)')
+          .select('*, products(name, image)')
           .eq('buyer_id', supabaseUser.id)
           .eq('status', 'ready_to_review')
           .order('created_at', { ascending: false });
-        setBuyerPendientes(pend || []);
+        setBuyerPendientes(await augmentWithProfiles(pend || [], false));
 
-        // Fetch Dadas (published) with reviews
         const { data: dadas } = await supabase.from('interactions')
-          .select('*, profiles!seller_id(first_name, last_name, store_name, avatar_url), products(name, image), reviews(seller_rating, product_rating, comment, created_at)')
+          .select('*, products(name, image), reviews(seller_rating, product_rating, comment, created_at)')
           .eq('buyer_id', supabaseUser.id)
           .eq('status', 'published')
           .order('created_at', { ascending: false });
-        setBuyerDadas(dadas || []);
+        setBuyerDadas(await augmentWithProfiles(dadas || [], false));
 
-        // Fetch Canceladas (rejected_by_seller, appealed)
         const { data: canc } = await supabase.from('interactions')
-          .select('*, profiles!seller_id(first_name, last_name, store_name, avatar_url), products(name, image)')
+          .select('*, products(name, image)')
           .eq('buyer_id', supabaseUser.id)
           .in('status', ['rejected_by_seller', 'appealed'])
           .order('created_at', { ascending: false });
-        setBuyerCanceladas(canc || []);
+        setBuyerCanceladas(await augmentWithProfiles(canc || [], false));
       }
       setIsLoadingData(false);
     };
@@ -228,7 +234,7 @@ export default function ResenasPage() {
           {activeMainTab === 'mis-resenas' && (
             <>
               {/* Subtabs de Mis Reseñas */}
-              <div style={{ display: 'flex', gap: '20px', borderBottom: `1px solid ${themeColors.borderSubtle3}`, marginBottom: '24px' }}>
+              <div style={{ display: 'flex', gap: '20px', borderBottom: `1px solid ${themeColors.borderSubtle3}`, marginBottom: '24px', overflowX: 'auto', whiteSpace: 'nowrap' }}>
                 <button
                   onClick={() => setActiveSubTabMisResenas('pendientes')}
                   style={{
@@ -280,7 +286,7 @@ export default function ResenasPage() {
                         ) : (
                           sellerPendientes.map((item) => (
                             <div key={item.id} style={{ padding: '20px', borderRadius: '16px', background: 'rgba(255,255,255,0.03)', border: `1px solid ${themeColors.borderSubtle3}` }}>
-                              <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                              <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap', gap: '12px' }}>
                                 <div>
                                   <h4 style={{ margin: '0 0 4px', color: 'var(--color-text-main)', fontSize: '1.1rem' }}>
                                     {item.profiles?.first_name ? `${item.profiles.first_name} ${item.profiles.last_name || ''}` : 'Usuario'}
@@ -310,7 +316,7 @@ export default function ResenasPage() {
                             const rating = review?.seller_rating || 0;
                             return (
                               <div key={item.id} style={{ padding: '20px', borderRadius: '16px', background: 'rgba(255,255,255,0.03)', border: `1px solid ${themeColors.borderSubtle3}` }}>
-                                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: '12px' }}>
+                                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: '12px', flexWrap: 'wrap', gap: '8px' }}>
                                   <div>
                                     <h4 style={{ margin: '0 0 4px', color: 'var(--color-text-main)', fontSize: '1.1rem' }}>
                                       {item.profiles?.first_name ? `${item.profiles.first_name} ${item.profiles.last_name || ''}` : 'Usuario'}
@@ -339,7 +345,7 @@ export default function ResenasPage() {
                         ) : (
                           sellerCanceladas.map((item) => (
                             <div key={item.id} style={{ padding: '20px', borderRadius: '16px', background: 'rgba(255,255,255,0.03)', border: `1px solid ${themeColors.borderSubtle3}` }}>
-                              <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start' }}>
+                              <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', flexWrap: 'wrap', gap: '8px' }}>
                                 <div>
                                   <h4 style={{ margin: '0 0 4px', color: 'var(--color-text-main)', fontSize: '1.1rem' }}>
                                     {item.profiles?.first_name ? `${item.profiles.first_name} ${item.profiles.last_name || ''}` : 'Usuario'}
@@ -366,7 +372,7 @@ export default function ResenasPage() {
           {activeMainTab === 'resenas-dadas' && (
             <>
               {/* Subtabs de Reseñas Dadas */}
-              <div style={{ display: 'flex', gap: '20px', borderBottom: `1px solid ${themeColors.borderSubtle3}`, marginBottom: '24px' }}>
+              <div style={{ display: 'flex', gap: '20px', borderBottom: `1px solid ${themeColors.borderSubtle3}`, marginBottom: '24px', overflowX: 'auto', whiteSpace: 'nowrap' }}>
                 <button
                   onClick={() => setActiveSubTabResenasDadas('pendientes')}
                   style={{
@@ -419,7 +425,7 @@ export default function ResenasPage() {
                         ) : (
                           buyerPendientes.map((item) => (
                             <div key={item.id} style={{ padding: '20px', borderRadius: '16px', background: 'rgba(255,255,255,0.03)', border: `1px solid ${themeColors.borderSubtle3}` }}>
-                              <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                              <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap', gap: '12px' }}>
                                 <div>
                                   <h4 style={{ margin: '0 0 4px', color: 'var(--color-text-main)', fontSize: '1.1rem' }}>
                                     {item.profiles?.store_name || (item.profiles?.first_name ? `${item.profiles.first_name} ${item.profiles.last_name || ''}` : 'Negocio')}
@@ -445,7 +451,7 @@ export default function ResenasPage() {
                             const rating = review?.seller_rating || 0;
                             return (
                               <div key={item.id} style={{ padding: '20px', borderRadius: '16px', background: 'rgba(255,255,255,0.03)', border: `1px solid ${themeColors.borderSubtle3}` }}>
-                                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: '12px' }}>
+                                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: '12px', flexWrap: 'wrap', gap: '8px' }}>
                                   <div>
                                     <h4 style={{ margin: '0 0 4px', color: 'var(--color-text-main)', fontSize: '1.1rem' }}>
                                       {item.profiles?.store_name || (item.profiles?.first_name ? `${item.profiles.first_name} ${item.profiles.last_name || ''}` : 'Negocio')}
@@ -474,7 +480,7 @@ export default function ResenasPage() {
                         ) : (
                           buyerCanceladas.map((item) => (
                             <div key={item.id} style={{ padding: '20px', borderRadius: '16px', background: 'rgba(255,0,0,0.03)', border: '1px solid rgba(255,0,0,0.2)' }}>
-                              <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: '12px' }}>
+                              <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: '12px', flexWrap: 'wrap', gap: '8px' }}>
                                 <div>
                                   <h4 style={{ margin: '0 0 4px', color: 'var(--color-text-main)', fontSize: '1.1rem' }}>
                                     {item.profiles?.store_name || (item.profiles?.first_name ? `${item.profiles.first_name} ${item.profiles.last_name || ''}` : 'Negocio')}
