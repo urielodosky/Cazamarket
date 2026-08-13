@@ -159,6 +159,23 @@ export default function MensajesPage() {
     };
 
     fetchChats();
+
+    const buyerChannel = supabase.channel('chats_buyer_list')
+      .on('postgres_changes', { event: '*', schema: 'public', table: 'chats', filter: `buyer_id=eq.${supabaseUser.id}` }, () => {
+        fetchChats();
+      })
+      .subscribe();
+
+    const sellerChannel = supabase.channel('chats_seller_list')
+      .on('postgres_changes', { event: '*', schema: 'public', table: 'chats', filter: `seller_id=eq.${supabaseUser.id}` }, () => {
+        fetchChats();
+      })
+      .subscribe();
+
+    return () => {
+      supabase.removeChannel(buyerChannel);
+      supabase.removeChannel(sellerChannel);
+    };
   }, [supabaseUser, supabase]);
 
   const currentChats = chats.filter(c => c.type === activeTab);

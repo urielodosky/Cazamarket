@@ -2,6 +2,7 @@
 
 import Image from 'next/image';
 import { useState, useEffect, Suspense } from 'react';
+import useSWR from 'swr';
 import { useAuth } from '@/contexts/AuthContext';
 import Link from 'next/link';
 import { useRouter, useSearchParams } from 'next/navigation';
@@ -17,89 +18,91 @@ function ProductosContent() {
   const { isVendorModeActive } = useAuth();
   const { hasFeature, permissions } = usePlan();
   const router = useRouter();
-  const [isLoading, setIsLoading] = useState(true);
+  
   const { isFavorite, toggleFavorite } = useFavorites();
   const { addToCart, canAddToCart } = useCart();
-  const [localProducts, setLocalProducts] = useState<any[]>([]);
   const [openMenuId, setOpenMenuId] = useState<number | null>(null);
   const [theme, setTheme] = useState<{primaryColor?: string, textColor?: string, bgColor?: string} | null>(null);
+  const fetcher = async () => {
+    const supabase = createClient();
+    let query = supabase.from('products').select('*, profiles(first_name, last_name, full_name, avatar_url, store_name, branches)');
+    
+    const { data: userData } = await supabase.auth.getUser();
+    if (isVendorModeActive && userData?.user) {
+      query = query.eq('user_id', userData.user.id);
+    }
+    
+    const { data, error } = await query;
+    if (error) throw error;
+    if (!data) return [];
+
+    const ratingsMap: Record<number, { sum: number, count: number }> = {};
+    try {
+      const { data: allReviews, error: revError } = await supabase
+        .from('reviews')
+        .select('product_rating, interactions!inner(product_id)')
+        .eq('interactions.status', 'published')
+        .not('interactions.product_id', 'is', null);
+        
+      if (allReviews && !revError) {
+        allReviews.forEach((r: any) => {
+          const pId = r.interactions?.product_id;
+          if (pId && r.product_rating) {
+            if (!ratingsMap[pId]) ratingsMap[pId] = { sum: 0, count: 0 };
+            ratingsMap[pId].sum += r.product_rating;
+            ratingsMap[pId].count += 1;
+          }
+        });
+      }
+    } catch (e) {
+      console.warn('Could not fetch reviews rating', e);
+    }
+
+    const localProf = localStorage.getItem('cazamarket_profile');
+    let parsedProf: any = null;
+    if (localProf) {
+      try { parsedProf = JSON.parse(localProf); } catch (e) {}
+    }
+    
+    return data.map(p => {
+      const isOwn = userData?.user?.id === p.user_id;
+      const fallbackStore = isOwn && parsedProf ? (parsedProf.storeName || parsedProf.username || parsedProf.firstName) : 'Usuario Anónimo';
+      const fallbackAvatar = isOwn && parsedProf?.avatar ? parsedProf.avatar : 'https://images.unsplash.com/photo-1511497584788-876760111969?q=80&w=200&auto=format&fit=crop';
+      
+      const ratingData = ratingsMap[p.id];
+      const averageRating = ratingData ? (ratingData.sum / ratingData.count).toFixed(1) : null;
+      
+      const profileObj = Array.isArray(p.profiles) ? p.profiles[0] : p.profiles;
+
+      return {
+        ...p,
+        store: profileObj?.store_name || profileObj?.full_name || fallbackStore || `${profileObj?.first_name || ''} ${profileObj?.last_name || ''}`.trim() || 'Usuario Anónimo',
+        avatar: profileObj?.avatar_url || fallbackAvatar,
+        branches: profileObj?.branches || (isOwn && parsedProf?.branches ? parsedProf.branches : []),
+        calculatedRating: averageRating
+      };
+    });
+  };
+
+  const { data: productsData, error: productsError, mutate } = useSWR(
+    ['productos', isVendorModeActive],
+    fetcher,
+    { revalidateOnFocus: false }
+  );
+
+  const localProducts = productsData || [];
+  const isLoading = !productsData && !productsError;
 
   const handleDeleteProduct = async (e: React.MouseEvent, id: any) => {
     e.stopPropagation();
     
     const supabase = createClient();
-    // Delete from Supabase (solo funciona si el usuario es el dueño gracias a RLS)
     await supabase.from('products').delete().eq('id', id);
 
-    const updated = localProducts.filter(p => String(p.id) !== String(id));
-    setLocalProducts(updated);
+    mutate(localProducts.filter((p: any) => String(p.id) !== String(id)), false);
   };
 
   useEffect(() => {
-    const fetchProducts = async () => {
-      const supabase = createClient();
-      let query = supabase.from('products').select('*, profiles(first_name, last_name, full_name, avatar_url, store_name, branches)');
-      
-      // En modo vendedor en esta vista específica, mostramos solo sus productos
-      // Opcional: si queremos que el vendedor vea el marketplace completo, podemos quitar esto
-      // pero mantenemos el comportamiento actual por ahora.
-      const { data: userData } = await supabase.auth.getUser();
-      if (isVendorModeActive && userData?.user) {
-        query = query.eq('user_id', userData.user.id);
-      }
-      
-      const { data, error } = await query;
-      if (data && !error) {
-        const ratingsMap: Record<number, { sum: number, count: number }> = {};
-        try {
-          const { data: allReviews, error: revError } = await supabase
-            .from('reviews')
-            .select('product_rating, interactions!inner(product_id)')
-            .eq('interactions.status', 'published')
-            .not('interactions.product_id', 'is', null);
-            
-          if (allReviews && !revError) {
-            allReviews.forEach((r: any) => {
-              const pId = r.interactions?.product_id;
-              if (pId && r.product_rating) {
-                if (!ratingsMap[pId]) ratingsMap[pId] = { sum: 0, count: 0 };
-                ratingsMap[pId].sum += r.product_rating;
-                ratingsMap[pId].count += 1;
-              }
-            });
-          }
-        } catch (e) {
-          console.warn('Could not fetch reviews rating', e);
-        }
-
-        // Fallback al perfil guardado localmente si es el mismo usuario
-        const localProf = localStorage.getItem('cazamarket_profile');
-        let parsedProf: any = null;
-        if (localProf) {
-          try { parsedProf = JSON.parse(localProf); } catch (e) {}
-        }
-        
-        const formattedData = data.map(p => {
-          const isOwn = userData?.user?.id === p.user_id;
-          const fallbackStore = isOwn && parsedProf ? (parsedProf.storeName || parsedProf.username || parsedProf.firstName) : 'Usuario Anónimo';
-          const fallbackAvatar = isOwn && parsedProf?.avatar ? parsedProf.avatar : 'https://images.unsplash.com/photo-1511497584788-876760111969?q=80&w=200&auto=format&fit=crop';
-          
-          const ratingData = ratingsMap[p.id];
-          const averageRating = ratingData ? (ratingData.sum / ratingData.count).toFixed(1) : null;
-
-          return {
-            ...p,
-            store: p.profiles?.store_name || p.profiles?.full_name || fallbackStore || `${p.profiles?.first_name || ''} ${p.profiles?.last_name || ''}`.trim() || 'Usuario Anónimo',
-            avatar: p.profiles?.avatar_url || fallbackAvatar,
-            branches: p.profiles?.branches || (isOwn && parsedProf?.branches ? parsedProf.branches : []),
-            calculatedRating: averageRating
-          };
-        });
-        setLocalProducts(formattedData);
-      }
-      setIsLoading(false);
-    };
-    fetchProducts();
 
     const savedProfile = localStorage.getItem('cazamarket_profile');
     if (savedProfile) {

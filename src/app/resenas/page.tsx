@@ -144,6 +144,25 @@ export default function ResenasPage() {
     };
 
     fetchInteractions();
+
+    if (!supabaseUser) return;
+    
+    const buyerChannel = supabase.channel('interactions_buyer_list')
+      .on('postgres_changes', { event: '*', schema: 'public', table: 'interactions', filter: `buyer_id=eq.${supabaseUser.id}` }, () => {
+        fetchInteractions();
+      })
+      .subscribe();
+
+    const sellerChannel = supabase.channel('interactions_seller_list')
+      .on('postgres_changes', { event: '*', schema: 'public', table: 'interactions', filter: `seller_id=eq.${supabaseUser.id}` }, () => {
+        fetchInteractions();
+      })
+      .subscribe();
+
+    return () => {
+      supabase.removeChannel(buyerChannel);
+      supabase.removeChannel(sellerChannel);
+    };
   }, [activeMainTab, isMounted, isLoggedIn, supabaseUser, isVendor]);
 
   const openBuyerReviewModal = (id: string, productId: string | null) => {
