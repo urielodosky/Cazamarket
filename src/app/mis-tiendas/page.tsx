@@ -13,6 +13,7 @@ import { CATEGORIES_DATA } from '@/constants/categoriesData';
 import { createClient } from '@/lib/supabase/client';
 import ImageCropperModal from '@/components/ImageCropperModal';
 import getCroppedImg from '@/utils/cropImage';
+import BusinessTagInput, { BusinessTag } from '@/components/BusinessTagInput';
 
 const PROVINCES_MAP: Record<string, string> = {
   "02": "Ciudad Autónoma de Buenos Aires",
@@ -105,7 +106,7 @@ const ensureCategoriesArray = (raw: any, targetLen: number = 3): string[] => {
 };
 
 export default function MiNegocioPage() {
-  const { isVendorModeActive, username, email, avatar, coverUrl, updateUser, storeDescription, businessType: authBusinessType, storeCategories, storeTheme, phone, province, locality, street, streetNumber, branches, socialMedia, supabaseUser } = useAuth();
+  const { isVendorModeActive, username, email, avatar, coverUrl, updateUser, storeDescription, businessType: authBusinessType, storeCategories, storeTheme, phone, province, locality, street, streetNumber, branches, socialMedia, supabaseUser, providers, distributors } = useAuth();
   const { permissions, planTier, planDisplayName } = usePlan();
   const themeColors = useThemeColors();
   const [activeTab, setActiveTab] = useState<'productos' | 'servicios' | 'informacion' | 'apariencia'>('productos');
@@ -122,6 +123,8 @@ export default function MiNegocioPage() {
   const [businessType, setBusinessType] = useState(authBusinessType || '');
   const [categories, setCategories] = useState(storeCategories?.length > 0 ? storeCategories : ['', '', '']);
   const [storeBanner, setStoreBanner] = useState(coverUrl || null);
+  const [providersList, setProvidersList] = useState<BusinessTag[]>(providers || []);
+  const [distributorsList, setDistributorsList] = useState<BusinessTag[]>(distributors || []);
 
   const [cropImageSrc, setCropImageSrc] = useState<string | null>(null);
   const [cropType, setCropType] = useState<'avatar' | 'banner' | null>(null);
@@ -168,7 +171,9 @@ export default function MiNegocioPage() {
     if (socialMedia?.length > 0) setRedesSociales(socialMedia);
     if (branches?.length > 0) setSucursales(branches);
     if (coverUrl) setStoreBanner(coverUrl);
-  }, [storeTheme, storeDescription, username, authBusinessType, storeCategories, phone, socialMedia, branches, coverUrl]);
+    setProvidersList(providers || []);
+    setDistributorsList(distributors || []);
+  }, [storeTheme, storeDescription, username, authBusinessType, storeCategories, phone, socialMedia, branches, coverUrl, providers, distributors]);
 
   React.useEffect(() => {
     // Auto-select first available tab if default is not available
@@ -531,7 +536,44 @@ export default function MiNegocioPage() {
                 {description || 'Haz clic aquí para añadir una descripción a tu tienda...'}
               </p>
             )}
+            <EditButton onClick={() => setIsEditingDesc(true)} style={{ top: '24px', right: '24px' }} label={description ? 'Editar Descripción' : 'Añadir Descripción'} />
           </div>
+          
+          {/* Business Relations (Proveedores y Distribuidores) */}
+          {(businessType === 'Minorista' || businessType === 'Mayorista' || businessType === 'Mixto') && (
+            <div style={{ display: 'flex', flexDirection: 'column', gap: '24px', marginBottom: '40px', padding: '24px', background: 'rgba(255,255,255,0.02)', borderRadius: 'var(--radius-md)' }}>
+              <h3 style={{ margin: 0, fontSize: '1.1rem', color: 'var(--color-text-main)', display: 'flex', alignItems: 'center', gap: '8px' }}>
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"></path><circle cx="9" cy="7" r="4"></circle><path d="M23 21v-2a4 4 0 0 0-3-3.87"></path><path d="M16 3.13a4 4 0 0 1 0 7.75"></path></svg>
+                Red de Alianzas Comerciales
+              </h3>
+              
+              <div style={{ display: 'flex', flexDirection: 'column', gap: '20px' }}>
+                {(businessType === 'Minorista' || businessType === 'Mixto') && (
+                  <BusinessTagInput 
+                    label="Mis Proveedores" 
+                    tags={providersList} 
+                    onChange={(tags) => {
+                      setProvidersList(tags);
+                      updateUser({ providers: tags });
+                    }} 
+                    placeholder="Buscar o escribir nombre de proveedor..." 
+                  />
+                )}
+                
+                {(businessType === 'Mayorista' || businessType === 'Mixto') && (
+                  <BusinessTagInput 
+                    label="Mis Distribuidores" 
+                    tags={distributorsList} 
+                    onChange={(tags) => {
+                      setDistributorsList(tags);
+                      updateUser({ distributors: tags });
+                    }} 
+                    placeholder="Buscar o escribir nombre de distribuidor..." 
+                  />
+                )}
+              </div>
+            </div>
+          )}
 
           {/* Tabs Navigation */}
           <div style={{ display: 'flex', borderBottom: '1px solid var(--color-border)', marginBottom: '32px' }}>

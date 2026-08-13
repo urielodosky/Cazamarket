@@ -32,13 +32,16 @@ type AuthContextType = {
   storeTheme: any;
   storeCategories: any[];
   businessType: string;
+  providers: any[];
+  distributors: any[];
   trustScore: number;
   logout: () => Promise<void>;
   updateUser: (data: { 
     username?: string, avatar?: string, personType?: string, birthDate?: string, cuit?: string, phone?: string, contactEmail?: string,
     firstName?: string, lastName?: string, storeName?: string, storeDescription?: string, street?: string, streetNumber?: string, province?: string, locality?: string,
     socialMedia?: any[], branches?: any[], schedules?: any[], role?: string, phone_verified?: boolean,
-    storeTheme?: any, storeCategories?: any[], businessType?: string, coverUrl?: string
+    storeTheme?: any, storeCategories?: any[], businessType?: string, coverUrl?: string,
+    providers?: any[], distributors?: any[]
   }) => Promise<void>;
   toggleVendorMode: () => void;
   upgradeToVendor: () => Promise<void>;
@@ -74,7 +77,9 @@ const AuthContext = createContext<AuthContextType>({
   storeTheme: null,
   storeCategories: [],
   businessType: '',
-  trustScore: 100,
+  providers: [],
+  distributors: [],
+  trustScore: 0,
   logout: async () => {},
   updateUser: async () => {},
   toggleVendorMode: () => {},
@@ -112,7 +117,9 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
   const [storeTheme, setStoreTheme] = useState<any>(null);
   const [storeCategories, setStoreCategories] = useState<any[]>([]);
   const [businessType, setBusinessType] = useState('');
-  const [trustScore, setTrustScore] = useState(100);
+  const [providers, setProviders] = useState<any[]>([]);
+  const [distributors, setDistributors] = useState<any[]>([]);
+  const [trustScore, setTrustScore] = useState(0);
   const [supabaseUser, setSupabaseUser] = useState<any>(null);
 
   useEffect(() => {
@@ -147,6 +154,9 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
         setStoreTheme(null);
         setStoreCategories([]);
         setBusinessType('');
+        setProviders([]);
+        setDistributors([]);
+        setTrustScore(0);
         return;
       }
 
@@ -186,7 +196,6 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
         setCuit(profile.cuit || '');
         setPhone(profile.phone || '');
         setPhoneVerified(profile.phone_verified || false);
-        setTrustScore(profile.trust_score ?? 100);
         setContactEmail(profile.contact_email || user.email || '');
         setFirstName(profile.first_name || '');
         setLastName(profile.last_name || '');
@@ -203,6 +212,10 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
         setStoreTheme(profile.store_theme || null);
         setStoreCategories(profile.store_categories || []);
         setBusinessType(profile.business_type || '');
+        setProviders(profile.providers || []);
+        setDistributors(profile.distributors || []);
+        setTrustScore(profile.trust_score || 0);
+
         if (profile.role !== 'negocio') {
           setIsVendorModeActive(false);
           localStorage.setItem('cazamarket_vendor_mode', 'false');
@@ -241,7 +254,8 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
     username?: string, avatar?: string, personType?: string, birthDate?: string, cuit?: string, phone?: string, contactEmail?: string,
     firstName?: string, lastName?: string, storeName?: string, storeDescription?: string, street?: string, streetNumber?: string, province?: string, locality?: string,
     socialMedia?: any[], branches?: any[], schedules?: any[], role?: string, phone_verified?: boolean,
-    storeTheme?: any, storeCategories?: any[], businessType?: string, coverUrl?: string
+    storeTheme?: any, storeCategories?: any[], businessType?: string, coverUrl?: string,
+    providers?: any[], distributors?: any[]
   }) => {
     // Actualizar base de datos
     if (supabaseUser) {
@@ -279,8 +293,11 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
       if (data.schedules !== undefined) updates.schedules = data.schedules;
       if (data.role !== undefined) updates.role = data.role;
       if (data.storeTheme !== undefined) updates.store_theme = data.storeTheme;
-      if (data.storeCategories !== undefined) updates.store_categories = data.storeCategories;
-      if (data.businessType !== undefined) updates.business_type = data.businessType;
+      if (data.storeCategories !== undefined) { updates.store_categories = data.storeCategories; setStoreCategories(data.storeCategories); }
+      if (data.businessType !== undefined) { updates.business_type = data.businessType; setBusinessType(data.businessType); }
+      if (data.providers !== undefined) { updates.providers = data.providers; setProviders(data.providers); }
+      if (data.distributors !== undefined) { updates.distributors = data.distributors; setDistributors(data.distributors); }
+      if (data.coverUrl !== undefined) { updates.cover_url = data.coverUrl; setCoverUrl(data.coverUrl); }
       const { error } = await supabase.from('profiles').update(updates).eq('id', supabaseUser.id);
       if (error) {
         console.error("Error updating profile in Supabase:", error.message || 'Unknown error');
@@ -296,7 +313,6 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
       if (data.contactEmail !== undefined) setContactEmail(data.contactEmail);
       if (data.firstName !== undefined) setFirstName(data.firstName);
       if (data.lastName !== undefined) setLastName(data.lastName);
-      if (data.coverUrl !== undefined) setCoverUrl(data.coverUrl);
       if (data.storeName !== undefined) setStoreName(data.storeName);
       if (data.storeDescription !== undefined) setStoreDescription(data.storeDescription);
       if (data.street !== undefined) setStreet(data.street);
@@ -307,8 +323,6 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
       if (data.branches !== undefined) setBranches(data.branches);
       if (data.schedules !== undefined) setSchedules(data.schedules);
       if (data.storeTheme !== undefined) setStoreTheme(data.storeTheme);
-      if (data.storeCategories !== undefined) setStoreCategories(data.storeCategories);
-      if (data.businessType !== undefined) setBusinessType(data.businessType);
       if (data.role === 'negocio') {
         setIsVendor(true);
         setIsVendorModeActive(true);
@@ -370,6 +384,8 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
       storeTheme,
       storeCategories,
       businessType,
+      providers,
+      distributors,
       trustScore,
       logout,
       updateUser, toggleVendorMode, upgradeToVendor,

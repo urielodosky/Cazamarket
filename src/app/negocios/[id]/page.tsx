@@ -82,7 +82,9 @@ const BLANK_NEGOCIO = {
   servicesCount: 0,
   phone: 'No especificado',
   hours: 'Consultar horarios',
-  socials: []
+  socials: [],
+  providers: [],
+  distributors: []
 };
 
 export default function NegocioDetailPage({ params }: { params: Promise<{ id: string }> }) {
@@ -226,6 +228,8 @@ export default function NegocioDetailPage({ params }: { params: Promise<{ id: st
             description: profile.store_description || 'Bienvenido a mi tienda oficial en CazaMarket.',
             avatar: profile.avatar_url || 'https://images.unsplash.com/photo-1511497584788-876760111969?q=80&w=200&auto=format&fit=crop',
             phone: profile.phone || 'No especificado',
+            providers: profile.providers || [],
+            distributors: profile.distributors || [],
             productsCount: prods ? prods.length : 0,
             servicesCount: servs ? servs.length : 0,
             productSections: prods && prods.length > 0 ? [{ name: 'Catálogo', products: prods }] : [],
@@ -1409,22 +1413,73 @@ export default function NegocioDetailPage({ params }: { params: Promise<{ id: st
                    {/* Otras Direcciones Block */}
                    {negocio.otherLocations && negocio.otherLocations.length > 0 && (
                      <div>
-                       <h3 style={{ margin: '0 0 24px 0', color: 'var(--color-primary)', display: 'flex', alignItems: 'center', gap: '8px' }}>
-                        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M12 22s-8-4.5-8-11.8A8 8 0 0 1 12 2a8 8 0 0 1 8 8.2c0 7.3-8 11.8-8 11.8z"></path><circle cx="12" cy="10" r="3"></circle></svg>
-                        Otras Direcciones
-                       </h3>
-                       <div style={{ display: 'flex', flexDirection: 'column', gap: '16px' }}>
+                       <h3 style={{ margin: '0 0 16px 0', color: 'var(--color-primary)' }}>Otras Direcciones</h3>
+                       <div style={{ display: 'flex', flexDirection: 'column', gap: '12px' }}>
                          {negocio.otherLocations.map((loc: any, i: number) => (
-                           <div key={`other-${i}`} style={{ padding: '16px', background: 'rgba(255,255,255,0.03)', borderRadius: 'var(--radius-md)', borderLeft: '3px solid var(--color-text-muted)' }}>
-                             <div style={{ fontWeight: 600, fontSize: '1.05rem', color: 'var(--color-text-main)', marginBottom: '4px' }}>{loc.name}</div>
-                             <div style={{ color: 'var(--color-text-muted)', fontSize: '0.9rem', marginBottom: '8px' }}>{loc.description}</div>
-                             <div style={{ color: 'var(--color-text-muted)', fontSize: '0.85rem', display: 'flex', alignItems: 'center', gap: '6px' }}>
-                               <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"></path><circle cx="12" cy="10" r="3"></circle></svg>
-                               {loc.city}, Provincia de {loc.province}
-                             </div>
+                           <div key={`other-${i}`} style={{ padding: '12px', background: 'rgba(255,255,255,0.03)', borderRadius: 'var(--radius-md)' }}>
+                             📍 {loc.name ? `${loc.name}: ${loc.address || loc.description}` : loc}
                            </div>
                          ))}
                        </div>
+                     </div>
+                   )}
+                   
+                   {/* Proveedores y Distribuidores */}
+                   {(negocio.providers?.length > 0 || negocio.distributors?.length > 0) && (
+                     <div style={{ display: 'flex', flexDirection: 'column', gap: '32px', marginTop: '16px' }}>
+                       {negocio.providers?.length > 0 && (
+                         <div>
+                           <h3 style={{ margin: '0 0 16px 0', color: 'var(--color-primary)', display: 'flex', alignItems: 'center', gap: '8px' }}>
+                             <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"></path><circle cx="9" cy="7" r="4"></circle><path d="M23 21v-2a4 4 0 0 0-3-3.87"></path><path d="M16 3.13a4 4 0 0 1 0 7.75"></path></svg>
+                             Nuestros Proveedores
+                           </h3>
+                           <div style={{ display: 'flex', flexWrap: 'wrap', gap: '12px' }}>
+                             {negocio.providers.map((p: any, i: number) => (
+                               <div key={i} onClick={() => p.id ? router.push(`/negocios/${p.id}`) : null} style={{
+                                 display: 'flex', alignItems: 'center', gap: '10px', background: 'rgba(255,255,255,0.03)', border: '1px solid var(--color-border)',
+                                 padding: '8px 16px', borderRadius: 'var(--radius-full)', cursor: p.id ? 'pointer' : 'default', transition: 'all 0.2s'
+                               }} onMouseEnter={p.id ? (e) => { e.currentTarget.style.borderColor = 'var(--color-primary)'; e.currentTarget.style.background = 'rgba(255,115,0,0.05)'; } : undefined}
+                                  onMouseLeave={p.id ? (e) => { e.currentTarget.style.borderColor = 'var(--color-border)'; e.currentTarget.style.background = 'rgba(255,255,255,0.03)'; } : undefined}>
+                                 {p.avatar ? (
+                                   <img src={p.avatar} alt={p.name} style={{ width: '28px', height: '28px', borderRadius: '50%', objectFit: 'cover' }} />
+                                 ) : (
+                                   <div style={{ width: '28px', height: '28px', borderRadius: '50%', background: 'var(--color-border)', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+                                     <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="var(--color-text-muted)" strokeWidth="2"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path><circle cx="12" cy="7" r="4"></circle></svg>
+                                   </div>
+                                 )}
+                                 <span style={{ fontWeight: p.id ? 600 : 400, color: p.id ? 'var(--color-text-main)' : 'var(--color-text-muted)' }}>{p.name}</span>
+                               </div>
+                             ))}
+                           </div>
+                         </div>
+                       )}
+
+                       {negocio.distributors?.length > 0 && (
+                         <div>
+                           <h3 style={{ margin: '0 0 16px 0', color: 'var(--color-primary)', display: 'flex', alignItems: 'center', gap: '8px' }}>
+                             <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"></path><circle cx="9" cy="7" r="4"></circle><path d="M23 21v-2a4 4 0 0 0-3-3.87"></path><path d="M16 3.13a4 4 0 0 1 0 7.75"></path></svg>
+                             Nuestros Distribuidores
+                           </h3>
+                           <div style={{ display: 'flex', flexWrap: 'wrap', gap: '12px' }}>
+                             {negocio.distributors.map((d: any, i: number) => (
+                               <div key={i} onClick={() => d.id ? router.push(`/negocios/${d.id}`) : null} style={{
+                                 display: 'flex', alignItems: 'center', gap: '10px', background: 'rgba(255,255,255,0.03)', border: '1px solid var(--color-border)',
+                                 padding: '8px 16px', borderRadius: 'var(--radius-full)', cursor: d.id ? 'pointer' : 'default', transition: 'all 0.2s'
+                               }} onMouseEnter={d.id ? (e) => { e.currentTarget.style.borderColor = 'var(--color-primary)'; e.currentTarget.style.background = 'rgba(255,115,0,0.05)'; } : undefined}
+                                  onMouseLeave={d.id ? (e) => { e.currentTarget.style.borderColor = 'var(--color-border)'; e.currentTarget.style.background = 'rgba(255,255,255,0.03)'; } : undefined}>
+                                 {d.avatar ? (
+                                   <img src={d.avatar} alt={d.name} style={{ width: '28px', height: '28px', borderRadius: '50%', objectFit: 'cover' }} />
+                                 ) : (
+                                   <div style={{ width: '28px', height: '28px', borderRadius: '50%', background: 'var(--color-border)', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+                                     <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="var(--color-text-muted)" strokeWidth="2"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path><circle cx="12" cy="7" r="4"></circle></svg>
+                                   </div>
+                                 )}
+                                 <span style={{ fontWeight: d.id ? 600 : 400, color: d.id ? 'var(--color-text-main)' : 'var(--color-text-muted)' }}>{d.name}</span>
+                               </div>
+                             ))}
+                           </div>
+                         </div>
+                       )}
                      </div>
                    )}
                 </div>
