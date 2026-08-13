@@ -12,6 +12,22 @@ export default function ResenasPage() {
   const themeColors = useThemeColors();
   const supabase = createClient();
 
+  const getSafeImageUrl = (url: string | null | undefined, type: 'avatar' | 'product') => {
+    if (!url) return type === 'avatar' ? '/default-avatar.png' : '/placeholder.jpg';
+    if (url.startsWith('http') || url.startsWith('/')) return url;
+    
+    // Si la URL es solo un string del id de supabase o una ruta parcial del storage
+    const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL || '';
+    if (supabaseUrl && !url.includes('supabase.co')) {
+       return `${supabaseUrl}/storage/v1/object/public/avatars/${url}`;
+    }
+    if (url.includes('supabase.co') && !url.startsWith('http')) {
+       return `https://${url}`;
+    }
+    return url;
+  };
+
+
   // Tab principal: 'mis-resenas' (como vendedor) o 'resenas-dadas' (como comprador)
   // Por defecto, si es vendedor arranca en mis-resenas, si no, en resenas-dadas
   const [activeMainTab, setActiveMainTab] = useState<'mis-resenas' | 'resenas-dadas'>(isVendor ? 'mis-resenas' : 'resenas-dadas');
@@ -192,12 +208,12 @@ export default function ResenasPage() {
         <div style={{ 
           display: 'flex', gap: '8px', marginBottom: '24px', 
           background: themeColors.bgSubtle2, padding: '6px', borderRadius: '16px',
-          overflowX: 'auto'
+          overflowX: 'auto', whiteSpace: 'nowrap', width: '100%'
         }}>
           <button
             onClick={() => setActiveMainTab('mis-resenas')}
             style={{
-              flex: 1, padding: '12px 24px', borderRadius: '12px', border: 'none', cursor: 'pointer',
+              flexShrink: 0, flex: 1, padding: '12px 24px', borderRadius: '12px', border: 'none', cursor: 'pointer',
               fontWeight: 600, fontSize: '0.95rem', transition: 'all 0.2s ease',
               background: activeMainTab === 'mis-resenas' ? 'var(--color-bg-surface-elevated)' : 'transparent',
               color: activeMainTab === 'mis-resenas' ? 'var(--color-primary)' : 'var(--color-text-muted)',
@@ -210,7 +226,7 @@ export default function ResenasPage() {
           <button
             onClick={() => setActiveMainTab('resenas-dadas')}
             style={{
-              flex: 1, padding: '12px 24px', borderRadius: '12px', border: 'none', cursor: 'pointer',
+              flexShrink: 0, flex: 1, padding: '12px 24px', borderRadius: '12px', border: 'none', cursor: 'pointer',
               fontWeight: 600, fontSize: '0.95rem', transition: 'all 0.2s ease',
               background: activeMainTab === 'resenas-dadas' ? 'var(--color-bg-surface-elevated)' : 'transparent',
               color: activeMainTab === 'resenas-dadas' ? 'var(--color-primary)' : 'var(--color-text-muted)',
@@ -234,11 +250,11 @@ export default function ResenasPage() {
           {activeMainTab === 'mis-resenas' && (
             <>
               {/* Subtabs de Mis Reseñas */}
-              <div style={{ display: 'flex', gap: '20px', borderBottom: `1px solid ${themeColors.borderSubtle3}`, marginBottom: '24px', overflowX: 'auto', whiteSpace: 'nowrap' }}>
+              <div style={{ display: 'flex', gap: '20px', borderBottom: `1px solid ${themeColors.borderSubtle3}`, marginBottom: '24px', overflowX: 'auto', whiteSpace: 'nowrap', width: '100%' }}>
                 <button
                   onClick={() => setActiveSubTabMisResenas('pendientes')}
                   style={{
-                    padding: '0 0 12px', border: 'none', background: 'transparent', cursor: 'pointer',
+                    flexShrink: 0, padding: '0 0 12px', border: 'none', background: 'transparent', cursor: 'pointer',
                     fontWeight: activeSubTabMisResenas === 'pendientes' ? 700 : 500, fontSize: '0.95rem',
                     color: activeSubTabMisResenas === 'pendientes' ? 'var(--color-primary)' : 'var(--color-text-muted)',
                     borderBottom: activeSubTabMisResenas === 'pendientes' ? '2px solid var(--color-primary)' : '2px solid transparent',
@@ -250,7 +266,7 @@ export default function ResenasPage() {
                 <button
                   onClick={() => setActiveSubTabMisResenas('recibidas')}
                   style={{
-                    padding: '0 0 12px', border: 'none', background: 'transparent', cursor: 'pointer',
+                    flexShrink: 0, padding: '0 0 12px', border: 'none', background: 'transparent', cursor: 'pointer',
                     fontWeight: activeSubTabMisResenas === 'recibidas' ? 700 : 500, fontSize: '0.95rem',
                     color: activeSubTabMisResenas === 'recibidas' ? 'var(--color-primary)' : 'var(--color-text-muted)',
                     borderBottom: activeSubTabMisResenas === 'recibidas' ? '2px solid var(--color-primary)' : '2px solid transparent',
@@ -262,7 +278,7 @@ export default function ResenasPage() {
                 <button
                   onClick={() => setActiveSubTabMisResenas('canceladas')}
                   style={{
-                    padding: '0 0 12px', border: 'none', background: 'transparent', cursor: 'pointer',
+                    flexShrink: 0, padding: '0 0 12px', border: 'none', background: 'transparent', cursor: 'pointer',
                     fontWeight: activeSubTabMisResenas === 'canceladas' ? 700 : 500, fontSize: '0.95rem',
                     color: activeSubTabMisResenas === 'canceladas' ? 'var(--color-primary)' : 'var(--color-text-muted)',
                     borderBottom: activeSubTabMisResenas === 'canceladas' ? '2px solid var(--color-primary)' : '2px solid transparent',
@@ -287,14 +303,34 @@ export default function ResenasPage() {
                           sellerPendientes.map((item) => (
                             <div key={item.id} style={{ padding: '20px', borderRadius: '16px', background: 'rgba(255,255,255,0.03)', border: `1px solid ${themeColors.borderSubtle3}` }}>
                               <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap', gap: '12px' }}>
-                                <div>
-                                  <h4 style={{ margin: '0 0 4px', color: 'var(--color-text-main)', fontSize: '1.1rem' }}>
-                                    {item.profiles?.first_name ? `${item.profiles.first_name} ${item.profiles.last_name || ''}` : 'Usuario'}
-                                  </h4>
-                                  <span style={{ color: 'var(--color-text-muted)', fontSize: '0.85rem' }}>
-                                    {item.products ? `Compra: ${item.products.name}` : 'Interacción: General/Servicio'}
-                                  </span>
-                                </div>
+                                
+  <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
+    <img 
+      src={getSafeImageUrl(item.profiles?.avatar_url, 'avatar')} 
+      alt="Avatar" 
+      style={{ width: '40px', height: '40px', borderRadius: '50%', objectFit: 'cover' }} 
+      onError={(e) => { e.currentTarget.src = 'https://ui-avatars.com/api/?name=' + (item.profiles?.first_name || 'U'); }} 
+    />
+    <div>
+      <h4 style={{ margin: '0 0 4px', color: 'var(--color-text-main)', fontSize: '1.1rem' }}>
+        {item.profiles?.first_name ? `${item.profiles.first_name} ${item.profiles.last_name || ''}` : 'Usuario'}
+      </h4>
+      <div style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
+        {item.products?.image && (
+          <img 
+            src={getSafeImageUrl(item.products.image, 'product')} 
+            alt="Producto" 
+            style={{ width: '20px', height: '20px', borderRadius: '4px', objectFit: 'cover' }} 
+            onError={(e) => { e.currentTarget.style.display = 'none'; }} 
+          />
+        )}
+        <span style={{ color: 'var(--color-text-muted)', fontSize: '0.85rem' }}>
+          {item.products ? `Compra: ${item.products.name}` : 'Interacción: General/Servicio'}
+        </span>
+      </div>
+    </div>
+  </div>
+  
                                 <div style={{ display: 'flex', gap: '8px' }}>
                                   <button onClick={() => handleAcceptInteraction(item.id)} style={{ padding: '8px 16px', borderRadius: '8px', border: 'none', background: 'var(--color-primary)', color: '#fff', cursor: 'pointer', fontWeight: 600 }}>Aceptar</button>
                                   <button onClick={() => handleRejectInteraction(item.id)} style={{ padding: '8px 16px', borderRadius: '8px', border: `1px solid ${themeColors.borderSubtle3}`, background: 'transparent', color: 'var(--color-text-main)', cursor: 'pointer', fontWeight: 600 }}>Rechazar</button>
@@ -317,14 +353,34 @@ export default function ResenasPage() {
                             return (
                               <div key={item.id} style={{ padding: '20px', borderRadius: '16px', background: 'rgba(255,255,255,0.03)', border: `1px solid ${themeColors.borderSubtle3}` }}>
                                 <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: '12px', flexWrap: 'wrap', gap: '8px' }}>
-                                  <div>
-                                    <h4 style={{ margin: '0 0 4px', color: 'var(--color-text-main)', fontSize: '1.1rem' }}>
-                                      {item.profiles?.first_name ? `${item.profiles.first_name} ${item.profiles.last_name || ''}` : 'Usuario'}
-                                    </h4>
-                                    <span style={{ color: 'var(--color-text-muted)', fontSize: '0.85rem' }}>
-                                      {item.products ? `Compra: ${item.products.name}` : 'Interacción: General/Servicio'}
-                                    </span>
-                                  </div>
+                                  
+  <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
+    <img 
+      src={getSafeImageUrl(item.profiles?.avatar_url, 'avatar')} 
+      alt="Avatar" 
+      style={{ width: '40px', height: '40px', borderRadius: '50%', objectFit: 'cover' }} 
+      onError={(e) => { e.currentTarget.src = 'https://ui-avatars.com/api/?name=' + (item.profiles?.first_name || 'U'); }} 
+    />
+    <div>
+      <h4 style={{ margin: '0 0 4px', color: 'var(--color-text-main)', fontSize: '1.1rem' }}>
+        {item.profiles?.first_name ? `${item.profiles.first_name} ${item.profiles.last_name || ''}` : 'Usuario'}
+      </h4>
+      <div style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
+        {item.products?.image && (
+          <img 
+            src={getSafeImageUrl(item.products.image, 'product')} 
+            alt="Producto" 
+            style={{ width: '20px', height: '20px', borderRadius: '4px', objectFit: 'cover' }} 
+            onError={(e) => { e.currentTarget.style.display = 'none'; }} 
+          />
+        )}
+        <span style={{ color: 'var(--color-text-muted)', fontSize: '0.85rem' }}>
+          {item.products ? `Compra: ${item.products.name}` : 'Interacción: General/Servicio'}
+        </span>
+      </div>
+    </div>
+  </div>
+  
                                   <div style={{ display: 'flex', gap: '4px' }}>
                                     {[1, 2, 3, 4, 5].map(star => (
                                       <svg key={star} width="16" height="16" viewBox="0 0 24 24" fill={star <= rating ? "#FFD700" : "none"} stroke="#FFD700" strokeWidth="2"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"></polygon></svg>
@@ -346,14 +402,34 @@ export default function ResenasPage() {
                           sellerCanceladas.map((item) => (
                             <div key={item.id} style={{ padding: '20px', borderRadius: '16px', background: 'rgba(255,255,255,0.03)', border: `1px solid ${themeColors.borderSubtle3}` }}>
                               <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', flexWrap: 'wrap', gap: '8px' }}>
-                                <div>
-                                  <h4 style={{ margin: '0 0 4px', color: 'var(--color-text-main)', fontSize: '1.1rem' }}>
-                                    {item.profiles?.first_name ? `${item.profiles.first_name} ${item.profiles.last_name || ''}` : 'Usuario'}
-                                  </h4>
-                                  <span style={{ color: 'var(--color-text-muted)', fontSize: '0.85rem' }}>
-                                    {item.products ? `Compra: ${item.products.name}` : 'Interacción: General/Servicio'}
-                                  </span>
-                                </div>
+                                
+  <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
+    <img 
+      src={getSafeImageUrl(item.profiles?.avatar_url, 'avatar')} 
+      alt="Avatar" 
+      style={{ width: '40px', height: '40px', borderRadius: '50%', objectFit: 'cover' }} 
+      onError={(e) => { e.currentTarget.src = 'https://ui-avatars.com/api/?name=' + (item.profiles?.first_name || 'U'); }} 
+    />
+    <div>
+      <h4 style={{ margin: '0 0 4px', color: 'var(--color-text-main)', fontSize: '1.1rem' }}>
+        {item.profiles?.first_name ? `${item.profiles.first_name} ${item.profiles.last_name || ''}` : 'Usuario'}
+      </h4>
+      <div style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
+        {item.products?.image && (
+          <img 
+            src={getSafeImageUrl(item.products.image, 'product')} 
+            alt="Producto" 
+            style={{ width: '20px', height: '20px', borderRadius: '4px', objectFit: 'cover' }} 
+            onError={(e) => { e.currentTarget.style.display = 'none'; }} 
+          />
+        )}
+        <span style={{ color: 'var(--color-text-muted)', fontSize: '0.85rem' }}>
+          {item.products ? `Compra: ${item.products.name}` : 'Interacción: General/Servicio'}
+        </span>
+      </div>
+    </div>
+  </div>
+  
                                 <span style={{ padding: '4px 8px', borderRadius: '4px', background: 'rgba(255,0,0,0.1)', color: '#ff6b6b', fontSize: '0.8rem', fontWeight: 'bold' }}>
                                   {item.status === 'appealed' ? 'Apelada' : 'Rechazada'}
                                 </span>
@@ -372,11 +448,11 @@ export default function ResenasPage() {
           {activeMainTab === 'resenas-dadas' && (
             <>
               {/* Subtabs de Reseñas Dadas */}
-              <div style={{ display: 'flex', gap: '20px', borderBottom: `1px solid ${themeColors.borderSubtle3}`, marginBottom: '24px', overflowX: 'auto', whiteSpace: 'nowrap' }}>
+              <div style={{ display: 'flex', gap: '20px', borderBottom: `1px solid ${themeColors.borderSubtle3}`, marginBottom: '24px', overflowX: 'auto', whiteSpace: 'nowrap', width: '100%' }}>
                 <button
                   onClick={() => setActiveSubTabResenasDadas('pendientes')}
                   style={{
-                    padding: '0 0 12px', border: 'none', background: 'transparent', cursor: 'pointer',
+                    flexShrink: 0, padding: '0 0 12px', border: 'none', background: 'transparent', cursor: 'pointer',
                     fontWeight: activeSubTabResenasDadas === 'pendientes' ? 700 : 500, fontSize: '0.95rem',
                     color: activeSubTabResenasDadas === 'pendientes' ? 'var(--color-primary)' : 'var(--color-text-muted)',
                     borderBottom: activeSubTabResenasDadas === 'pendientes' ? '2px solid var(--color-primary)' : '2px solid transparent',
@@ -388,7 +464,7 @@ export default function ResenasPage() {
                 <button
                   onClick={() => setActiveSubTabResenasDadas('dadas')}
                   style={{
-                    padding: '0 0 12px', border: 'none', background: 'transparent', cursor: 'pointer',
+                    flexShrink: 0, padding: '0 0 12px', border: 'none', background: 'transparent', cursor: 'pointer',
                     fontWeight: activeSubTabResenasDadas === 'dadas' ? 700 : 500, fontSize: '0.95rem',
                     color: activeSubTabResenasDadas === 'dadas' ? 'var(--color-primary)' : 'var(--color-text-muted)',
                     borderBottom: activeSubTabResenasDadas === 'dadas' ? '2px solid var(--color-primary)' : '2px solid transparent',
@@ -400,7 +476,7 @@ export default function ResenasPage() {
                 <button
                   onClick={() => setActiveSubTabResenasDadas('canceladas')}
                   style={{
-                    padding: '0 0 12px', border: 'none', background: 'transparent', cursor: 'pointer',
+                    flexShrink: 0, padding: '0 0 12px', border: 'none', background: 'transparent', cursor: 'pointer',
                     fontWeight: activeSubTabResenasDadas === 'canceladas' ? 700 : 500, fontSize: '0.95rem',
                     color: activeSubTabResenasDadas === 'canceladas' ? 'var(--color-primary)' : 'var(--color-text-muted)',
                     borderBottom: activeSubTabResenasDadas === 'canceladas' ? '2px solid var(--color-primary)' : '2px solid transparent',
@@ -426,14 +502,34 @@ export default function ResenasPage() {
                           buyerPendientes.map((item) => (
                             <div key={item.id} style={{ padding: '20px', borderRadius: '16px', background: 'rgba(255,255,255,0.03)', border: `1px solid ${themeColors.borderSubtle3}` }}>
                               <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap', gap: '12px' }}>
-                                <div>
-                                  <h4 style={{ margin: '0 0 4px', color: 'var(--color-text-main)', fontSize: '1.1rem' }}>
-                                    {item.profiles?.store_name || (item.profiles?.first_name ? `${item.profiles.first_name} ${item.profiles.last_name || ''}` : 'Negocio')}
-                                  </h4>
-                                  <span style={{ color: 'var(--color-text-muted)', fontSize: '0.85rem' }}>
-                                    {item.products ? `Producto: ${item.products.name}` : 'Interacción: General/Servicio'}
-                                  </span>
-                                </div>
+                                
+  <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
+    <img 
+      src={getSafeImageUrl(item.profiles?.avatar_url, 'avatar')} 
+      alt="Avatar" 
+      style={{ width: '40px', height: '40px', borderRadius: '50%', objectFit: 'cover' }} 
+      onError={(e) => { e.currentTarget.src = 'https://ui-avatars.com/api/?name=' + (item.profiles?.store_name || item.profiles?.first_name || 'N'); }} 
+    />
+    <div>
+      <h4 style={{ margin: '0 0 4px', color: 'var(--color-text-main)', fontSize: '1.1rem' }}>
+        {item.profiles?.store_name || (item.profiles?.first_name ? `${item.profiles.first_name} ${item.profiles.last_name || ''}` : 'Negocio')}
+      </h4>
+      <div style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
+        {item.products?.image && (
+          <img 
+            src={getSafeImageUrl(item.products.image, 'product')} 
+            alt="Producto" 
+            style={{ width: '20px', height: '20px', borderRadius: '4px', objectFit: 'cover' }} 
+            onError={(e) => { e.currentTarget.style.display = 'none'; }} 
+          />
+        )}
+        <span style={{ color: 'var(--color-text-muted)', fontSize: '0.85rem' }}>
+          {item.products ? `Producto: ${item.products.name}` : 'Interacción: General/Servicio'}
+        </span>
+      </div>
+    </div>
+  </div>
+  
                                 <button onClick={() => openReviewModal(item.id, item.product_id)} style={{ padding: '8px 16px', borderRadius: '8px', border: 'none', background: 'var(--color-primary)', color: '#fff', cursor: 'pointer', fontWeight: 600 }}>Dejar reseña</button>
                               </div>
                             </div>
@@ -452,14 +548,34 @@ export default function ResenasPage() {
                             return (
                               <div key={item.id} style={{ padding: '20px', borderRadius: '16px', background: 'rgba(255,255,255,0.03)', border: `1px solid ${themeColors.borderSubtle3}` }}>
                                 <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: '12px', flexWrap: 'wrap', gap: '8px' }}>
-                                  <div>
-                                    <h4 style={{ margin: '0 0 4px', color: 'var(--color-text-main)', fontSize: '1.1rem' }}>
-                                      {item.profiles?.store_name || (item.profiles?.first_name ? `${item.profiles.first_name} ${item.profiles.last_name || ''}` : 'Negocio')}
-                                    </h4>
-                                    <span style={{ color: 'var(--color-text-muted)', fontSize: '0.85rem' }}>
-                                      {item.products ? `Producto: ${item.products.name}` : 'Interacción: General/Servicio'}
-                                    </span>
-                                  </div>
+                                  
+  <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
+    <img 
+      src={getSafeImageUrl(item.profiles?.avatar_url, 'avatar')} 
+      alt="Avatar" 
+      style={{ width: '40px', height: '40px', borderRadius: '50%', objectFit: 'cover' }} 
+      onError={(e) => { e.currentTarget.src = 'https://ui-avatars.com/api/?name=' + (item.profiles?.store_name || item.profiles?.first_name || 'N'); }} 
+    />
+    <div>
+      <h4 style={{ margin: '0 0 4px', color: 'var(--color-text-main)', fontSize: '1.1rem' }}>
+        {item.profiles?.store_name || (item.profiles?.first_name ? `${item.profiles.first_name} ${item.profiles.last_name || ''}` : 'Negocio')}
+      </h4>
+      <div style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
+        {item.products?.image && (
+          <img 
+            src={getSafeImageUrl(item.products.image, 'product')} 
+            alt="Producto" 
+            style={{ width: '20px', height: '20px', borderRadius: '4px', objectFit: 'cover' }} 
+            onError={(e) => { e.currentTarget.style.display = 'none'; }} 
+          />
+        )}
+        <span style={{ color: 'var(--color-text-muted)', fontSize: '0.85rem' }}>
+          {item.products ? `Producto: ${item.products.name}` : 'Interacción: General/Servicio'}
+        </span>
+      </div>
+    </div>
+  </div>
+  
                                   <div style={{ display: 'flex', gap: '4px' }}>
                                     {[1, 2, 3, 4, 5].map(star => (
                                       <svg key={star} width="16" height="16" viewBox="0 0 24 24" fill={star <= rating ? "#FFD700" : "none"} stroke="#FFD700" strokeWidth="2"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"></polygon></svg>
@@ -481,14 +597,24 @@ export default function ResenasPage() {
                           buyerCanceladas.map((item) => (
                             <div key={item.id} style={{ padding: '20px', borderRadius: '16px', background: 'rgba(255,0,0,0.03)', border: '1px solid rgba(255,0,0,0.2)' }}>
                               <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: '12px', flexWrap: 'wrap', gap: '8px' }}>
-                                <div>
-                                  <h4 style={{ margin: '0 0 4px', color: 'var(--color-text-main)', fontSize: '1.1rem' }}>
-                                    {item.profiles?.store_name || (item.profiles?.first_name ? `${item.profiles.first_name} ${item.profiles.last_name || ''}` : 'Negocio')}
-                                  </h4>
-                                  <span style={{ color: 'var(--color-text-muted)', fontSize: '0.85rem' }}>
-                                    {item.status === 'appealed' ? 'Reseña en proceso de apelación' : 'Reseña rechazada por el vendedor'}
-                                  </span>
-                                </div>
+                                
+  <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
+    <img 
+      src={getSafeImageUrl(item.profiles?.avatar_url, 'avatar')} 
+      alt="Avatar" 
+      style={{ width: '40px', height: '40px', borderRadius: '50%', objectFit: 'cover' }} 
+      onError={(e) => { e.currentTarget.src = 'https://ui-avatars.com/api/?name=' + (item.profiles?.store_name || item.profiles?.first_name || 'N'); }} 
+    />
+    <div>
+      <h4 style={{ margin: '0 0 4px', color: 'var(--color-text-main)', fontSize: '1.1rem' }}>
+        {item.profiles?.store_name || (item.profiles?.first_name ? `${item.profiles.first_name} ${item.profiles.last_name || ''}` : 'Negocio')}
+      </h4>
+      <span style={{ color: 'var(--color-text-muted)', fontSize: '0.85rem' }}>
+        {item.status === 'appealed' ? 'Reseña en proceso de apelación' : 'Reseña rechazada por el vendedor'}
+      </span>
+    </div>
+  </div>
+  
                               </div>
                               <p style={{ margin: '0 0 16px 0', color: 'var(--color-text-muted)', lineHeight: 1.6 }}>
                                 {item.status === 'appealed' ? 'Tu apelación está siendo revisada por el soporte.' : 'El negocio rechazó la solicitud para dejar tu valoración.'}
