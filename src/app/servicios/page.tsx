@@ -62,6 +62,16 @@ function ServiciosContent() {
       if (normalize(sCat) !== normFCat && normalize(sSub) !== normFCat) return false;
     }
 
+    const filterRating = searchParams?.get('rating') || '';
+    if (filterRating) {
+      const r = Number(servicio.rating || 0);
+      if (filterRating === '5' && r < 5) return false;
+      if (filterRating === '4' && r < 4) return false;
+      if (filterRating === '3' && r < 3) return false;
+      if (filterRating === 'menos_3' && (r >= 3 || r === 0)) return false;
+      if (filterRating === 'nuevo' && r !== 0) return false;
+    }
+
     return true;
   });
 

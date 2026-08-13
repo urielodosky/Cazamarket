@@ -179,6 +179,17 @@ function ProductosContent() {
       if (!hasLocalidad) return false;
     }
 
+    // 7. Filtrar por rating
+    const filterRating = searchParams?.get('rating') || '';
+    if (filterRating) {
+      const r = Number(producto.rating || 0);
+      if (filterRating === '5' && r < 5) return false;
+      if (filterRating === '4' && r < 4) return false;
+      if (filterRating === '3' && r < 3) return false;
+      if (filterRating === 'menos_3' && (r >= 3 || r === 0)) return false;
+      if (filterRating === 'nuevo' && r !== 0) return false;
+    }
+
     return true;
   });
 

@@ -36,7 +36,7 @@ export default function Navbar() {
   
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   const [isFiltersOpen, setIsFiltersOpen] = useState(false);
-  const [ratingFilter, setRatingFilter] = useState(0);
+  const [rating, setRating] = useState('');
   const [searchQuery, setSearchQuery] = useState(searchParams?.get('q') || '');
   const [isSearchFocused, setIsSearchFocused] = useState(false);
 
@@ -136,6 +136,7 @@ export default function Navbar() {
     if (tipo) params.set('tipo', tipo);
     if (provincia) params.set('provincia', provincia);
     if (localidad) params.set('localidad', localidad);
+    if (rating) params.set('rating', rating);
     
     let basePath = pathname || '/productos';
     if (basePath === '/' || basePath.includes('mis-tiendas') || basePath.includes('configuracion') || basePath.includes('registro')) {
@@ -153,7 +154,7 @@ export default function Navbar() {
       return;
     }
     executeSearch();
-  }, [categoria, ofrece, tipo, provincia, localidad, ratingFilter]);
+  }, [categoria, ofrece, tipo, provincia, localidad, rating]);
 
   const isBusinessProfile = pathname?.startsWith('/negocios/') && pathname !== '/negocios';
 
@@ -269,6 +270,22 @@ export default function Navbar() {
               value={tipo} 
               onChange={setTipo} 
               placeholder={pathname.startsWith('/productos') ? "Condición" : (pathname.startsWith('/servicios') ? "Duración" : "Tipo")} 
+            />
+          </div>
+
+          <div className="filter-wrapper-item" style={{ flex: '1 1 calc(33.333% - 8px)', minWidth: '140px', zIndex: 105 }}>
+            <CustomSelect 
+              options={[
+                { value: '', label: 'Rating (Todos)' },
+                { value: '5', label: '★★★★★ (5)' },
+                { value: '4', label: '★★★★☆ (4 o más)' },
+                { value: '3', label: '★★★☆☆ (3 o más)' },
+                { value: 'menos_3', label: 'Menos de 3' },
+                { value: 'nuevo', label: 'Nuevos' },
+              ]} 
+              value={rating} 
+              onChange={setRating} 
+              placeholder="Rating" 
             />
           </div>
         </>

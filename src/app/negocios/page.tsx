@@ -114,6 +114,7 @@ export default function NegociosPage() {
   const filterProvincia = searchParams?.get('provincia') || '';
   const filterLocalidad = searchParams?.get('localidad') || '';
   const filterTipo = searchParams?.get('tipo') || '';
+  const filterRating = searchParams?.get('rating') || '';
 
   const filteredNegocios = negocios.filter(negocio => {
     if (q) {
@@ -134,6 +135,14 @@ export default function NegociosPage() {
     }
     if (filterTipo) {
       if (!negocio.businessType || negocio.businessType.toLowerCase() !== filterTipo.toLowerCase()) return false;
+    }
+    if (filterRating) {
+      const r = Number(negocio.calculatedRating || negocio.rating || 0);
+      if (filterRating === '5' && r < 5) return false;
+      if (filterRating === '4' && r < 4) return false;
+      if (filterRating === '3' && r < 3) return false;
+      if (filterRating === 'menos_3' && (r >= 3 || r === 0)) return false;
+      if (filterRating === 'nuevo' && r !== 0) return false;
     }
     return true;
   });
