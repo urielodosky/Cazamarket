@@ -373,40 +373,32 @@ export default function ProductoDetailPage({ params }: { params: Promise<{ id: s
 
 
       {/* Descripción y Características a lo largo de todo */}
-      <div style={{ padding: '0 20px', marginBottom: '64px' }}>
-        <div style={{ maxWidth: '800px', margin: '0 auto' }}>
+      <div className="pp-description-wrapper">
+        <div className="pp-description-inner">
           <div style={{ marginBottom: '40px' }}>
-            <h3 style={{ fontSize: '1.4rem', marginBottom: '20px', borderBottom: '1px solid var(--color-border)', paddingBottom: '12px', color: 'var(--color-text-main)' }}>Descripción del Producto</h3>
+            <h3 className="pp-section-title">Descripción del Producto</h3>
             <div 
-              style={{ color: 'var(--color-text-muted)', lineHeight: 1.8, fontSize: '1.05rem', wordBreak: 'break-word', overflowWrap: 'anywhere' }}
+              className="pp-description-text"
               dangerouslySetInnerHTML={{ __html: sanitizeInput(product.description) }}
             />
           </div>
 
           {product.features && product.features.length > 0 && (
             <div>
-              <h3 style={{ fontSize: '1.4rem', marginBottom: '20px', borderBottom: '1px solid var(--color-border)', paddingBottom: '12px', color: 'var(--color-text-main)' }}>Características Principales</h3>
-              <ul style={{ color: 'var(--color-text-muted)', lineHeight: 1.8, fontSize: '1.05rem', paddingLeft: '24px', margin: 0 }}>
+              <h3 className="pp-section-title">Características Principales</h3>
+              <ul className="pp-features-list">
                 {product.features.map((feature: string, idx: number) => (
-                  <li key={idx} style={{ marginBottom: '12px', wordBreak: 'break-word', overflowWrap: 'anywhere' }}>{feature}</li>
+                  <li key={idx} className="pp-feature-item">{feature}</li>
                 ))}
               </ul>
             </div>
           )}
 
           {/* Report Button */}
-          <div style={{ marginTop: '24px', textAlign: 'right' }}>
+          <div className="pp-report-container">
             <button 
               onClick={() => setIsReportModalOpen(true)}
-              style={{
-                background: 'transparent',
-                border: 'none',
-                color: 'var(--color-text-muted)',
-                fontSize: '0.85rem',
-                cursor: 'pointer',
-                textDecoration: 'underline',
-                padding: '4px 8px'
-              }}
+              className="pp-report-btn"
             >
               Denunciar publicación
             </button>

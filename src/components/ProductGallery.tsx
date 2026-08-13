@@ -48,10 +48,9 @@ export default function ProductGallery({ product }: { product: any }) {
   };
 
   return (
-    <div style={{ display: 'flex', flexDirection: 'column', gap: '16px' }}>
+    <div className="pg-container">
       <div
-        className="glass-panel product-image-container"
-        style={{ position: 'relative', padding: 0, borderRadius: 'var(--radius-lg)', overflow: 'hidden', height: '500px', display: 'flex', alignItems: 'center', justifyContent: 'center' }}
+        className="glass-panel product-image-container pg-main-image-container"
         onMouseEnter={() => setIsHoveringImage(true)}
         onMouseLeave={() => setIsHoveringImage(false)}
       >
@@ -59,7 +58,7 @@ export default function ProductGallery({ product }: { product: any }) {
           <video
             src={activeSrc}
             controls
-            style={{ width: '100%', height: '100%', objectFit: 'contain', background: '#000' }}
+            className="pg-video"
           />
         ) : (
           <Image
@@ -67,7 +66,7 @@ export default function ProductGallery({ product }: { product: any }) {
             alt={product.name || 'Producto'}
             fill
             sizes="(max-width: 768px) 100vw, 50vw"
-            style={{ objectFit: 'cover' }}
+            className="pg-main-image"
             onError={() => setImgError(true)}
           />
         )}
@@ -75,14 +74,8 @@ export default function ProductGallery({ product }: { product: any }) {
         {/* Botón Anterior */}
         <button
           onClick={prevImage}
-          style={{
-            position: 'absolute', left: '16px', top: '50%', transform: 'translateY(-50%)',
-            background: 'rgba(0,0,0,0.6)', border: '1px solid rgba(255,255,255,0.2)', borderRadius: '50%', width: '44px', height: '44px',
-            display: 'flex', alignItems: 'center', justifyContent: 'center', cursor: 'pointer',
-            opacity: isHoveringImage ? 1 : 0, transition: 'all 0.2s', zIndex: 10
-          }}
-          onMouseEnter={(e) => e.currentTarget.style.background = 'rgba(0,0,0,0.85)'}
-          onMouseLeave={(e) => e.currentTarget.style.background = 'rgba(0,0,0,0.6)'}
+          className="pg-nav-button prev"
+          style={{ opacity: isHoveringImage ? 1 : 0 }}
         >
           <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="white" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><polyline points="15 18 9 12 15 6"></polyline></svg>
         </button>
@@ -90,20 +83,14 @@ export default function ProductGallery({ product }: { product: any }) {
         {/* Botón Siguiente */}
         <button
           onClick={nextImage}
-          style={{
-            position: 'absolute', right: '16px', top: '50%', transform: 'translateY(-50%)',
-            background: 'rgba(0,0,0,0.6)', border: '1px solid rgba(255,255,255,0.2)', borderRadius: '50%', width: '44px', height: '44px',
-            display: 'flex', alignItems: 'center', justifyContent: 'center', cursor: 'pointer',
-            opacity: isHoveringImage ? 1 : 0, transition: 'all 0.2s', zIndex: 10
-          }}
-          onMouseEnter={(e) => e.currentTarget.style.background = 'rgba(0,0,0,0.85)'}
-          onMouseLeave={(e) => e.currentTarget.style.background = 'rgba(0,0,0,0.6)'}
+          className="pg-nav-button next"
+          style={{ opacity: isHoveringImage ? 1 : 0 }}
         >
           <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="white" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><polyline points="9 18 15 12 9 6"></polyline></svg>
         </button>
       </div>
 
-      <div style={{ display: 'flex', gap: '12px', flexWrap: 'wrap' }}>
+      <div className="pg-thumbnails-container">
         {(product.media || (product.images || []).map((img: string) => ({ url: img, type: 'image' }))).map((m: any, idx: number) => {
           const thumbSrc = getThumbnailSrc(m, idx);
           
@@ -111,26 +98,14 @@ export default function ProductGallery({ product }: { product: any }) {
             <button
               key={idx}
               onClick={() => { setActiveImage(idx); setImgError(false); }}
-              style={{
-                width: '80px',
-                height: '80px',
-                borderRadius: '12px',
-                overflow: 'hidden',
-                border: activeImage === idx ? '2px solid var(--color-primary)' : '1px solid rgba(255, 255, 255, 0.12)',
-                boxShadow: activeImage === idx ? '0 0 12px color-mix(in srgb, var(--color-primary) 40%, transparent)' : 'none',
-                cursor: 'pointer',
-                padding: 0,
-                background: 'rgba(0,0,0,0.3)',
-                transition: 'all 0.2s ease',
-                position: 'relative'
-              }}
+              className={`pg-thumbnail-btn ${activeImage === idx ? 'active' : ''}`}
             >
               <Image
                 src={thumbSrc}
                 alt={`Vista ${idx + 1}`}
                 fill
                 sizes="80px"
-                style={{ objectFit: 'cover' }}
+                className="pg-thumbnail-image"
               />
             </button>
           )
