@@ -12,14 +12,18 @@ export default function ResenasPage() {
   const themeColors = useThemeColors();
   const supabase = createClient();
 
-  const getSafeImageUrl = (url: string | null | undefined, type: 'avatar' | 'product') => {
+  const getSafeImageUrl = (urlInput: any, type: 'avatar' | 'product') => {
+    let url = urlInput;
+    if (Array.isArray(url)) url = url[0];
+    if (typeof url !== 'string') url = '';
     if (!url) return type === 'avatar' ? '/default-avatar.png' : '/placeholder.jpg';
     if (url.startsWith('http') || url.startsWith('/')) return url;
     
     // Si la URL es solo un string del id de supabase o una ruta parcial del storage
     const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL || '';
     if (supabaseUrl && !url.includes('supabase.co')) {
-       return `${supabaseUrl}/storage/v1/object/public/avatars/${url}`;
+       const bucket = type === 'avatar' ? 'avatars' : 'products';
+       return `${supabaseUrl}/storage/v1/object/public/${bucket}/${url}`;
     }
     if (url.includes('supabase.co') && !url.startsWith('http')) {
        return `https://${url}`;
