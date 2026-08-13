@@ -205,15 +205,16 @@ export default function ResenasPage() {
         </div>
 
         {/* Tabs Principales */}
-        <div style={{ 
+        <div className="flex overflow-x-auto whitespace-nowrap w-full gap-2" style={{ 
           display: 'flex', gap: '8px', marginBottom: '24px', 
           background: themeColors.bgSubtle2, padding: '6px', borderRadius: '16px',
-          overflowX: 'auto', whiteSpace: 'nowrap', width: '100%'
+          overflowX: 'auto', whiteSpace: 'nowrap', width: '100%', scrollbarWidth: 'none'
         }}>
           <button
             onClick={() => setActiveMainTab('mis-resenas')}
+            className="flex-shrink-0"
             style={{
-              flexShrink: 0, flex: 1, padding: '12px 24px', borderRadius: '12px', border: 'none', cursor: 'pointer',
+              flex: '1 0 auto', padding: '12px 24px', borderRadius: '12px', border: 'none', cursor: 'pointer',
               fontWeight: 600, fontSize: '0.95rem', transition: 'all 0.2s ease',
               background: activeMainTab === 'mis-resenas' ? 'var(--color-bg-surface-elevated)' : 'transparent',
               color: activeMainTab === 'mis-resenas' ? 'var(--color-primary)' : 'var(--color-text-muted)',
@@ -225,8 +226,9 @@ export default function ResenasPage() {
           </button>
           <button
             onClick={() => setActiveMainTab('resenas-dadas')}
+            className="flex-shrink-0"
             style={{
-              flexShrink: 0, flex: 1, padding: '12px 24px', borderRadius: '12px', border: 'none', cursor: 'pointer',
+              flex: '1 0 auto', padding: '12px 24px', borderRadius: '12px', border: 'none', cursor: 'pointer',
               fontWeight: 600, fontSize: '0.95rem', transition: 'all 0.2s ease',
               background: activeMainTab === 'resenas-dadas' ? 'var(--color-bg-surface-elevated)' : 'transparent',
               color: activeMainTab === 'resenas-dadas' ? 'var(--color-primary)' : 'var(--color-text-muted)',
@@ -250,9 +252,10 @@ export default function ResenasPage() {
           {activeMainTab === 'mis-resenas' && (
             <>
               {/* Subtabs de Mis Reseñas */}
-              <div style={{ display: 'flex', gap: '20px', borderBottom: `1px solid ${themeColors.borderSubtle3}`, marginBottom: '24px', overflowX: 'auto', whiteSpace: 'nowrap', width: '100%' }}>
+              <div className="flex overflow-x-auto whitespace-nowrap w-full gap-5" style={{ display: 'flex', gap: '20px', borderBottom: `1px solid ${themeColors.borderSubtle3}`, marginBottom: '24px', overflowX: 'auto', whiteSpace: 'nowrap', width: '100%', scrollbarWidth: 'none' }}>
                 <button
                   onClick={() => setActiveSubTabMisResenas('pendientes')}
+                  className="flex-shrink-0"
                   style={{
                     flexShrink: 0, padding: '0 0 12px', border: 'none', background: 'transparent', cursor: 'pointer',
                     fontWeight: activeSubTabMisResenas === 'pendientes' ? 700 : 500, fontSize: '0.95rem',
@@ -448,9 +451,10 @@ export default function ResenasPage() {
           {activeMainTab === 'resenas-dadas' && (
             <>
               {/* Subtabs de Reseñas Dadas */}
-              <div style={{ display: 'flex', gap: '20px', borderBottom: `1px solid ${themeColors.borderSubtle3}`, marginBottom: '24px', overflowX: 'auto', whiteSpace: 'nowrap', width: '100%' }}>
+              <div className="flex overflow-x-auto whitespace-nowrap w-full gap-5" style={{ display: 'flex', gap: '20px', borderBottom: `1px solid ${themeColors.borderSubtle3}`, marginBottom: '24px', overflowX: 'auto', whiteSpace: 'nowrap', width: '100%', scrollbarWidth: 'none' }}>
                 <button
                   onClick={() => setActiveSubTabResenasDadas('pendientes')}
+                  className="flex-shrink-0"
                   style={{
                     flexShrink: 0, padding: '0 0 12px', border: 'none', background: 'transparent', cursor: 'pointer',
                     fontWeight: activeSubTabResenasDadas === 'pendientes' ? 700 : 500, fontSize: '0.95rem',
