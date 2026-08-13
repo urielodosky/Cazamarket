@@ -47,6 +47,7 @@ export default function ProductInfo({
               fill
               sizes="40px"
               className="pi-store-avatar"
+              priority={true}
             />
           </div>
           <div className="pi-store-info">

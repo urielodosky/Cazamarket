@@ -1,4 +1,6 @@
 'use client';
+
+import Image from 'next/image';
 import { useState, useEffect, Suspense } from 'react';
 import { useAuth } from '@/contexts/AuthContext';
 import Link from 'next/link';
@@ -308,11 +310,12 @@ function ProductosContent() {
               </button>
             </div>
             <div className="aspect-image-4-3" style={{ borderTopLeftRadius: 'var(--radius-lg)', borderTopRightRadius: 'var(--radius-lg)', position: 'relative', overflow: 'hidden' }}>
-              <img 
+              <Image 
                 src={producto.image} 
                 alt={producto.name || producto.title || "Producto"} 
-                loading="lazy" 
-                style={{ position: 'absolute', top: 0, left: 0, width: '100%', height: '100%', objectFit: 'cover' }} 
+                fill
+                sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
+                style={{ objectFit: 'cover' }} 
               />
               {/* Product Rating Top Right */}
               <div style={{ position: 'absolute', top: '10px', right: '10px', background: 'rgba(0,0,0,0.65)', backdropFilter: 'blur(4px)', padding: '4px 8px', borderRadius: '12px', display: 'flex', alignItems: 'center', gap: '4px', zIndex: 5 }}>
@@ -324,7 +327,7 @@ function ProductosContent() {
               {/* Foto de perfil + Username */}
               <div style={{ display: 'flex', alignItems: 'center', gap: '8px', cursor: (producto.storeId === 1 && !hasFeature('tiendaVirtual')) ? 'default' : 'pointer', marginBottom: '8px' }} onClick={(e) => { e.stopPropagation(); if (producto.storeId === 1 && !hasFeature('tiendaVirtual')) return; if (producto.storeId) router.push(`/negocios/${producto.storeId}`); }}>
                 <div style={{ position: 'relative', width: '30px', height: '30px', flexShrink: 0 }}>
-                  <img src={producto.avatar} alt={producto.store} style={{ width: '100%', height: '100%', borderRadius: '50%', objectFit: 'cover', border: '1px solid var(--color-border)' }} />
+                  <Image src={producto.avatar} alt={producto.store} fill sizes="30px" style={{ borderRadius: '50%', objectFit: 'cover', border: '1px solid var(--color-border)' }} />
                   {(producto.storeId === 1 ? hasFeature('insigniaVerificada') : producto.verified) && (
                     <span title="Negocio Verificado" style={{ position: 'absolute', bottom: '-2px', right: '-2px', width: '12px', height: '12px', borderRadius: '50%', background: 'var(--color-primary)', display: 'flex', alignItems: 'center', justifyContent: 'center', border: '2px solid var(--color-bg-base)' }}>
                       <svg width="8" height="8" viewBox="0 0 24 24" fill="none" stroke="#fff" strokeWidth="4" strokeLinecap="round" strokeLinejoin="round"><polyline points="20 6 9 17 4 12"></polyline></svg>

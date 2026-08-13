@@ -67,6 +67,7 @@ export default function ProductGallery({ product }: { product: any }) {
             fill
             sizes="(max-width: 768px) 100vw, 50vw"
             className="pg-main-image"
+            priority={true}
             onError={() => setImgError(true)}
           />
         )}
