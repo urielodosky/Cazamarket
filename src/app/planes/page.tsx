@@ -159,6 +159,7 @@ export default function PlanesPage() {
 
   return (
     <div className="planes-container">
+      <h1 className="sr-only" style={{ position: 'absolute', width: '1px', height: '1px', padding: 0, margin: '-1px', overflow: 'hidden', clip: 'rect(0, 0, 0, 0)', whiteSpace: 'nowrap', borderWidth: 0 }}>Planes y Precios</h1>
       <div className="planes-hero" style={{ paddingTop: '10px' }}>
         <div className="planes-tabs-wrapper">
           <div className="planes-tabs glass-panel">

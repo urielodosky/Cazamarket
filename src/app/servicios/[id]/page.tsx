@@ -260,7 +260,7 @@ export default function ServicioDetailPage({ params }: { params: Promise<{ id: s
   if (!service) {
     return (
       <div className="container-page" style={{ paddingTop: '100px', paddingBottom: '100px', textAlign: 'center', minHeight: '60vh', display: 'flex', flexDirection: 'column', justifyContent: 'center', alignItems: 'center' }}>
-        <h1 style={{ color: 'var(--color-text-main)', marginBottom: '16px' }}>Servicio no encontrado</h1>
+        <h2 style={{ color: 'var(--color-text-main)', marginBottom: '16px' }}>Servicio no encontrado</h2>
         <p style={{ color: 'var(--color-text-muted)', marginBottom: '24px' }}>El servicio que estás buscando no existe o fue eliminado.</p>
         <Link href="/" style={{ padding: '12px 24px', background: 'var(--color-primary)', color: '#fff', textDecoration: 'none', borderRadius: '8px', fontWeight: 600 }}>Volver al inicio</Link>
       </div>

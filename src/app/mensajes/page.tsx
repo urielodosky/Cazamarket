@@ -742,6 +742,7 @@ export default function MensajesPage() {
 
   return (
     <div className="layout-container mensajes-page-wrapper">
+      <h1 className="sr-only" style={{ position: 'absolute', width: '1px', height: '1px', padding: 0, margin: '-1px', overflow: 'hidden', clip: 'rect(0, 0, 0, 0)', whiteSpace: 'nowrap', borderWidth: 0 }}>Mensajes</h1>
       
       <div className="glass-panel messages-container" style={{ display: 'flex', height: '75vh', minHeight: '600px', borderRadius: 'var(--radius-xl)', overflow: 'hidden', border: '1px solid var(--color-border)', boxShadow: '0 10px 30px rgba(0,0,0,0.05)' }}>
         

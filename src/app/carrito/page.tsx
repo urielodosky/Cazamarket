@@ -105,9 +105,11 @@ export default function CarritoPage() {
         seller_id: items[0].storeId,
         product_id: parseInt(productId) || null, // Asumimos que id numérico es producto, sino null si es negocio
         status: 'pending_time'
-      }));
+      })).filter(insert => insert.buyer_id !== insert.seller_id); // Evitar que el usuario se contacte a sí mismo
 
-      await supabase.from('interactions').insert(inserts);
+      if (inserts.length > 0) {
+        await supabase.from('interactions').insert(inserts);
+      }
     } catch (err) {
       console.error('Error recording cart interactions', err);
     }

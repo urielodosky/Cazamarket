@@ -316,7 +316,7 @@ export default function MiNegocioPage() {
   if (!isVendorModeActive) {
     return (
       <div style={{ paddingTop: '100px', paddingBottom: 'var(--spacing-8)', paddingLeft: 'var(--spacing-4)', paddingRight: 'var(--spacing-4)', maxWidth: '1200px', margin: '0 auto', textAlign: 'center' }}>
-        <h1 style={{ color: 'var(--color-text-main)' }}>Acceso Denegado</h1>
+        <h2 style={{ color: 'var(--color-text-main)' }}>Acceso Denegado</h2>
         <p style={{ color: 'var(--color-text-muted)' }}>Debes cambiar al Modo Vendedor para acceder a esta sección.</p>
       </div>
     );
