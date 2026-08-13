@@ -17,19 +17,24 @@ const supabaseAdmin = createClient(
   process.env.SUPABASE_SERVICE_ROLE_KEY!
 );
 
-async function testQuery() {
-  const { data, error } = await supabaseAdmin
-    .from('sponsored_ads')
-    .select('*, profiles(store_name, full_name, contact_email)')
-    .eq('status', 'active')
-    .gte('end_date', new Date().toISOString())
-    .order('end_date', { ascending: true });
-
+async function fixForeignKeys() {
+  const sql = `
+    ALTER TABLE public.interactions
+      DROP CONSTRAINT IF EXISTS interactions_buyer_id_fkey,
+      DROP CONSTRAINT IF EXISTS interactions_seller_id_fkey;
+      
+    ALTER TABLE public.interactions
+      ADD CONSTRAINT interactions_buyer_id_fkey FOREIGN KEY (buyer_id) REFERENCES public.profiles(id) ON DELETE CASCADE,
+      ADD CONSTRAINT interactions_seller_id_fkey FOREIGN KEY (seller_id) REFERENCES public.profiles(id) ON DELETE CASCADE;
+  `;
+  const { error } = await supabaseAdmin.rpc('exec_sql', { sql_query: sql });
   if (error) {
-    console.error('SUPABASE ERROR:', error.message);
+    console.error('RPC failed:', error);
+    // If RPC exec_sql doesn't exist, we'll need to create a migration script or run it through the dashboard.
+    // Wait, let's see if there is another way.
   } else {
-    console.log('Success! Data count:', data?.length);
+    console.log('Fixed FKs successfully.');
   }
 }
 
-testQuery();
+fixForeignKeys();
