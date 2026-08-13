@@ -293,7 +293,7 @@ export default function Navbar() {
 
       {/* Provincia (API) */}
       {!pathname.startsWith('/comunidad') && (
-        <div className="filter-wrapper-item" style={{ flex: '1 1 calc(50% - 6px)', minWidth: '130px', zIndex: 100 }}>
+        <div className="filter-wrapper-item" style={{ flex: '1 1 calc(33.333% - 8px)', minWidth: '130px', zIndex: 100 }}>
           <CustomSelect 
             options={provincias.length > 0 ? provincias : [{ value: '', label: 'Cargando...' }]} 
             value={provincia} 
@@ -306,7 +306,7 @@ export default function Navbar() {
       
       {/* Localidad (API) */}
       {!pathname.startsWith('/comunidad') && (
-        <div className="filter-wrapper-item" style={{ flex: '1 1 calc(50% - 6px)', minWidth: '130px', zIndex: 100 }}>
+        <div className="filter-wrapper-item" style={{ flex: '1 1 calc(33.333% - 8px)', minWidth: '130px', zIndex: 100 }}>
           <CustomSelect 
             options={provincia ? (localidades.length > 0 ? localidades : [{ value: '', label: 'Cargando...' }]) : []} 
             value={localidad} 

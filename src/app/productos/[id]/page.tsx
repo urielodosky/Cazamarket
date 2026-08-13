@@ -13,6 +13,7 @@ import { usePlan } from '@/contexts/PlanContext';
 import { useThemeColors } from '@/hooks/useThemeColors';
 import { getPlanPermissions } from '@/types/planTypes';
 import '../producto.css';
+import ReportModal from '@/components/ReportModal';
 function getSocialUrl(platform: string, handle: string) {
   if (handle.startsWith('http') || handle.startsWith('www')) {
     return handle.startsWith('www') ? `https://${handle}` : handle;
