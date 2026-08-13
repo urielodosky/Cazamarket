@@ -80,53 +80,67 @@ export default function ResenasPage() {
       };
 
       if (activeMainTab === 'mis-resenas' && isVendor) {
-        const { data: pend } = await supabase.from('interactions')
-          .select('*, products(name, image)')
-          .eq('seller_id', supabaseUser.id)
-          .eq('status', 'pending_time')
-          .order('created_at', { ascending: false });
-        setSellerPendientes(await augmentWithProfiles(pend || [], true));
+        const [pendRes, recRes, cancRes] = await Promise.all([
+          supabase.from('interactions')
+            .select('*, products(name, image)')
+            .eq('seller_id', supabaseUser.id)
+            .eq('status', 'pending_time')
+            .order('created_at', { ascending: false }),
+          supabase.from('interactions')
+            .select('*, products(name, image), reviews(seller_rating, product_rating, comment, created_at)')
+            .eq('seller_id', supabaseUser.id)
+            .eq('status', 'published')
+            .order('created_at', { ascending: false }),
+          supabase.from('interactions')
+            .select('*, products(name, image)')
+            .eq('seller_id', supabaseUser.id)
+            .in('status', ['rejected_by_seller', 'appealed'])
+            .order('created_at', { ascending: false })
+        ]);
 
-        const { data: rec } = await supabase.from('interactions')
-          .select('*, products(name, image), reviews(seller_rating, product_rating, comment, created_at)')
-          .eq('seller_id', supabaseUser.id)
-          .eq('status', 'published')
-          .order('created_at', { ascending: false });
-        setSellerRecibidas(await augmentWithProfiles(rec || [], true));
+        const [augPend, augRec, augCanc] = await Promise.all([
+          augmentWithProfiles(pendRes.data || [], true),
+          augmentWithProfiles(recRes.data || [], true),
+          augmentWithProfiles(cancRes.data || [], true)
+        ]);
 
-        const { data: canc } = await supabase.from('interactions')
-          .select('*, products(name, image)')
-          .eq('seller_id', supabaseUser.id)
-          .in('status', ['rejected_by_seller', 'appealed'])
-          .order('created_at', { ascending: false });
-        setSellerCanceladas(await augmentWithProfiles(canc || [], true));
+        setSellerPendientes(augPend);
+        setSellerRecibidas(augRec);
+        setSellerCanceladas(augCanc);
       } else if (activeMainTab === 'resenas-dadas') {
-        const { data: pend } = await supabase.from('interactions')
-          .select('*, products(name, image)')
-          .eq('buyer_id', supabaseUser.id)
-          .eq('status', 'ready_to_review')
-          .order('created_at', { ascending: false });
-        setBuyerPendientes(await augmentWithProfiles(pend || [], false));
+        const [pendRes, dadasRes, cancRes] = await Promise.all([
+          supabase.from('interactions')
+            .select('*, products(name, image)')
+            .eq('buyer_id', supabaseUser.id)
+            .eq('status', 'ready_to_review')
+            .order('created_at', { ascending: false }),
+          supabase.from('interactions')
+            .select('*, products(name, image), reviews(seller_rating, product_rating, comment, created_at)')
+            .eq('buyer_id', supabaseUser.id)
+            .eq('status', 'published')
+            .order('created_at', { ascending: false }),
+          supabase.from('interactions')
+            .select('*, products(name, image)')
+            .eq('buyer_id', supabaseUser.id)
+            .in('status', ['rejected_by_seller', 'appealed'])
+            .order('created_at', { ascending: false })
+        ]);
 
-        const { data: dadas } = await supabase.from('interactions')
-          .select('*, products(name, image), reviews(seller_rating, product_rating, comment, created_at)')
-          .eq('buyer_id', supabaseUser.id)
-          .eq('status', 'published')
-          .order('created_at', { ascending: false });
-        setBuyerDadas(await augmentWithProfiles(dadas || [], false));
+        const [augPend, augDadas, augCanc] = await Promise.all([
+          augmentWithProfiles(pendRes.data || [], false),
+          augmentWithProfiles(dadasRes.data || [], false),
+          augmentWithProfiles(cancRes.data || [], false)
+        ]);
 
-        const { data: canc } = await supabase.from('interactions')
-          .select('*, products(name, image)')
-          .eq('buyer_id', supabaseUser.id)
-          .in('status', ['rejected_by_seller', 'appealed'])
-          .order('created_at', { ascending: false });
-        setBuyerCanceladas(await augmentWithProfiles(canc || [], false));
+        setBuyerPendientes(augPend);
+        setBuyerDadas(augDadas);
+        setBuyerCanceladas(augCanc);
       }
       setIsLoadingData(false);
     };
 
     fetchInteractions();
-  }, [activeMainTab, isMounted, isLoggedIn, supabaseUser, activeSubTabMisResenas, activeSubTabResenasDadas, isVendor]);
+  }, [activeMainTab, isMounted, isLoggedIn, supabaseUser, isVendor]);
 
   const handleAcceptInteraction = async (id: string) => {
     try {
