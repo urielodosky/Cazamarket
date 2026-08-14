@@ -396,12 +396,12 @@
   }
   
   .user-avatar-trigger {
-    width: 36px;
-    height: 36px;
+    width: 48px;
+    height: 48px;
   }
   
   .user-avatar-trigger svg {
-    width: 20px;
-    height: 20px;
+    width: 24px;
+    height: 24px;
   }
 }
