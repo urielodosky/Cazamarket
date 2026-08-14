@@ -516,7 +516,7 @@ export default function Navbar() {
           ) : (
             <div className="guest-menu-container" ref={guestMenuRef} style={{ position: 'relative' }}>
               {/* Desktop: Botón CTA "Empezar ahora" */}
-              <Link href="/registro" className="guest-cta-desktop" style={{
+              <Link href="/registro" className={`guest-cta-desktop ${isHome ? 'show-on-mobile' : ''}`} style={{
                 display: 'inline-flex',
                 alignItems: 'center',
                 gap: '8px',
@@ -536,7 +536,7 @@ export default function Navbar() {
 
               {/* Mobile: Ícono de usuario con dropdown */}
               <button 
-                className="guest-icon-mobile"
+                className={`guest-icon-mobile ${isHome ? 'hide-on-mobile' : ''}`}
                 onClick={() => setIsGuestMenuOpen(!isGuestMenuOpen)}
                 style={{
                   width: '40px',
