@@ -405,7 +405,7 @@ function NuevoServicioContent() {
       </div>
 
       <div className="glass-panel" style={{ padding: 'var(--spacing-6)', borderRadius: 'var(--radius-lg)' }}>
-        <div style={{ display: 'grid', gridTemplateColumns: '1fr', gap: '32px' }}>
+        <div className="grid grid-cols-1 gap-8">
 
           {currentStep === 1 && (
             <>
@@ -537,7 +537,7 @@ function NuevoServicioContent() {
                     color: 'var(--color-text-main)', fontSize: '1rem', outline: 'none'
                   }}
                 />
-                <button type="button" onClick={addFeature} className="btn btn-outline" style={{ padding: '0 24px', borderRadius: 'var(--radius-md)' }}>Agregar</button>
+                <button type="button" onClick={addFeature} className="btn btn-outline w-full md:w-auto" style={{ padding: '0 24px', borderRadius: 'var(--radius-md)' }}>Agregar</button>
               </div>
               {features.length > 0 && (
                 <ul style={{ listStyle: 'none', padding: 0, margin: 0, display: 'flex', flexDirection: 'column', gap: '8px' }}>
@@ -552,7 +552,7 @@ function NuevoServicioContent() {
             </div>
 
             {/* Category & Subcategory */}
-            <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '16px' }}>
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
               <div>
                 <label style={{ display: 'block', color: 'var(--color-text-main)', fontWeight: 600, marginBottom: '8px' }}>
                   Categoría Principal *
@@ -589,10 +589,10 @@ function NuevoServicioContent() {
           )}
 
           {currentStep === 2 && (
-            <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '24px' }}>
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
 
             {/* Price */}
-            <div style={{ gridColumn: '1 / -1' }}>
+            <div className="col-span-full">
               <label style={{ display: 'block', color: 'var(--color-text-main)', fontWeight: 600, marginBottom: '8px' }}>
                 Precio *
               </label>
@@ -642,7 +642,7 @@ function NuevoServicioContent() {
             </div>
 
             {/* Calendar */}
-            <div style={{ gridColumn: '1 / -1', background: 'rgba(255,255,255,0.02)', padding: '16px', borderRadius: 'var(--radius-md)', border: '1px solid var(--color-border)' }}>
+            <div style={{ gridColumn: "1 / -1" /* col-span-full */, background: 'rgba(255,255,255,0.02)', padding: '16px', borderRadius: 'var(--radius-md)', border: '1px solid var(--color-border)' }}>
               <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
                 <div>
                   <h4 style={{ color: 'var(--color-text-main)', margin: '0 0 4px 0', display: 'flex', alignItems: 'center', gap: '8px' }}>
@@ -695,7 +695,7 @@ function NuevoServicioContent() {
             </div>
 
             {/* Cupos */}
-            <div style={{ gridColumn: '1 / -1' }}>
+            <div className="col-span-full">
               <label style={{ display: 'block', color: 'var(--color-text-main)', fontWeight: 600, marginBottom: '8px' }}>
                 Cupos Disponibles
               </label>
@@ -741,9 +741,9 @@ function NuevoServicioContent() {
           )}
 
           {currentStep === 3 && (
-            <div style={{ display: 'grid', gridTemplateColumns: '1fr', gap: '32px' }}>
+            <div className="grid grid-cols-1 gap-8">
             {/* Ubicación del Servicio */}
-            <div style={{ gridColumn: '1 / -1' }}>
+            <div className="col-span-full">
               <label style={{ display: 'block', color: 'var(--color-text-main)', fontWeight: 600, marginBottom: '8px' }}>
                 Ubicación del Servicio *
               </label>
@@ -832,7 +832,7 @@ function NuevoServicioContent() {
             </div>
 
             {/* Área de Cobertura */}
-            <div style={{ gridColumn: '1 / -1', background: 'rgba(255,255,255,0.02)', padding: '20px', borderRadius: 'var(--radius-lg)', border: '1px solid var(--color-border)' }}>
+            <div style={{ gridColumn: "1 / -1" /* col-span-full */, background: 'rgba(255,255,255,0.02)', padding: '20px', borderRadius: 'var(--radius-lg)', border: '1px solid var(--color-border)' }}>
               <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: showServiceArea ? '20px' : '0' }}>
                 <div>
                   <h4 style={{ color: 'var(--color-text-main)', margin: '0 0 4px 0', display: 'flex', alignItems: 'center', gap: '8px', fontSize: '1.1rem' }}>
@@ -877,7 +877,7 @@ function NuevoServicioContent() {
               </div>
 
               {showServiceArea && permissions.mapasTerritorio && (
-                <div style={{ display: 'flex', flexDirection: 'column', gap: '12px' }}>
+                <div className="flex flex-col gap-3">
                   <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
                     <button 
                       type="button"
@@ -913,7 +913,7 @@ function NuevoServicioContent() {
             </div>
             
             {/* Descuentos Promocionales */}
-            <div style={{ gridColumn: '1 / -1', background: 'rgba(255, 115, 0, 0.05)', padding: '20px', borderRadius: 'var(--radius-lg)', border: '1px solid rgba(255, 115, 0, 0.2)' }}>
+            <div style={{ gridColumn: "1 / -1" /* col-span-full */, background: 'rgba(255, 115, 0, 0.05)', padding: '20px', borderRadius: 'var(--radius-lg)', border: '1px solid rgba(255, 115, 0, 0.2)' }}>
               <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: hasDiscount ? '16px' : '0' }}>
                 <div>
                   <h3 style={{ margin: '0 0 4px 0', color: 'var(--color-text-main)', fontSize: '1.1rem' }}>Descuentos Promocionales</h3>
@@ -944,7 +944,7 @@ function NuevoServicioContent() {
                     </div>
                     {hasBaseDiscount && (
                       <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '20px' }}>
-                        <div style={{ gridColumn: '1 / -1' }}>
+                        <div className="col-span-full">
                           <label style={{ display: 'block', color: 'var(--color-text-muted)', fontSize: '0.85rem', marginBottom: '8px', fontWeight: 500 }}>Nombre del Descuento Principal</label>
                           <input type="text" placeholder="Ej: Promoción de Lanzamiento" value={discountName} onChange={(e) => setDiscountName(e.target.value)} style={{ width: '100%', padding: '12px 16px', borderRadius: 'var(--radius-md)', background: 'rgba(255,255,255,0.05)', border: '1px solid rgba(255,255,255,0.1)', color: 'white', outline: 'none', transition: 'all 0.2s', fontSize: '0.95rem' }} onFocus={e => { e.currentTarget.style.borderColor = 'var(--color-primary)'; e.currentTarget.style.background = 'rgba(255,255,255,0.08)'; }} onBlur={e => { e.currentTarget.style.borderColor = 'rgba(255,255,255,0.1)'; e.currentTarget.style.background = 'rgba(255,255,255,0.05)'; }} />
                         </div>
@@ -973,7 +973,7 @@ function NuevoServicioContent() {
                       </button>
                     </div>
                     
-                    <div style={{ display: 'flex', flexDirection: 'column', gap: '16px' }}>
+                    <div className="flex flex-col gap-4">
                       {timeDiscounts.map((rule, idx) => (
                         <div key={idx} style={{ display: 'grid', gridTemplateColumns: '1fr 1fr 1fr auto', gap: '16px', alignItems: 'end', background: 'rgba(0,0,0,0.3)', padding: '16px', borderRadius: 'var(--radius-md)', border: '1px solid rgba(255,255,255,0.05)', transition: 'background 0.2s, transform 0.2s', position: 'relative', zIndex: 10 - idx }} onMouseEnter={e => { e.currentTarget.style.background = 'rgba(255,255,255,0.05)'; e.currentTarget.style.transform = 'translateX(4px)'; }} onMouseLeave={e => { e.currentTarget.style.background = 'rgba(0,0,0,0.3)'; e.currentTarget.style.transform = 'translateX(0)'; }}>
                           <div>
@@ -1007,7 +1007,7 @@ function NuevoServicioContent() {
                       </button>
                     </div>
                     
-                    <div style={{ display: 'flex', flexDirection: 'column', gap: '16px' }}>
+                    <div className="flex flex-col gap-4">
                       {earlyBirdDiscounts.map((rule, idx) => (
                         <div key={idx} style={{ display: 'grid', gridTemplateColumns: '1fr 1fr 1fr auto', gap: '16px', alignItems: 'end', background: 'rgba(0,0,0,0.3)', padding: '16px', borderRadius: 'var(--radius-md)', border: '1px solid rgba(255,255,255,0.05)', transition: 'background 0.2s, transform 0.2s', position: 'relative', zIndex: 10 - idx }} onMouseEnter={e => { e.currentTarget.style.background = 'rgba(255,255,255,0.05)'; e.currentTarget.style.transform = 'translateX(4px)'; }} onMouseLeave={e => { e.currentTarget.style.background = 'rgba(0,0,0,0.3)'; e.currentTarget.style.transform = 'translateX(0)'; }}>
                           <div>
@@ -1041,7 +1041,7 @@ function NuevoServicioContent() {
                       </button>
                     </div>
                     
-                    <div style={{ display: 'flex', flexDirection: 'column', gap: '16px' }}>
+                    <div className="flex flex-col gap-4">
                       {seasonRules.map((rule, idx) => (
                         <div key={idx} style={{ display: 'flex', flexDirection: 'column', gap: '12px', background: 'rgba(0,0,0,0.3)', padding: '20px', borderRadius: 'var(--radius-md)', border: '1px solid rgba(255,255,255,0.05)', transition: 'background 0.2s', position: 'relative', zIndex: 10 - idx }} onMouseEnter={e => e.currentTarget.style.background = 'rgba(255,255,255,0.03)'} onMouseLeave={e => e.currentTarget.style.background = 'rgba(0,0,0,0.3)'}>
                           <div style={{ display: 'grid', gridTemplateColumns: '1fr auto', gap: '16px', alignItems: 'center' }}>
@@ -1116,11 +1116,11 @@ function NuevoServicioContent() {
             </div>
           )}
 
-          <div style={{ borderTop: '1px solid var(--color-border)', paddingTop: '24px', display: 'flex', justifyContent: 'flex-end', gap: '16px' }}>
+          <div className="border-t border-[var(--color-border)] pt-6 flex flex-col md:flex-row justify-end gap-4">
             {currentStep > 1 ? (
               <button 
                 type="button" 
-                className="btn btn-outline"
+                className="btn btn-outline w-full md:w-auto"
                 onClick={handlePrev}
                 style={{ padding: '12px 24px', borderRadius: 'var(--radius-full)' }}
               >
@@ -1129,7 +1129,7 @@ function NuevoServicioContent() {
             ) : (
               <button 
                 type="button" 
-                className="btn btn-outline"
+                className="btn btn-outline w-full md:w-auto"
                 onClick={() => router.push('/mis-tiendas')}
                 style={{ padding: '12px 24px', borderRadius: 'var(--radius-full)' }}
               >
@@ -1140,7 +1140,7 @@ function NuevoServicioContent() {
             {currentStep < 3 ? (
               <button 
                 type="button" 
-                className="btn btn-primary"
+                className="btn btn-primary w-full md:w-auto"
                 onClick={handleNext}
                 style={{ padding: '12px 32px', borderRadius: 'var(--radius-full)' }}
               >
@@ -1149,7 +1149,7 @@ function NuevoServicioContent() {
             ) : (
               <button 
                 type="button" 
-                className="btn btn-primary"
+                className="btn btn-primary w-full md:w-auto"
                 onClick={handleSubmit}
                 style={{ padding: '12px 32px', borderRadius: 'var(--radius-full)' }}
               >

@@ -485,7 +485,7 @@ function NuevoProductoContent() {
       )}
 
       <div className="glass-panel" style={{ padding: 'var(--spacing-6)', borderRadius: 'var(--radius-lg)' }}>
-        <div style={{ display: 'grid', gridTemplateColumns: '1fr', gap: '32px' }}>
+        <div className="grid grid-cols-1 gap-8">
 
           {currentStep === 1 && (
             <>
@@ -614,7 +614,7 @@ function NuevoProductoContent() {
                     color: 'var(--color-text-main)', fontSize: '1rem', outline: 'none'
                   }}
                 />
-                <button type="button" onClick={addFeature} className="btn btn-outline" style={{ padding: '0 24px', borderRadius: 'var(--radius-md)' }}>Agregar</button>
+                <button type="button" onClick={addFeature} className="btn btn-outline w-full md:w-auto" style={{ padding: '0 24px', borderRadius: 'var(--radius-md)' }}>Agregar</button>
               </div>
               {features.length > 0 && (
                 <ul style={{ listStyle: 'none', padding: 0, margin: 0, display: 'flex', flexDirection: 'column', gap: '8px' }}>
@@ -628,7 +628,7 @@ function NuevoProductoContent() {
               )}
             </div>
 
-            <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '16px' }}>
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
               <div>
                 <label style={{ display: 'block', color: 'var(--color-text-main)', fontWeight: 600, marginBottom: '8px' }}>
                   Categoría Principal *
@@ -662,7 +662,7 @@ function NuevoProductoContent() {
               )}
 
               {category === 'Armas de Fuego' && (
-                <div style={{ gridColumn: '1 / -1', background: 'rgba(255, 193, 7, 0.1)', border: '1px solid #ffc107', borderRadius: '8px', padding: '16px', display: 'flex', gap: '12px', alignItems: 'flex-start', marginTop: '8px' }}>
+                <div style={{ gridColumn: "1 / -1" /* col-span-full */, background: 'rgba(255, 193, 7, 0.1)', border: '1px solid #ffc107', borderRadius: '8px', padding: '16px', display: 'flex', gap: '12px', alignItems: 'flex-start', marginTop: '8px' }}>
                   <input
                     type="checkbox"
                     id="firearmsPermit"
@@ -681,9 +681,9 @@ function NuevoProductoContent() {
           )}
 
           {currentStep === 2 && (
-            <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '24px' }}>
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
 
-            <div style={{ gridColumn: '1 / -1' }}>
+            <div className="col-span-full">
               <label style={{ display: 'block', color: 'var(--color-text-main)', fontWeight: 600, marginBottom: '8px' }}>
                 Precio *
               </label>
@@ -775,7 +775,7 @@ function NuevoProductoContent() {
           )}
 
           {currentStep === 3 && (
-            <div style={{ display: 'grid', gridTemplateColumns: '1fr', gap: '32px' }}>
+            <div className="grid grid-cols-1 gap-8">
             <div>
               <label style={{ display: 'block', color: 'var(--color-text-main)', fontWeight: 600, marginBottom: '8px' }}>
                 Opciones de Envío
@@ -834,7 +834,7 @@ function NuevoProductoContent() {
               {pickupAvailable === 'si' && (
                 <div style={{ marginTop: '16px', background: 'rgba(0,0,0,0.2)', padding: '16px', borderRadius: 'var(--radius-md)', border: '1px solid var(--color-border)' }}>
                   {vendorLocations.length > 0 ? (
-                    <div style={{ display: 'flex', flexDirection: 'column', gap: '12px' }}>
+                    <div className="flex flex-col gap-3">
                       <p style={{ margin: '0 0 8px 0', color: 'var(--color-text-main)', fontSize: '0.9rem', fontWeight: 500 }}>Selecciona las sucursales habilitadas:</p>
                       {vendorLocations.map((loc, idx) => (
                         <label key={idx} style={{ display: 'flex', alignItems: 'center', gap: '8px', cursor: 'pointer' }}>
@@ -855,7 +855,7 @@ function NuevoProductoContent() {
               )}
             </div>
             
-            <div style={{ gridColumn: '1 / -1', background: 'rgba(255, 115, 0, 0.05)', padding: '20px', borderRadius: 'var(--radius-lg)', border: '1px solid rgba(255, 115, 0, 0.2)' }}>
+            <div style={{ gridColumn: "1 / -1" /* col-span-full */, background: 'rgba(255, 115, 0, 0.05)', padding: '20px', borderRadius: 'var(--radius-lg)', border: '1px solid rgba(255, 115, 0, 0.2)' }}>
               <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: hasDiscount ? '16px' : '0' }}>
                 <div>
                   <h3 style={{ margin: '0 0 4px 0', color: 'var(--color-text-main)', fontSize: '1.1rem' }}>Descuentos Promocionales</h3>
@@ -867,8 +867,8 @@ function NuevoProductoContent() {
               </div>
               
               {hasDiscount && (
-                <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '16px' }}>
-                  <div style={{ gridColumn: '1 / -1' }}>
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                  <div className="col-span-full">
                     <label style={{ display: 'block', color: 'var(--color-text-main)', fontSize: '0.9rem', marginBottom: '6px' }}>Nombre del Descuento</label>
                     <input type="text" placeholder="Ej: Especial Día del Padre" value={discountName} onChange={(e) => setDiscountName(e.target.value)} style={{ width: '100%', padding: '10px 14px', borderRadius: 'var(--radius-md)', background: 'rgba(0,0,0,0.3)', border: '1px solid var(--color-border)', color: 'var(--color-text-main)', outline: 'none' }} />
                   </div>
@@ -880,7 +880,7 @@ function NuevoProductoContent() {
                     <label style={{ display: 'block', color: 'var(--color-text-main)', fontSize: '0.9rem', marginBottom: '6px' }}>Valor del Descuento</label>
                     <input type="number" placeholder={discountType === 'porcentaje' ? 'Ej: 15' : 'Ej: 500'} value={discountValue} onChange={(e) => setDiscountValue(e.target.value)} style={{ width: '100%', padding: '10px 14px', borderRadius: 'var(--radius-md)', background: 'rgba(0,0,0,0.3)', border: '1px solid var(--color-border)', color: 'var(--color-text-main)', outline: 'none' }} />
                   </div>
-                  <div style={{ gridColumn: '1 / -1', marginTop: '16px', paddingTop: '16px', borderTop: '1px dashed rgba(255,115,0,0.3)' }}>
+                  <div style={{ gridColumn: "1 / -1" /* col-span-full */, marginTop: '16px', paddingTop: '16px', borderTop: '1px dashed rgba(255,115,0,0.3)' }}>
                     <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '12px' }}>
                       <label style={{ color: 'var(--color-text-main)', fontSize: '0.95rem', fontWeight: 600 }}>Descuentos por Cantidad (Mayorista)</label>
                       <button 
@@ -893,7 +893,7 @@ function NuevoProductoContent() {
                     </div>
                     
                     {volumeDiscounts.map((rule, idx) => (
-                      <div key={idx} style={{ display: 'grid', gridTemplateColumns: '1fr 1fr 1fr auto', gap: '12px', alignItems: 'end', marginBottom: '12px', background: 'rgba(0,0,0,0.2)', padding: '12px', borderRadius: 'var(--radius-md)' }}>
+                      <div key={idx} className="grid grid-cols-1 md:grid-cols-[1fr_1fr_1fr_auto] gap-3 items-end mb-3 bg-black/20 p-3 rounded-md">
                         <div>
                           <label style={{ display: 'block', color: 'var(--color-text-muted)', fontSize: '0.8rem', marginBottom: '4px' }}>Mínimo de Unidades</label>
                           <input type="number" min="2" value={rule.minQty} onChange={(e) => {
@@ -973,11 +973,11 @@ function NuevoProductoContent() {
             </div>
           )}
 
-          <div style={{ borderTop: '1px solid var(--color-border)', paddingTop: '24px', display: 'flex', justifyContent: 'flex-end', gap: '16px' }}>
+          <div className="border-t border-[var(--color-border)] pt-6 flex flex-col md:flex-row justify-end gap-4">
             {currentStep > 1 ? (
               <button 
                 type="button" 
-                className="btn btn-outline"
+                className="btn btn-outline w-full md:w-auto"
                 onClick={handlePrev}
                 style={{ padding: '12px 24px', borderRadius: 'var(--radius-full)' }}
               >
@@ -986,7 +986,7 @@ function NuevoProductoContent() {
             ) : (
               <button 
                 type="button" 
-                className="btn btn-outline"
+                className="btn btn-outline w-full md:w-auto"
                 onClick={() => router.push('/mis-tiendas')}
                 style={{ padding: '12px 24px', borderRadius: 'var(--radius-full)' }}
               >
@@ -997,7 +997,7 @@ function NuevoProductoContent() {
             {currentStep < 3 ? (
               <button 
                 type="button" 
-                className="btn btn-primary"
+                className="btn btn-primary w-full md:w-auto"
                 onClick={handleNext}
                 style={{ padding: '12px 32px', borderRadius: 'var(--radius-full)' }}
               >
@@ -1006,7 +1006,7 @@ function NuevoProductoContent() {
             ) : (
               <button 
                 type="button" 
-                className="btn btn-primary"
+                className="btn btn-primary w-full md:w-auto"
                 onClick={handleSubmit}
                 disabled={isSubmitting}
                 style={{ padding: '12px 32px', borderRadius: 'var(--radius-full)', opacity: isSubmitting ? 0.7 : 1, cursor: isSubmitting ? 'not-allowed' : 'pointer' }}
