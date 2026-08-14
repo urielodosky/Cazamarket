@@ -89,7 +89,7 @@ export default function TemaPage({ params }: { params: Promise<{ id: string }> }
     const supabase = createClient();
     const { data: topic, error: topicError } = await supabase
       .from('forum_topics')
-      .select('*, author:profiles(store_name, avatar_url, first_name, last_name, username)')
+      .select('*, author:profiles(store_name, avatar_url, first_name, last_name, full_name)')
       .eq('id', id)
       .single();
     
@@ -97,7 +97,7 @@ export default function TemaPage({ params }: { params: Promise<{ id: string }> }
     
     const { data: repliesData, error: repliesError } = await supabase
       .from('forum_replies')
-      .select('*, author:profiles(store_name, avatar_url, first_name, last_name, username)')
+      .select('*, author:profiles(store_name, avatar_url, first_name, last_name, full_name)')
       .eq('topic_id', id)
       .order('created_at', { ascending: true });
       
@@ -108,7 +108,7 @@ export default function TemaPage({ params }: { params: Promise<{ id: string }> }
       repliesData.forEach((r: any) => {
         let authorName = 'Usuario';
         if (r.author) {
-          authorName = r.author.store_name || r.author.username || `${r.author.first_name || ''} ${r.author.last_name || ''}`.trim() || 'Usuario';
+          authorName = r.author.store_name || r.author.full_name || `${r.author.first_name || ''} ${r.author.last_name || ''}`.trim() || 'Usuario';
         }
         const formattedReply: ForumReply = {
           id: r.id,
@@ -133,7 +133,7 @@ export default function TemaPage({ params }: { params: Promise<{ id: string }> }
 
     let authorName = 'Usuario';
     if (topic.author) {
-      authorName = topic.author.store_name || topic.author.username || `${topic.author.first_name || ''} ${topic.author.last_name || ''}`.trim() || 'Usuario';
+      authorName = topic.author.store_name || topic.author.full_name || `${topic.author.first_name || ''} ${topic.author.last_name || ''}`.trim() || 'Usuario';
     }
 
     const viewKey = `cazamarket_viewed_post_${id}`;

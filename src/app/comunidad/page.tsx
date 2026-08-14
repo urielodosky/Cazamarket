@@ -82,7 +82,7 @@ export default function ComunidadPage() {
     const supabase = createClient();
     const { data, error } = await supabase
       .from('forum_topics')
-      .select('*, author:profiles(store_name, avatar_url, first_name, last_name, username), forum_replies(id)')
+      .select('*, author:profiles(store_name, avatar_url, first_name, last_name, full_name), forum_replies(id)')
       .order('created_at', { ascending: false });
     
     if (error) throw error;
@@ -90,7 +90,7 @@ export default function ComunidadPage() {
     return data.map((t: any) => {
       let authorName = 'CazadorAnonimo';
       if (t.author) {
-        authorName = t.author.store_name || t.author.username || `${t.author.first_name || ''} ${t.author.last_name || ''}`.trim() || 'Usuario';
+        authorName = t.author.store_name || t.author.full_name || `${t.author.first_name || ''} ${t.author.last_name || ''}`.trim() || 'Usuario';
       }
       return {
         id: t.id,
