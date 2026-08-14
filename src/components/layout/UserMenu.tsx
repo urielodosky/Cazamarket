@@ -86,7 +86,7 @@ export default function UserMenu() {
             {/* Opciones del menú */}
             <div className="user-dropdown-body">
               <button 
-                className="dropdown-item toggle-mode-btn mobile-hidden" 
+                className="dropdown-item toggle-mode-btn" 
                 onClick={() => {
                   if (isVendor) {
                     toggleVendorMode();
