@@ -19,7 +19,8 @@ export default function ToastNotifications() {
       try {
         hasCheckedRef.current = true; // Only check once per session load
         
-        // 1. Check Unread Messages
+        // 1. Check Unread Messages (Temporarily disabled due to schema mismatch)
+        /*
         const { data: messages } = await supabase
           .from('messages')
           .select('id, sender_id')
@@ -33,6 +34,7 @@ export default function ToastNotifications() {
             duration: 5000,
           });
         }
+        */
 
         // 2. Check Plan Expiration
         const { data: profile, error } = await supabase
