@@ -35,14 +35,20 @@ export default function ToastNotifications() {
         }
 
         // 2. Check Plan Expiration
-        const { data: profile } = await supabase
+        const { data: profile, error } = await supabase
           .from('profiles')
-          .select('plan_tier, plan_expires_at')
+          .select('product_plan_tier, service_plan_tier, subscription_start_date')
           .eq('id', supabaseUser.id)
           .single();
 
-        if (isMounted && profile && profile.plan_tier !== 'gratis' && profile.plan_expires_at) {
-          const expiresAt = new Date(profile.plan_expires_at);
+        if (error) {
+          console.error("Error fetching profile for notifications:", error);
+          return;
+        }
+
+        if (isMounted && profile && (profile.product_plan_tier !== 'gratis' || profile.service_plan_tier !== 'gratis') && profile.subscription_start_date) {
+          const startDate = new Date(profile.subscription_start_date);
+          const expiresAt = new Date(startDate.setMonth(startDate.getMonth() + 1)); // Assuming 1 month duration
           const now = new Date();
           const diffTime = expiresAt.getTime() - now.getTime();
           const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
