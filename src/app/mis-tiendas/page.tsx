@@ -336,23 +336,23 @@ export default function MiNegocioPage() {
     <div className="container-page" style={customStyles}>
 
       {/* Limits indicator */}
-      <div style={{ display: 'flex', justifyContent: 'flex-end', marginBottom: '16px', gap: '12px' }}>
-        <div style={{ display: 'flex', alignItems: 'center', gap: '8px', padding: '6px 16px', borderRadius: 'var(--radius-full)', background: 'color-mix(in srgb, var(--color-primary) 8%, transparent)', border: '1px solid color-mix(in srgb, var(--color-primary) 20%, transparent)' }}>
+      <div className="flex flex-wrap justify-end mb-4 gap-3">
+        <div className="flex items-center gap-2 px-4 py-1.5 rounded-full border" style={{ background: 'color-mix(in srgb, var(--color-primary) 8%, transparent)', borderColor: 'color-mix(in srgb, var(--color-primary) 20%, transparent)' }}>
           <span style={{ color: 'var(--color-primary)', fontWeight: 600, fontSize: '0.85rem' }}>Plan: {planDisplayName}</span>
         </div>
-        <div style={{ display: 'flex', alignItems: 'center', gap: '8px', padding: '6px 16px', borderRadius: 'var(--radius-full)', background: 'var(--color-bg-surface-elevated)', border: '1px solid var(--color-border)' }}>
-          <span style={{ color: 'var(--color-text-muted)', fontSize: '0.85rem' }}>Productos:</span>
-          <span style={{ color: themeColors.textWhite, fontWeight: 600, fontSize: '0.85rem' }}>{myProducts.length} / {permissions.maxProductos === Infinity ? '∞' : permissions.maxProductos}</span>
+        <div className="flex items-center gap-2 px-4 py-1.5 rounded-full border border-[var(--color-border)] bg-[var(--color-bg-surface-elevated)]">
+          <span className="text-[0.85rem] text-[var(--color-text-muted)]">Productos:</span>
+          <span className="font-semibold text-[0.85rem]" style={{ color: themeColors.textWhite }}>{myProducts.length} / {permissions.maxProductos === Infinity ? '∞' : permissions.maxProductos}</span>
         </div>
         {permissions.maxServicios > 0 && (
-          <div style={{ display: 'flex', alignItems: 'center', gap: '8px', padding: '6px 16px', borderRadius: 'var(--radius-full)', background: 'var(--color-bg-surface-elevated)', border: '1px solid var(--color-border)' }}>
-            <span style={{ color: 'var(--color-text-muted)', fontSize: '0.85rem' }}>Servicios:</span>
-            <span style={{ color: themeColors.textWhite, fontWeight: 600, fontSize: '0.85rem' }}>{myServices.length} / {permissions.maxServicios}</span>
+          <div className="flex items-center gap-2 px-4 py-1.5 rounded-full border border-[var(--color-border)] bg-[var(--color-bg-surface-elevated)]">
+            <span className="text-[0.85rem] text-[var(--color-text-muted)]">Servicios:</span>
+            <span className="font-semibold text-[0.85rem]" style={{ color: themeColors.textWhite }}>{myServices.length} / {permissions.maxServicios}</span>
           </div>
         )}
       </div>
 
-      <div className="glass-panel" style={{ borderRadius: 'var(--radius-lg)', padding: 0, position: 'relative' }}>
+      <div className="glass-panel relative p-0 rounded-[var(--radius-lg)]">
 
         {/* Banner */}
         {isAtLeast(planTier, 'emprendedor') ? (
@@ -397,37 +397,23 @@ export default function MiNegocioPage() {
           </div>
         )}
 
-        <div style={{ padding: '0 var(--spacing-5) var(--spacing-5) var(--spacing-5)', position: 'relative' }}>
+        <div className="relative px-5 pb-5">
 
           {/* Header Info (Avatar & Title) */}
-          <div style={{
-            display: 'flex',
-            gap: '32px',
-            alignItems: 'flex-end',
-            marginTop: (isAtLeast(planTier, 'emprendedor') && storeBanner) ? '-60px' : '-40px',
-            marginBottom: '32px',
-            position: 'relative',
-            zIndex: 10
-          }}>
+          <div 
+            className="flex flex-col items-center md:flex-row md:items-end gap-6 md:gap-8 relative z-10 mb-8"
+            style={{ marginTop: (isAtLeast(planTier, 'emprendedor') && storeBanner) ? '-60px' : '-40px' }}
+          >
             {/* Avatar */}
             <div
-              style={{ position: 'relative', cursor: 'pointer' }}
+              className="relative cursor-pointer"
               onMouseEnter={() => setIsAvatarHovered(true)}
               onMouseLeave={() => setIsAvatarHovered(false)}
             >
-              <div style={{
-                width: '140px',
-                height: '140px',
-                borderRadius: '50%',
-                border: '6px solid var(--color-bg-surface)',
-                backgroundImage: `url(${avatar || 'https://images.unsplash.com/photo-1511497584788-876760111969?q=80&w=200&auto=format&fit=crop'})`,
-                backgroundSize: 'cover',
-                backgroundPosition: 'center',
-                backgroundColor: 'var(--color-bg-surface-elevated)',
-                boxShadow: '0 8px 24px rgba(0,0,0,0.6)',
-                flexShrink: 0,
-                position: 'relative'
-              }}>
+              <div 
+                className="w-32 h-32 md:w-[140px] md:h-[140px] rounded-full border-[6px] border-[var(--color-bg-surface)] bg-cover bg-center bg-[var(--color-bg-surface-elevated)] shrink-0 relative shadow-[0_8px_24px_rgba(0,0,0,0.6)]"
+                style={{ backgroundImage: `url(${avatar || 'https://images.unsplash.com/photo-1511497584788-876760111969?q=80&w=200&auto=format&fit=crop'})` }}
+              >
                 {permissions.insigniaVerificada && (
                   <div title="Negocio Verificado" style={{ position: 'absolute', bottom: '4px', right: '4px', background: 'var(--color-bg-surface)', borderRadius: '50%', padding: '4px', display: 'flex', border: '2px solid var(--color-bg-surface)', boxShadow: '0 2px 8px rgba(0,0,0,0.5)' }}>
                     <svg width="20" height="20" viewBox="0 0 24 24" fill="var(--color-primary)" stroke="var(--color-bg-surface)" strokeWidth="1" strokeLinecap="round" strokeLinejoin="round"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"></path></svg>
@@ -450,47 +436,43 @@ export default function MiNegocioPage() {
             </div>
 
             {/* Title & Key Stats */}
-            <div style={{ flex: 1, paddingBottom: '16px', position: 'relative' }}>
-              <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start' }}>
-                <div style={{ width: '100%', maxWidth: '600px' }}>
-                  {isEditingName ? (
-                    <input
-                      autoFocus
-                      type="text"
-                      value={name}
-                      onChange={(e) => setName(e.target.value)}
-                      onBlur={() => {
+            <div className="flex-1 min-w-0 text-center md:text-left">
+              <div className="flex flex-col items-center md:items-start">
+                {isEditingName ? (
+                  <input
+                    autoFocus
+                    value={name}
+                    onChange={(e) => setName(e.target.value)}
+                    onBlur={() => {
+                      setIsEditingName(false);
+                      updateUser({ username: name, avatar });
+                    }}
+                    onKeyDown={(e) => {
+                      if (e.key === 'Enter') {
                         setIsEditingName(false);
                         updateUser({ username: name, avatar });
-                      }}
-                      onKeyDown={(e) => {
-                        if (e.key === 'Enter') {
-                          setIsEditingName(false);
-                          updateUser({ username: name, avatar });
-                        }
-                      }}
-                      style={{ fontSize: '2.5rem', fontWeight: 'bold', margin: '0 0 12px 0', color: '#fff', background: 'rgba(255,255,255,0.05)', border: '1px dashed var(--color-primary)', borderRadius: 'var(--radius-md)', padding: '4px 12px', width: '100%', outline: 'none', lineHeight: 1.1 }}
-                    />
-                  ) : (
-                    <h1
-                      onClick={() => setIsEditingName(true)}
-                      style={{ fontSize: '2.5rem', margin: '0 0 12px 0', color: '#fff', lineHeight: 1.1, cursor: 'pointer', display: 'inline-block', borderBottom: '1px dashed rgba(255,255,255,0.2)' }}
-                      title="Clic para editar el nombre"
-                    >
-                      {name}
-                    </h1>
-                  )}
-                  {/* Rating block removed */}
-                </div>
+                      }
+                    }}
+                    className="text-3xl md:text-[2.5rem] font-bold mb-3 text-white bg-white/5 border border-dashed border-[var(--color-primary)] rounded-[var(--radius-md)] px-3 py-1 w-full outline-none leading-[1.1] text-center md:text-left"
+                  />
+                ) : (
+                  <h1
+                    onClick={() => setIsEditingName(true)}
+                    className="text-3xl md:text-[2.5rem] mb-3 text-white leading-[1.1] cursor-pointer inline-block border-b border-dashed border-white/20 text-center md:text-left"
+                    title="Clic para editar el nombre"
+                  >
+                    {name}
+                  </h1>
+                )}
               </div>
             </div>
           </div>
 
           {/* Description & Tags */}
-          <div style={{ display: 'flex', flexDirection: 'column', gap: '20px', marginBottom: '40px', position: 'relative', padding: '24px', background: 'rgba(255,255,255,0.02)', borderRadius: 'var(--radius-md)' }}>
+          <div className="flex flex-col gap-5 mb-10 relative p-6 bg-white/5 rounded-[var(--radius-md)]">
 
-            <div style={{ display: 'flex', gap: '16px', flexWrap: 'wrap', alignItems: 'center', position: 'relative', zIndex: 15 }}>
-              <div style={{ minWidth: '200px' }}>
+            <div className="flex gap-4 flex-wrap items-center relative z-10 w-full">
+              <div className="w-full md:flex-1 md:min-w-[200px]">
                 <CustomSelect
                   options={[
                     { value: '', label: 'Tipo de Negocio' },
@@ -512,7 +494,7 @@ export default function MiNegocioPage() {
                 const availableCategories = CATEGORIES_DATA.filter(c => !selectedOthers.includes(c.name));
 
                 return (
-                  <div key={index} style={{ minWidth: '220px', flex: 1 }}>
+                  <div key={index} className="w-full md:flex-1 md:min-w-[220px]">
                     <CustomSelect
                       options={[
                         { value: '', label: `Categoría ${index + 1}` },
@@ -540,16 +522,16 @@ export default function MiNegocioPage() {
                 onBlur={() => setIsEditingDesc(false)}
                 rows={3}
                 placeholder="Describe tu negocio en pocas palabras..."
-                style={{ width: '100%', background: 'rgba(255,255,255,0.05)', color: 'var(--color-text-main)', fontSize: '1.05rem', lineHeight: 1.6, padding: '12px', border: '1px dashed var(--color-primary)', borderRadius: 'var(--radius-md)', outline: 'none', resize: 'vertical' }}
+                className="w-full bg-white/5 text-[var(--color-text-main)] text-base md:text-lg leading-relaxed p-3 border border-dashed border-[var(--color-primary)] rounded-[var(--radius-md)] outline-none resize-y"
               />
             ) : (
               <p
                 onClick={() => setIsEditingDesc(true)}
                 title="Clic para editar la descripción"
-                style={{ color: description ? 'var(--color-text-muted)' : 'var(--color-text-muted)', fontSize: '1.05rem', lineHeight: 1.6, maxWidth: '900px', margin: 0, cursor: 'pointer', borderBottom: '1px dashed rgba(255,255,255,0.2)', paddingBottom: '4px', display: 'inline-block', opacity: description ? 1 : 0.6 }}
+                className={`text-[var(--color-text-muted)] text-base md:text-lg leading-relaxed max-w-[900px] m-0 cursor-pointer border-b border-dashed border-white/20 pb-1 inline-block ${description ? 'opacity-100' : 'opacity-60'}`}
               >
                 {description || (
-                  <span style={{ display: 'inline-flex', alignItems: 'center', gap: '8px' }}>
+                  <span className="inline-flex items-center gap-2">
                     <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"></path><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"></path></svg>
                     Añadir descripción a tu tienda...
                   </span>
@@ -560,13 +542,13 @@ export default function MiNegocioPage() {
           
           {/* Business Relations (Proveedores y Distribuidores) */}
           {(businessType === 'Minorista' || businessType === 'Mayorista' || businessType === 'Mixto') && (
-            <div style={{ display: 'flex', flexDirection: 'column', gap: '24px', marginBottom: '40px', padding: '24px', background: 'rgba(255,255,255,0.02)', borderRadius: 'var(--radius-md)' }}>
-              <h3 style={{ margin: 0, fontSize: '1.1rem', color: 'var(--color-text-main)', display: 'flex', alignItems: 'center', gap: '8px' }}>
+            <div className="flex flex-col gap-6 mb-10 p-6 bg-white/5 rounded-[var(--radius-md)]">
+              <h3 className="m-0 text-lg text-[var(--color-text-main)] flex items-center gap-2">
                 <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"></path><circle cx="9" cy="7" r="4"></circle><path d="M23 21v-2a4 4 0 0 0-3-3.87"></path><path d="M16 3.13a4 4 0 0 1 0 7.75"></path></svg>
                 Red de Alianzas Comerciales
               </h3>
               
-              <div style={{ display: 'flex', flexDirection: 'column', gap: '20px' }}>
+              <div className="flex flex-col gap-5">
                 {(businessType === 'Minorista' || businessType === 'Mixto') && (
                   <BusinessTagInput 
                     label="Mis Proveedores" 
@@ -595,7 +577,7 @@ export default function MiNegocioPage() {
           )}
 
           {/* Tabs Navigation */}
-          <div style={{ display: 'flex', borderBottom: '1px solid var(--color-border)', marginBottom: '32px' }}>
+          <div className="flex border-b border-[var(--color-border)] mb-8 overflow-x-auto whitespace-nowrap scrollbar-hide">
             {['productos', 'servicios', 'informacion', ...(permissions.coloresPersonalizados ? ['apariencia'] : [])].map(tab => {
               if (tab === 'servicios' && permissions.maxServicios === 0) return null;
               if (tab === 'productos' && permissions.maxProductos === 0) return null;
@@ -603,20 +585,9 @@ export default function MiNegocioPage() {
                 <button
                   key={tab}
                   onClick={() => setActiveTab(tab as any)}
-                  style={{
-                    padding: '16px 32px',
-                    fontSize: '1.05rem',
-                    fontWeight: 600,
-                    color: activeTab === tab ? 'var(--color-primary)' : 'var(--color-text-muted)',
-                    borderBottom: activeTab === tab ? '3px solid var(--color-primary)' : '3px solid transparent',
-                    background: 'none',
-                    borderTop: 'none',
-                    borderLeft: 'none',
-                    borderRight: 'none',
-                    cursor: 'pointer',
-                    textTransform: 'capitalize',
-                    transition: 'all 0.2s'
-                  }}
+                  className={`px-4 md:px-8 py-4 text-base md:text-[1.05rem] font-semibold border-b-4 bg-transparent outline-none cursor-pointer transition-colors ${
+                    activeTab === tab ? 'text-[var(--color-primary)] border-[var(--color-primary)]' : 'text-[var(--color-text-muted)] border-transparent hover:text-[var(--color-text-main)] hover:border-[var(--color-border)]'
+                  }`}
                 >
                   {tab === 'informacion' ? 'Información De Contacto' : tab === 'apariencia' ? 'Apariencia' : `Mis ${tab}`}
                 </button>
@@ -774,9 +745,9 @@ export default function MiNegocioPage() {
             {/* PRODUCTOS TAB */}
             {activeTab === 'productos' && (
               <div>
-                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '24px', flexWrap: 'wrap', gap: '16px' }}>
-                  <h3 style={{ margin: 0, fontSize: '1.5rem' }}>Catálogo de Productos</h3>
-                  <button onClick={() => handleCreateNew('product')} className="btn btn-primary" style={{ padding: '12px 24px', fontSize: '1rem', fontWeight: 600, borderRadius: 'var(--radius-full)', background: 'var(--color-primary)', color: '#fff', border: 'none', cursor: 'pointer' }}>
+                <div className="flex flex-col md:flex-row justify-between items-start md:items-center mb-6 flex-wrap gap-4">
+                  <h3 className="m-0 text-2xl font-bold">Catálogo de Productos</h3>
+                  <button onClick={() => handleCreateNew('product')} className="btn btn-primary w-full md:w-auto px-6 py-3 text-base font-semibold rounded-full bg-[var(--color-primary)] text-white border-none cursor-pointer">
                     + Nuevo Producto
                   </button>
                 </div>
@@ -870,14 +841,14 @@ export default function MiNegocioPage() {
             {/* SERVICIOS TAB */}
             {activeTab === 'servicios' && (
               <div>
-                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '24px', flexWrap: 'wrap', gap: '16px' }}>
-                  <h3 style={{ margin: 0, fontSize: '1.5rem' }}>Catálogo de Servicios</h3>
+                <div className="flex flex-col md:flex-row justify-between items-start md:items-center mb-6 flex-wrap gap-4">
+                  <h3 className="m-0 text-2xl font-bold">Catálogo de Servicios</h3>
                   {isAtLeast(planTier, 'emprendedor') ? (
-                    <button onClick={() => handleCreateNew('service')} className="btn btn-primary" style={{ padding: '12px 24px', fontSize: '1rem', fontWeight: 600, borderRadius: 'var(--radius-full)', background: 'var(--color-primary)', color: '#fff', border: 'none', cursor: 'pointer' }}>
+                    <button onClick={() => handleCreateNew('service')} className="btn btn-primary w-full md:w-auto px-6 py-3 text-base font-semibold rounded-full bg-[var(--color-primary)] text-white border-none cursor-pointer">
                       + Nuevo Servicio
                     </button>
                   ) : (
-                    <button onClick={() => router.push('/planes')} className="btn btn-primary" style={{ padding: '12px 24px', fontSize: '1rem', fontWeight: 600, borderRadius: 'var(--radius-full)', background: 'var(--color-border)', color: 'var(--color-text-muted)', border: 'none', cursor: 'pointer', display: 'flex', alignItems: 'center', gap: '8px' }}>
+                    <button onClick={() => router.push('/planes')} className="btn btn-primary w-full md:w-auto px-6 py-3 text-base font-semibold rounded-full bg-[var(--color-border)] text-[var(--color-text-muted)] border-none cursor-pointer flex items-center justify-center md:justify-start gap-2">
                       <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><rect x="3" y="11" width="18" height="11" rx="2" ry="2"></rect><path d="M7 11V7a5 5 0 0 1 10 0v4"></path></svg>
                       Bloqueado
                     </button>
@@ -978,7 +949,7 @@ export default function MiNegocioPage() {
 
             {/* INFORMACION TAB */}
             {activeTab === 'informacion' && (
-              <div style={{ display: 'grid', gridTemplateColumns: '1fr', gap: '40px', position: 'relative', padding: '24px', background: themeColors.bgSubtle3, borderRadius: 'var(--radius-md)' }}>
+              <div className="grid grid-cols-1 gap-10 relative p-6 rounded-[var(--radius-md)]" style={{ background: themeColors.bgSubtle3 }}>
                 <EditButton onClick={() => router.push('/configuracion')} style={{ top: '24px', right: '24px' }} label="Editar en Configuración" />
 
                 <div>

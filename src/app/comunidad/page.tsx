@@ -82,7 +82,7 @@ export default function ComunidadPage() {
     const supabase = createClient();
     const { data, error } = await supabase
       .from('forum_topics')
-      .select('*, author:profiles!author_id(store_name, avatar_url, first_name, last_name, username), forum_replies(id)')
+      .select('*, author:profiles(store_name, avatar_url, first_name, last_name, username), forum_replies(id)')
       .order('created_at', { ascending: false });
     
     if (error) throw error;

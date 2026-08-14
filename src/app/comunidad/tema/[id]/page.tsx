@@ -89,7 +89,7 @@ export default function TemaPage({ params }: { params: Promise<{ id: string }> }
     const supabase = createClient();
     const { data: topic, error: topicError } = await supabase
       .from('forum_topics')
-      .select('*, author:profiles!author_id(store_name, avatar_url, first_name, last_name, username)')
+      .select('*, author:profiles(store_name, avatar_url, first_name, last_name, username)')
       .eq('id', id)
       .single();
     
@@ -97,7 +97,7 @@ export default function TemaPage({ params }: { params: Promise<{ id: string }> }
     
     const { data: repliesData, error: repliesError } = await supabase
       .from('forum_replies')
-      .select('*, author:profiles!author_id(store_name, avatar_url, first_name, last_name, username)')
+      .select('*, author:profiles(store_name, avatar_url, first_name, last_name, username)')
       .eq('topic_id', id)
       .order('created_at', { ascending: true });
       
