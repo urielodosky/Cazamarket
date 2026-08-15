@@ -636,51 +636,9 @@ export default function MiNegocioPage() {
                   Ajusta los colores de tu tienda pública. Estos cambios se aplicarán automáticamente.
                 </p>
 
-                <div style={{ display: 'flex', flexDirection: 'column', gap: '24px' }}>
-                  <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', background: themeColors.bgSubtle2, padding: '20px', borderRadius: 'var(--radius-md)', border: `1px solid ${themeColors.borderSubtle2}` }}>
-                    <div>
-                      <h4 style={{ margin: '0 0 4px 0', fontSize: '1.1rem' }}>Color Principal</h4>
-                      <div style={{ color: 'var(--color-text-muted)', fontSize: '0.9rem' }}>Botones, íconos y detalles destacados</div>
-                    </div>
-                    <input
-                      type="color"
-                      value={theme.primaryColor}
-                      onChange={(e) => handleThemeChange('primaryColor', e.target.value)}
-                      style={{ width: '50px', height: '50px', padding: '0', border: 'none', borderRadius: '8px', cursor: 'pointer', background: 'none' }}
-                    />
-                  </div>
-
-                  <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', background: themeColors.bgSubtle2, padding: '20px', borderRadius: 'var(--radius-md)', border: `1px solid ${themeColors.borderSubtle2}` }}>
-                    <div>
-                      <h4 style={{ margin: '0 0 4px 0', fontSize: '1.1rem' }}>Color de Texto</h4>
-                      <div style={{ color: 'var(--color-text-muted)', fontSize: '0.9rem' }}>El color de los textos principales</div>
-                    </div>
-                    <input
-                      type="color"
-                      value={theme.textColor}
-                      onChange={(e) => handleThemeChange('textColor', e.target.value)}
-                      style={{ width: '50px', height: '50px', padding: '0', border: 'none', borderRadius: '8px', cursor: 'pointer', background: 'none' }}
-                    />
-                  </div>
-
-                  <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', background: themeColors.bgSubtle2, padding: '20px', borderRadius: 'var(--radius-md)', border: `1px solid ${themeColors.borderSubtle2}` }}>
-                    <div>
-                      <h4 style={{ margin: '0 0 4px 0', fontSize: '1.1rem' }}>Color de Fondo</h4>
-                      <div style={{ color: 'var(--color-text-muted)', fontSize: '0.9rem' }}>Fondo general de tu página de negocio</div>
-                    </div>
-                    <input
-                      type="color"
-                      value={theme.bgColor}
-                      onChange={(e) => handleThemeChange('bgColor', e.target.value)}
-                      style={{ width: '50px', height: '50px', padding: '0', border: 'none', borderRadius: '8px', cursor: 'pointer', background: 'none' }}
-                    />
-                  </div>
-                </div>
-
-                <div style={{ marginTop: '24px', display: 'flex', justifyContent: 'space-between', alignItems: 'center', background: themeColors.bgSubtle2, padding: '20px', borderRadius: 'var(--radius-md)', border: `1px solid ${themeColors.borderSubtle2}` }}>
+                <div style={{ marginBottom: '24px', display: 'flex', justifyContent: 'space-between', alignItems: 'center', background: themeColors.bgSubtle2, padding: '20px', borderRadius: 'var(--radius-md)', border: `1px solid ${themeColors.borderSubtle2}` }}>
                   <div>
-                    <h4 style={{ margin: '0 0 4px 0', fontSize: '1.1rem' }}>Fijar Colores (Ignorar Modo Claro)</h4>
-                    <div style={{ color: 'var(--color-text-muted)', fontSize: '0.9rem' }}>Obliga a que estos colores se vean igual para todos los usuarios.</div>
+                    <h4 style={{ margin: '0', fontSize: '1.1rem' }}>Fijar Colores</h4>
                   </div>
                   <label style={{ display: 'flex', alignItems: 'center', cursor: 'pointer' }}>
                     <div style={{ position: 'relative' }}>
@@ -703,6 +661,49 @@ export default function MiNegocioPage() {
                     </div>
                   </label>
                 </div>
+
+                {theme.forceCustom && (
+                  <div style={{ display: 'flex', flexDirection: 'column', gap: '24px' }}>
+                    <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', background: themeColors.bgSubtle2, padding: '20px', borderRadius: 'var(--radius-md)', border: `1px solid ${themeColors.borderSubtle2}` }}>
+                      <div>
+                        <h4 style={{ margin: '0 0 4px 0', fontSize: '1.1rem' }}>Color Principal</h4>
+                        <div style={{ color: 'var(--color-text-muted)', fontSize: '0.9rem' }}>Botones, íconos y detalles destacados</div>
+                      </div>
+                      <input
+                        type="color"
+                        value={theme.primaryColor}
+                        onChange={(e) => handleThemeChange('primaryColor', e.target.value)}
+                        style={{ width: '50px', height: '50px', padding: '0', border: 'none', borderRadius: '8px', cursor: 'pointer', background: 'none' }}
+                      />
+                    </div>
+
+                    <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', background: themeColors.bgSubtle2, padding: '20px', borderRadius: 'var(--radius-md)', border: `1px solid ${themeColors.borderSubtle2}` }}>
+                      <div>
+                        <h4 style={{ margin: '0 0 4px 0', fontSize: '1.1rem' }}>Color de Texto</h4>
+                        <div style={{ color: 'var(--color-text-muted)', fontSize: '0.9rem' }}>El color de los textos principales</div>
+                      </div>
+                      <input
+                        type="color"
+                        value={theme.textColor}
+                        onChange={(e) => handleThemeChange('textColor', e.target.value)}
+                        style={{ width: '50px', height: '50px', padding: '0', border: 'none', borderRadius: '8px', cursor: 'pointer', background: 'none' }}
+                      />
+                    </div>
+
+                    <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', background: themeColors.bgSubtle2, padding: '20px', borderRadius: 'var(--radius-md)', border: `1px solid ${themeColors.borderSubtle2}` }}>
+                      <div>
+                        <h4 style={{ margin: '0 0 4px 0', fontSize: '1.1rem' }}>Color de Fondo</h4>
+                        <div style={{ color: 'var(--color-text-muted)', fontSize: '0.9rem' }}>Fondo general de tu página de negocio</div>
+                      </div>
+                      <input
+                        type="color"
+                        value={theme.bgColor}
+                        onChange={(e) => handleThemeChange('bgColor', e.target.value)}
+                        style={{ width: '50px', height: '50px', padding: '0', border: 'none', borderRadius: '8px', cursor: 'pointer', background: 'none' }}
+                      />
+                    </div>
+                  </div>
+                )}
 
                 <div style={{ marginTop: '40px' }}>
                   <h4 style={{ margin: '0 0 16px 0', fontSize: '1.2rem', color: 'var(--color-text-main)' }}>Vista Previa de Tarjeta Pública</h4>
