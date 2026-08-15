@@ -713,10 +713,10 @@ export default function MiNegocioPage() {
                             </div>
                             
                             <div style={{ flex: 1, minWidth: 0, marginTop: (isAtLeast(planTier, 'emprendedor') && storeBanner) ? '12px' : '0', paddingRight: '40px' }}>
-                              <div style={{ display: 'flex', alignItems: 'center', gap: '8px', flexWrap: 'wrap' }}>
-                                <h3 style={{ margin: '0', fontSize: '1.25rem', color: 'var(--color-text-main)', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>{name || 'Mi Negocio'}</h3>
-                                <span style={{ background: 'var(--color-bg-subtle)', color: 'var(--color-text-muted)', padding: '2px 8px', borderRadius: 'var(--radius-full)', fontSize: '0.7rem', fontWeight: 600 }}>Nuevo</span>
-                                {isAtLeast(planTier, 'empresarial') && <span style={{ color: 'var(--color-primary)' }} title="Verificado">✓</span>}
+                              <div style={{ display: 'flex', alignItems: 'center', gap: '8px', flexWrap: 'nowrap' }}>
+                                <h3 style={{ margin: '0', fontSize: '1.25rem', color: 'var(--color-text-main)', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis', minWidth: 0 }}>{name || 'Mi Negocio'}</h3>
+                                <span style={{ background: 'var(--color-bg-subtle)', color: 'var(--color-text-muted)', padding: '2px 8px', borderRadius: 'var(--radius-full)', fontSize: '0.7rem', fontWeight: 600, flexShrink: 0 }}>Nuevo</span>
+                                {isAtLeast(planTier, 'empresarial') && <span style={{ color: 'var(--color-primary)', flexShrink: 0 }} title="Verificado">✓</span>}
                               </div>
                             </div>
                           </div>

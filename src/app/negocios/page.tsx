@@ -285,10 +285,11 @@ export default function NegociosPage() {
                   flexDirection: 'column',
                   justifyContent: 'center',
                   flex: 1,
+                  minWidth: 0,
                   paddingRight: '40px'
                 }}>
                   <div style={{ display: 'flex', alignItems: 'center', gap: '8px', marginBottom: '6px' }}>
-                    <h3 style={{ fontSize: '1.25rem', color: 'var(--color-text-main)', margin: '0', lineHeight: 1.2 }}>
+                    <h3 style={{ fontSize: '1.25rem', color: 'var(--color-text-main)', margin: '0', lineHeight: 1.2, whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis', minWidth: 0 }}>
                       {negocio.name}
                     </h3>
                     {(negocio.calculatedRating || negocio.rating) ? (
