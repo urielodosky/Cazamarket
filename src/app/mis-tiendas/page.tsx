@@ -313,7 +313,7 @@ export default function MiNegocioPage() {
     alert(`Modo Demo: Acá se abriría el modal para editar: ${section}`);
   };
 
-  if (false) {
+  if (!isLoggedIn) {
     return (
       <div style={{ paddingTop: '100px', paddingBottom: 'var(--spacing-8)', paddingLeft: 'var(--spacing-4)', paddingRight: 'var(--spacing-4)', maxWidth: '1200px', margin: '0 auto', textAlign: 'center' }}>
         <h2 style={{ color: 'var(--color-text-main)' }}>Acceso Denegado</h2>
