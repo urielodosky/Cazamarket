@@ -399,7 +399,7 @@ export default function MiNegocioPage() {
         <div style={{ position: 'relative', padding: '0 20px 20px 20px', zIndex: 20 }}>
 
           {/* Header Info (Avatar & Title) */}
-          <div style={{ display: 'flex', flexWrap: 'wrap', alignItems: 'flex-end', gap: '24px', position: 'relative', zIndex: 10, marginBottom: '32px' }}>
+          <div style={{ display: 'flex', flexWrap: 'wrap', alignItems: 'flex-end', gap: 'clamp(16px, 4vw, 24px)', position: 'relative', zIndex: 10, marginBottom: '32px' }}>
             {/* Avatar */}
             <div
               style={{ position: 'relative', cursor: 'pointer', flexShrink: 0, zIndex: 20, marginTop: (isAtLeast(planTier, 'emprendedor') && storeBanner) ? '-60px' : '-40px' }}
@@ -407,7 +407,7 @@ export default function MiNegocioPage() {
               onMouseLeave={() => setIsAvatarHovered(false)}
             >
               <div 
-                style={{ width: '120px', height: '120px', borderRadius: '50%', border: '4px solid var(--color-primary)', backgroundColor: 'var(--color-bg-surface-elevated)', backgroundImage: `url(${avatar || 'https://images.unsplash.com/photo-1511497584788-876760111969?q=80&w=200&auto=format&fit=crop'})`, backgroundSize: 'cover', backgroundPosition: 'center', boxShadow: '0 4px 12px rgba(0,0,0,0.1)', position: 'relative' }}
+                style={{ width: 'clamp(80px, 20vw, 120px)', height: 'clamp(80px, 20vw, 120px)', borderRadius: '50%', border: '4px solid var(--color-primary)', backgroundColor: 'var(--color-bg-surface-elevated)', backgroundImage: `url(${avatar || 'https://images.unsplash.com/photo-1511497584788-876760111969?q=80&w=200&auto=format&fit=crop'})`, backgroundSize: 'cover', backgroundPosition: 'center', boxShadow: '0 4px 12px rgba(0,0,0,0.1)', position: 'relative' }}
               >
                 {permissions.insigniaVerificada && (
                   <div title="Negocio Verificado" style={{ position: 'absolute', bottom: '4px', right: '4px', background: 'var(--color-bg-surface)', borderRadius: '50%', padding: '4px', display: 'flex', border: '2px solid var(--color-bg-surface)', boxShadow: '0 2px 8px rgba(0,0,0,0.5)' }}>
@@ -448,12 +448,12 @@ export default function MiNegocioPage() {
                         updateUser({ username: name, avatar });
                       }
                     }}
-                    style={{ fontSize: '2.5rem', fontWeight: 'bold', marginBottom: '12px', color: 'var(--color-text-main)', background: 'var(--color-bg-surface-elevated)', border: '1px dashed var(--color-primary)', borderRadius: 'var(--radius-md)', padding: '4px 12px', width: '100%', outline: 'none', lineHeight: 1.1, boxShadow: '0 1px 2px rgba(0,0,0,0.05)' }}
+                    style={{ fontSize: 'clamp(1.5rem, 6vw, 2.5rem)', fontWeight: 'bold', marginBottom: '12px', color: 'var(--color-text-main)', background: 'var(--color-bg-surface-elevated)', border: '1px dashed var(--color-primary)', borderRadius: 'var(--radius-md)', padding: '4px 12px', width: '100%', outline: 'none', lineHeight: 1.1, boxShadow: '0 1px 2px rgba(0,0,0,0.05)' }}
                   />
                 ) : (
                   <h1
                     onClick={() => setIsEditingName(true)}
-                    style={{ fontSize: '2.5rem', fontWeight: 'bold', marginBottom: '12px', color: 'var(--color-text-main)', lineHeight: 1.1, cursor: 'pointer', borderBottom: '1px dashed var(--color-border)', transition: 'color 0.2s', display: 'inline-block' }}
+                    style={{ fontSize: 'clamp(1.5rem, 6vw, 2.5rem)', fontWeight: 'bold', marginBottom: '12px', color: 'var(--color-text-main)', lineHeight: 1.1, cursor: 'pointer', borderBottom: '1px dashed var(--color-border)', transition: 'color 0.2s', display: 'inline-block', wordBreak: 'break-word' }}
                     title="Clic para editar el nombre"
                   >
                     {name}

@@ -471,7 +471,7 @@ export default function NegocioDetailPage({ params }: { params: Promise<{ id: st
           {/* Header Info (Avatar & Title) */}
           <div className="business-header-info" style={{ 
             display: 'flex', 
-            gap: '32px', 
+            gap: 'clamp(16px, 4vw, 32px)', 
             alignItems: 'flex-end',
             marginTop: ((isOwnProfile ? hasFeature('banner') : isAtLeast(negocio.planTier, 'emprendedor')) && negocio.image) ? '-60px' : '-40px',
             marginBottom: '32px',
@@ -479,8 +479,8 @@ export default function NegocioDetailPage({ params }: { params: Promise<{ id: st
             zIndex: 10
           }}>
             <div className="business-avatar-container" style={{ 
-              width: '140px', 
-              height: '140px', 
+              width: 'clamp(80px, 20vw, 140px)', 
+              height: 'clamp(80px, 20vw, 140px)', 
               borderRadius: '50%',
               border: '6px solid var(--color-primary)',
               backgroundImage: `url(${negocio.avatar})`,
@@ -502,7 +502,7 @@ export default function NegocioDetailPage({ params }: { params: Promise<{ id: st
             <div className="business-title-container" style={{ flex: 1, paddingBottom: '16px' }}>
               <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start' }}>
                 <div style={{ width: '100%' }}>
-                  <h1 className="business-title" style={{ fontSize: '2.5rem', margin: '0 0 12px 0', color: 'var(--color-text-main)', lineHeight: 1.1, textShadow: themeColors.isLight ? '0 0 4px #ffffff, 0 0 8px #ffffff' : '0 0 4px rgba(0,0,0,0.5), 0 0 8px rgba(0,0,0,0.5)' }}>{negocio.name}</h1>
+                  <h1 className="business-title" style={{ fontSize: 'clamp(1.5rem, 6vw, 2.5rem)', margin: '0 0 12px 0', color: 'var(--color-text-main)', lineHeight: 1.1, textShadow: themeColors.isLight ? '0 0 4px #ffffff, 0 0 8px #ffffff' : '0 0 4px rgba(0,0,0,0.5), 0 0 8px rgba(0,0,0,0.5)', wordBreak: 'break-word' }}>{negocio.name}</h1>
                   <div className="business-stats-row" style={{ display: 'flex', alignItems: 'center', gap: '24px', color: 'var(--color-text-muted)', fontSize: '1rem' }}>
                     <div style={{ display: 'flex', alignItems: 'center', gap: '6px', color: negocio.rating > 0 ? '#FFD700' : 'var(--color-text-muted)', fontWeight: 'bold' }} title={`${negocio.reviews} reseña${negocio.reviews !== 1 ? 's' : ''}`}>
                       <svg width="18" height="18" viewBox="0 0 24 24" fill={negocio.rating > 0 ? '#FFD700' : 'none'} stroke={negocio.rating > 0 ? '#FFD700' : 'currentColor'} strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"></polygon></svg>
