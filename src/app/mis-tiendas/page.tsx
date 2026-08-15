@@ -686,7 +686,7 @@ export default function MiNegocioPage() {
                     '--color-text-main': theme.textColor,
                     '--color-bg-base': theme.bgColor
                   } as any}>
-                    <div className="glass-panel" style={{ backgroundColor: theme.bgColor, position: 'relative', borderRadius: 'var(--radius-lg)', display: 'flex', flexDirection: 'column', textAlign: 'left', padding: 0 }}>
+                    <div style={{ backgroundColor: theme.bgColor, backdropFilter: 'blur(10px)', border: '1px solid var(--color-border)', position: 'relative', borderRadius: 'var(--radius-lg)', display: 'flex', flexDirection: 'column', textAlign: 'left', padding: 0 }}>
                       
                       {(isAtLeast(planTier, 'emprendedor') && storeBanner) && (
                         <div className="aspect-image-16-9" style={{ minHeight: '120px', height: '120px', borderTopLeftRadius: 'var(--radius-lg)', borderTopRightRadius: 'var(--radius-lg)', position: 'relative', overflow: 'hidden' }}>
@@ -736,7 +736,7 @@ export default function MiNegocioPage() {
                           ))}
                         </div>
 
-                        <div style={{ marginTop: 'auto', paddingTop: '16px', borderTop: '1px solid rgba(255,255,255,0.1)' }}>
+                        <div style={{ marginTop: 'auto', paddingTop: '16px', borderTop: '1px solid color-mix(in srgb, var(--color-text-main) 10%, transparent)' }}>
                           <button style={{ width: '100%', background: 'transparent', border: '1px solid var(--color-primary)', color: 'var(--color-text-main)', padding: '8px', borderRadius: 'var(--radius-full)', fontSize: '0.9rem', fontWeight: 600 }}>
                             Visitar Tienda
                           </button>
