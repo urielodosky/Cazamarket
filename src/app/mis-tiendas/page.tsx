@@ -470,7 +470,7 @@ export default function MiNegocioPage() {
           <div className="flex flex-col gap-4 mb-10 relative p-4 md:p-6 bg-[var(--color-bg-surface-elevated)] border border-[var(--color-border)] rounded-[var(--radius-md)] shadow-sm">
 
             <div className="flex flex-col gap-3 sm:grid sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 sm:gap-4 relative z-10 w-full">
-              <div className="w-full">
+              <div className="w-full mb-3 sm:mb-0">
                 <CustomSelect
                   options={[
                     { value: '', label: 'Tipo de Negocio' },
@@ -492,7 +492,7 @@ export default function MiNegocioPage() {
                 const availableCategories = CATEGORIES_DATA.filter(c => !selectedOthers.includes(c.name));
 
                 return (
-                  <div key={index} className="w-full">
+                  <div key={index} className="w-full mb-3 sm:mb-0">
                     <CustomSelect
                       options={[
                         { value: '', label: `Categoría ${index + 1}` },
