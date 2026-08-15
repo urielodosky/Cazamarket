@@ -336,16 +336,16 @@ export default function MiNegocioPage() {
     <div className="container-page" style={customStyles}>
 
       {/* Limits indicator */}
-      <div className="flex flex-wrap justify-end mb-4 gap-3">
-        <div className="flex items-center gap-2 px-4 py-1.5 rounded-full border" style={{ background: 'color-mix(in srgb, var(--color-primary) 8%, transparent)', borderColor: 'color-mix(in srgb, var(--color-primary) 20%, transparent)' }}>
+      <div className="flex flex-col sm:flex-row flex-wrap sm:justify-end items-stretch sm:items-center mb-4 gap-3">
+        <div className="flex items-center justify-center sm:justify-start gap-2 px-4 py-2 sm:py-1.5 rounded-full border" style={{ background: 'color-mix(in srgb, var(--color-primary) 8%, transparent)', borderColor: 'color-mix(in srgb, var(--color-primary) 20%, transparent)' }}>
           <span style={{ color: 'var(--color-primary)', fontWeight: 600, fontSize: '0.85rem' }}>Plan: {planDisplayName}</span>
         </div>
-        <div className="flex items-center gap-2 px-4 py-1.5 rounded-full border border-[var(--color-border)] bg-[var(--color-bg-surface-elevated)]">
+        <div className="flex items-center justify-between sm:justify-start gap-2 px-4 py-2 sm:py-1.5 rounded-full border border-[var(--color-border)] bg-[var(--color-bg-surface-elevated)]">
           <span className="text-[0.85rem] text-[var(--color-text-muted)]">Productos:</span>
           <span className="font-semibold text-[0.85rem]" style={{ color: themeColors.textWhite }}>{myProducts.length} / {permissions.maxProductos === Infinity ? '∞' : permissions.maxProductos}</span>
         </div>
         {permissions.maxServicios > 0 && (
-          <div className="flex items-center gap-2 px-4 py-1.5 rounded-full border border-[var(--color-border)] bg-[var(--color-bg-surface-elevated)]">
+          <div className="flex items-center justify-between sm:justify-start gap-2 px-4 py-2 sm:py-1.5 rounded-full border border-[var(--color-border)] bg-[var(--color-bg-surface-elevated)]">
             <span className="text-[0.85rem] text-[var(--color-text-muted)]">Servicios:</span>
             <span className="font-semibold text-[0.85rem]" style={{ color: themeColors.textWhite }}>{myServices.length} / {permissions.maxServicios}</span>
           </div>
@@ -471,7 +471,7 @@ export default function MiNegocioPage() {
           {/* Description & Tags */}
           <div className="flex flex-col gap-4 mb-10 relative p-4 md:p-6 bg-[var(--color-bg-surface-elevated)] border border-[var(--color-border)] rounded-[var(--radius-md)] shadow-sm">
 
-            <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4 relative z-10 w-full">
+            <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4 relative z-10 w-full">
               <div className="w-full">
                 <CustomSelect
                   options={[
