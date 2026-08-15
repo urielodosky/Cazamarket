@@ -101,13 +101,19 @@ export default function ProductGallery({ product }: { product: any }) {
               onClick={() => { setActiveImage(idx); setImgError(false); }}
               className={`pg-thumbnail-btn ${activeImage === idx ? 'active' : ''}`}
             >
-              <Image
-                src={thumbSrc}
-                alt={`Vista ${idx + 1}`}
-                fill
-                sizes="80px"
-                className="pg-thumbnail-image"
-              />
+              {(m.type === 'video' || thumbSrc.includes('.mp4') || thumbSrc.includes('.webm')) ? (
+                <div style={{ width: '100%', height: '100%', backgroundColor: '#111', display: 'flex', alignItems: 'center', justifyContent: 'center', position: 'absolute', inset: 0 }}>
+                  <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="white" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><polygon points="5 3 19 12 5 21 5 3"></polygon></svg>
+                </div>
+              ) : (
+                <Image
+                  src={thumbSrc}
+                  alt={`Vista ${idx + 1}`}
+                  fill
+                  sizes="80px"
+                  className="pg-thumbnail-image"
+                />
+              )}
             </button>
           )
         })}
