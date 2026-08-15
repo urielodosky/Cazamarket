@@ -150,7 +150,7 @@ export default function NegociosPage() {
   return (
     <div className="container-page" style={{ maxWidth: '1200px', margin: '0 auto', minHeight: '60vh', paddingBottom: 'var(--spacing-12)' }}>
       {isVendorModeActive && (
-        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 'var(--spacing-6)' }}>
+        <div style={{ display: 'flex', flexWrap: 'wrap', gap: '16px', justifyContent: 'space-between', alignItems: 'center', marginBottom: 'var(--spacing-6)' }}>
           <div>
             <h1 style={{ fontSize: '2rem', margin: 0, color: 'var(--color-text-main)' }}>Mis Tiendas</h1>
             <p style={{ color: 'var(--color-text-muted)', margin: '4px 0 0 0' }}>Administra tus negocios y perfiles comerciales.</p>
