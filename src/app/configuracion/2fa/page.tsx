@@ -152,7 +152,7 @@ export default function Configurar2FAPage() {
           )}
 
           {isEnrolled ? (
-            <div className="flex flex-col items-center justify-center p-8 bg-[var(--color-background)] rounded-xl border border-green-500/30">
+            <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', padding: '32px', background: 'var(--color-background)', borderRadius: '0.75rem', border: '1px solid rgba(34, 197, 94, 0.3)' }}>
               <div className="w-16 h-16 bg-green-500/20 rounded-full flex items-center justify-center mb-4">
                 <svg className="w-8 h-8 text-green-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z" />
@@ -172,7 +172,7 @@ export default function Configurar2FAPage() {
             </div>
           ) : qrCodeUri ? (
             <div className="space-y-8 animate-fade-in">
-              <div className="flex flex-col items-center space-y-4">
+              <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '16px' }}>
                 <p className="text-center font-medium text-[var(--color-text)]">
                   1. Escanea este código QR con Google Authenticator o Authy
                 </p>
@@ -185,7 +185,7 @@ export default function Configurar2FAPage() {
                 <label className="block text-center font-medium text-[var(--color-text)]">
                   2. Ingresa el código de 6 dígitos que aparece en la aplicación
                 </label>
-                <div className="flex space-x-2">
+                <div style={{ display: 'flex', gap: '8px' }}>
                   <input
                     type="text"
                     value={verificationCode}
@@ -204,7 +204,7 @@ export default function Configurar2FAPage() {
               </div>
             </div>
           ) : (
-            <div className="flex flex-col items-center justify-center p-8 text-center space-y-6">
+            <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', padding: '32px', textAlign: 'center', gap: '24px' }}>
               <div className="w-20 h-20 bg-[var(--color-primary)]/10 rounded-full flex items-center justify-center">
                 <svg className="w-10 h-10 text-[var(--color-primary)]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z" />

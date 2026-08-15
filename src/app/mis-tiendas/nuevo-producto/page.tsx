@@ -834,7 +834,7 @@ function NuevoProductoContent() {
               {pickupAvailable === 'si' && (
                 <div style={{ marginTop: '16px', background: 'rgba(0,0,0,0.2)', padding: '16px', borderRadius: 'var(--radius-md)', border: '1px solid var(--color-border)' }}>
                   {vendorLocations.length > 0 ? (
-                    <div className="flex flex-col gap-3">
+                    <div style={{ display: 'flex', flexDirection: 'column', gap: '12px' }}>
                       <p style={{ margin: '0 0 8px 0', color: 'var(--color-text-main)', fontSize: '0.9rem', fontWeight: 500 }}>Selecciona las sucursales habilitadas:</p>
                       {vendorLocations.map((loc, idx) => (
                         <label key={idx} style={{ display: 'flex', alignItems: 'center', gap: '8px', cursor: 'pointer' }}>

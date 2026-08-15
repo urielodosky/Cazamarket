@@ -877,7 +877,7 @@ function NuevoServicioContent() {
               </div>
 
               {showServiceArea && permissions.mapasTerritorio && (
-                <div className="flex flex-col gap-3">
+                <div style={{ display: 'flex', flexDirection: 'column', gap: '12px' }}>
                   <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
                     <button 
                       type="button"
@@ -973,7 +973,7 @@ function NuevoServicioContent() {
                       </button>
                     </div>
                     
-                    <div className="flex flex-col gap-4">
+                    <div style={{ display: 'flex', flexDirection: 'column', gap: '16px' }}>
                       {timeDiscounts.map((rule, idx) => (
                         <div key={idx} style={{ display: 'grid', gridTemplateColumns: '1fr 1fr 1fr auto', gap: '16px', alignItems: 'end', background: 'rgba(0,0,0,0.3)', padding: '16px', borderRadius: 'var(--radius-md)', border: '1px solid rgba(255,255,255,0.05)', transition: 'background 0.2s, transform 0.2s', position: 'relative', zIndex: 10 - idx }} onMouseEnter={e => { e.currentTarget.style.background = 'rgba(255,255,255,0.05)'; e.currentTarget.style.transform = 'translateX(4px)'; }} onMouseLeave={e => { e.currentTarget.style.background = 'rgba(0,0,0,0.3)'; e.currentTarget.style.transform = 'translateX(0)'; }}>
                           <div>
@@ -1007,7 +1007,7 @@ function NuevoServicioContent() {
                       </button>
                     </div>
                     
-                    <div className="flex flex-col gap-4">
+                    <div style={{ display: 'flex', flexDirection: 'column', gap: '16px' }}>
                       {earlyBirdDiscounts.map((rule, idx) => (
                         <div key={idx} style={{ display: 'grid', gridTemplateColumns: '1fr 1fr 1fr auto', gap: '16px', alignItems: 'end', background: 'rgba(0,0,0,0.3)', padding: '16px', borderRadius: 'var(--radius-md)', border: '1px solid rgba(255,255,255,0.05)', transition: 'background 0.2s, transform 0.2s', position: 'relative', zIndex: 10 - idx }} onMouseEnter={e => { e.currentTarget.style.background = 'rgba(255,255,255,0.05)'; e.currentTarget.style.transform = 'translateX(4px)'; }} onMouseLeave={e => { e.currentTarget.style.background = 'rgba(0,0,0,0.3)'; e.currentTarget.style.transform = 'translateX(0)'; }}>
                           <div>
@@ -1041,7 +1041,7 @@ function NuevoServicioContent() {
                       </button>
                     </div>
                     
-                    <div className="flex flex-col gap-4">
+                    <div style={{ display: 'flex', flexDirection: 'column', gap: '16px' }}>
                       {seasonRules.map((rule, idx) => (
                         <div key={idx} style={{ display: 'flex', flexDirection: 'column', gap: '12px', background: 'rgba(0,0,0,0.3)', padding: '20px', borderRadius: 'var(--radius-md)', border: '1px solid rgba(255,255,255,0.05)', transition: 'background 0.2s', position: 'relative', zIndex: 10 - idx }} onMouseEnter={e => e.currentTarget.style.background = 'rgba(255,255,255,0.03)'} onMouseLeave={e => e.currentTarget.style.background = 'rgba(0,0,0,0.3)'}>
                           <div style={{ display: 'grid', gridTemplateColumns: '1fr auto', gap: '16px', alignItems: 'center' }}>
