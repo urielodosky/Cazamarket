@@ -675,7 +675,6 @@ export default function MiNegocioPage() {
                       style={{ width: '50px', height: '50px', padding: '0', border: 'none', borderRadius: '8px', cursor: 'pointer', background: 'none' }}
                     />
                   </div>
-                  </div>
                 </div>
 
                 <div style={{ marginTop: '24px', display: 'flex', justifyContent: 'space-between', alignItems: 'center', background: themeColors.bgSubtle2, padding: '20px', borderRadius: 'var(--radius-md)', border: `1px solid ${themeColors.borderSubtle2}` }}>
