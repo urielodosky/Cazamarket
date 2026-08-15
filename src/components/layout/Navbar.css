@@ -4,11 +4,7 @@
   z-index: var(--z-header);
   width: 100%;
   padding-top: var(--spacing-3);
-  background-color: rgba(18, 18, 18, 0.8);
-  backdrop-filter: blur(16px);
-  -webkit-backdrop-filter: blur(16px);
-  border-bottom: 1px solid rgba(255, 255, 255, 0.05);
-  box-shadow: 0 4px 30px rgba(0, 0, 0, 0.3);
+  background-color: var(--color-bg-base);
 }
 
 .navbar-container {
