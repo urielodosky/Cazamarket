@@ -378,7 +378,7 @@ export default function MiNegocioPage() {
               <div style={{ position: 'absolute', top: '64px', right: '16px', color: 'rgba(255,255,255,0.9)', fontSize: '0.75rem', background: 'rgba(0,0,0,0.7)', padding: '4px 8px', borderRadius: '4px', pointerEvents: 'none' }}>Recomendado: 1200x400 px</div>
             </div>
           ) : (
-            <div style={{ height: '80px', position: 'relative', background: 'var(--color-bg-surface-elevated)', borderTopLeftRadius: 'var(--radius-lg)', borderTopRightRadius: 'var(--radius-lg)' }}>
+            <div style={{ height: '100px', position: 'relative', background: 'var(--color-bg-surface-elevated)', borderTopLeftRadius: 'var(--radius-lg)', borderTopRightRadius: 'var(--radius-lg)', border: '1px solid var(--color-border)' }}>
               <input
                 type="file"
                 ref={bannerInputRef}
@@ -386,11 +386,11 @@ export default function MiNegocioPage() {
                 accept="image/*"
                 style={{ display: 'none' }}
               />
-              <EditButton onClick={() => bannerInputRef.current?.click()} style={{ top: '24px', right: '16px' }} label="Añadir Portada" />
+              <EditButton onClick={() => bannerInputRef.current?.click()} style={{ top: '16px', right: '16px' }} label="Añadir Portada" />
             </div>
           )
         ) : (
-          <div style={{ height: '80px', position: 'relative', background: 'var(--color-bg-surface-elevated)', borderTopLeftRadius: 'var(--radius-lg)', borderTopRightRadius: 'var(--radius-lg)' }}>
+          <div style={{ height: '100px', position: 'relative', background: 'var(--color-bg-surface-elevated)', borderTopLeftRadius: 'var(--radius-lg)', borderTopRightRadius: 'var(--radius-lg)', border: '1px solid var(--color-border)' }}>
             <Link href="/planes" style={{ position: 'absolute', top: '16px', right: '16px', padding: '6px 12px', background: 'rgba(255,115,0,0.1)', color: 'var(--color-primary)', borderRadius: 'var(--radius-full)', fontSize: '0.85rem', fontWeight: 600, textDecoration: 'none', border: '1px solid rgba(255,115,0,0.2)' }}>
               Mejorar plan para Banner
             </Link>
@@ -406,12 +406,12 @@ export default function MiNegocioPage() {
           >
             {/* Avatar */}
             <div
-              className="relative cursor-pointer"
+              className="relative cursor-pointer shrink-0"
               onMouseEnter={() => setIsAvatarHovered(true)}
               onMouseLeave={() => setIsAvatarHovered(false)}
             >
               <div 
-                className="w-32 h-32 md:w-[140px] md:h-[140px] rounded-full border-[6px] border-[var(--color-bg-surface)] bg-cover bg-center bg-[var(--color-bg-surface-elevated)] shrink-0 relative shadow-[0_8px_24px_rgba(0,0,0,0.6)]"
+                className="w-24 h-24 md:w-[140px] md:h-[140px] rounded-full border-[4px] md:border-[6px] border-[var(--color-bg-surface)] bg-cover bg-center bg-[var(--color-bg-surface-elevated)] relative shadow-[0_4px_12px_rgba(0,0,0,0.1)] dark:shadow-[0_8px_24px_rgba(0,0,0,0.6)]"
                 style={{ backgroundImage: `url(${avatar || 'https://images.unsplash.com/photo-1511497584788-876760111969?q=80&w=200&auto=format&fit=crop'})` }}
               >
                 {permissions.insigniaVerificada && (
@@ -453,12 +453,12 @@ export default function MiNegocioPage() {
                         updateUser({ username: name, avatar });
                       }
                     }}
-                    className="text-3xl md:text-[2.5rem] font-bold mb-3 text-white bg-white/5 border border-dashed border-[var(--color-primary)] rounded-[var(--radius-md)] px-3 py-1 w-full outline-none leading-[1.1] text-center md:text-left"
+                    className="text-2xl md:text-[2.5rem] font-bold mb-3 text-[var(--color-text-main)] bg-[var(--color-bg-surface-elevated)] border border-dashed border-[var(--color-primary)] rounded-[var(--radius-md)] px-3 py-1 w-full outline-none leading-[1.1] text-center md:text-left shadow-sm"
                   />
                 ) : (
                   <h1
                     onClick={() => setIsEditingName(true)}
-                    className="text-3xl md:text-[2.5rem] mb-3 text-white leading-[1.1] cursor-pointer inline-block border-b border-dashed border-white/20 text-center md:text-left"
+                    className="text-2xl md:text-[2.5rem] font-bold mb-3 text-[var(--color-text-main)] leading-[1.1] cursor-pointer inline-block border-b border-dashed border-[var(--color-border)] text-center md:text-left hover:text-[var(--color-primary)] transition-colors"
                     title="Clic para editar el nombre"
                   >
                     {name}
@@ -469,10 +469,10 @@ export default function MiNegocioPage() {
           </div>
 
           {/* Description & Tags */}
-          <div className="flex flex-col gap-5 mb-10 relative p-6 bg-white/5 rounded-[var(--radius-md)]">
+          <div className="flex flex-col gap-4 mb-10 relative p-4 md:p-6 bg-[var(--color-bg-surface-elevated)] border border-[var(--color-border)] rounded-[var(--radius-md)] shadow-sm">
 
-            <div className="flex gap-4 flex-wrap items-center relative z-10 w-full">
-              <div className="w-full md:flex-1 md:min-w-[200px]">
+            <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4 relative z-10 w-full">
+              <div className="w-full">
                 <CustomSelect
                   options={[
                     { value: '', label: 'Tipo de Negocio' },
@@ -494,7 +494,7 @@ export default function MiNegocioPage() {
                 const availableCategories = CATEGORIES_DATA.filter(c => !selectedOthers.includes(c.name));
 
                 return (
-                  <div key={index} className="w-full md:flex-1 md:min-w-[220px]">
+                  <div key={index} className="w-full">
                     <CustomSelect
                       options={[
                         { value: '', label: `Categoría ${index + 1}` },
