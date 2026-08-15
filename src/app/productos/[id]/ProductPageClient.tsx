@@ -131,8 +131,8 @@ export default function ProductoDetailPage({ params }: { params: Promise<{ id: s
           let sellerReviewsCount = 0;
 
           const { data: prodRevs } = await supabase.from('reviews')
-            .select('id, product_rating, comment, created_at, interactions!inner(buyer_id)')
-            .eq('product_id', productId)
+            .select('id, product_rating, comment, created_at, interactions!inner(buyer_id, product_id)')
+            .eq('interactions.product_id', productId)
             .eq('is_published', true)
             .not('product_rating', 'is', null)
             .order('created_at', { ascending: false });
