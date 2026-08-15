@@ -560,29 +560,32 @@ export default function NegocioDetailPage({ params }: { params: Promise<{ id: st
 
           {/* Tabs Navigation */}
           <div className="business-tabs" style={{ display: 'flex', borderBottom: '1px solid var(--color-border)', marginBottom: '32px' }}>
-            {['productos', 'servicios', 'informacion', 'reseñas'].map(tab => (
-              <button 
-                key={tab}
-                onClick={() => setActiveTab(tab)}
-                style={{ 
-                  padding: '16px 32px', 
-                  fontSize: '1.05rem', 
-                  fontWeight: 600,
-                  flexShrink: 0,
-                  color: activeTab === tab ? 'var(--color-primary)' : 'var(--color-text-muted)',
-                  borderBottom: activeTab === tab ? '3px solid var(--color-primary)' : '3px solid transparent',
-                  background: 'none',
-                  borderTop: 'none',
-                  borderLeft: 'none',
-                  borderRight: 'none',
-                  cursor: 'pointer',
-                  textTransform: 'capitalize',
-                  transition: 'all 0.2s'
-                }}
-              >
-                {tab === 'informacion' ? 'Información' : tab}
-              </button>
-            ))}
+            {['productos', 'servicios', 'alianzas', 'informacion', 'reseñas'].map(tab => {
+              if (tab === 'alianzas' && (!negocio.providers?.length && !negocio.distributors?.length)) return null;
+              return (
+                <button 
+                  key={tab}
+                  onClick={() => setActiveTab(tab)}
+                  style={{ 
+                    padding: '16px 32px', 
+                    fontSize: '1.05rem', 
+                    fontWeight: 600,
+                    flexShrink: 0,
+                    color: activeTab === tab ? 'var(--color-primary)' : 'var(--color-text-muted)',
+                    borderBottom: activeTab === tab ? '3px solid var(--color-primary)' : '3px solid transparent',
+                    background: 'none',
+                    borderTop: 'none',
+                    borderLeft: 'none',
+                    borderRight: 'none',
+                    cursor: 'pointer',
+                    textTransform: 'capitalize',
+                    transition: 'all 0.2s'
+                  }}
+                >
+                  {tab === 'informacion' ? 'Información' : tab === 'alianzas' ? 'Aliados' : tab}
+                </button>
+              );
+            })}
           </div>
 
           {/* Tab Content Area */}
@@ -1487,6 +1490,44 @@ export default function NegocioDetailPage({ params }: { params: Promise<{ id: st
               </div>
             )}
             
+            {/* ALIANZAS TAB */}
+            {activeTab === 'alianzas' && (
+              <div style={{ display: 'flex', flexDirection: 'column', gap: '32px' }}>
+                <h3 style={{ margin: '0 0 8px 0', fontSize: '1.5rem', display: 'flex', alignItems: 'center', gap: '12px' }}>
+                  <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="var(--color-primary)" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"></path><circle cx="9" cy="7" r="4"></circle><path d="M23 21v-2a4 4 0 0 0-3-3.87"></path><path d="M16 3.13a4 4 0 0 1 0 7.75"></path></svg>
+                  Red de Alianzas Comerciales
+                </h3>
+                
+                <div style={{ display: 'flex', flexDirection: 'column', gap: '32px' }}>
+                  {negocio.providers && negocio.providers.length > 0 && (
+                    <div>
+                      <h4 style={{ margin: '0 0 16px 0', color: 'var(--color-text-muted)' }}>Proveedores</h4>
+                      <div style={{ display: 'flex', flexWrap: 'wrap', gap: '12px' }}>
+                        {negocio.providers.map((p: any) => (
+                          <span key={p.id} style={{ background: 'rgba(255,255,255,0.05)', color: 'var(--color-text-main)', padding: '8px 16px', borderRadius: '24px', fontSize: '0.95rem', border: '1px solid var(--color-border)' }}>
+                            {p.text}
+                          </span>
+                        ))}
+                      </div>
+                    </div>
+                  )}
+
+                  {negocio.distributors && negocio.distributors.length > 0 && (
+                    <div>
+                      <h4 style={{ margin: '0 0 16px 0', color: 'var(--color-text-muted)' }}>Distribuidores</h4>
+                      <div style={{ display: 'flex', flexWrap: 'wrap', gap: '12px' }}>
+                        {negocio.distributors.map((d: any) => (
+                          <span key={d.id} style={{ background: 'rgba(255,255,255,0.05)', color: 'var(--color-text-main)', padding: '8px 16px', borderRadius: '24px', fontSize: '0.95rem', border: '1px solid var(--color-border)' }}>
+                            {d.text}
+                          </span>
+                        ))}
+                      </div>
+                    </div>
+                  )}
+                </div>
+              </div>
+            )}
+
             {/* RESEÑAS TAB */}
             {activeTab === 'reseñas' && (
               <div style={{ display: 'flex', flexDirection: 'column', gap: '32px' }}>

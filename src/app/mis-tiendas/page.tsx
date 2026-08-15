@@ -110,7 +110,7 @@ export default function MiNegocioPage() {
   const { isVendorModeActive, username, email, avatar, coverUrl, updateUser, storeDescription, businessType: authBusinessType, storeCategories, storeTheme, phone, province, locality, street, streetNumber, branches, socialMedia, supabaseUser, providers, distributors } = useAuth();
   const { permissions, planTier, planDisplayName } = usePlan();
   const themeColors = useThemeColors();
-  const [activeTab, setActiveTab] = useState<'productos' | 'servicios' | 'informacion' | 'apariencia'>('productos');
+  const [activeTab, setActiveTab] = useState<'productos' | 'servicios' | 'alianzas' | 'informacion' | 'apariencia'>('productos');
   const router = useRouter();
   const fileInputRef = React.useRef<HTMLInputElement>(null);
   const bannerInputRef = React.useRef<HTMLInputElement>(null);
@@ -535,47 +535,12 @@ export default function MiNegocioPage() {
             )}
           </div>
           
-          {/* Business Relations (Proveedores y Distribuidores) */}
-          {(businessType === 'Minorista' || businessType === 'Mayorista' || businessType === 'Mixto') && (
-            <div style={{ display: 'flex', flexDirection: 'column', gap: '24px', marginBottom: '40px', padding: '24px', background: 'rgba(255,255,255,0.05)', borderRadius: 'var(--radius-md)' }}>
-              <h3 style={{ margin: 0, fontSize: '1.125rem', color: 'var(--color-text-main)', display: 'flex', alignItems: 'center', gap: '8px' }}>
-                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"></path><circle cx="9" cy="7" r="4"></circle><path d="M23 21v-2a4 4 0 0 0-3-3.87"></path><path d="M16 3.13a4 4 0 0 1 0 7.75"></path></svg>
-                Red de Alianzas Comerciales
-              </h3>
-              
-              <div style={{ display: 'flex', flexDirection: 'column', gap: '20px' }}>
-                {(businessType === 'Minorista' || businessType === 'Mixto') && (
-                  <BusinessTagInput 
-                    label="Mis Proveedores" 
-                    tags={providersList} 
-                    onChange={(tags) => {
-                      setProvidersList(tags);
-                      updateUser({ providers: tags });
-                    }} 
-                    placeholder="Buscar o escribir nombre de proveedor..." 
-                  />
-                )}
-                
-                {(businessType === 'Mayorista' || businessType === 'Mixto') && (
-                  <BusinessTagInput 
-                    label="Mis Distribuidores" 
-                    tags={distributorsList} 
-                    onChange={(tags) => {
-                      setDistributorsList(tags);
-                      updateUser({ distributors: tags });
-                    }} 
-                    placeholder="Buscar o escribir nombre de distribuidor..." 
-                  />
-                )}
-              </div>
-            </div>
-          )}
-
           {/* Tabs Navigation */}
           <div style={{ display: 'flex', borderBottom: '1px solid var(--color-border)', marginBottom: '32px', overflowX: 'auto', whiteSpace: 'nowrap' }} className="scrollbar-hide">
-            {['productos', 'servicios', 'informacion', ...(permissions.coloresPersonalizados ? ['apariencia'] : [])].map(tab => {
+            {['productos', 'servicios', 'alianzas', 'informacion', ...(permissions.coloresPersonalizados ? ['apariencia'] : [])].map(tab => {
               if (tab === 'servicios' && permissions.maxServicios === 0) return null;
               if (tab === 'productos' && permissions.maxProductos === 0) return null;
+              if (tab === 'alianzas' && businessType !== 'Minorista' && businessType !== 'Mayorista' && businessType !== 'Mixto') return null;
               return (
                 <button
                   key={tab}
@@ -595,7 +560,7 @@ export default function MiNegocioPage() {
                   onMouseEnter={(e) => { if (activeTab !== tab) { e.currentTarget.style.color = 'var(--color-text-main)'; e.currentTarget.style.borderColor = 'var(--color-border)'; } }}
                   onMouseLeave={(e) => { if (activeTab !== tab) { e.currentTarget.style.color = 'var(--color-text-muted)'; e.currentTarget.style.borderColor = 'transparent'; } }}
                 >
-                  {tab === 'informacion' ? 'Información De Contacto' : tab === 'apariencia' ? 'Apariencia' : `Mis ${tab}`}
+                  {tab === 'informacion' ? 'Información De Contacto' : tab === 'apariencia' ? 'Apariencia' : tab === 'alianzas' ? 'Aliados' : `Mis ${tab}`}
                 </button>
               );
             })}
@@ -977,6 +942,44 @@ export default function MiNegocioPage() {
                     ))}
                   </div>
                 )}
+              </div>
+            )}
+
+            {/* ALIANZAS TAB */}
+            {activeTab === 'alianzas' && (
+              <div className="grid grid-cols-1 gap-10 relative p-6 rounded-[var(--radius-md)]" style={{ background: themeColors.bgSubtle3 }}>
+                <div>
+                  <h3 style={{ margin: '0 0 24px 0', color: 'var(--color-primary)', display: 'flex', alignItems: 'center', gap: '8px' }}>
+                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"></path><circle cx="9" cy="7" r="4"></circle><path d="M23 21v-2a4 4 0 0 0-3-3.87"></path><path d="M16 3.13a4 4 0 0 1 0 7.75"></path></svg>
+                    Red de Alianzas Comerciales
+                  </h3>
+                  
+                  <div style={{ display: 'flex', flexDirection: 'column', gap: '20px' }}>
+                    {(businessType === 'Minorista' || businessType === 'Mixto') && (
+                      <BusinessTagInput 
+                        label="Mis Proveedores" 
+                        tags={providersList} 
+                        onChange={(tags) => {
+                          setProvidersList(tags);
+                          updateUser({ providers: tags });
+                        }} 
+                        placeholder="Buscar o escribir nombre de proveedor..." 
+                      />
+                    )}
+                    
+                    {(businessType === 'Mayorista' || businessType === 'Mixto') && (
+                      <BusinessTagInput 
+                        label="Mis Distribuidores" 
+                        tags={distributorsList} 
+                        onChange={(tags) => {
+                          setDistributorsList(tags);
+                          updateUser({ distributors: tags });
+                        }} 
+                        placeholder="Buscar o escribir nombre de distribuidor..." 
+                      />
+                    )}
+                  </div>
+                </div>
               </div>
             )}
 
