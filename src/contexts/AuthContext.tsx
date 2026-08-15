@@ -339,9 +339,6 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
     const handleResize = () => {
       const mobile = window.innerWidth < 768;
       setIsMobile(mobile);
-      if (mobile && isVendorModeActive) {
-        setIsVendorModeActive(false);
-      }
     };
     
     // Initial check
@@ -349,10 +346,10 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
 
     window.addEventListener('resize', handleResize);
     return () => window.removeEventListener('resize', handleResize);
-  }, [isVendorModeActive]);
+  }, []);
 
   const toggleVendorMode = () => {
-    if (isVendor && !isMobile) {
+    if (isVendor) {
       const newMode = !isVendorModeActive;
       setIsVendorModeActive(newMode);
       localStorage.setItem('cazamarket_vendor_mode', newMode ? 'true' : 'false');
