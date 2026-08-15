@@ -554,6 +554,7 @@ export default function MiNegocioPage() {
                     outline: 'none',
                     cursor: 'pointer',
                     transition: 'all 0.2s',
+                    flexShrink: 0,
                     color: activeTab === tab ? 'var(--color-primary)' : 'var(--color-text-muted)',
                     borderColor: activeTab === tab ? 'var(--color-primary)' : 'transparent'
                   }}
