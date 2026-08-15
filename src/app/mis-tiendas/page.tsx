@@ -686,7 +686,7 @@ export default function MiNegocioPage() {
                     '--color-text-main': theme.textColor,
                     '--color-bg-base': theme.bgColor
                   } as any}>
-                    <div style={{ backgroundColor: theme.bgColor, backdropFilter: 'blur(10px)', border: '1px solid var(--color-border)', position: 'relative', borderRadius: 'var(--radius-lg)', display: 'flex', flexDirection: 'column', textAlign: 'left', padding: 0 }}>
+                    <div style={{ backgroundColor: theme.bgColor, border: '1px solid var(--color-border)', position: 'relative', borderRadius: 'var(--radius-lg)', display: 'flex', flexDirection: 'column', textAlign: 'left', padding: 0 }}>
                       
                       {(isAtLeast(planTier, 'emprendedor') && storeBanner) && (
                         <div className="aspect-image-16-9" style={{ minHeight: '120px', height: '120px', borderTopLeftRadius: 'var(--radius-lg)', borderTopRightRadius: 'var(--radius-lg)', position: 'relative', overflow: 'hidden' }}>
@@ -1044,7 +1044,7 @@ export default function MiNegocioPage() {
                     ))}
 
                     {(!ubicacionPrincipal || (!ubicacionPrincipal.provincia && !ubicacionPrincipal.calle)) && sucursales.length === 0 && (
-                      <div style={{ color: 'var(--color-text-muted)', padding: '20px', border: `1px dashed ${themeColors.borderSubtle3}`, borderRadius: 'var(--radius-md)', background: themeColors.bgSubtle }}>
+                      <div style={{ color: 'var(--color-text-muted)', padding: '20px', border: '1px dashed var(--color-border)', borderRadius: 'var(--radius-md)', background: 'transparent' }}>
                         No has configurado ninguna ubicación. <Link href="/configuracion" style={{ color: 'var(--color-primary)' }}>Configurar ahora</Link>
                       </div>
                     )}
