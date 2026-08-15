@@ -284,7 +284,8 @@ export default function NegociosPage() {
                   display: 'flex', 
                   flexDirection: 'column',
                   justifyContent: 'center',
-                  flex: 1
+                  flex: 1,
+                  paddingRight: '40px'
                 }}>
                   <div style={{ display: 'flex', alignItems: 'center', gap: '8px', marginBottom: '6px' }}>
                     <h3 style={{ fontSize: '1.25rem', color: 'var(--color-text-main)', margin: '0', lineHeight: 1.2 }}>

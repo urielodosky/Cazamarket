@@ -712,7 +712,7 @@ export default function MiNegocioPage() {
                               </div>
                             </div>
                             
-                            <div style={{ flex: 1, minWidth: 0, marginTop: (isAtLeast(planTier, 'emprendedor') && storeBanner) ? '12px' : '0' }}>
+                            <div style={{ flex: 1, minWidth: 0, marginTop: (isAtLeast(planTier, 'emprendedor') && storeBanner) ? '12px' : '0', paddingRight: '40px' }}>
                               <div style={{ display: 'flex', alignItems: 'center', gap: '8px', flexWrap: 'wrap' }}>
                                 <h3 style={{ margin: '0', fontSize: '1.25rem', color: 'var(--color-text-main)', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>{name || 'Mi Negocio'}</h3>
                                 <span style={{ background: 'var(--color-bg-subtle)', color: 'var(--color-text-muted)', padding: '2px 8px', borderRadius: 'var(--radius-full)', fontSize: '0.7rem', fontWeight: 600 }}>Nuevo</span>
@@ -721,14 +721,65 @@ export default function MiNegocioPage() {
                             </div>
                           </div>
 
-                          <p style={{ color: 'var(--color-text-muted)', fontSize: '0.9rem', marginBottom: '24px', display: '-webkit-box', WebkitLineClamp: 2, WebkitBoxOrient: 'vertical', overflow: 'hidden', flex: 1 }}>
+                          <p style={{ color: 'var(--color-text-muted)', fontSize: '0.9rem', marginBottom: '16px', display: '-webkit-box', WebkitLineClamp: 2, WebkitBoxOrient: 'vertical', overflow: 'hidden', flex: 1 }}>
                             {description || 'Sin descripción'}
                           </p>
 
+                          {/* Business Type and Category (as tags) */}
+                          <div style={{ display: 'flex', gap: '8px', alignItems: 'center', flexWrap: 'wrap', marginBottom: '16px', marginTop: 'auto' }}>
+                            <span style={{ background: 'color-mix(in srgb, var(--color-primary) 10%, transparent)', color: 'var(--color-primary)', padding: '4px 12px', borderRadius: 'var(--radius-full)', fontSize: '0.8rem', border: '1px solid var(--color-primary)', fontWeight: 500 }}>
+                              {authBusinessType || 'No especificado'}
+                            </span>
+                            {(() => {
+                              const activeCats = (storeCategories || []).filter((cat: any) => typeof cat === 'string' && cat.trim() !== '');
+                              if (activeCats.length === 0) return null;
+
+                              const firstCat = activeCats[0];
+                              const remainingCats = activeCats.slice(1);
+
+                              return (
+                                <>
+                                  <span 
+                                    title={firstCat}
+                                    style={{ 
+                                      background: themeColors.bgSubtle, 
+                                      color: themeColors.textWhite, 
+                                      padding: '4px 10px', 
+                                      borderRadius: 'var(--radius-full)', 
+                                      fontSize: '0.78rem', 
+                                      border: `1px solid ${themeColors.borderSubtle2}`,
+                                      maxWidth: '130px',
+                                      whiteSpace: 'nowrap',
+                                      overflow: 'hidden',
+                                      textOverflow: 'ellipsis',
+                                      display: 'inline-block',
+                                      verticalAlign: 'middle'
+                                    }}
+                                  >
+                                    {firstCat}
+                                  </span>
+                                  {remainingCats.length > 0 && (
+                                    <span style={{ 
+                                      background: themeColors.bgSubtle2, 
+                                      color: themeColors.textWhite, 
+                                      padding: '4px 10px', 
+                                      borderRadius: 'var(--radius-full)', 
+                                      fontSize: '0.78rem', 
+                                      border: `1px solid ${themeColors.borderSubtle3}`, 
+                                      fontWeight: 600
+                                    }}>
+                                      +{remainingCats.length}
+                                    </span>
+                                  )}
+                                </>
+                              );
+                            })()}
+                          </div>
+
                           {/* Footer */}
                           <div style={{ height: '1px', background: `color-mix(in srgb, ${themeColors.borderSubtle3} 50%, transparent)`, margin: '0 -24px 16px -24px' }}></div>
-                          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-                            <div style={{ display: 'flex', gap: '8px', color: 'var(--color-text-muted)', fontSize: '0.85rem' }}>
+                          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap', gap: '8px' }}>
+                            <div style={{ display: 'flex', gap: '8px', color: 'var(--color-text-muted)', fontSize: '0.85rem', whiteSpace: 'nowrap' }}>
                               <span><strong>{myProducts.length}</strong> prods</span>
                               <span><strong>{myServices.length}</strong> servs</span>
                             </div>
