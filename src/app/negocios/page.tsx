@@ -192,14 +192,17 @@ export default function NegociosPage() {
           </div>
         ) : filteredNegocios.map(negocio => {
           const isCustomColorsAllowed = negocio.id === 1 ? permissions.coloresPersonalizados : isAtLeast(negocio.planTier, 'empresarial');
+          const useForceCustom = isCustomColorsAllowed && negocio.theme && negocio.theme.forceCustom;
           const customStyles = (isCustomColorsAllowed && negocio.theme) ? {
             '--color-primary': negocio.theme.primaryColor,
-            '--color-text-main': themeColors.isLight ? '#1a1c18' : negocio.theme.textColor,
-            '--color-bg-base': themeColors.isLight ? '#f5f3ee' : negocio.theme.bgColor,
+            '--color-text-main': (!useForceCustom && themeColors.isLight) ? '#1a1c18' : negocio.theme.textColor,
+            '--color-bg-base': (!useForceCustom && themeColors.isLight) ? '#f5f3ee' : negocio.theme.bgColor,
+            backgroundColor: (!useForceCustom && themeColors.isLight) ? 'var(--color-bg-base)' : negocio.theme.bgColor,
+            border: useForceCustom ? '1px solid var(--color-border)' : undefined
           } as React.CSSProperties : {};
 
           return (
-          <div key={negocio.id} className="glass-panel" 
+          <div key={negocio.id} className={useForceCustom ? "" : "glass-panel"} 
                onClick={() => router.push(`/negocios/${negocio.id}`)}
                style={{ ...customStyles, position: 'relative', borderRadius: 'var(--radius-lg)', display: 'flex', flexDirection: 'column', transition: 'transform 0.2s', cursor: 'pointer' }}
                onMouseEnter={(e) => e.currentTarget.style.transform = 'translateY(-5px)'}

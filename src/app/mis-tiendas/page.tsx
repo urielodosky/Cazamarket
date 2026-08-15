@@ -130,7 +130,7 @@ export default function MiNegocioPage() {
   };
 
   // Appearance State
-  const [theme, setTheme] = useState({ primaryColor: '#ff7300', textColor: '#ffffff', bgColor: '#111310' });
+  const [theme, setTheme] = useState({ primaryColor: '#ff7300', textColor: '#ffffff', bgColor: '#111310', forceCustom: false });
 
   // Editable States
   const [name, setName] = useState(username || 'Mi Negocio');
@@ -204,14 +204,14 @@ export default function MiNegocioPage() {
     updateUser({ storeDescription: newDesc });
   };
 
-  const handleThemeChange = (field: string, value: string) => {
+  const handleThemeChange = (field: string, value: any) => {
     const newTheme = { ...theme, [field]: value };
     setTheme(newTheme);
     updateUser({ storeTheme: newTheme });
   };
 
   const handleResetTheme = () => {
-    const defaultTheme = { primaryColor: '#ff7300', textColor: '#ffffff', bgColor: '#111310' };
+    const defaultTheme = { primaryColor: '#ff7300', textColor: '#ffffff', bgColor: '#111310', forceCustom: false };
     setTheme(defaultTheme);
     updateUser({ storeTheme: defaultTheme });
   };
@@ -675,6 +675,34 @@ export default function MiNegocioPage() {
                       style={{ width: '50px', height: '50px', padding: '0', border: 'none', borderRadius: '8px', cursor: 'pointer', background: 'none' }}
                     />
                   </div>
+                  </div>
+                </div>
+
+                <div style={{ marginTop: '24px', display: 'flex', justifyContent: 'space-between', alignItems: 'center', background: themeColors.bgSubtle2, padding: '20px', borderRadius: 'var(--radius-md)', border: `1px solid ${themeColors.borderSubtle2}` }}>
+                  <div>
+                    <h4 style={{ margin: '0 0 4px 0', fontSize: '1.1rem' }}>Fijar Colores (Ignorar Modo Claro)</h4>
+                    <div style={{ color: 'var(--color-text-muted)', fontSize: '0.9rem' }}>Obliga a que estos colores se vean igual para todos los usuarios.</div>
+                  </div>
+                  <label style={{ display: 'flex', alignItems: 'center', cursor: 'pointer' }}>
+                    <div style={{ position: 'relative' }}>
+                      <input 
+                        type="checkbox" 
+                        checked={theme.forceCustom || false} 
+                        onChange={(e) => handleThemeChange('forceCustom', e.target.checked)}
+                        style={{ opacity: 0, width: 0, height: 0 }}
+                      />
+                      <div style={{ 
+                        width: '44px', height: '24px', backgroundColor: theme.forceCustom ? 'var(--color-primary)' : themeColors.borderSubtle3, 
+                        borderRadius: '24px', transition: 'background-color 0.2s', position: 'relative'
+                      }}>
+                        <div style={{ 
+                          position: 'absolute', top: '2px', left: theme.forceCustom ? '22px' : '2px', 
+                          width: '20px', height: '20px', backgroundColor: 'white', borderRadius: '50%', 
+                          transition: 'left 0.2s', boxShadow: '0 2px 4px rgba(0,0,0,0.2)' 
+                        }} />
+                      </div>
+                    </div>
+                  </label>
                 </div>
 
                 <div style={{ marginTop: '40px' }}>
@@ -682,10 +710,12 @@ export default function MiNegocioPage() {
                   <div style={{ marginTop: '40px' }}>
                     <h4 style={{ margin: '0 0 16px 0', fontSize: '1.2rem', color: 'var(--color-text-main)' }}>Vista Previa de Tarjeta Pública</h4>
                     <div style={{ maxWidth: '400px', margin: '0 auto' }}>
-                      <div className="glass-panel" style={{ 
+                      <div className={(!theme.forceCustom && themeColors.isLight) ? "glass-panel" : ""} style={{ 
                         '--color-primary': theme.primaryColor,
-                        '--color-text-main': themeColors.isLight ? '#1a1c18' : theme.textColor,
-                        '--color-bg-base': themeColors.isLight ? '#f5f3ee' : theme.bgColor,
+                        '--color-text-main': (!theme.forceCustom && themeColors.isLight) ? '#1a1c18' : theme.textColor,
+                        '--color-bg-base': (!theme.forceCustom && themeColors.isLight) ? '#f5f3ee' : theme.bgColor,
+                        backgroundColor: (!theme.forceCustom && themeColors.isLight) ? 'var(--color-bg-base)' : theme.bgColor,
+                        border: '1px solid var(--color-border)',
                         position: 'relative', borderRadius: 'var(--radius-lg)', display: 'flex', flexDirection: 'column' 
                       } as any}>
                         

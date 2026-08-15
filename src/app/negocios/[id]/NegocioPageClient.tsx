@@ -429,25 +429,26 @@ export default function NegocioDetailPage({ params }: { params: Promise<{ id: st
   }
 
   const isCustomColorsAllowed = isOwnProfile ? hasFeature('coloresPersonalizados') : isAtLeast(negocio.planTier, 'empresarial');
+  const useForceCustom = isCustomColorsAllowed && negocio.theme && negocio.theme.forceCustom;
   const customStyles: React.CSSProperties = {
     paddingTop: '40px', 
     paddingBottom: '40px',
     ...(isCustomColorsAllowed && negocio.theme ? {
       '--color-primary': negocio.theme.primaryColor,
-      '--color-text-main': themeColors.isLight ? '#1a1c18' : negocio.theme.textColor,
-      '--color-bg-base': themeColors.isLight ? '#f5f3ee' : negocio.theme.bgColor,
-      backgroundColor: themeColors.isLight ? '#f5f3ee' : negocio.theme.bgColor
+      '--color-text-main': (!useForceCustom && themeColors.isLight) ? '#1a1c18' : negocio.theme.textColor,
+      '--color-bg-base': (!useForceCustom && themeColors.isLight) ? '#f5f3ee' : negocio.theme.bgColor,
+      backgroundColor: (!useForceCustom && themeColors.isLight) ? '#f5f3ee' : negocio.theme.bgColor
     } as any : {})
   };
 
   return (
     <div style={{ 
       minHeight: '100vh', 
-      backgroundColor: (isCustomColorsAllowed && negocio.theme) ? (themeColors.isLight ? '#f5f3ee' : negocio.theme.bgColor) : 'var(--color-bg-base)',
+      backgroundColor: (isCustomColorsAllowed && negocio.theme) ? ((!useForceCustom && themeColors.isLight) ? '#f5f3ee' : negocio.theme.bgColor) : 'var(--color-bg-base)',
       transition: 'background-color 0.3s ease'
     }}>
       <div className="container-page" style={customStyles}>
-      <div ref={panelRef} className="glass-panel" style={{ borderRadius: 'var(--radius-lg)', padding: 0, position: 'relative' }}>
+      <div ref={panelRef} className={useForceCustom ? "" : "glass-panel"} style={{ backgroundColor: useForceCustom ? 'rgba(255,255,255,0.03)' : undefined, border: useForceCustom ? '1px solid rgba(255,255,255,0.1)' : undefined, borderRadius: 'var(--radius-lg)', padding: 0, position: 'relative' }}>
         {/* Banner */}
         {((isOwnProfile ? hasFeature('banner') : isAtLeast(negocio.planTier, 'emprendedor')) && negocio.image) ? (
           <div style={{ 
