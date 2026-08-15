@@ -752,7 +752,7 @@ export default function MiNegocioPage() {
             {/* PRODUCTOS TAB */}
             {activeTab === 'productos' && (
               <div>
-                <div className="flex flex-col md:flex-row justify-between items-start md:items-center mb-6 flex-wrap gap-4">
+                <div style={{ display: 'flex', flexWrap: 'wrap', justifyContent: 'space-between', alignItems: 'center', marginBottom: '24px', gap: '16px' }}>
                   <h3 className="m-0 text-2xl font-bold">Catálogo de Productos</h3>
                   <button onClick={() => handleCreateNew('product')} className="btn btn-primary w-full md:w-auto px-6 py-3 text-base font-semibold rounded-full bg-[var(--color-primary)] text-white border-none cursor-pointer">
                     + Nuevo Producto
@@ -848,7 +848,7 @@ export default function MiNegocioPage() {
             {/* SERVICIOS TAB */}
             {activeTab === 'servicios' && (
               <div>
-                <div className="flex flex-col md:flex-row justify-between items-start md:items-center mb-6 flex-wrap gap-4">
+                <div style={{ display: 'flex', flexWrap: 'wrap', justifyContent: 'space-between', alignItems: 'center', marginBottom: '24px', gap: '16px' }}>
                   <h3 className="m-0 text-2xl font-bold">Catálogo de Servicios</h3>
                   {isAtLeast(planTier, 'emprendedor') ? (
                     <button onClick={() => handleCreateNew('service')} className="btn btn-primary w-full md:w-auto px-6 py-3 text-base font-semibold rounded-full bg-[var(--color-primary)] text-white border-none cursor-pointer">
