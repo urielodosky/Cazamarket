@@ -774,5 +774,13 @@
   }
 }
 
-
-
+/* Fix mobile line separation in light mode */
+@media (max-width: 768px) {
+  [data-theme="light"] .navbar-header,
+  [data-theme="light"] .mobile-filters-panel,
+  [data-theme="light"] .navbar-container {
+    border-bottom: none !important;
+    border-top: none !important;
+    box-shadow: none !important;
+  }
+}
