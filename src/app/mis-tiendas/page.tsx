@@ -313,7 +313,7 @@ export default function MiNegocioPage() {
     alert(`Modo Demo: Acá se abriría el modal para editar: ${section}`);
   };
 
-  if (!isVendorModeActive) {
+  if (false) {
     return (
       <div style={{ paddingTop: '100px', paddingBottom: 'var(--spacing-8)', paddingLeft: 'var(--spacing-4)', paddingRight: 'var(--spacing-4)', maxWidth: '1200px', margin: '0 auto', textAlign: 'center' }}>
         <h2 style={{ color: 'var(--color-text-main)' }}>Acceso Denegado</h2>
@@ -378,7 +378,7 @@ export default function MiNegocioPage() {
               <div style={{ position: 'absolute', top: '64px', right: '16px', color: 'rgba(255,255,255,0.9)', fontSize: '0.75rem', background: 'rgba(0,0,0,0.7)', padding: '4px 8px', borderRadius: '4px', pointerEvents: 'none' }}>Recomendado: 1200x400 px</div>
             </div>
           ) : (
-            <div style={{ height: '100px', position: 'relative', background: 'var(--color-bg-surface-elevated)', borderTopLeftRadius: 'var(--radius-lg)', borderTopRightRadius: 'var(--radius-lg)', border: '1px solid var(--color-border)' }}>
+            <div style={{ height: '100px', position: 'relative', zIndex: 0, background: 'var(--color-bg-surface-elevated)', borderTopLeftRadius: 'var(--radius-lg)', borderTopRightRadius: 'var(--radius-lg)', border: '1px solid var(--color-border)' }}>
               <input
                 type="file"
                 ref={bannerInputRef}
@@ -390,14 +390,14 @@ export default function MiNegocioPage() {
             </div>
           )
         ) : (
-          <div style={{ height: '100px', position: 'relative', background: 'var(--color-bg-surface-elevated)', borderTopLeftRadius: 'var(--radius-lg)', borderTopRightRadius: 'var(--radius-lg)', border: '1px solid var(--color-border)' }}>
+          <div style={{ height: '100px', position: 'relative', zIndex: 0, background: 'var(--color-bg-surface-elevated)', borderTopLeftRadius: 'var(--radius-lg)', borderTopRightRadius: 'var(--radius-lg)', border: '1px solid var(--color-border)' }}>
             <Link href="/planes" style={{ position: 'absolute', top: '16px', right: '16px', padding: '6px 12px', background: 'rgba(255,115,0,0.1)', color: 'var(--color-primary)', borderRadius: 'var(--radius-full)', fontSize: '0.85rem', fontWeight: 600, textDecoration: 'none', border: '1px solid rgba(255,115,0,0.2)' }}>
               Mejorar plan para Banner
             </Link>
           </div>
         )}
 
-        <div className="relative px-5 pb-5">
+        <div className="relative px-5 pb-5" style={{ zIndex: 20 }}>
 
           {/* Header Info (Avatar & Title) */}
           <div 
@@ -411,7 +411,7 @@ export default function MiNegocioPage() {
               onMouseLeave={() => setIsAvatarHovered(false)}
             >
               <div 
-                className="w-24 h-24 md:w-[140px] md:h-[140px] rounded-full border-[4px] md:border-[6px] border-[var(--color-bg-surface)] bg-cover bg-center bg-[var(--color-bg-surface-elevated)] relative shadow-[0_4px_12px_rgba(0,0,0,0.1)] dark:shadow-[0_8px_24px_rgba(0,0,0,0.6)]"
+                className="w-[96px] h-[96px] md:w-[140px] md:h-[140px] rounded-full border-[4px] md:border-[6px] border-[var(--color-bg-surface)] bg-cover bg-center bg-[var(--color-bg-surface-elevated)] relative shadow-[0_4px_12px_rgba(0,0,0,0.1)] dark:shadow-[0_8px_24px_rgba(0,0,0,0.6)]"
                 style={{ backgroundImage: `url(${avatar || 'https://images.unsplash.com/photo-1511497584788-876760111969?q=80&w=200&auto=format&fit=crop'})` }}
               >
                 {permissions.insigniaVerificada && (
