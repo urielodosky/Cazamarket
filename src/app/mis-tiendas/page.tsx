@@ -679,67 +679,67 @@ export default function MiNegocioPage() {
 
                 <div style={{ marginTop: '40px' }}>
                   <h4 style={{ margin: '0 0 16px 0', fontSize: '1.2rem', color: 'var(--color-text-main)' }}>Vista Previa de Tarjeta Pública</h4>
-                  <div style={{ 
-                    maxWidth: '400px', 
-                    margin: '0 auto',
-                    '--color-primary': theme.primaryColor,
-                    '--color-text-main': theme.textColor,
-                    '--color-bg-base': theme.bgColor
-                  } as any}>
-                    <div style={{ backgroundColor: theme.bgColor, border: '1px solid var(--color-border)', position: 'relative', borderRadius: 'var(--radius-lg)', display: 'flex', flexDirection: 'column', textAlign: 'left', padding: 0 }}>
-                      
-                      {(isAtLeast(planTier, 'emprendedor') && storeBanner) && (
-                        <div className="aspect-image-16-9" style={{ minHeight: '120px', height: '120px', borderTopLeftRadius: 'var(--radius-lg)', borderTopRightRadius: 'var(--radius-lg)', position: 'relative', overflow: 'hidden' }}>
-                          <img src={storeBanner} alt="Banner" style={{ position: 'absolute', top: 0, left: 0, width: '100%', height: '100%', objectFit: 'cover' }} />
-                          <div style={{ position: 'absolute', inset: 0, background: 'linear-gradient(to bottom, rgba(0,0,0,0.1), rgba(0,0,0,0.6))' }} />
-                        </div>
-                      )}
-
-                      <div className="card-content-fluid" style={{ paddingTop: (isAtLeast(planTier, 'emprendedor') && storeBanner) ? '0px' : '24px', display: 'flex', flexDirection: 'column', flex: 1, padding: '0 24px 24px 24px' }}>
+                  <div style={{ marginTop: '40px' }}>
+                    <h4 style={{ margin: '0 0 16px 0', fontSize: '1.2rem', color: 'var(--color-text-main)' }}>Vista Previa de Tarjeta Pública</h4>
+                    <div style={{ maxWidth: '400px', margin: '0 auto' }}>
+                      <div className="glass-panel" style={{ 
+                        '--color-primary': theme.primaryColor,
+                        '--color-text-main': themeColors.isLight ? '#1a1c18' : theme.textColor,
+                        '--color-bg-base': themeColors.isLight ? '#f5f3ee' : theme.bgColor,
+                        position: 'relative', borderRadius: 'var(--radius-lg)', display: 'flex', flexDirection: 'column' 
+                      } as any}>
                         
-                        <div style={{ display: 'flex', gap: '16px', marginBottom: '16px', position: 'relative', zIndex: 20, alignItems: 'center' }}>
-                          <div style={{ 
-                            width: (isAtLeast(planTier, 'emprendedor') && storeBanner) ? '64px' : '48px', 
-                            height: (isAtLeast(planTier, 'emprendedor') && storeBanner) ? '64px' : '48px', 
-                            borderRadius: '50%',
-                            border: '3px solid var(--color-bg-base)',
-                            backgroundImage: `url(${avatar || 'https://images.unsplash.com/photo-1511497584788-876760111969?q=80&w=200&auto=format&fit=crop'})`,
-                            backgroundSize: 'cover',
-                            backgroundPosition: 'center',
-                            backgroundColor: 'var(--color-bg-surface-elevated)',
-                            flexShrink: 0,
-                            position: 'relative',
-                            marginTop: (isAtLeast(planTier, 'emprendedor') && storeBanner) ? '-32px' : '0'
-                          }}>
-                            {permissions.insigniaVerificada && (
-                              <span style={{ position: 'absolute', bottom: '-2px', right: '-2px', width: '20px', height: '20px', borderRadius: '50%', background: 'var(--color-primary)', display: 'flex', alignItems: 'center', justifyContent: 'center', border: '2px solid var(--color-bg-base)' }}>
-                                <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="#fff" strokeWidth="4" strokeLinecap="round" strokeLinejoin="round"><polyline points="20 6 9 17 4 12"></polyline></svg>
-                              </span>
-                            )}
-                          </div>
-
-                          <div style={{ flex: 1, minWidth: 0, marginTop: (isAtLeast(planTier, 'emprendedor') && storeBanner) ? '8px' : '0' }}>
-                            <h3 style={{ fontSize: '1.25rem', margin: '0 0 4px 0', color: 'var(--color-text-main)', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>{name}</h3>
-                            {businessType && <span style={{ fontSize: '0.8rem', color: 'var(--color-primary)', fontWeight: 'bold', textTransform: 'uppercase' }}>{businessType}</span>}
+                        {/* Favoritos (Mock) */}
+                        <div style={{ position: 'absolute', top: '15px', right: '15px', zIndex: 30 }}>
+                          <div style={{ background: 'rgba(0,0,0,0.5)', borderRadius: '50%', width: '32px', height: '32px', display: 'flex', alignItems: 'center', justifyContent: 'center', color: 'rgba(255,255,255,0.7)', backdropFilter: 'blur(4px)' }}>
+                            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"></path></svg>
                           </div>
                         </div>
 
-                        <p style={{ color: 'var(--color-text-main)', opacity: 0.8, fontSize: '0.9rem', lineHeight: 1.5, marginBottom: '20px', display: '-webkit-box', WebkitLineClamp: 2, WebkitBoxOrient: 'vertical', overflow: 'hidden' }}>
-                          {description || 'Sin descripción'}
-                        </p>
+                        {/* Banner */}
+                        {(isAtLeast(planTier, 'emprendedor') && storeBanner) && (
+                          <div className="aspect-image-16-9" style={{ minHeight: '120px', height: '120px', borderTopLeftRadius: 'var(--radius-lg)', borderTopRightRadius: 'var(--radius-lg)', position: 'relative', overflow: 'hidden' }}>
+                            <img src={storeBanner} alt="Banner" style={{ position: 'absolute', top: 0, left: 0, width: '100%', height: '100%', objectFit: 'cover' }} />
+                            <div style={{ position: 'absolute', inset: 0, background: 'linear-gradient(to bottom, rgba(0,0,0,0.1), rgba(0,0,0,0.6))' }} />
+                          </div>
+                        )}
 
-                        <div style={{ display: 'flex', flexWrap: 'wrap', gap: '6px', marginBottom: '16px' }}>
-                          {categories.filter(c => c).map((cat, idx) => (
-                            <span key={idx} style={{ background: 'rgba(255,115,0,0.1)', color: 'var(--color-primary)', padding: '4px 10px', borderRadius: 'var(--radius-full)', fontSize: '0.8rem', fontWeight: 600 }}>
-                              {cat}
-                            </span>
-                          ))}
-                        </div>
+                        <div className="card-content-fluid" style={{ paddingTop: (isAtLeast(planTier, 'emprendedor') && storeBanner) ? '0px' : '24px', display: 'flex', flexDirection: 'column', flex: 1 }}>
+                          
+                          <div style={{ display: 'flex', gap: '16px', marginBottom: '16px', position: 'relative', zIndex: 20 }}>
+                            <div style={{ width: '64px', height: '64px', borderRadius: '50%', backgroundColor: 'var(--color-bg-elevated)', border: `2px solid ${isAtLeast(planTier, 'emprendedor') ? 'var(--color-primary)' : 'var(--color-border)'}`, overflow: 'hidden', flexShrink: 0, position: 'relative', marginTop: (isAtLeast(planTier, 'emprendedor') && storeBanner) ? '-32px' : '0' }}>
+                              <div style={{ position: 'absolute', bottom: '0', left: '0', width: '100%', height: '100%', borderRadius: '50%', backgroundImage: `url(${avatar || 'https://images.unsplash.com/photo-1511497584788-876760111969?q=80&w=200&auto=format&fit=crop'})`, backgroundSize: 'cover', backgroundPosition: 'center', backgroundColor: 'var(--color-bg-surface-elevated)' }}>
+                                {permissions.insigniaVerificada && (
+                                  <span title="Negocio Verificado" style={{ position: 'absolute', bottom: '2px', right: '2px', width: '22px', height: '22px', borderRadius: '50%', background: 'var(--color-primary)', display: 'flex', alignItems: 'center', justifyContent: 'center', border: '2px solid var(--color-bg-surface-elevated)', boxShadow: '0 2px 5px rgba(0,0,0,0.3)' }}>
+                                    <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="#fff" strokeWidth="4" strokeLinecap="round" strokeLinejoin="round"><polyline points="20 6 9 17 4 12"></polyline></svg>
+                                  </span>
+                                )}
+                              </div>
+                            </div>
+                            
+                            <div style={{ flex: 1, minWidth: 0, marginTop: (isAtLeast(planTier, 'emprendedor') && storeBanner) ? '12px' : '0' }}>
+                              <div style={{ display: 'flex', alignItems: 'center', gap: '8px', flexWrap: 'wrap' }}>
+                                <h3 style={{ margin: '0', fontSize: '1.25rem', color: 'var(--color-text-main)', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>{name || 'Mi Negocio'}</h3>
+                                <span style={{ background: 'var(--color-bg-subtle)', color: 'var(--color-text-muted)', padding: '2px 8px', borderRadius: 'var(--radius-full)', fontSize: '0.7rem', fontWeight: 600 }}>Nuevo</span>
+                                {isAtLeast(planTier, 'empresarial') && <span style={{ color: 'var(--color-primary)' }} title="Verificado">✓</span>}
+                              </div>
+                            </div>
+                          </div>
 
-                        <div style={{ marginTop: 'auto', paddingTop: '16px', borderTop: '1px solid color-mix(in srgb, var(--color-text-main) 10%, transparent)' }}>
-                          <button style={{ width: '100%', background: 'transparent', border: '1px solid var(--color-primary)', color: 'var(--color-text-main)', padding: '8px', borderRadius: 'var(--radius-full)', fontSize: '0.9rem', fontWeight: 600 }}>
-                            Visitar Tienda
-                          </button>
+                          <p style={{ color: 'var(--color-text-muted)', fontSize: '0.9rem', marginBottom: '24px', display: '-webkit-box', WebkitLineClamp: 2, WebkitBoxOrient: 'vertical', overflow: 'hidden', flex: 1 }}>
+                            {description || 'Sin descripción'}
+                          </p>
+
+                          {/* Footer */}
+                          <div style={{ height: '1px', background: `color-mix(in srgb, ${themeColors.borderSubtle3} 50%, transparent)`, margin: '0 -24px 16px -24px' }}></div>
+                          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                            <div style={{ display: 'flex', gap: '8px', color: 'var(--color-text-muted)', fontSize: '0.85rem' }}>
+                              <span><strong>{productos.length}</strong> prods</span>
+                              <span><strong>{servicios.length}</strong> servs</span>
+                            </div>
+                            <div className="btn btn-outline" style={{ display: 'inline-flex', alignItems: 'center', justifyContent: 'center', padding: '6px 16px', fontSize: '0.9rem', borderRadius: 'var(--radius-full)', color: themeColors.textWhite, borderColor: themeColors.borderSubtle3 }}>Visitar Tienda</div>
+                          </div>
+
                         </div>
                       </div>
                     </div>
@@ -1044,8 +1044,9 @@ export default function MiNegocioPage() {
                     ))}
 
                     {(!ubicacionPrincipal || (!ubicacionPrincipal.provincia && !ubicacionPrincipal.calle)) && sucursales.length === 0 && (
-                      <div style={{ color: 'var(--color-text-muted)', padding: '20px', border: '1px dashed var(--color-border)', borderRadius: 'var(--radius-md)', background: 'transparent' }}>
-                        No has configurado ninguna ubicación. <Link href="/configuracion" style={{ color: 'var(--color-primary)' }}>Configurar ahora</Link>
+                      <div style={{ display: 'flex', alignItems: 'center', gap: '8px', color: 'var(--color-text-muted)', fontSize: '0.95rem' }}>
+                        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><circle cx="12" cy="12" r="10"></circle><line x1="12" y1="8" x2="12" y2="12"></line><line x1="12" y1="16" x2="12.01" y2="16"></line></svg>
+                        No has configurado ninguna ubicación. <Link href="/configuracion" style={{ color: 'var(--color-primary)', textDecoration: 'underline' }}>Configurar ahora</Link>
                       </div>
                     )}
                   </div>
