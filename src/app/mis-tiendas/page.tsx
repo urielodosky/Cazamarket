@@ -326,9 +326,8 @@ export default function MiNegocioPage() {
     paddingTop: '40px',
     paddingBottom: '40px',
     ...(permissions.coloresPersonalizados ? {
-      '--color-primary': theme.primaryColor,
-      '--color-text-main': theme.textColor,
-      '--color-bg-base': theme.bgColor
+      '--color-primary': theme.primaryColor
+      // Eliminamos textColor y bgColor para que no rompan el modo claro del dashboard
     } as any : {})
   };
 
@@ -408,7 +407,7 @@ export default function MiNegocioPage() {
               onMouseLeave={() => setIsAvatarHovered(false)}
             >
               <div 
-                style={{ width: '120px', height: '120px', borderRadius: '50%', border: '4px solid var(--color-bg-surface)', backgroundColor: 'var(--color-bg-surface-elevated)', backgroundImage: `url(${avatar || 'https://images.unsplash.com/photo-1511497584788-876760111969?q=80&w=200&auto=format&fit=crop'})`, backgroundSize: 'cover', backgroundPosition: 'center', boxShadow: '0 4px 12px rgba(0,0,0,0.1)', position: 'relative' }}
+                style={{ width: '120px', height: '120px', borderRadius: '50%', border: '4px solid var(--color-primary)', backgroundColor: 'var(--color-bg-surface-elevated)', backgroundImage: `url(${avatar || 'https://images.unsplash.com/photo-1511497584788-876760111969?q=80&w=200&auto=format&fit=crop'})`, backgroundSize: 'cover', backgroundPosition: 'center', boxShadow: '0 4px 12px rgba(0,0,0,0.1)', position: 'relative' }}
               >
                 {permissions.insigniaVerificada && (
                   <div title="Negocio Verificado" style={{ position: 'absolute', bottom: '4px', right: '4px', background: 'var(--color-bg-surface)', borderRadius: '50%', padding: '4px', display: 'flex', border: '2px solid var(--color-bg-surface)', boxShadow: '0 2px 8px rgba(0,0,0,0.5)' }}>
