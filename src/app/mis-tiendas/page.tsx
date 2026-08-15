@@ -336,7 +336,7 @@ export default function MiNegocioPage() {
     <div className="container-page" style={customStyles}>
 
       {/* Limits indicator */}
-      <div className="flex flex-col sm:flex-row flex-wrap sm:justify-end items-stretch sm:items-center mb-4 gap-3">
+      <div className="flex flex-col sm:flex-row flex-wrap sm:justify-end items-start sm:items-center mb-6 gap-3">
         <div className="flex items-center justify-center sm:justify-start gap-2 px-4 py-2 sm:py-1.5 rounded-full border" style={{ background: 'color-mix(in srgb, var(--color-primary) 8%, transparent)', borderColor: 'color-mix(in srgb, var(--color-primary) 20%, transparent)' }}>
           <span style={{ color: 'var(--color-primary)', fontWeight: 600, fontSize: '0.85rem' }}>Plan: {planDisplayName}</span>
         </div>
@@ -400,13 +400,11 @@ export default function MiNegocioPage() {
         <div className="relative px-5 pb-5" style={{ zIndex: 20 }}>
 
           {/* Header Info (Avatar & Title) */}
-          <div 
-            className="flex flex-col items-center md:flex-row md:items-end gap-6 md:gap-8 relative z-10 mb-8"
-            style={{ marginTop: (isAtLeast(planTier, 'emprendedor') && storeBanner) ? '-60px' : '-40px' }}
-          >
+          <div className="flex flex-col items-center md:flex-row md:items-end gap-4 md:gap-8 relative z-10 mb-8 pt-4 md:pt-0">
             {/* Avatar */}
             <div
-              className="relative cursor-pointer shrink-0"
+              className="relative cursor-pointer shrink-0 z-20"
+              style={{ marginTop: (isAtLeast(planTier, 'emprendedor') && storeBanner) ? '-60px' : '-40px' }}
               onMouseEnter={() => setIsAvatarHovered(true)}
               onMouseLeave={() => setIsAvatarHovered(false)}
             >
@@ -471,7 +469,7 @@ export default function MiNegocioPage() {
           {/* Description & Tags */}
           <div className="flex flex-col gap-4 mb-10 relative p-4 md:p-6 bg-[var(--color-bg-surface-elevated)] border border-[var(--color-border)] rounded-[var(--radius-md)] shadow-sm">
 
-            <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4 relative z-10 w-full">
+            <div className="flex flex-col gap-3 sm:grid sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 sm:gap-4 relative z-10 w-full">
               <div className="w-full">
                 <CustomSelect
                   options={[
