@@ -707,8 +707,6 @@ export default function MiNegocioPage() {
 
                 <div style={{ marginTop: '40px' }}>
                   <h4 style={{ margin: '0 0 16px 0', fontSize: '1.2rem', color: 'var(--color-text-main)' }}>Vista Previa de Tarjeta Pública</h4>
-                  <div style={{ marginTop: '40px' }}>
-                    <h4 style={{ margin: '0 0 16px 0', fontSize: '1.2rem', color: 'var(--color-text-main)' }}>Vista Previa de Tarjeta Pública</h4>
                     <div style={{ maxWidth: '400px', margin: '0 auto' }}>
                       <div className={(!theme.forceCustom && themeColors.isLight) ? "glass-panel" : ""} style={{ 
                         '--color-primary': theme.primaryColor,
@@ -764,8 +762,8 @@ export default function MiNegocioPage() {
                           <div style={{ height: '1px', background: `color-mix(in srgb, ${themeColors.borderSubtle3} 50%, transparent)`, margin: '0 -24px 16px -24px' }}></div>
                           <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
                             <div style={{ display: 'flex', gap: '8px', color: 'var(--color-text-muted)', fontSize: '0.85rem' }}>
-                              <span><strong>{productos.length}</strong> prods</span>
-                              <span><strong>{servicios.length}</strong> servs</span>
+                              <span><strong>{myProducts.length}</strong> prods</span>
+                              <span><strong>{myServices.length}</strong> servs</span>
                             </div>
                             <div className="btn btn-outline" style={{ display: 'inline-flex', alignItems: 'center', justifyContent: 'center', padding: '6px 16px', fontSize: '0.9rem', borderRadius: 'var(--radius-full)', color: themeColors.textWhite, borderColor: themeColors.borderSubtle3 }}>Visitar Tienda</div>
                           </div>
@@ -775,7 +773,6 @@ export default function MiNegocioPage() {
                     </div>
                   </div>
                 </div>
-              </div>
             )}
 
             {/* PRODUCTOS TAB */}
@@ -1089,7 +1086,7 @@ export default function MiNegocioPage() {
       
       {cropImageSrc && cropType && (
         <ImageCropperModal
-          imageSrc={cropImageSrc}
+          imageSrc={cropImageSrc as string}
           aspect={cropType === 'avatar' ? 1 : 3 / 1}
           onCropComplete={handleCropComplete}
           onCancel={() => {
