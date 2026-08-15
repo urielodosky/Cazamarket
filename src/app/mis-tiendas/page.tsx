@@ -573,8 +573,8 @@ export default function MiNegocioPage() {
             {/* APARIENCIA TAB */}
             {activeTab === 'apariencia' && permissions.coloresPersonalizados && (
               <div style={{ maxWidth: '600px', margin: '0 auto', padding: '40px 20px' }}>
-                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '8px' }}>
-                  <h3 style={{ fontSize: '1.8rem', margin: 0 }}>Colores Personalizados</h3>
+                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', flexWrap: 'wrap', gap: '16px', marginBottom: '16px' }}>
+                  <h3 style={{ fontSize: 'clamp(1.25rem, 5vw, 1.8rem)', margin: 0, wordBreak: 'break-word', flex: 1, minWidth: '150px' }}>Colores Personalizados</h3>
                   <button
                     onClick={handleResetTheme}
                     style={{
@@ -589,7 +589,8 @@ export default function MiNegocioPage() {
                       transition: 'all 0.2s',
                       display: 'flex',
                       alignItems: 'center',
-                      gap: '6px'
+                      gap: '6px',
+                      flexShrink: 0
                     }}
                     onMouseEnter={(e) => { e.currentTarget.style.background = themeColors.bgSubtle3; e.currentTarget.style.borderColor = themeColors.borderSubtle3; }}
                     onMouseLeave={(e) => { e.currentTarget.style.background = themeColors.bgSubtle2; e.currentTarget.style.borderColor = themeColors.borderSubtle2; }}
