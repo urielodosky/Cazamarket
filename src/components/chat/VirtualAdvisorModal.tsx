@@ -235,6 +235,14 @@ export default function VirtualAdvisorModal({ onClose, productId }: VirtualAdvis
   const [editingRuleId, setEditingRuleId] = useState<string | null>(null);
   const [isLoading, setIsLoading] = useState(true);
   const visualBuilderRef = useRef<any>(null);
+  const [isMobile, setIsMobile] = useState(false);
+  
+  useEffect(() => {
+    const handleResize = () => setIsMobile(window.innerWidth <= 768);
+    handleResize(); // set initial state
+    window.addEventListener('resize', handleResize);
+    return () => window.removeEventListener('resize', handleResize);
+  }, []);
 
   // Settings state
   const [retargetingDays, setRetargetingDays] = useState<number | ''>('');
@@ -713,13 +721,19 @@ export default function VirtualAdvisorModal({ onClose, productId }: VirtualAdvis
                     
                     {/* Modo Visual */}
                     <div 
-                      className="desktop-only"
-                      onClick={() => { setResponseType('options'); setBuilderMode('visual'); }}
-                      style={{ background: 'rgba(255, 115, 0, 0.05)', border: '1px solid rgba(255, 115, 0, 0.2)', padding: 'clamp(16px, 4vw, 32px)', borderRadius: 'var(--radius-lg)', cursor: 'pointer', transition: 'all 0.3s ease', display: 'flex', flexDirection: 'column', alignItems: 'center', textAlign: 'center', gap: '16px' }}
-                      onMouseEnter={(e) => { e.currentTarget.style.transform = 'translateY(-4px)'; e.currentTarget.style.background = 'rgba(255, 115, 0, 0.1)'; e.currentTarget.style.boxShadow = '0 12px 24px rgba(255, 115, 0, 0.15)'; }}
-                      onMouseLeave={(e) => { e.currentTarget.style.transform = 'translateY(0)'; e.currentTarget.style.background = 'rgba(255, 115, 0, 0.05)'; e.currentTarget.style.boxShadow = 'none'; }}
+                      onClick={() => { 
+                        if (isMobile) return;
+                        setResponseType('options'); 
+                        setBuilderMode('visual'); 
+                      }}
+                      style={{ background: 'rgba(255, 115, 0, 0.05)', border: '1px solid rgba(255, 115, 0, 0.2)', padding: 'clamp(16px, 4vw, 32px)', borderRadius: 'var(--radius-lg)', cursor: isMobile ? 'not-allowed' : 'pointer', transition: 'all 0.3s ease', display: 'flex', flexDirection: 'column', alignItems: 'center', textAlign: 'center', gap: '16px', opacity: isMobile ? 0.6 : 1, position: 'relative' }}
+                      onMouseEnter={(e) => { if (isMobile) return; e.currentTarget.style.transform = 'translateY(-4px)'; e.currentTarget.style.background = 'rgba(255, 115, 0, 0.1)'; e.currentTarget.style.boxShadow = '0 12px 24px rgba(255, 115, 0, 0.15)'; }}
+                      onMouseLeave={(e) => { if (isMobile) return; e.currentTarget.style.transform = 'translateY(0)'; e.currentTarget.style.background = 'rgba(255, 115, 0, 0.05)'; e.currentTarget.style.boxShadow = 'none'; }}
                     >
-                      <div style={{ width: '64px', height: '64px', borderRadius: '16px', background: 'var(--color-primary)', display: 'flex', alignItems: 'center', justifyContent: 'center', color: '#fff', marginBottom: '8px' }}>
+                      {isMobile && (
+                        <div style={{ position: 'absolute', top: '-12px', right: '16px', background: 'rgba(255,50,50,0.9)', color: '#fff', padding: '4px 10px', borderRadius: '4px', fontSize: '0.75rem', fontWeight: 'bold', boxShadow: '0 4px 12px rgba(0,0,0,0.2)', zIndex: 10 }}>No disponible en móvil</div>
+                      )}
+                      <div style={{ width: '64px', height: '64px', borderRadius: '16px', background: isMobile ? 'rgba(255, 115, 0, 0.5)' : 'var(--color-primary)', display: 'flex', alignItems: 'center', justifyContent: 'center', color: '#fff', marginBottom: '8px' }}>
                         <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><rect x="3" y="3" width="18" height="18" rx="2" ry="2"></rect><line x1="3" y1="9" x2="21" y2="9"></line><line x1="9" y1="21" x2="9" y2="9"></line></svg>
                       </div>
                       <h4 style={{ margin: 0, fontSize: '1.2rem', color: 'var(--color-primary)' }}>Modo Visual (Cajitas)</h4>
