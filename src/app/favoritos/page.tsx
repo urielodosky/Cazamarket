@@ -111,7 +111,9 @@ export default function FavoritosPage() {
               cursor: 'pointer',
               color: activeTab === tab ? 'var(--color-primary)' : 'var(--color-text-muted)',
               borderBottom: activeTab === tab ? '2px solid var(--color-primary)' : '2px solid transparent',
-              textTransform: 'capitalize'
+              textTransform: 'capitalize',
+              whiteSpace: 'nowrap',
+              flexShrink: 0
             }}
           >
             {tab}
@@ -130,7 +132,9 @@ export default function FavoritosPage() {
             color: 'var(--color-text-muted)',
             borderBottom: '2px solid transparent',
             transition: 'all 0.2s',
-            marginLeft: 'auto'
+            marginLeft: 'auto',
+            whiteSpace: 'nowrap',
+            flexShrink: 0
           }}
         >
           Mis Reseñas
