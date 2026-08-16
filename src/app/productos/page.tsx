@@ -204,7 +204,7 @@ function ProductosContent() {
         <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 'var(--spacing-6)' }}>
           <div>
             <h1 style={{ fontSize: '2rem', margin: 0, color: 'var(--color-text-main)' }}>Mis Productos</h1>
-            <p style={{ color: 'var(--color-text-muted)', margin: '4px 0 0 0' }}>Administra tu inventario y publicaciones.</p>
+            <p style={{ wordBreak: 'break-word', overflowWrap: 'anywhere', color: 'var(--color-text-muted)', margin: '4px 0 0 0' }}>Administra tu inventario y publicaciones.</p>
           </div>
           <button className="btn btn-primary" style={{ padding: '10px 20px', borderRadius: 'var(--radius-full)' }} onClick={() => router.push('/mis-tiendas/nuevo-producto')}>
             + Nuevo Producto
@@ -227,16 +227,16 @@ function ProductosContent() {
             <svg width="64" height="64" viewBox="0 0 24 24" fill="none" stroke="rgba(255,255,255,0.2)" strokeWidth="1" strokeLinecap="round" strokeLinejoin="round" style={{ marginBottom: '16px' }}><path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z"></path><polyline points="3.27 6.96 12 12.01 20.73 6.96"></polyline><line x1="12" y1="22.08" x2="12" y2="12"></line></svg>
             {isVendorModeActive ? (
               <>
-                <h3 style={{ color: 'var(--color-text-main)', fontSize: '1.2rem', marginBottom: '8px' }}>No tienes productos publicados</h3>
-                <p style={{ color: 'var(--color-text-muted)', maxWidth: '400px', marginBottom: '24px' }}>Comienza a vender en CazaMarket creando tu primer producto. Puedes agregar fotos, descripciones y gestionar tu inventario.</p>
+                <h3 style={{ wordBreak: 'break-word', overflowWrap: 'anywhere', color: 'var(--color-text-main)', fontSize: '1.2rem', marginBottom: '8px' }}>No tienes productos publicados</h3>
+                <p style={{ wordBreak: 'break-word', overflowWrap: 'anywhere', color: 'var(--color-text-muted)', maxWidth: '400px', marginBottom: '24px' }}>Comienza a vender en CazaMarket creando tu primer producto. Puedes agregar fotos, descripciones y gestionar tu inventario.</p>
                 <button className="btn btn-primary" style={{ padding: '12px 24px', borderRadius: 'var(--radius-full)' }} onClick={() => router.push('/mis-tiendas')}>
                   Crear mi primer producto
                 </button>
               </>
             ) : (
               <>
-                <h3 style={{ color: 'var(--color-text-main)', fontSize: '1.2rem', marginBottom: '8px' }}>No hay productos disponibles</h3>
-                <p style={{ color: 'var(--color-text-muted)', maxWidth: '400px' }}>Aún no hay productos publicados en esta categoría.</p>
+                <h3 style={{ wordBreak: 'break-word', overflowWrap: 'anywhere', color: 'var(--color-text-main)', fontSize: '1.2rem', marginBottom: '8px' }}>No hay productos disponibles</h3>
+                <p style={{ wordBreak: 'break-word', overflowWrap: 'anywhere', color: 'var(--color-text-muted)', maxWidth: '400px' }}>Aún no hay productos publicados en esta categoría.</p>
               </>
             )}
           </div>
@@ -344,11 +344,11 @@ function ProductosContent() {
 
               {/* Nombre del producto */}
               <div style={{ marginBottom: '2px' }}>
-                <h3 style={{ fontSize: '1rem', color: 'var(--color-text-main)', margin: '0' }}>{producto.name}</h3>
+                <h3 style={{ wordBreak: 'break-word', overflowWrap: 'anywhere', fontSize: '1rem', color: 'var(--color-text-main)', margin: '0' }}>{producto.name}</h3>
               </div>
               
               {/* Descripcion (max 3 lineas) */}
-              <p style={{ color: 'var(--color-text-muted)', fontSize: '0.8rem', lineHeight: 1.3, margin: '0 0 8px 0', display: '-webkit-box', WebkitLineClamp: 3, WebkitBoxOrient: 'vertical', overflow: 'hidden' }}>
+              <p style={{ wordBreak: 'break-word', overflowWrap: 'anywhere', color: 'var(--color-text-muted)', fontSize: '0.8rem', lineHeight: 1.3, margin: '0 0 8px 0', display: '-webkit-box', WebkitLineClamp: 3, WebkitBoxOrient: 'vertical', overflow: 'hidden' }}>
                 {producto.description}
               </p>
 

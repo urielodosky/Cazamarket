@@ -341,3 +341,5 @@ input[type="number"] {
 }
 *, *::before, *::after { box-sizing: border-box; }
 *, *::before, *::after { box-sizing: border-box; }
+
+h1, h2, h3, h4, h5, h6, p, span { overflow-wrap: break-word; word-wrap: break-word; word-break: break-word; }

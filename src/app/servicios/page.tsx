@@ -118,7 +118,7 @@ function ServiciosContent() {
         <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 'var(--spacing-6)' }}>
           <div>
             <h1 style={{ fontSize: '2rem', margin: 0, color: 'var(--color-text-main)' }}>Mis Servicios</h1>
-            <p style={{ color: 'var(--color-text-muted)', margin: '4px 0 0 0' }}>Administra los servicios que ofreces.</p>
+            <p style={{ wordBreak: 'break-word', overflowWrap: 'anywhere', color: 'var(--color-text-muted)', margin: '4px 0 0 0' }}>Administra los servicios que ofreces.</p>
           </div>
           <button className="btn btn-primary" style={{ padding: '10px 20px', borderRadius: 'var(--radius-full)' }} onClick={() => router.push('/mis-tiendas/nuevo-servicio')}>
             + Nuevo Servicio
@@ -141,16 +141,16 @@ function ServiciosContent() {
             <svg width="64" height="64" viewBox="0 0 24 24" fill="none" stroke="rgba(255,255,255,0.2)" strokeWidth="1" strokeLinecap="round" strokeLinejoin="round" style={{ marginBottom: '16px' }}><polygon points="12 2 2 7 12 12 22 7 12 2"></polygon><polyline points="2 17 12 22 22 17"></polyline><polyline points="2 12 12 17 22 12"></polyline></svg>
             {(isVendorModeActive && permissions.maxServicios > 0) ? (
               <>
-                <h3 style={{ color: 'var(--color-text-main)', fontSize: '1.2rem', marginBottom: '8px' }}>No tienes servicios publicados</h3>
-                <p style={{ color: 'var(--color-text-muted)', maxWidth: '400px', marginBottom: '24px' }}>Empieza a ofrecer tus servicios, cursos o guías en CazaMarket. Llega a miles de clientes buscando tu experiencia.</p>
+                <h3 style={{ wordBreak: 'break-word', overflowWrap: 'anywhere', color: 'var(--color-text-main)', fontSize: '1.2rem', marginBottom: '8px' }}>No tienes servicios publicados</h3>
+                <p style={{ wordBreak: 'break-word', overflowWrap: 'anywhere', color: 'var(--color-text-muted)', maxWidth: '400px', marginBottom: '24px' }}>Empieza a ofrecer tus servicios, cursos o guías en CazaMarket. Llega a miles de clientes buscando tu experiencia.</p>
                 <button className="btn btn-primary" style={{ padding: '12px 24px', borderRadius: 'var(--radius-full)' }} onClick={() => router.push('/mis-tiendas')}>
                   Crear mi primer servicio
                 </button>
               </>
             ) : (
               <>
-                <h3 style={{ color: 'var(--color-text-main)', fontSize: '1.2rem', marginBottom: '8px' }}>No hay servicios disponibles</h3>
-                <p style={{ color: 'var(--color-text-muted)', maxWidth: '400px' }}>Aún no hay servicios publicados en esta categoría.</p>
+                <h3 style={{ wordBreak: 'break-word', overflowWrap: 'anywhere', color: 'var(--color-text-main)', fontSize: '1.2rem', marginBottom: '8px' }}>No hay servicios disponibles</h3>
+                <p style={{ wordBreak: 'break-word', overflowWrap: 'anywhere', color: 'var(--color-text-muted)', maxWidth: '400px' }}>Aún no hay servicios publicados en esta categoría.</p>
               </>
             )}
           </div>
@@ -263,7 +263,7 @@ function ServiciosContent() {
                  </div>
               </div>
               <div style={{ marginBottom: '8px', display: 'flex', flexDirection: 'column', gap: '6px' }}>
-                <h3 style={{ fontSize: '1.2rem', color: 'var(--color-text-main)', margin: 0 }}>{servicio.title || servicio.name}</h3>
+                <h3 style={{ wordBreak: 'break-word', overflowWrap: 'anywhere', fontSize: '1.2rem', color: 'var(--color-text-main)', margin: 0 }}>{servicio.title || servicio.name}</h3>
                 <div style={{ display: 'flex', gap: '6px', flexWrap: 'wrap' }}>
                   {(servicio.category || servicio.categoria) && (
                     <span style={{ fontSize: '0.75rem', background: 'rgba(255,115,0,0.15)', color: 'var(--color-primary)', border: '1px solid rgba(255,115,0,0.3)', padding: '2px 10px', borderRadius: 'var(--radius-full)', fontWeight: 600, display: 'inline-block' }}>
