@@ -713,6 +713,7 @@ export default function VirtualAdvisorModal({ onClose, productId }: VirtualAdvis
                     
                     {/* Modo Visual */}
                     <div 
+                      className="desktop-only"
                       onClick={() => { setResponseType('options'); setBuilderMode('visual'); }}
                       style={{ background: 'rgba(255, 115, 0, 0.05)', border: '1px solid rgba(255, 115, 0, 0.2)', padding: 'clamp(16px, 4vw, 32px)', borderRadius: 'var(--radius-lg)', cursor: 'pointer', transition: 'all 0.3s ease', display: 'flex', flexDirection: 'column', alignItems: 'center', textAlign: 'center', gap: '16px' }}
                       onMouseEnter={(e) => { e.currentTarget.style.transform = 'translateY(-4px)'; e.currentTarget.style.background = 'rgba(255, 115, 0, 0.1)'; e.currentTarget.style.boxShadow = '0 12px 24px rgba(255, 115, 0, 0.15)'; }}
