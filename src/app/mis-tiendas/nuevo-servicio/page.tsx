@@ -474,7 +474,7 @@ function NuevoServicioContent() {
               type="file" 
               multiple 
               onChange={handleMediaUpload}
-              accept="image/png, image/jpeg, image/webp, video/mp4, video/quicktime" 
+              accept="image/*,video/*" 
               style={{ display: 'none' }} 
             />
           </div>
