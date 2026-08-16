@@ -606,13 +606,13 @@ function NuevoProductoContent() {
             <div>
               <label style={{ display: 'flex', justifyContent: 'space-between', color: 'var(--color-text-main)', fontWeight: 600, marginBottom: '8px' }}>
                 <span>Características (Features)</span>
-                <span style={{ fontSize: '0.8rem', color: 'var(--color-text-muted)', fontWeight: 400 }}>{featureInput.length}/30</span>
+                <span style={{ fontSize: '0.8rem', color: 'var(--color-text-muted)', fontWeight: 400 }}>{featureInput.length}/50</span>
               </label>
               <div style={{ display: 'flex', gap: '8px', marginBottom: '12px' }}>
                 <input
                   type="text"
                   placeholder="Ej: Material de Acero, Color Negro..."
-                  maxLength={30}
+                  maxLength={50}
                   value={featureInput}
                   onChange={(e) => setFeatureInput(e.target.value)}
                   onKeyDown={(e) => { if (e.key === 'Enter') { e.preventDefault(); addFeature(); } }}
