@@ -27,6 +27,8 @@ function NuevoProductoContent() {
   const [isAdvisorModalOpen, setIsAdvisorModalOpen] = useState(false);
   
   const [stockMode, setStockMode] = useState<'definido' | 'no_necesario'>('no_necesario');
+  const [hasMinUnits, setHasMinUnits] = useState(false);
+  const [minUnits, setMinUnits] = useState('2');
   const [mediaPreview, setMediaPreview] = useState<{url: string, type: string, file?: File}[]>([]);
   const [uploadError, setUploadError] = useState<string | null>(null);
   const [currency, setCurrency] = useState('USD');
@@ -256,6 +258,7 @@ function NuevoProductoContent() {
   const validateStep2 = () => {
     if (!price || parseFloat(price) <= 0) return 'Debes ingresar un precio válido.';
     if (stockMode === 'definido' && (!stock || parseInt(stock) < 1)) return 'Debes ingresar una cantidad de stock válida.';
+    if (hasMinUnits && (!minUnits || parseInt(minUnits) < 1)) return 'Debes ingresar un mínimo de unidades válido (al menos 1).';
     return null;
   };
 
@@ -720,11 +723,11 @@ function NuevoProductoContent() {
               </label>
               <div style={{ display: 'flex', gap: '16px', padding: '14px 0' }}>
                 <label style={{ display: 'flex', alignItems: 'center', gap: '8px', cursor: 'pointer' }}>
-                  <input type="radio" name="condition" value="nuevo" checked={condition === 'nuevo'} onChange={(e) => setCondition(e.target.value)} style={{ accentColor: 'var(--color-primary)', width: '18px', height: '18px' }} />
+                  <input type="radio" name="condition" value="nuevo" checked={condition === 'nuevo'} onChange={(e) => setCondition(e.target.value)} style={{ accentColor: 'var(--color-primary)', width: '18px', height: '18px', minWidth: '18px', minHeight: '18px', flexShrink: 0 }} />
                   <span style={{ color: 'var(--color-text-main)' }}>Nuevo</span>
                 </label>
                 <label style={{ display: 'flex', alignItems: 'center', gap: '8px', cursor: 'pointer' }}>
-                  <input type="radio" name="condition" value="usado" checked={condition === 'usado'} onChange={(e) => setCondition(e.target.value)} style={{ accentColor: 'var(--color-primary)', width: '18px', height: '18px' }} />
+                  <input type="radio" name="condition" value="usado" checked={condition === 'usado'} onChange={(e) => setCondition(e.target.value)} style={{ accentColor: 'var(--color-primary)', width: '18px', height: '18px', minWidth: '18px', minHeight: '18px', flexShrink: 0 }} />
                   <span style={{ color: 'var(--color-text-main)' }}>Usado</span>
                 </label>
               </div>
@@ -741,7 +744,7 @@ function NuevoProductoContent() {
                     name="stockMode" 
                     checked={stockMode === 'definido'} 
                     onChange={() => setStockMode('definido')}
-                    style={{ accentColor: 'var(--color-primary)', width: '18px', height: '18px' }} 
+                    style={{ accentColor: 'var(--color-primary)', width: '18px', height: '18px', minWidth: '18px', minHeight: '18px', flexShrink: 0 }} 
                   />
                   <span style={{ color: 'var(--color-text-main)' }}>Stock definido</span>
                 </label>
@@ -751,7 +754,7 @@ function NuevoProductoContent() {
                     name="stockMode" 
                     checked={stockMode === 'no_necesario'}
                     onChange={() => setStockMode('no_necesario')}
-                    style={{ accentColor: 'var(--color-primary)', width: '18px', height: '18px' }} 
+                    style={{ accentColor: 'var(--color-primary)', width: '18px', height: '18px', minWidth: '18px', minHeight: '18px', flexShrink: 0 }} 
                   />
                   <span style={{ color: 'var(--color-text-main)' }}>No es necesario</span>
                 </label>
@@ -763,6 +766,48 @@ function NuevoProductoContent() {
                   value={stock}
                   onChange={(e) => setStock(e.target.value)}
                   min={1}
+                  style={{
+                    width: '100%', padding: '14px 16px', borderRadius: 'var(--radius-md)',
+                    background: 'rgba(0,0,0,0.3)', border: '1px solid var(--color-border)',
+                    color: 'var(--color-text-main)', fontSize: '1rem', outline: 'none'
+                  }}
+                />
+              )}
+            </div>
+
+            <div className="col-span-full">
+              <label style={{ display: 'block', color: 'var(--color-text-main)', fontWeight: 600, marginBottom: '8px' }}>
+                Mínimo de unidades por venta
+              </label>
+              <div style={{ display: 'flex', gap: '16px', marginBottom: '12px' }}>
+                <label style={{ display: 'flex', alignItems: 'center', gap: '8px', cursor: 'pointer' }}>
+                  <input 
+                    type="radio" 
+                    name="hasMinUnits" 
+                    checked={hasMinUnits === true} 
+                    onChange={() => setHasMinUnits(true)}
+                    style={{ accentColor: 'var(--color-primary)', width: '18px', height: '18px', minWidth: '18px', minHeight: '18px', flexShrink: 0 }} 
+                  />
+                  <span style={{ color: 'var(--color-text-main)' }}>Sí</span>
+                </label>
+                <label style={{ display: 'flex', alignItems: 'center', gap: '8px', cursor: 'pointer' }}>
+                  <input 
+                    type="radio" 
+                    name="hasMinUnits" 
+                    checked={hasMinUnits === false}
+                    onChange={() => setHasMinUnits(false)}
+                    style={{ accentColor: 'var(--color-primary)', width: '18px', height: '18px', minWidth: '18px', minHeight: '18px', flexShrink: 0 }} 
+                  />
+                  <span style={{ color: 'var(--color-text-main)' }}>No</span>
+                </label>
+              </div>
+              {hasMinUnits && (
+                <input
+                  type="number"
+                  min="1"
+                  placeholder="Ej: 5"
+                  value={minUnits}
+                  onChange={(e) => setMinUnits(e.target.value)}
                   style={{
                     width: '100%', padding: '14px 16px', borderRadius: 'var(--radius-md)',
                     background: 'rgba(0,0,0,0.3)', border: '1px solid var(--color-border)',
