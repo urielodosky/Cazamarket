@@ -970,22 +970,22 @@ function NuevoProductoContent() {
             </div>
           )}
 
-          <div className="border-t border-[var(--color-border)] pt-6 flex flex-col md:flex-row justify-end gap-4">
+          <div style={{ borderTop: '1px solid var(--color-border)', paddingTop: '24px', display: 'flex', flexWrap: 'wrap', gap: '16px', justifyContent: 'flex-end', marginTop: '24px' }}>
             {currentStep > 1 ? (
               <button 
                 type="button" 
-                className="btn btn-outline w-full md:w-auto"
+                className="btn btn-outline"
                 onClick={handlePrev}
-                style={{ padding: '12px 24px', borderRadius: 'var(--radius-full)' }}
+                style={{ padding: '12px 24px', borderRadius: 'var(--radius-full)', flex: '1 1 auto', textAlign: 'center' }}
               >
                 Atrás
               </button>
             ) : (
               <button 
                 type="button" 
-                className="btn btn-outline w-full md:w-auto"
+                className="btn btn-outline"
                 onClick={() => router.push('/mis-tiendas')}
-                style={{ padding: '12px 24px', borderRadius: 'var(--radius-full)' }}
+                style={{ padding: '12px 24px', borderRadius: 'var(--radius-full)', flex: '1 1 auto', textAlign: 'center' }}
               >
                 Cancelar
               </button>
@@ -994,19 +994,19 @@ function NuevoProductoContent() {
             {currentStep < 3 ? (
               <button 
                 type="button" 
-                className="btn btn-primary w-full md:w-auto"
+                className="btn btn-primary"
                 onClick={handleNext}
-                style={{ padding: '12px 32px', borderRadius: 'var(--radius-full)' }}
+                style={{ padding: '12px 32px', borderRadius: 'var(--radius-full)', flex: '1 1 auto', textAlign: 'center' }}
               >
                 Siguiente
               </button>
             ) : (
               <button 
                 type="button" 
-                className="btn btn-primary w-full md:w-auto"
+                className="btn btn-primary"
                 onClick={handleSubmit}
                 disabled={isSubmitting}
-                style={{ padding: '12px 32px', borderRadius: 'var(--radius-full)', opacity: isSubmitting ? 0.7 : 1, cursor: isSubmitting ? 'not-allowed' : 'pointer' }}
+                style={{ padding: '12px 32px', borderRadius: 'var(--radius-full)', opacity: isSubmitting ? 0.7 : 1, cursor: isSubmitting ? 'not-allowed' : 'pointer', flex: '1 1 auto', textAlign: 'center' }}
               >
                 {isSubmitting ? (editId ? 'Guardando...' : 'Publicando...') : (editId ? 'Guardar Cambios' : 'Publicar Producto')}
               </button>
