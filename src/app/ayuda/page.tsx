@@ -13,87 +13,31 @@ export default function AyudaPage() {
       <div style={{ marginBottom: 'var(--spacing-6)' }}>
         <h1 style={{ fontSize: '2.5rem', color: 'var(--color-text-main)', margin: '0 0 8px 0' }}>Centro de Ayuda</h1>
         <p style={{ color: 'var(--color-text-muted)', fontSize: '1.1rem', margin: 0 }}>
-          Encuentra todas las guías y respuestas para sacar el máximo provecho a CazaMarket.
+          Todo lo que necesitas saber para comprar y vender en CazaMarket, explicado de forma simple.
         </p>
       </div>
 
-      {/* A. Legal y Seguridad */}
+      {/* 1. Seguridad al Comprar */}
       <div className="glass-panel" style={{ padding: 'var(--spacing-6)', borderRadius: 'var(--radius-xl)', marginBottom: 'var(--spacing-8)' }}>
         <h2 style={{ fontSize: '1.5rem', color: 'var(--color-primary)', marginBottom: '24px', display: 'flex', alignItems: 'center', gap: '8px' }}>
           <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-            <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path>
-            <polyline points="14 2 14 8 20 8"></polyline>
-            <line x1="16" y1="13" x2="8" y2="13"></line>
-            <line x1="16" y1="17" x2="8" y2="17"></line>
-            <polyline points="10 9 9 9 8 9"></polyline>
+            <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"></path>
           </svg>
-          Legal y Seguridad
+          Seguridad al Comprar
         </h2>
         
-        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(250px, 1fr))', gap: '16px', marginBottom: '24px' }}>
-          <Link href="/terminos-y-condiciones" style={{ display: 'block', textDecoration: 'none' }}>
-            <div style={{ background: 'rgba(0,0,0,0.2)', border: '1px solid rgba(255,255,255,0.1)', padding: '20px', borderRadius: 'var(--radius-lg)', transition: 'background 0.2s', cursor: 'pointer' }}>
-              <h3 style={{ margin: '0 0 8px 0', color: 'var(--color-text-main)', fontSize: '1.1rem' }}>Términos y Condiciones</h3>
-              <p style={{ margin: 0, color: 'var(--color-text-muted)', fontSize: '0.9rem' }}>Reglas de uso de la plataforma.</p>
-            </div>
-          </Link>
-          
-          <Link href="/politica-de-privacidad" style={{ display: 'block', textDecoration: 'none' }}>
-            <div style={{ background: 'rgba(0,0,0,0.2)', border: '1px solid rgba(255,255,255,0.1)', padding: '20px', borderRadius: 'var(--radius-lg)', transition: 'background 0.2s', cursor: 'pointer' }}>
-              <h3 style={{ margin: '0 0 8px 0', color: 'var(--color-text-main)', fontSize: '1.1rem' }}>Políticas de Privacidad</h3>
-              <p style={{ margin: 0, color: 'var(--color-text-muted)', fontSize: '0.9rem' }}>Cómo protegemos tus datos.</p>
-            </div>
-          </Link>
-        </div>
-
-        <AccordionItem title="Comprar con Seguridad">
-          <p><strong>CazaMarket funciona como una vidriera virtual.</strong> Nosotros no procesamos los pagos ni participamos directamente en la transacción entre tú y el vendedor.</p>
-          <p style={{ marginTop: '8px' }}>Por tu seguridad, antes de realizar cualquier compra o transferencia, te recomendamos encarecidamente:</p>
+        <AccordionItem title="Cómo comprar con seguridad">
+          <p><strong>CazaMarket funciona como una enorme vidriera virtual.</strong> Esto significa que nosotros te conectamos con el vendedor, pero el pago y la entrega la coordinas directamente con él.</p>
+          <p style={{ marginTop: '8px' }}>Para evitar estafas y dolores de cabeza, te damos tres consejos de oro antes de transferir dinero:</p>
           <ul style={{ paddingLeft: '20px', display: 'flex', flexDirection: 'column', gap: '8px', marginTop: '12px' }}>
-            <li>Verificar las <strong>Reseñas</strong> del vendedor dejadas por otros usuarios.</li>
-            <li>Averiguar y constatar la información del negocio contactado (teléfonos, ubicación física si la tiene, y redes sociales).</li>
-            <li>Realizar todas las preguntas necesarias mediante el sistema de Mensajes o Chat antes de concretar.</li>
+            <li><strong>Revisá las Reseñas:</strong> Entrá al perfil del negocio y leé lo que opinaron otros compradores reales. Es el mejor termómetro de confianza.</li>
+            <li><strong>Averiguá sobre el negocio:</strong> Chequeá su dirección, buscalo en Google Maps, llamalos por teléfono o fijate en sus redes sociales para confirmar que existen.</li>
+            <li><strong>Sacate las dudas:</strong> Usá nuestro sistema de chat para preguntar todo lo necesario antes de concretar la compra.</li>
           </ul>
         </AccordionItem>
       </div>
 
-      {/* B. Primeros Pasos y Comunidad */}
-      <div className="glass-panel" style={{ padding: 'var(--spacing-6)', borderRadius: 'var(--radius-xl)', marginBottom: 'var(--spacing-8)' }}>
-        <h2 style={{ fontSize: '1.5rem', color: 'var(--color-primary)', marginBottom: '24px', display: 'flex', alignItems: 'center', gap: '8px' }}>
-          <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-            <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"></path>
-            <circle cx="9" cy="7" r="4"></circle>
-            <path d="M23 21v-2a4 4 0 0 0-3-3.87"></path>
-            <path d="M16 3.13a4 4 0 0 1 0 7.75"></path>
-          </svg>
-          Primeros Pasos y Comunidad
-        </h2>
-        
-        <AccordionItem title="¿Cómo funciona la sección de Comunidad?">
-          <p>La Comunidad es el foro central de CazaMarket. Es el lugar ideal para:</p>
-          <ul style={{ paddingLeft: '20px', display: 'flex', flexDirection: 'column', gap: '8px', marginTop: '12px' }}>
-            <li><strong>Crear Temas:</strong> Si tienes dudas sobre un equipo, buscas recomendaciones o quieres compartir experiencias.</li>
-            <li><strong>Responder y Ayudar:</strong> Puedes interactuar con otros cazadores y entusiastas del outdoor.</li>
-            <li><strong>Filtros:</strong> Puedes buscar temas específicos por categoría para encontrar rápido lo que te interesa.</li>
-          </ul>
-        </AccordionItem>
-
-        <AccordionItem title="¿Cómo funcionan los Favoritos?">
-          <p>El sistema de favoritos (el ícono del corazón) te permite guardar elementos para verlos más tarde sin perderlos de vista:</p>
-          <ul style={{ paddingLeft: '20px', display: 'flex', flexDirection: 'column', gap: '8px', marginTop: '12px' }}>
-            <li><strong>Productos y Servicios:</strong> Guárdalos para comparar precios o comprarlos después.</li>
-            <li><strong>Negocios/Tiendas:</strong> Si encuentras un vendedor de confianza, agrégalo a favoritos para acceder rápidamente a su catálogo actualizado.</li>
-          </ul>
-          <p style={{ marginTop: '8px' }}>Puedes gestionar todo esto desde la sección "Favoritos" en tu menú de usuario.</p>
-        </AccordionItem>
-
-        <AccordionItem title="¿Cómo funcionan las Reseñas?">
-          <p>Las reseñas son el pilar de la confianza en nuestra plataforma. Luego de interactuar con un negocio, tienes la opción de dejar una reseña (de 1 a 5 estrellas) acompañada de un comentario.</p>
-          <p style={{ marginTop: '8px' }}><strong>Importante:</strong> Las reseñas impactan directamente en la visibilidad del vendedor. Un vendedor con altas calificaciones genera más confianza y sube en los rankings de búsqueda.</p>
-        </AccordionItem>
-      </div>
-
-      {/* C. Guía para Vendedores: Inicio y Configuración */}
+      {/* 2. Guía para Vendedores (Primeros Pasos) */}
       <div className="glass-panel" style={{ padding: 'var(--spacing-6)', borderRadius: 'var(--radius-xl)', marginBottom: 'var(--spacing-8)' }}>
         <h2 style={{ fontSize: '1.5rem', color: 'var(--color-primary)', marginBottom: '24px', display: 'flex', alignItems: 'center', gap: '8px' }}>
           <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
@@ -101,47 +45,41 @@ export default function AyudaPage() {
             <line x1="3" y1="9" x2="21" y2="9"></line>
             <line x1="9" y1="21" x2="9" y2="9"></line>
           </svg>
-          Guía para Vendedores: Inicio y Configuración
+          Guía para Vendedores (Primeros Pasos)
         </h2>
 
-        <AccordionItem title="Cómo empezar a vender (Modo Vendedor)">
-          <p>Para comenzar a vender, solo necesitas abrir tu menú de usuario (arriba a la derecha) y hacer clic en <strong>"Cambiar a Vendedor"</strong>.</p>
-          <p style={{ marginTop: '8px' }}>Al hacer esto, la interfaz cambiará y tendrás acceso a tu panel de administración ("Mi Negocio"), desde donde podrás configurar tu tienda, publicar artículos y elegir un Plan (Hunter, Sniper o Armory).</p>
+        <AccordionItem title="Cómo empezar a vender">
+          <p>Cualquier usuario puede tener su propia tienda. Solo tenés que ir al menú arriba a la derecha (donde está tu nombre) y hacer clic en <strong>"Cambiar a Vendedor"</strong>.</p>
+          <p style={{ marginTop: '8px' }}>Ese botón es como la puerta trasera de tu negocio: te lleva al panel de administración donde vas a poder cargar tus artículos y configurar cómo te ve la gente.</p>
         </AccordionItem>
 
-        <AccordionItem title="Configurar tu Negocio (Tipos y Categorías)">
-          <p>En la sección "Configurar Negocio", debes establecer la base de tu identidad:</p>
+        <AccordionItem title="Cómo configurar tu negocio y categorías">
+          <p>Al crear tu tienda, te vamos a pedir un par de datos para que los clientes sepan con quién tratan:</p>
           <ul style={{ paddingLeft: '20px', display: 'flex', flexDirection: 'column', gap: '8px', marginTop: '12px' }}>
-            <li><strong>Tipo de Negocio:</strong> Define si eres un Minorista, Mayorista, Fabricante, Importador, etc. Esto ayuda a los compradores (y a otros negocios) a entender tu rol en la cadena comercial.</li>
-            <li><strong>Categorías del Negocio:</strong> Selecciona en qué rubros generales operas (Armería, Indumentaria, Cuchillería). Esto no limita lo que puedes publicar, pero categoriza tu tienda en el directorio de negocios.</li>
+            <li><strong>Tipo de Negocio:</strong> Elegí si sos un Minorista (local común), Mayorista, Fabricante o Importador.</li>
+            <li><strong>Categorías:</strong> Seleccioná los rubros principales en los que te movés (ejemplo: Armería, Camping, Pesca). Esto sirve para que aparezcas en el directorio general de negocios de esos rubros.</li>
           </ul>
         </AccordionItem>
 
-        <AccordionItem title="Información de Contacto y Horarios">
-          <p>Una tienda transparente vende más. Asegúrate de configurar:</p>
+        <AccordionItem title="Contacto, Horarios, Proveedores y Distribuidores">
+          <p>Una tienda transparente vende el doble. Asegurate de completar esto desde "Mi Negocio":</p>
           <ul style={{ paddingLeft: '20px', display: 'flex', flexDirection: 'column', gap: '8px', marginTop: '12px' }}>
-            <li><strong>Teléfono de WhatsApp:</strong> Fundamental, ya que es el canal principal donde te llegarán los clientes (si no usas el Bot IA).</li>
-            <li><strong>Ubicación y Sucursales:</strong> Ingresa la dirección exacta. Si tienes un plan superior, podrás agregar múltiples sucursales para los retiros.</li>
-            <li><strong>Horarios de Atención:</strong> Establece qué días y en qué franjas horarias trabajas. Si un cliente intenta contactarte por chat fuera de horario, se le informará de tu ausencia.</li>
+            <li><strong>Contacto y Horarios:</strong> Poné tu número de WhatsApp real y fijá qué días y en qué horas trabajás. Si alguien te habla fuera de hora, el sistema le avisa que estás cerrado.</li>
+            <li><strong>Proveedores y Distribuidores:</strong> Si vendés marcas conocidas (ej: Glock, Shimano), agregalas acá. Sirve como chapa de calidad (para que sepan que sos distribuidor oficial) y atrae a los fanáticos de esas marcas directo a tu perfil.</li>
           </ul>
         </AccordionItem>
 
-        <AccordionItem title="Personalizar la Tienda (Medidas de Imágenes)">
-          <p>Tu perfil es tu carta de presentación. Para que se vea profesional, respeta estas medidas sugeridas:</p>
+        <AccordionItem title="Cómo personalizar la tienda (Medidas de Imágenes)">
+          <p>La apariencia de tu perfil es clave. Te recomendamos estos tamaños para que tus fotos no queden cortadas ni estiradas:</p>
           <ul style={{ paddingLeft: '20px', display: 'flex', flexDirection: 'column', gap: '8px', marginTop: '12px' }}>
-            <li><strong>Imagen de Perfil / Logo:</strong> Formato cuadrado (1:1). Recomendado: <code>500x500 píxeles</code>.</li>
-            <li><strong>Banner / Portada de la Tienda:</strong> Formato horizontal. Recomendado: <code>1200x400 píxeles</code> o similar (ratio 3:1).</li>
-            <li><strong>Imágenes de Productos y Servicios:</strong> Formato horizontal clásico (4:3). Recomendado: <code>800x600 píxeles</code>. Si subes otras proporciones, el sistema las adaptará, pero 4:3 garantiza que no se recorten en los listados.</li>
+            <li><strong>Logo / Imagen de Perfil:</strong> Tiene que ser cuadrada (relación 1:1). Tamaño ideal: <code>500x500 píxeles</code>.</li>
+            <li><strong>Banner / Portada de la tienda:</strong> Es la imagen ancha que va arriba de todo. Tamaño ideal: <code>1200x400 píxeles</code>.</li>
+            <li><strong>Fotos de artículos:</strong> Tienen que ser rectangulares (relación 4:3). Tamaño ideal: <code>800x600 píxeles</code>.</li>
           </ul>
-        </AccordionItem>
-
-        <AccordionItem title="Proveedores y Distribuidores">
-          <p><strong>¿Para qué sirve mostrarlos?</strong></p>
-          <p style={{ marginTop: '8px' }}>Si eres un comercio y vendes marcas específicas (ej. marcas de cuchillos, ópticas, indumentaria), puedes agregarlas a tu lista de Proveedores/Marcas. Esto sirve como validación de calidad ("Distribuidor Oficial") y atrae a compradores que buscan esas marcas específicas dentro de tu perfil.</p>
         </AccordionItem>
       </div>
 
-      {/* D. Publicación de Catálogo */}
+      {/* 3. Publicaciones (Productos y Servicios) */}
       <div className="glass-panel" style={{ padding: 'var(--spacing-6)', borderRadius: 'var(--radius-xl)', marginBottom: 'var(--spacing-8)' }}>
         <h2 style={{ fontSize: '1.5rem', color: 'var(--color-primary)', marginBottom: '24px', display: 'flex', alignItems: 'center', gap: '8px' }}>
           <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
@@ -149,72 +87,122 @@ export default function AyudaPage() {
             <polyline points="3.27 6.96 12 12.01 20.73 6.96"></polyline>
             <line x1="12" y1="22.08" x2="12" y2="12"></line>
           </svg>
-          Publicación de Catálogo
+          Publicaciones (Productos y Servicios)
         </h2>
 
-        <AccordionItem title="Cómo Publicar un Producto y sus Características">
-          <p>Los Productos son bienes físicos intercambiables. Al crear uno, puedes configurar:</p>
+        <AccordionItem title="Cómo publicar un Producto">
+          <p>Los productos son cosas físicas (una caña, una linterna, etc). Al cargarlos podés configurar:</p>
           <ul style={{ paddingLeft: '20px', display: 'flex', flexDirection: 'column', gap: '8px', marginTop: '12px' }}>
-            <li><strong>Límites:</strong> Título (máx 30 caracteres), Descripción (máx 500 caracteres).</li>
-            <li><strong>Características Específicas:</strong> Agrega tags (ej. Calibre, Peso, Color) de hasta 50 caracteres para detallar técnica del producto sin ensuciar el título.</li>
-            <li><strong>Envío y Retiro:</strong> Define si el envío es gratis, tiene un costo acordado extra, y si permites retirar físicamente de una sucursal específica.</li>
-            <li><strong>Stock:</strong> Puedes llevar control numérico ("Stock Definido") o dejarlo infinito ("No Necesario").</li>
-            <li><strong>Declaración Jurada:</strong> Obligatorio de marcar si vendes Armas de Fuego, garantizando que cumples las leyes de transferencias correspondientes.</li>
+            <li><strong>Características:</strong> Agregale etiquetas como "Calibre", "Color" o "Peso". Esto te ayuda a dar detalles técnicos sin hacer un título larguísimo.</li>
+            <li><strong>Stock y Envío:</strong> Definí cuántas unidades te quedan, si hacés envíos gratis y si la gente puede pasar a retirar por tu local.</li>
+            <li><strong>Armas de Fuego:</strong> Si vendés armas, el sistema te obliga a marcar una opción especial para avisar que el comprador debe cumplir con las leyes de la ANMaC (entidad regulatoria).</li>
           </ul>
         </AccordionItem>
 
-        <AccordionItem title="Cómo Crear un Servicio y sus Características">
-          <p>Los Servicios son intangibles (ej. Guías, Mantenimiento, Cursos). Se configuran distinto a los productos:</p>
+        <AccordionItem title="Cómo publicar un Servicio">
+          <p>Los servicios son intangibles (como ser Guía de Pesca, dar Cursos de Tiro, o reparar equipos). Tienen opciones especiales que los productos no tienen:</p>
           <ul style={{ paddingLeft: '20px', display: 'flex', flexDirection: 'column', gap: '8px', marginTop: '12px' }}>
-            <li><strong>Ubicación del Servicio:</strong> Puedes indicar si se brinda en el domicilio del cliente, en tu local, o de forma online.</li>
-            <li><strong>Radio de Cobertura (Mapa):</strong> Puedes dibujar en el mapa exactamente hasta qué área geográfica te desplazas para brindar el servicio.</li>
-            <li><strong>Reglas de Temporada:</strong> Útil para servicios como "Caza Mayor". Puedes definir en qué meses del año el servicio está disponible.</li>
+            <li><strong>Lugar:</strong> Aclará si el servicio es a domicilio, si tienen que ir a tu local, o si es online.</li>
+            <li><strong>Mapa de Cobertura:</strong> Si tenés un plan avanzado, podés dibujar en Google Maps hasta qué zonas viajás para brindar el servicio.</li>
+            <li><strong>Temporada:</strong> Súper útil para caza o pesca. Podés marcar que el servicio solo se puede comprar, por ejemplo, entre marzo y agosto.</li>
           </ul>
         </AccordionItem>
 
-        <AccordionItem title="Cómo Funcionan los Descuentos">
-          <p>Tanto en productos como servicios, puedes habilitar una Zona de Descuentos para incentivar ventas. Opciones disponibles:</p>
+        <AccordionItem title="Cómo funcionan los Descuentos">
+          <p>Para empujar las ventas, podés crear ofertas directamente desde tu panel:</p>
           <ul style={{ paddingLeft: '20px', display: 'flex', flexDirection: 'column', gap: '8px', marginTop: '12px' }}>
-            <li><strong>Descuento Estándar:</strong> Un porcentaje (%) o monto fijo rebajado del precio final de forma permanente.</li>
-            <li><strong>Descuentos por Volumen (Venta Mayorista):</strong> <em>"Lleva 5 unidades y obtén 10% OFF"</em>. Configura reglas según la cantidad.</li>
-            <li><strong>Early Bird (Solo Servicios):</strong> Descuentos por reservar con anticipación (ej. <em>"15% OFF si reservas 30 días antes"</em>).</li>
-            <li><strong>Horarios Valle (Solo Servicios):</strong> Descuentos automáticos si el cliente contrata el servicio en días u horas de baja demanda.</li>
+            <li><strong>Descuento Normal:</strong> Le bajás el precio fijo o le restás un porcentaje (%).</li>
+            <li><strong>Descuento por Volumen (Mayorista):</strong> Configurás que si te compran más de X unidades, se hace un descuento automático.</li>
+            <li><strong>Compra Anticipada (Early Bird):</strong> Si te contratan un servicio con un mes de anticipación, les podés hacer precio.</li>
+            <li><strong>Horarios Valle:</strong> Si das turnos, podés cobrar más barato los días de semana que casi no va nadie, para llenar la agenda.</li>
           </ul>
         </AccordionItem>
       </div>
 
-      {/* E. Planes y Herramientas */}
-      <div className="glass-panel" style={{ padding: 'var(--spacing-6)', borderRadius: 'var(--radius-xl)' }}>
+      {/* 4. Planes, Ventajas y Anuncios */}
+      <div className="glass-panel" style={{ padding: 'var(--spacing-6)', borderRadius: 'var(--radius-xl)', marginBottom: 'var(--spacing-8)' }}>
         <h2 style={{ fontSize: '1.5rem', color: 'var(--color-primary)', marginBottom: '24px', display: 'flex', alignItems: 'center', gap: '8px' }}>
           <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
             <polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"></polygon>
           </svg>
-          Planes y Herramientas del Negocio
+          Planes, Ventajas y Anuncios
         </h2>
 
-        <AccordionItem title="Los Diferentes Planes y Modalidades (Mixtos)">
-          <p>CazaMarket te ofrece escalar tu negocio con 4 niveles principales: <strong>Básico, Emprendedor, Comercial y Empresarial</strong>.</p>
-          <p style={{ marginTop: '8px' }}>Además, puedes elegir si tu plan se enfoca solo en <strong>Productos</strong>, solo en <strong>Servicios</strong>, o si quieres un <strong>Plan Mixto</strong> que te permita publicar ambos simultáneamente.</p>
+        <AccordionItem title="Los diferentes planes">
+          <p>CazaMarket tiene 4 escalones para tu negocio: <strong>Básico, Emprendedor, Comercial y Empresarial</strong>.</p>
+          <p style={{ marginTop: '8px' }}>Y a la vez, podés elegir si tu tienda va a ser solo de Productos, solo de Servicios, o un <strong>Plan Mixto</strong> (para vender ambas cosas a la vez).</p>
+          <p style={{ marginTop: '8px' }}>Cuanto más alto sea tu plan, más artículos y sucursales vas a poder cargar, y más herramientas profesionales se te van a habilitar.</p>
+        </AccordionItem>
+
+        <AccordionItem title="Cómo funciona cada ventaja (Carrito, Chat, Bot, Calendarios)">
+          <p>Estas son las herramientas que vas desbloqueando según tu plan:</p>
           <ul style={{ paddingLeft: '20px', display: 'flex', flexDirection: 'column', gap: '12px', marginTop: '12px' }}>
-            <li><strong>Límites de Publicación:</strong> A medida que subes de plan, aumenta la cantidad de productos/servicios que puedes tener activos, así como el número de sucursales o categorías de tu negocio.</li>
-            <li><strong>Mapas de Territorio (Servicios):</strong> Los planes desde Comercial te habilitan a dibujar zonas de cobertura en el mapa para tus servicios.</li>
-            <li><strong>Calendario y Reservas:</strong> Exclusivo de planes avanzados (Empresarial), permite gestionar fechas y horarios de turnos.</li>
-            <li><strong>Bot Asesor Automático:</strong> Herramienta premium para configurar flujos de respuestas automatizadas y no perder tiempo con preguntas frecuentes.</li>
+            <li><strong>Chat interno:</strong> Te permite mensajearte de forma privada con el comprador dentro de la plataforma, sin tener que darle tu teléfono personal de entrada.</li>
+            <li><strong>Carrito a WhatsApp:</strong> Los clientes pueden juntar varios de tus productos, armar un pedido grande, y mandártelo todo junto por WhatsApp.</li>
+            <li><strong>Mapas (Comercial en adelante):</strong> Te deja dibujar en un mapa el área exacta donde trabajás o hacés envíos, ideal para servicios a domicilio.</li>
+            <li><strong>Bot Asesor Automático (Empresarial):</strong> Es como tener un empleado virtual. Le enseñás respuestas comunes y él se encarga de contestarle a los clientes a cualquier hora, filtrando a los curiosos. Solo te los manda al WhatsApp cuando ya están decididos a comprar.</li>
+            <li><strong>Calendario de Reservas (Empresarial):</strong> En vez de que te llamen para coordinar, tus clientes ven un calendario en tu perfil y eligen los días/horas que tenés libres. Si reservan un turno, ese espacio se bloquea automáticamente para el resto.</li>
           </ul>
         </AccordionItem>
 
-        <AccordionItem title="Posicionamiento y Ranking">
-          <p><strong>¿Cómo funciona el orden del catálogo?</strong></p>
-          <p style={{ marginTop: '8px' }}>Los resultados de búsqueda priorizan a los vendedores según el nivel de su suscripción activa. Un negocio con plan <strong>Empresarial</strong> tendrá mayor visibilidad y aparecerá antes en los listados que uno con plan <em>Básico</em> o <em>Gratis</em>.</p>
-          <p style={{ marginTop: '8px' }}>No existen "anuncios pagos" ni banners patrocinados comprables por separado; tu posicionamiento mejora orgánicamente y de forma transparente al escalar tu plan, mantener tu tienda actualizada y acumular buenas reseñas de compradores reales.</p>
+        <AccordionItem title="Ranking (Quién aparece primero)">
+          <p>Cuando un comprador busca algo (ej: "Caña de pescar"), la plataforma le muestra primero a los vendedores con planes más altos.</p>
+          <p style={{ marginTop: '8px' }}>Es decir, alguien con plan <strong>Empresarial</strong> va a salir mucho más arriba que alguien con plan Básico o Gratis. Además, el sistema tiene muy en cuenta tus reseñas: si tenés muchas estrellitas, también escalás posiciones.</p>
         </AccordionItem>
 
-        <AccordionItem title="Cómo funciona Cambiar de Plan">
-          <p>Puedes mejorar (upgrade) o reducir (downgrade) tu plan en cualquier momento desde la sección "Planes" de tu panel.</p>
-          <p style={{ marginTop: '8px' }}>Si pasas a un plan superior, las nuevas herramientas (como el Bot Asesor o los Calendarios) se desbloquean instantáneamente, permitiéndote configurarlas al momento.</p>
+        <AccordionItem title="Anuncios Promocionados (Publicidad Extra)">
+          <p>Si querés un empujón enorme de visitas sin importar qué plan tengas, podés contratar un <strong>Anuncio Promocionado</strong>.</p>
+          <ul style={{ paddingLeft: '20px', display: 'flex', flexDirection: 'column', gap: '8px', marginTop: '12px' }}>
+            <li><strong>¿Dónde aparecen?:</strong> Van directo al carrusel (los carteles grandes que pasan) en la pantalla principal de CazaMarket, donde los ven todos los usuarios al entrar.</li>
+            <li><strong>¿Qué puedo promocionar?:</strong> Podés promocionar tu tienda entera, o elegir un producto/servicio puntual que quieras vender rápido.</li>
+            <li><strong>Costo:</strong> Se paga aparte de tu plan. Cuesta $20 USD para que aparezca toda la semana entera, o $5 USD para que aparezca solo un fin de semana al mes.</li>
+          </ul>
+        </AccordionItem>
+
+        <AccordionItem title="Cambiar de plan y la opción de 'Acelerar'">
+          <p>Si querés pasarte a un plan mejor o a uno más barato, lo hacés desde la sección "Planes".</p>
+          <p style={{ marginTop: '8px' }}>Por regla general, el cambio impacta recién cuando arranca el mes siguiente, para no ensuciar la facturación. <strong>Pero si estás apurado</strong> (por ejemplo, te empezaron a llover mensajes y necesitás el Bot YA MISMO), podés tocar el botón de <strong>Acelerar Cambio</strong>.</p>
+          <p style={{ marginTop: '8px' }}>Al acelerar, el sistema te cobra la diferencia proporcional de los días que faltan y te activa todas las herramientas nuevas en 2 segundos.</p>
         </AccordionItem>
       </div>
 
+      {/* 5. Funciones Generales de la Comunidad */}
+      <div className="glass-panel" style={{ padding: 'var(--spacing-6)', borderRadius: 'var(--radius-xl)' }}>
+        <h2 style={{ fontSize: '1.5rem', color: 'var(--color-primary)', marginBottom: '24px', display: 'flex', alignItems: 'center', gap: '8px' }}>
+          <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+            <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"></path>
+            <circle cx="9" cy="7" r="4"></circle>
+            <path d="M23 21v-2a4 4 0 0 0-3-3.87"></path>
+            <path d="M16 3.13a4 4 0 0 1 0 7.75"></path>
+          </svg>
+          Funciones Generales de la Comunidad
+        </h2>
+        
+        <AccordionItem title="Cómo funciona la Comunidad (El Foro)">
+          <p>Tenemos una sección de foro donde todos pueden hablar de su pasión (caza, pesca, camping, armas).</p>
+          <p style={{ marginTop: '8px' }}>Ahí podés crear temas nuevos preguntando dudas, o responderle a otros usuarios para ayudarlos. Está separado en distintas categorías para que encuentres rápido lo que te interesa.</p>
+        </AccordionItem>
+
+        <AccordionItem title="Cómo funcionan los Favoritos">
+          <p>Viste un producto que te gusta pero no lo querés comprar ya mismo? Tocale el <strong>ícono del corazoncito</strong>.</p>
+          <p style={{ marginTop: '8px' }}>Eso lo guarda en tu lista personal de "Mis Favoritos" (accesible desde el menú de usuario). Funciona tanto para productos y servicios, como para guardar Negocios enteros que te parezcan de confianza.</p>
+        </AccordionItem>
+
+        <AccordionItem title="Cómo funcionan las Reseñas">
+          <p>Después de tener contacto con un negocio, podés dejarle una puntuación (de 1 a 5 estrellas) y escribirle un comentario público sobre cómo te trató.</p>
+          <p style={{ marginTop: '8px' }}>Hacer esto es vital, porque ayuda a otros cazadores a saber si ese vendedor es confiable, y además <strong>premia a los buenos negocios</strong> haciéndolos subir en los resultados de búsqueda.</p>
+        </AccordionItem>
+      </div>
+
+      {/* Links de Legales */}
+      <div style={{ display: 'flex', gap: '16px', marginTop: '40px', justifyContent: 'center' }}>
+        <Link href="/terminos-y-condiciones" style={{ color: 'var(--color-text-muted)', fontSize: '0.9rem', textDecoration: 'underline' }}>
+          Términos y Condiciones
+        </Link>
+        <Link href="/politica-de-privacidad" style={{ color: 'var(--color-text-muted)', fontSize: '0.9rem', textDecoration: 'underline' }}>
+          Política de Privacidad
+        </Link>
+      </div>
     </div>
   );
 }
