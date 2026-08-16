@@ -687,7 +687,7 @@ function NuevoProductoContent() {
           {currentStep === 2 && (
             <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(220px, 1fr))', gap: '24px' }}>
 
-            <div className="col-span-full">
+            <div style={{ gridColumn: '1 / -1' }}>
               <label style={{ display: 'block', color: 'var(--color-text-main)', fontWeight: 600, marginBottom: '8px' }}>
                 Precio *
               </label>
@@ -775,7 +775,7 @@ function NuevoProductoContent() {
               )}
             </div>
 
-            <div className="col-span-full">
+            <div style={{ gridColumn: '1 / -1' }}>
               <label style={{ display: 'block', color: 'var(--color-text-main)', fontWeight: 600, marginBottom: '8px' }}>
                 Mínimo de unidades por venta
               </label>
@@ -869,11 +869,11 @@ function NuevoProductoContent() {
               </label>
               <div style={{ display: 'flex', gap: '16px', marginBottom: '12px' }}>
                 <label style={{ display: 'flex', alignItems: 'center', gap: '8px', cursor: 'pointer' }}>
-                  <input type="radio" name="pickup" checked={pickupAvailable === 'no'} onChange={() => setPickupAvailable('no')} style={{ accentColor: 'var(--color-primary)' }} />
+                  <input type="radio" name="pickup" checked={pickupAvailable === 'no'} onChange={() => setPickupAvailable('no')} style={{ accentColor: 'var(--color-primary)', width: '18px', height: '18px', minWidth: '18px', minHeight: '18px', flexShrink: 0 }} />
                   <span style={{ color: 'var(--color-text-main)' }}>No</span>
                 </label>
                 <label style={{ display: 'flex', alignItems: 'center', gap: '8px', cursor: 'pointer' }}>
-                  <input type="radio" name="pickup" checked={pickupAvailable === 'si'} onChange={() => setPickupAvailable('si')} style={{ accentColor: 'var(--color-primary)' }} />
+                  <input type="radio" name="pickup" checked={pickupAvailable === 'si'} onChange={() => setPickupAvailable('si')} style={{ accentColor: 'var(--color-primary)', width: '18px', height: '18px', minWidth: '18px', minHeight: '18px', flexShrink: 0 }} />
                   <span style={{ color: 'var(--color-text-main)' }}>Sí</span>
                 </label>
               </div>
@@ -908,13 +908,13 @@ function NuevoProductoContent() {
                   <p style={{ margin: 0, color: 'var(--color-text-muted)', fontSize: '0.9rem' }}>¿Quieres agregar un descuento a este producto?</p>
                 </div>
                 <label style={{ display: 'flex', alignItems: 'center', cursor: 'pointer' }}>
-                  <input type="checkbox" checked={hasDiscount} onChange={(e) => setHasDiscount(e.target.checked)} style={{ width: '20px', height: '20px', accentColor: 'var(--color-primary)' }} />
+                  <input type="checkbox" checked={hasDiscount} onChange={(e) => setHasDiscount(e.target.checked)} style={{ width: '20px', height: '20px', minWidth: '20px', minHeight: '20px', flexShrink: 0, accentColor: 'var(--color-primary)' }} />
                 </label>
               </div>
               
               {hasDiscount && (
                 <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(220px, 1fr))', gap: '24px' }}>
-                  <div className="col-span-full">
+                  <div style={{ gridColumn: '1 / -1' }}>
                     <label style={{ display: 'block', color: 'var(--color-text-main)', fontSize: '0.9rem', marginBottom: '6px' }}>Nombre del Descuento</label>
                     <input type="text" placeholder="Ej: Especial Día del Padre" value={discountName} onChange={(e) => setDiscountName(e.target.value)} style={{ width: '100%', padding: '10px 14px', borderRadius: 'var(--radius-md)', background: 'rgba(0,0,0,0.3)', border: '1px solid var(--color-border)', color: 'var(--color-text-main)', outline: 'none' }} />
                   </div>

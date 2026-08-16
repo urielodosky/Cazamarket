@@ -591,7 +591,7 @@ function NuevoServicioContent() {
             <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(220px, 1fr))', gap: '24px' }}>
 
             {/* Price */}
-            <div className="col-span-full">
+            <div style={{ gridColumn: '1 / -1' }}>
               <label style={{ display: 'block', color: 'var(--color-text-main)', fontWeight: 600, marginBottom: '8px' }}>
                 Precio *
               </label>
@@ -694,7 +694,7 @@ function NuevoServicioContent() {
             </div>
 
             {/* Cupos */}
-            <div className="col-span-full">
+            <div style={{ gridColumn: '1 / -1' }}>
               <label style={{ display: 'block', color: 'var(--color-text-main)', fontWeight: 600, marginBottom: '8px' }}>
                 Cupos Disponibles
               </label>
@@ -742,7 +742,7 @@ function NuevoServicioContent() {
           {currentStep === 3 && (
             <div style={{ display: 'flex', flexDirection: 'column', gap: '32px' }}>
             {/* Ubicación del Servicio */}
-            <div className="col-span-full">
+            <div style={{ gridColumn: '1 / -1' }}>
               <label style={{ display: 'block', color: 'var(--color-text-main)', fontWeight: 600, marginBottom: '8px' }}>
                 Ubicación del Servicio *
               </label>
@@ -943,7 +943,7 @@ function NuevoServicioContent() {
                     </div>
                     {hasBaseDiscount && (
                       <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '20px' }}>
-                        <div className="col-span-full">
+                        <div style={{ gridColumn: '1 / -1' }}>
                           <label style={{ display: 'block', color: 'var(--color-text-muted)', fontSize: '0.85rem', marginBottom: '8px', fontWeight: 500 }}>Nombre del Descuento Principal</label>
                           <input type="text" placeholder="Ej: Promoción de Lanzamiento" value={discountName} onChange={(e) => setDiscountName(e.target.value)} style={{ width: '100%', padding: '12px 16px', borderRadius: 'var(--radius-md)', background: 'rgba(255,255,255,0.05)', border: '1px solid rgba(255,255,255,0.1)', color: 'white', outline: 'none', transition: 'all 0.2s', fontSize: '0.95rem' }} onFocus={e => { e.currentTarget.style.borderColor = 'var(--color-primary)'; e.currentTarget.style.background = 'rgba(255,255,255,0.08)'; }} onBlur={e => { e.currentTarget.style.borderColor = 'rgba(255,255,255,0.1)'; e.currentTarget.style.background = 'rgba(255,255,255,0.05)'; }} />
                         </div>
