@@ -405,6 +405,6 @@
     height: 22px;
   }
 }
-@media (max-width: 768px) { .user-dropdown-menu { max-height: 70vh; overflow-y: auto; } }
+
 
 @media (max-width: 768px) { .dropdown-item { padding: 5px 8px; margin: 0px 4px; } }
