@@ -246,6 +246,8 @@ function NuevoProductoContent() {
     if (mediaPreview.length === 0) return 'Debes subir al menos una foto o video.';
     if (!mediaPreview.some(m => m.type === 'image')) return 'Debes subir al menos una imagen para que sirva de portada.';
     if (!title || title.trim().length < 6) return 'El nombre del producto debe tener al menos 6 caracteres.';
+    if (title.length > 30) return 'El nombre del producto no puede exceder los 30 caracteres.';
+    if (description && description.length > 500) return 'La descripción no puede exceder los 500 caracteres.';
     if (!category) return 'Debes seleccionar una categoría.';
     if (category === 'Armas de Fuego' && !hasFirearmsPermit) return 'Debes confirmar que posees la documentación legal vigente (ANMaC) para publicar armas de fuego.';
     return null;
@@ -567,6 +569,7 @@ function NuevoProductoContent() {
               <input
                 type="text"
                 placeholder="Ej: Cuchillo Táctico de Supervivencia"
+                maxLength={30}
                 value={title}
                 onChange={(e) => setTitle(e.target.value)}
                 style={{
@@ -584,6 +587,7 @@ function NuevoProductoContent() {
               <textarea
                 placeholder="Describe las características técnicas, dimensiones, material, y estado general..."
                 rows={5}
+                maxLength={500}
                 value={description}
                 onChange={(e) => setDescription(e.target.value)}
                 style={{

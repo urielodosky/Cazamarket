@@ -218,8 +218,6 @@ function NuevoServicioContent() {
     } catch (err) {
       console.error("Error cropping image:", err);
       alert("Hubo un error al recortar la imagen.");
-    }
-    
     setPendingCropQueue(prev => prev.slice(1));
   };
 
@@ -229,6 +227,8 @@ function NuevoServicioContent() {
     if (mediaPreview.length === 0) return 'Debes subir al menos una foto o video.';
     if (!mediaPreview.some(m => m.type === 'image')) return 'Debes subir al menos una imagen para que sirva de portada.';
     if (!title || title.trim().length < 6) return 'El nombre del servicio debe tener al menos 6 caracteres.';
+    if (title.length > 30) return 'El nombre del servicio no puede exceder los 30 caracteres.';
+    if (description && description.length > 500) return 'La descripción no puede exceder los 500 caracteres.';
     if (!category) return 'Debes seleccionar una categoría.';
     return null;
   };
@@ -487,6 +487,7 @@ function NuevoServicioContent() {
               <input
                 type="text"
                 placeholder="Ej: Guía de caza mayor..."
+                maxLength={30}
                 value={title}
                 onChange={(e) => setTitle(e.target.value)}
                 style={{
@@ -505,6 +506,7 @@ function NuevoServicioContent() {
               <textarea
                 placeholder="Describe en qué consiste el servicio, horarios, itinerario, requisitos, etc..."
                 rows={5}
+                maxLength={500}
                 value={description}
                 onChange={(e) => setDescription(e.target.value)}
                 style={{
