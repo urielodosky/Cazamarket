@@ -117,6 +117,24 @@ export default function FavoritosPage() {
             {tab}
           </button>
         ))}
+        
+        <button 
+          onClick={() => router.push('/resenas')}
+          style={{
+            background: 'transparent',
+            border: 'none',
+            padding: '8px 16px',
+            fontSize: '1rem',
+            fontWeight: 600,
+            cursor: 'pointer',
+            color: 'var(--color-text-muted)',
+            borderBottom: '2px solid transparent',
+            transition: 'all 0.2s',
+            marginLeft: 'auto'
+          }}
+        >
+          ⭐ Mis Reseñas
+        </button>
       </div>
 
       {activeTab === 'negocios' && (
