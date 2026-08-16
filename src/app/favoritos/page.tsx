@@ -92,9 +92,28 @@ export default function FavoritosPage() {
 
   return (
     <div style={{ padding: 'var(--spacing-8) var(--spacing-4)', maxWidth: '1200px', margin: '0 auto', minHeight: '60vh' }}>
-      <div style={{ marginBottom: 'var(--spacing-8)' }}>
-        <h1 style={{ fontSize: '2rem', margin: 0, color: 'var(--color-text-main)' }}>Mis Favoritos</h1>
-        <p style={{ color: 'var(--color-text-muted)', margin: '4px 0 0 0' }}>Aquí encontrarás todo lo que has guardado.</p>
+      <div style={{ marginBottom: 'var(--spacing-8)', display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', flexWrap: 'wrap', gap: '16px' }}>
+        <div>
+          <h1 style={{ fontSize: '2rem', margin: 0, color: 'var(--color-text-main)' }}>Mis Favoritos</h1>
+          <p style={{ color: 'var(--color-text-muted)', margin: '4px 0 0 0' }}>Aquí encontrarás todo lo que has guardado.</p>
+        </div>
+        <button 
+          onClick={() => router.push('/resenas')}
+          style={{
+            background: 'rgba(255, 115, 0, 0.1)',
+            border: '1px solid var(--color-primary)',
+            padding: '8px 16px',
+            fontSize: '0.95rem',
+            fontWeight: 600,
+            cursor: 'pointer',
+            color: 'var(--color-primary)',
+            borderRadius: '20px',
+            transition: 'all 0.2s',
+            whiteSpace: 'nowrap'
+          }}
+        >
+          Mis Reseñas
+        </button>
       </div>
 
       <div style={{ display: 'flex', gap: '16px', marginBottom: '24px', borderBottom: '1px solid var(--color-border)', paddingBottom: '16px', overflowX: 'auto' }}>
@@ -119,26 +138,6 @@ export default function FavoritosPage() {
             {tab}
           </button>
         ))}
-        
-        <button 
-          onClick={() => router.push('/resenas')}
-          style={{
-            background: 'transparent',
-            border: 'none',
-            padding: '8px 16px',
-            fontSize: '1rem',
-            fontWeight: 600,
-            cursor: 'pointer',
-            color: 'var(--color-text-muted)',
-            borderBottom: '2px solid transparent',
-            transition: 'all 0.2s',
-            marginLeft: 'auto',
-            whiteSpace: 'nowrap',
-            flexShrink: 0
-          }}
-        >
-          Mis Reseñas
-        </button>
       </div>
 
       {activeTab === 'negocios' && (
