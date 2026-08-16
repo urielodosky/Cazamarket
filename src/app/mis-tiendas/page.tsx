@@ -701,9 +701,35 @@ export default function MiNegocioPage() {
 
                         <div className="card-content-fluid" style={{ paddingTop: (isAtLeast(planTier, 'emprendedor') && storeBanner) ? '0px' : '24px', display: 'flex', flexDirection: 'column', flex: 1 }}>
                           
-                          <div style={{ display: 'flex', gap: '16px', marginBottom: '16px', position: 'relative', zIndex: 20 }}>
-                            <div style={{ width: '64px', height: '64px', borderRadius: '50%', backgroundColor: 'var(--color-bg-elevated)', border: `2px solid ${isAtLeast(planTier, 'emprendedor') ? 'var(--color-primary)' : 'var(--color-border)'}`, overflow: 'hidden', flexShrink: 0, position: 'relative', marginTop: (isAtLeast(planTier, 'emprendedor') && storeBanner) ? '-32px' : '0' }}>
-                              <div style={{ position: 'absolute', bottom: '0', left: '0', width: '100%', height: '100%', borderRadius: '50%', backgroundImage: `url(${avatar || 'https://images.unsplash.com/photo-1511497584788-876760111969?q=80&w=200&auto=format&fit=crop'})`, backgroundSize: 'cover', backgroundPosition: 'center', backgroundColor: 'var(--color-bg-surface-elevated)' }}>
+                          <div style={{ 
+                            display: 'flex', 
+                            gap: '16px', 
+                            marginBottom: '16px',
+                            position: 'relative',
+                            zIndex: 20,
+                            alignItems: 'center'
+                          }}>
+                            {/* Avatar Wrapper */}
+                            <div style={{ 
+                              width: '80px', 
+                              height: (isAtLeast(planTier, 'emprendedor') && storeBanner) ? '40px' : '80px', 
+                              position: 'relative',
+                              flexShrink: 0
+                            }}>
+                              <div style={{ 
+                                position: 'absolute',
+                                bottom: '0',
+                                left: '0',
+                                width: '80px', 
+                                height: '80px', 
+                                borderRadius: '50%',
+                                backgroundImage: `url(${avatar || 'https://images.unsplash.com/photo-1511497584788-876760111969?q=80&w=200&auto=format&fit=crop'})`,
+                                backgroundSize: 'cover',
+                                backgroundPosition: 'center',
+                                border: '3px solid var(--color-primary)',
+                                boxShadow: '0 4px 10px rgba(0,0,0,0.4)',
+                                backgroundColor: 'var(--color-bg-surface-elevated)'
+                              }}>
                                 {permissions.insigniaVerificada && (
                                   <span title="Negocio Verificado" style={{ position: 'absolute', bottom: '2px', right: '2px', width: '22px', height: '22px', borderRadius: '50%', background: 'var(--color-primary)', display: 'flex', alignItems: 'center', justifyContent: 'center', border: '2px solid var(--color-bg-surface-elevated)', boxShadow: '0 2px 5px rgba(0,0,0,0.3)' }}>
                                     <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="#fff" strokeWidth="4" strokeLinecap="round" strokeLinejoin="round"><polyline points="20 6 9 17 4 12"></polyline></svg>
@@ -712,11 +738,22 @@ export default function MiNegocioPage() {
                               </div>
                             </div>
                             
-                            <div style={{ flex: 1, minWidth: 0, marginTop: (isAtLeast(planTier, 'emprendedor') && storeBanner) ? '12px' : '0', paddingRight: '40px' }}>
-                              <div style={{ display: 'flex', alignItems: 'center', gap: '8px', flexWrap: 'nowrap' }}>
-                                <h3 style={{ margin: '0', fontSize: '1.25rem', color: 'var(--color-text-main)', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis', minWidth: 0 }}>{name || 'Mi Negocio'}</h3>
-                                <span style={{ background: 'var(--color-bg-subtle)', color: 'var(--color-text-muted)', padding: '2px 8px', borderRadius: 'var(--radius-full)', fontSize: '0.7rem', fontWeight: 600, flexShrink: 0 }}>Nuevo</span>
-                                {isAtLeast(planTier, 'empresarial') && <span style={{ color: 'var(--color-primary)', flexShrink: 0 }} title="Verificado">✓</span>}
+                            {/* Wrapper for Title & Location */}
+                            <div style={{ 
+                              display: 'flex', 
+                              flexDirection: 'column',
+                              justifyContent: 'center',
+                              flex: 1,
+                              minWidth: 0,
+                              paddingRight: '36px'
+                            }}>
+                              <div style={{ display: 'flex', alignItems: 'center', gap: '8px', marginBottom: '6px', flexWrap: 'wrap' }}>
+                                <h3 style={{ fontSize: '1.25rem', color: 'var(--color-text-main)', margin: '0', lineHeight: 1.2, wordBreak: 'break-word' }}>
+                                  {name || 'Mi Negocio'}
+                                </h3>
+                                <span style={{ display: 'flex', alignItems: 'center', gap: '4px', fontSize: '0.8rem', color: 'var(--color-text-muted)', flexShrink: 0, padding: '2px 6px', background: 'rgba(255,255,255,0.05)', borderRadius: 'var(--radius-full)' }}>
+                                  Nuevo
+                                </span>
                               </div>
                             </div>
                           </div>

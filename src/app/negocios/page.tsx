@@ -286,10 +286,10 @@ export default function NegociosPage() {
                   justifyContent: 'center',
                   flex: 1,
                   minWidth: 0,
-                  paddingRight: '40px'
+                  paddingRight: '36px'
                 }}>
-                  <div style={{ display: 'flex', alignItems: 'center', gap: '8px', marginBottom: '6px' }}>
-                    <h3 style={{ fontSize: '1.25rem', color: 'var(--color-text-main)', margin: '0', lineHeight: 1.2, whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis', minWidth: 0 }}>
+                  <div style={{ display: 'flex', alignItems: 'center', gap: '8px', marginBottom: '6px', flexWrap: 'wrap' }}>
+                    <h3 style={{ fontSize: '1.25rem', color: 'var(--color-text-main)', margin: '0', lineHeight: 1.2, wordBreak: 'break-word' }}>
                       {negocio.name}
                     </h3>
                     {(negocio.calculatedRating || negocio.rating) ? (
