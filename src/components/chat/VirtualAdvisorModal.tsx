@@ -541,17 +541,17 @@ export default function VirtualAdvisorModal({ onClose, productId }: VirtualAdvis
   };
 
   return (
-    <div className="virtual-advisor-overlay" style={{ position: 'fixed', top: 0, left: 0, right: 0, bottom: 0, background: 'rgba(0,0,0,0.6)', zIndex: 1000, display: 'flex', alignItems: 'center', justifyContent: 'center', padding: '20px' }}>
-      <div className="glass-panel virtual-advisor-modal" style={{ width: '100%', maxWidth: isAdding && (responseType === 'options') ? '95vw' : '1100px', maxHeight: '95vh', borderRadius: 'var(--radius-lg)', display: 'flex', flexDirection: 'column', overflow: 'hidden', border: '1px solid var(--color-border)', background: themeColors.surfaceElevated, fontFamily: 'var(--font-inter), sans-serif', transition: 'max-width 0.3s ease' }}>
+    <div className="virtual-advisor-overlay" style={{ position: 'fixed', top: 0, left: 0, right: 0, bottom: 0, background: 'rgba(0,0,0,0.6)', zIndex: 1000, display: 'flex', alignItems: 'center', justifyContent: 'center', padding: '16px' }}>
+      <div className="glass-panel virtual-advisor-modal" style={{ width: '100%', maxWidth: isAdding && (responseType === 'options') ? '95vw' : '1100px', height: '100%', maxHeight: 'calc(100vh - 32px)', borderRadius: 'var(--radius-lg)', display: 'flex', flexDirection: 'column', overflow: 'hidden', border: '1px solid var(--color-border)', background: themeColors.surfaceElevated, fontFamily: 'var(--font-inter), sans-serif', transition: 'max-width 0.3s ease' }}>
         
         {/* Header */}
-        <div style={{ padding: '20px 24px', borderBottom: '1px solid var(--color-border)', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-          <h2 style={{ margin: 0, color: 'var(--color-primary)' }}>Configurar Asesor Virtual {productId ? `(Personalizado)` : `(General)`}</h2>
-          <button onClick={onClose} style={{ background: 'transparent', border: 'none', color: themeColors.textWhite, cursor: 'pointer', fontSize: '1.5rem' }}>×</button>
+        <div style={{ padding: '16px 20px', borderBottom: '1px solid var(--color-border)', display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexShrink: 0 }}>
+          <h2 style={{ margin: 0, color: 'var(--color-primary)', fontSize: '1.2rem' }}>Configurar Asesor {productId ? `(Personalizado)` : `(General)`}</h2>
+          <button onClick={onClose} style={{ background: 'transparent', border: 'none', color: themeColors.textWhite, cursor: 'pointer', fontSize: '1.5rem', padding: '4px' }}>×</button>
         </div>
 
         {/* Content */}
-        <div className="virtual-advisor-content" style={{ padding: '24px', overflowY: 'auto', flex: 1, display: 'flex', flexDirection: 'column', gap: '24px' }}>
+        <div className="virtual-advisor-content" style={{ padding: '20px', overflowY: 'auto', flex: 1, display: 'flex', flexDirection: 'column', gap: '20px', WebkitOverflowScrolling: 'touch', overscrollBehavior: 'contain' }}>
           
           {isLoading ? (
             <p>Cargando configuración...</p>
