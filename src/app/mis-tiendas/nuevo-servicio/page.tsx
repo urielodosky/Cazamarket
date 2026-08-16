@@ -401,7 +401,7 @@ function NuevoServicioContent() {
       </div>
 
       <div className="glass-panel" style={{ padding: 'var(--spacing-6)', borderRadius: 'var(--radius-lg)' }}>
-        <div className="grid grid-cols-1 gap-8">
+        <div style={{ display: 'flex', flexDirection: 'column', gap: '32px' }}>
 
           {currentStep === 1 && (
             <>
@@ -533,7 +533,7 @@ function NuevoServicioContent() {
                     color: 'var(--color-text-main)', fontSize: '1rem', outline: 'none'
                   }}
                 />
-                <button type="button" onClick={addFeature} className="btn btn-outline w-full md:w-auto" style={{ padding: '0 24px', borderRadius: 'var(--radius-md)' }}>Agregar</button>
+                <button type="button" onClick={addFeature} className="btn btn-outline" style={{ padding: '0 24px', borderRadius: 'var(--radius-md)', flexShrink: 0 }}>Agregar</button>
               </div>
               {features.length > 0 && (
                 <ul style={{ listStyle: 'none', padding: 0, margin: 0, display: 'flex', flexDirection: 'column', gap: '8px' }}>
@@ -548,7 +548,7 @@ function NuevoServicioContent() {
             </div>
 
             {/* Category & Subcategory */}
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(280px, 1fr))', gap: '24px' }}>
               <div>
                 <label style={{ display: 'block', color: 'var(--color-text-main)', fontWeight: 600, marginBottom: '8px' }}>
                   Categoría Principal *
@@ -585,7 +585,7 @@ function NuevoServicioContent() {
           )}
 
           {currentStep === 2 && (
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(280px, 1fr))', gap: '24px' }}>
 
             {/* Price */}
             <div className="col-span-full">
@@ -737,7 +737,7 @@ function NuevoServicioContent() {
           )}
 
           {currentStep === 3 && (
-            <div className="grid grid-cols-1 gap-8">
+            <div style={{ display: 'flex', flexDirection: 'column', gap: '32px' }}>
             {/* Ubicación del Servicio */}
             <div className="col-span-full">
               <label style={{ display: 'block', color: 'var(--color-text-main)', fontWeight: 600, marginBottom: '8px' }}>

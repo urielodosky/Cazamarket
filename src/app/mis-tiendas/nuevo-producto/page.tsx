@@ -482,7 +482,7 @@ function NuevoProductoContent() {
       )}
 
       <div className="glass-panel" style={{ padding: 'var(--spacing-6)', borderRadius: 'var(--radius-lg)' }}>
-        <div className="grid grid-cols-1 gap-8">
+        <div style={{ display: 'flex', flexDirection: 'column', gap: '32px' }}>
 
           {currentStep === 1 && (
             <>
@@ -611,7 +611,7 @@ function NuevoProductoContent() {
                     color: 'var(--color-text-main)', fontSize: '1rem', outline: 'none'
                   }}
                 />
-                <button type="button" onClick={addFeature} className="btn btn-outline w-full md:w-auto" style={{ padding: '0 24px', borderRadius: 'var(--radius-md)' }}>Agregar</button>
+                <button type="button" onClick={addFeature} className="btn btn-outline" style={{ padding: '0 24px', borderRadius: 'var(--radius-md)', flexShrink: 0 }}>Agregar</button>
               </div>
               {features.length > 0 && (
                 <ul style={{ listStyle: 'none', padding: 0, margin: 0, display: 'flex', flexDirection: 'column', gap: '8px' }}>
@@ -625,7 +625,7 @@ function NuevoProductoContent() {
               )}
             </div>
 
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(280px, 1fr))', gap: '24px' }}>
               <div>
                 <label style={{ display: 'block', color: 'var(--color-text-main)', fontWeight: 600, marginBottom: '8px' }}>
                   Categoría Principal *
@@ -678,7 +678,7 @@ function NuevoProductoContent() {
           )}
 
           {currentStep === 2 && (
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(280px, 1fr))', gap: '24px' }}>
 
             <div className="col-span-full">
               <label style={{ display: 'block', color: 'var(--color-text-main)', fontWeight: 600, marginBottom: '8px' }}>
@@ -772,7 +772,7 @@ function NuevoProductoContent() {
           )}
 
           {currentStep === 3 && (
-            <div className="grid grid-cols-1 gap-8">
+            <div style={{ display: 'flex', flexDirection: 'column', gap: '32px' }}>
             <div>
               <label style={{ display: 'block', color: 'var(--color-text-main)', fontWeight: 600, marginBottom: '8px' }}>
                 Opciones de Envío
@@ -864,7 +864,7 @@ function NuevoProductoContent() {
               </div>
               
               {hasDiscount && (
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(280px, 1fr))', gap: '24px' }}>
                   <div className="col-span-full">
                     <label style={{ display: 'block', color: 'var(--color-text-main)', fontSize: '0.9rem', marginBottom: '6px' }}>Nombre del Descuento</label>
                     <input type="text" placeholder="Ej: Especial Día del Padre" value={discountName} onChange={(e) => setDiscountName(e.target.value)} style={{ width: '100%', padding: '10px 14px', borderRadius: 'var(--radius-md)', background: 'rgba(0,0,0,0.3)', border: '1px solid var(--color-border)', color: 'var(--color-text-main)', outline: 'none' }} />
