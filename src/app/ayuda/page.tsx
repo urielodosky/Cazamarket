@@ -32,14 +32,14 @@ export default function AyudaPage() {
         
         <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(250px, 1fr))', gap: '16px', marginBottom: '24px' }}>
           <Link href="/terminos-y-condiciones" style={{ display: 'block', textDecoration: 'none' }}>
-            <div style={{ background: 'rgba(0,0,0,0.2)', border: '1px solid rgba(255,255,255,0.1)', padding: '20px', borderRadius: 'var(--radius-lg)', transition: 'background 0.2s', cursor: 'pointer' }} onMouseEnter={(e) => e.currentTarget.style.background = 'rgba(255,255,255,0.05)'} onMouseLeave={(e) => e.currentTarget.style.background = 'rgba(0,0,0,0.2)'}>
+            <div style={{ background: 'rgba(0,0,0,0.2)', border: '1px solid rgba(255,255,255,0.1)', padding: '20px', borderRadius: 'var(--radius-lg)', transition: 'background 0.2s', cursor: 'pointer' }}>
               <h3 style={{ margin: '0 0 8px 0', color: 'var(--color-text-main)', fontSize: '1.1rem' }}>Términos y Condiciones</h3>
               <p style={{ margin: 0, color: 'var(--color-text-muted)', fontSize: '0.9rem' }}>Reglas de uso de la plataforma.</p>
             </div>
           </Link>
           
           <Link href="/politica-de-privacidad" style={{ display: 'block', textDecoration: 'none' }}>
-            <div style={{ background: 'rgba(0,0,0,0.2)', border: '1px solid rgba(255,255,255,0.1)', padding: '20px', borderRadius: 'var(--radius-lg)', transition: 'background 0.2s', cursor: 'pointer' }} onMouseEnter={(e) => e.currentTarget.style.background = 'rgba(255,255,255,0.05)'} onMouseLeave={(e) => e.currentTarget.style.background = 'rgba(0,0,0,0.2)'}>
+            <div style={{ background: 'rgba(0,0,0,0.2)', border: '1px solid rgba(255,255,255,0.1)', padding: '20px', borderRadius: 'var(--radius-lg)', transition: 'background 0.2s', cursor: 'pointer' }}>
               <h3 style={{ margin: '0 0 8px 0', color: 'var(--color-text-main)', fontSize: '1.1rem' }}>Políticas de Privacidad</h3>
               <p style={{ margin: 0, color: 'var(--color-text-muted)', fontSize: '0.9rem' }}>Cómo protegemos tus datos.</p>
             </div>
