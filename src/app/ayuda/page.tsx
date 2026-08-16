@@ -183,42 +183,35 @@ export default function AyudaPage() {
         </AccordionItem>
       </div>
 
-      {/* E. Planes, Herramientas y Posicionamiento */}
+      {/* E. Planes y Herramientas */}
       <div className="glass-panel" style={{ padding: 'var(--spacing-6)', borderRadius: 'var(--radius-xl)' }}>
         <h2 style={{ fontSize: '1.5rem', color: 'var(--color-primary)', marginBottom: '24px', display: 'flex', alignItems: 'center', gap: '8px' }}>
           <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
             <polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"></polygon>
           </svg>
-          Planes, Herramientas y Posicionamiento
+          Planes y Herramientas del Negocio
         </h2>
 
-        <AccordionItem title="Los Diferentes Planes y Ventajas">
-          <p>CazaMarket te ofrece escalar tu negocio mediante 3 planes (Hunter, Sniper, Armory). Estas son las herramientas de los planes avanzados:</p>
+        <AccordionItem title="Los Diferentes Planes y Modalidades (Mixtos)">
+          <p>CazaMarket te ofrece escalar tu negocio con 4 niveles principales: <strong>Básico, Emprendedor, Comercial y Empresarial</strong>.</p>
+          <p style={{ marginTop: '8px' }}>Además, puedes elegir si tu plan se enfoca solo en <strong>Productos</strong>, solo en <strong>Servicios</strong>, o si quieres un <strong>Plan Mixto</strong> que te permita publicar ambos simultáneamente.</p>
           <ul style={{ paddingLeft: '20px', display: 'flex', flexDirection: 'column', gap: '12px', marginTop: '12px' }}>
-            <li><strong>Carrito de Compras B2B:</strong> (Planes Superiores) Permite a los clientes armar pedidos por volumen combinando productos y solicitarte una cotización unificada.</li>
-            <li><strong>Bot Asesor de IA:</strong> En lugar de recibir "Hola precio" en tu WhatsApp todo el día, nuestro Bot lee las descripciones de tus productos e interactúa con el cliente. Resuelve dudas y, solo si el cliente confirma la compra, lo deriva a tu WhatsApp. ¡Es un filtro anti-curiosos!</li>
-            <li><strong>Mapas y Cobertura:</strong> (Sniper/Armory) Te habilita a dibujar polígonos de zonas de envío o servicio directamente en un mapa interactivo para que el comprador sepa exactamente hasta dónde llegas.</li>
-            <li><strong>Calendarios (Booking):</strong> (Sniper/Armory) Permite a tus clientes elegir una fecha y horario para reservar un servicio, bloqueando automáticamente los horarios ocupados.</li>
+            <li><strong>Límites de Publicación:</strong> A medida que subes de plan, aumenta la cantidad de productos/servicios que puedes tener activos, así como el número de sucursales o categorías de tu negocio.</li>
+            <li><strong>Mapas de Territorio (Servicios):</strong> Los planes desde Comercial te habilitan a dibujar zonas de cobertura en el mapa para tus servicios.</li>
+            <li><strong>Calendario y Reservas:</strong> Exclusivo de planes avanzados (Empresarial), permite gestionar fechas y horarios de turnos.</li>
+            <li><strong>Bot Asesor Automático:</strong> Herramienta premium para configurar flujos de respuestas automatizadas y no perder tiempo con preguntas frecuentes.</li>
           </ul>
         </AccordionItem>
 
-        <AccordionItem title="Anuncios Promocionados y el Ranking (Quién aparece primero)">
+        <AccordionItem title="Posicionamiento y Ranking">
           <p><strong>¿Cómo funciona el orden del catálogo?</strong></p>
-          <p style={{ marginTop: '8px' }}>Por defecto, los listados se ordenan mezclando métricas de éxito (reseñas, cantidad de visitas) y novedad. Sin embargo, los planes de suscripción alteran tu posicionamiento:</p>
-          <ul style={{ paddingLeft: '20px', display: 'flex', flexDirection: 'column', gap: '8px', marginTop: '12px' }}>
-            <li><strong>Plan Hunter:</strong> Publicaciones normales.</li>
-            <li><strong>Plan Sniper:</strong> Tus artículos obtienen un borde/insignia <strong style={{ color: '#4ade80' }}>Verde</strong> y reciben un empuje en el algoritmo, apareciendo por encima de los usuarios Hunter en la mayoría de búsquedas relacionadas.</li>
-            <li><strong>Plan Armory:</strong> Máxima prioridad. Tus artículos destacan con brillos y bordes <strong style={{ color: '#fbbf24' }}>Dorados (Tops)</strong>. Siempre son los primeros resultados sugeridos en su categoría.</li>
-          </ul>
-          <p style={{ marginTop: '8px' }}><strong>Anuncios de Pago:</strong> Adicionalmente, el plan Armory tiene acceso ilimitado (y Sniper 7 días) a colocar un "Banner Promocionado" en la página principal, garantizando cientos de visualizaciones extra por fuera de las búsquedas comunes.</p>
+          <p style={{ marginTop: '8px' }}>Los resultados de búsqueda priorizan a los vendedores según el nivel de su suscripción activa. Un negocio con plan <strong>Empresarial</strong> tendrá mayor visibilidad y aparecerá antes en los listados que uno con plan <em>Básico</em> o <em>Gratis</em>.</p>
+          <p style={{ marginTop: '8px' }}>No existen "anuncios pagos" ni banners patrocinados comprables por separado; tu posicionamiento mejora orgánicamente y de forma transparente al escalar tu plan, mantener tu tienda actualizada y acumular buenas reseñas de compradores reales.</p>
         </AccordionItem>
 
-        <AccordionItem title="Cómo funciona Cambiar de Plan (Acelerar Cambio)">
-          <p>Puedes subir o bajar de Plan en cualquier momento desde la pestaña "Planes".</p>
-          <p style={{ marginTop: '8px' }}>Al cambiar, el sistema calcula tu nuevo nivel y los beneficios se activan instantáneamente. </p>
-          <ul style={{ paddingLeft: '20px', display: 'flex', flexDirection: 'column', gap: '8px', marginTop: '12px' }}>
-            <li><strong>Acelerar Cambio:</strong> Si la plataforma detecta que estás por concretar ventas masivas o necesitas herramientas de inmediato (como el Bot IA para frenar una ola de mensajes), puedes usar la opción de acelerar el cambio, lo que hace que los nuevos algoritmos de posicionamiento y los módulos avanzados se desplieguen sin demoras en caché, dejándote 100% operativo en segundos.</li>
-          </ul>
+        <AccordionItem title="Cómo funciona Cambiar de Plan">
+          <p>Puedes mejorar (upgrade) o reducir (downgrade) tu plan en cualquier momento desde la sección "Planes" de tu panel.</p>
+          <p style={{ marginTop: '8px' }}>Si pasas a un plan superior, las nuevas herramientas (como el Bot Asesor o los Calendarios) se desbloquean instantáneamente, permitiéndote configurarlas al momento.</p>
         </AccordionItem>
       </div>
 
