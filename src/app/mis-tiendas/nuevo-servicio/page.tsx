@@ -482,8 +482,9 @@ function NuevoServicioContent() {
 
             {/* Title */}
             <div>
-              <label style={{ display: 'block', color: 'var(--color-text-main)', fontWeight: 600, marginBottom: '8px' }}>
-                Título del Servicio *
+              <label style={{ display: 'flex', justifyContent: 'space-between', color: 'var(--color-text-main)', fontWeight: 600, marginBottom: '8px' }}>
+                <span>Título del Servicio *</span>
+                <span style={{ fontSize: '0.8rem', color: 'var(--color-text-muted)', fontWeight: 400 }}>{title.length}/30</span>
               </label>
               <input
                 type="text"
@@ -501,8 +502,9 @@ function NuevoServicioContent() {
 
             {/* Description */}
             <div>
-              <label style={{ display: 'block', color: 'var(--color-text-main)', fontWeight: 600, marginBottom: '8px' }}>
-                Descripción Detallada
+              <label style={{ display: 'flex', justifyContent: 'space-between', color: 'var(--color-text-main)', fontWeight: 600, marginBottom: '8px' }}>
+                <span>Descripción Detallada</span>
+                <span style={{ fontSize: '0.8rem', color: 'var(--color-text-muted)', fontWeight: 400 }}>{description.length}/500</span>
               </label>
               <textarea
                 placeholder="Describe en qué consiste el servicio, horarios, itinerario, requisitos, etc..."
@@ -520,13 +522,15 @@ function NuevoServicioContent() {
             
             {/* Características */}
             <div>
-              <label style={{ display: 'block', color: 'var(--color-text-main)', fontWeight: 600, marginBottom: '8px' }}>
-                Características (Features)
+              <label style={{ display: 'flex', justifyContent: 'space-between', color: 'var(--color-text-main)', fontWeight: 600, marginBottom: '8px' }}>
+                <span>Características (Features)</span>
+                <span style={{ fontSize: '0.8rem', color: 'var(--color-text-muted)', fontWeight: 400 }}>{featureInput.length}/30</span>
               </label>
               <div style={{ display: 'flex', gap: '8px', marginBottom: '12px' }}>
                 <input
                   type="text"
                   placeholder="Ej: Material de Acero, Color Negro..."
+                  maxLength={30}
                   value={featureInput}
                   onChange={(e) => setFeatureInput(e.target.value)}
                   onKeyDown={(e) => { if (e.key === 'Enter') { e.preventDefault(); addFeature(); } }}
