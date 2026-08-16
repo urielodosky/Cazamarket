@@ -45,7 +45,7 @@ const DateMaskInput = ({ value, onChange, placeholder }: { value: string, onChan
       placeholder={placeholder || "DD/MM/AAAA"} 
       value={value} 
       onChange={handleChange}
-      style={{ width: '100%', padding: '10px 14px', borderRadius: 'var(--radius-sm)', background: 'rgba(255,255,255,0.05)', border: '1px solid rgba(255,255,255,0.1)', color: 'white', outline: 'none', transition: 'border-color 0.2s', fontFamily: 'inherit' }} 
+      style={{ boxSizing: "border-box", width: "100%", padding: '10px 14px', borderRadius: 'var(--radius-sm)', background: 'rgba(255,255,255,0.05)', border: '1px solid rgba(255,255,255,0.1)', color: 'white', outline: 'none', transition: 'border-color 0.2s', fontFamily: 'inherit' }} 
       onFocus={e => e.currentTarget.style.borderColor = 'var(--color-primary)'} 
       onBlur={e => e.currentTarget.style.borderColor = 'rgba(255,255,255,0.1)'}
       maxLength={10}
@@ -422,10 +422,10 @@ function NuevoServicioContent() {
                 {mediaPreview.map((media, idx) => (
                   <div key={idx} style={{ position: 'relative', width: '120px', height: '120px', borderRadius: 'var(--radius-md)', overflow: 'hidden', border: '1px solid var(--color-border)' }}>
                     {media.type === 'image' ? (
-                      <img src={media.url} alt="preview" style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
+                      <img src={media.url} alt="preview" style={{ boxSizing: "border-box", width: "100%", height: '100%', objectFit: 'cover' }} />
                     ) : (
                       <>
-                        <video src={media.url} style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
+                        <video src={media.url} style={{ boxSizing: "border-box", width: "100%", height: '100%', objectFit: 'cover' }} />
                         <div style={{ position: 'absolute', top: 0, left: 0, right: 0, bottom: 0, display: 'flex', alignItems: 'center', justifyContent: 'center', background: 'rgba(0,0,0,0.3)', pointerEvents: 'none' }}>
                           <svg width="32" height="32" viewBox="0 0 24 24" fill="var(--color-primary)" stroke="var(--color-primary)" strokeWidth="1" strokeLinejoin="round"><polygon points="5 3 19 12 5 21 5 3"></polygon></svg>
                         </div>
@@ -457,7 +457,7 @@ function NuevoServicioContent() {
               <label 
                 htmlFor="media-upload"
                 style={{
-                  width: '100%', height: '240px', borderRadius: 'var(--radius-md)',
+                  boxSizing: "border-box", width: "100%", height: '240px', borderRadius: 'var(--radius-md)',
                   background: 'rgba(0,0,0,0.2)', border: '2px dashed rgba(255, 115, 0, 0.3)',
                   display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center',
                   cursor: 'pointer', transition: 'all 0.2s',
@@ -493,7 +493,7 @@ function NuevoServicioContent() {
                 value={title}
                 onChange={(e) => setTitle(e.target.value)}
                 style={{
-                  width: '100%', padding: '14px 16px', borderRadius: 'var(--radius-md)',
+                  boxSizing: "border-box", width: "100%", padding: '14px 16px', borderRadius: 'var(--radius-md)',
                   background: 'rgba(0,0,0,0.3)', border: '1px solid var(--color-border)',
                   color: 'var(--color-text-main)', fontSize: '1rem', outline: 'none'
                 }}
@@ -513,7 +513,7 @@ function NuevoServicioContent() {
                 value={description}
                 onChange={(e) => setDescription(e.target.value)}
                 style={{
-                  width: '100%', padding: '16px', borderRadius: 'var(--radius-md)',
+                  boxSizing: "border-box", width: "100%", padding: '16px', borderRadius: 'var(--radius-md)',
                   background: 'rgba(0,0,0,0.3)', border: '1px solid var(--color-border)',
                   color: 'var(--color-text-main)', fontSize: '1rem', fontFamily: 'inherit', resize: 'vertical', outline: 'none'
                 }}
@@ -608,7 +608,7 @@ function NuevoServicioContent() {
                     value={price}
                     onChange={(e) => setPrice(e.target.value)}
                     style={{
-                      width: '100%', padding: '14px 80px 14px 32px', borderRadius: 'var(--radius-md)',
+                      boxSizing: "border-box", width: "100%", padding: '14px 80px 14px 32px', borderRadius: 'var(--radius-md)',
                       background: 'rgba(0,0,0,0.3)', border: '1px solid var(--color-border)',
                       color: 'var(--color-text-main)', fontSize: '1rem', outline: 'none'
                     }}
@@ -668,7 +668,7 @@ function NuevoServicioContent() {
                       }
                       setUsesCalendar(e.target.checked);
                     }}
-                    style={{ opacity: 0, position: 'absolute', width: '100%', height: '100%', cursor: 'pointer', zIndex: 2 }}
+                    style={{ opacity: 0, position: 'absolute', boxSizing: "border-box", width: "100%", height: '100%', cursor: 'pointer', zIndex: 2 }}
                   />
                   <div style={{
                     width: '44px', height: '24px', borderRadius: '12px',
@@ -732,7 +732,7 @@ function NuevoServicioContent() {
                   onChange={(e) => setStock(e.target.value)}
                   min={1}
                   style={{
-                    width: '100%', padding: '14px 16px', borderRadius: 'var(--radius-md)',
+                    boxSizing: "border-box", width: "100%", padding: '14px 16px', borderRadius: 'var(--radius-md)',
                     background: 'rgba(0,0,0,0.3)', border: '1px solid var(--color-border)',
                     color: 'var(--color-text-main)', fontSize: '1rem', outline: 'none'
                   }}
@@ -786,7 +786,7 @@ function NuevoServicioContent() {
                   }}
                   onBlur={() => setTimeout(() => setLocationSuggestions([]), 200)}
                   style={{
-                    width: '100%', padding: '14px 16px 14px 48px', borderRadius: 'var(--radius-md)',
+                    boxSizing: "border-box", width: "100%", padding: '14px 16px 14px 48px', borderRadius: 'var(--radius-md)',
                     background: 'rgba(0,0,0,0.3)', border: '1px solid var(--color-border)',
                     color: 'var(--color-text-main)', fontSize: '1rem', outline: 'none'
                   }}
@@ -863,7 +863,7 @@ function NuevoServicioContent() {
                       }
                       setShowServiceArea(e.target.checked);
                     }}
-                    style={{ opacity: 0, position: 'absolute', width: '100%', height: '100%', cursor: 'pointer', zIndex: 2 }}
+                    style={{ opacity: 0, position: 'absolute', boxSizing: "border-box", width: "100%", height: '100%', cursor: 'pointer', zIndex: 2 }}
                   />
                   <div style={{
                     width: '44px', height: '24px', borderRadius: '12px',
@@ -949,7 +949,7 @@ function NuevoServicioContent() {
                       <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '20px' }}>
                         <div style={{ gridColumn: '1 / -1' }}>
                           <label style={{ display: 'block', color: 'var(--color-text-muted)', fontSize: '0.85rem', marginBottom: '8px', fontWeight: 500 }}>Nombre del Descuento Principal</label>
-                          <input type="text" placeholder="Ej: Promoción de Lanzamiento" value={discountName} onChange={(e) => setDiscountName(e.target.value)} style={{ width: '100%', padding: '12px 16px', borderRadius: 'var(--radius-md)', background: 'rgba(255,255,255,0.05)', border: '1px solid rgba(255,255,255,0.1)', color: 'white', outline: 'none', transition: 'all 0.2s', fontSize: '0.95rem' }} onFocus={e => { e.currentTarget.style.borderColor = 'var(--color-primary)'; e.currentTarget.style.background = 'rgba(255,255,255,0.08)'; }} onBlur={e => { e.currentTarget.style.borderColor = 'rgba(255,255,255,0.1)'; e.currentTarget.style.background = 'rgba(255,255,255,0.05)'; }} />
+                          <input type="text" placeholder="Ej: Promoción de Lanzamiento" value={discountName} onChange={(e) => setDiscountName(e.target.value)} style={{ boxSizing: "border-box", width: "100%", padding: '12px 16px', borderRadius: 'var(--radius-md)', background: 'rgba(255,255,255,0.05)', border: '1px solid rgba(255,255,255,0.1)', color: 'white', outline: 'none', transition: 'all 0.2s', fontSize: '0.95rem' }} onFocus={e => { e.currentTarget.style.borderColor = 'var(--color-primary)'; e.currentTarget.style.background = 'rgba(255,255,255,0.08)'; }} onBlur={e => { e.currentTarget.style.borderColor = 'rgba(255,255,255,0.1)'; e.currentTarget.style.background = 'rgba(255,255,255,0.05)'; }} />
                         </div>
                         <div>
                           <label style={{ display: 'block', color: 'var(--color-text-muted)', fontSize: '0.85rem', marginBottom: '8px', fontWeight: 500 }}>Tipo de Descuento</label>
@@ -957,7 +957,7 @@ function NuevoServicioContent() {
                         </div>
                         <div>
                           <label style={{ display: 'block', color: 'var(--color-text-muted)', fontSize: '0.85rem', marginBottom: '8px', fontWeight: 500 }}>Valor del Descuento</label>
-                          <input type="number" placeholder={discountType === 'porcentaje' ? 'Ej: 15' : 'Ej: 500'} value={discountValue} onChange={(e) => setDiscountValue(e.target.value)} style={{ width: '100%', padding: '12px 16px', borderRadius: 'var(--radius-md)', background: 'rgba(255,255,255,0.05)', border: '1px solid rgba(255,255,255,0.1)', color: 'white', outline: 'none', transition: 'all 0.2s', fontSize: '0.95rem' }} onFocus={e => { e.currentTarget.style.borderColor = 'var(--color-primary)'; e.currentTarget.style.background = 'rgba(255,255,255,0.08)'; }} onBlur={e => { e.currentTarget.style.borderColor = 'rgba(255,255,255,0.1)'; e.currentTarget.style.background = 'rgba(255,255,255,0.05)'; }} />
+                          <input type="number" placeholder={discountType === 'porcentaje' ? 'Ej: 15' : 'Ej: 500'} value={discountValue} onChange={(e) => setDiscountValue(e.target.value)} style={{ boxSizing: "border-box", width: "100%", padding: '12px 16px', borderRadius: 'var(--radius-md)', background: 'rgba(255,255,255,0.05)', border: '1px solid rgba(255,255,255,0.1)', color: 'white', outline: 'none', transition: 'all 0.2s', fontSize: '0.95rem' }} onFocus={e => { e.currentTarget.style.borderColor = 'var(--color-primary)'; e.currentTarget.style.background = 'rgba(255,255,255,0.08)'; }} onBlur={e => { e.currentTarget.style.borderColor = 'rgba(255,255,255,0.1)'; e.currentTarget.style.background = 'rgba(255,255,255,0.05)'; }} />
                         </div>
                       </div>
                     )}
@@ -981,7 +981,7 @@ function NuevoServicioContent() {
                         <div key={idx} style={{ display: 'grid', gridTemplateColumns: '1fr 1fr 1fr auto', gap: '16px', alignItems: 'end', background: 'rgba(0,0,0,0.3)', padding: '16px', borderRadius: 'var(--radius-md)', border: '1px solid rgba(255,255,255,0.05)', transition: 'background 0.2s, transform 0.2s', position: 'relative', zIndex: 10 - idx }} onMouseEnter={e => { e.currentTarget.style.background = 'rgba(255,255,255,0.05)'; e.currentTarget.style.transform = 'translateX(4px)'; }} onMouseLeave={e => { e.currentTarget.style.background = 'rgba(0,0,0,0.3)'; e.currentTarget.style.transform = 'translateX(0)'; }}>
                           <div>
                             <label style={{ display: 'block', color: 'var(--color-text-muted)', fontSize: '0.8rem', marginBottom: '8px', fontWeight: 500 }}>Mínimo de Períodos</label>
-                            <input type="number" min="2" value={rule.minTime} onChange={(e) => { const r = [...timeDiscounts]; r[idx].minTime = e.target.value; setTimeDiscounts(r); }} style={{ width: '100%', padding: '10px 14px', borderRadius: 'var(--radius-sm)', background: 'rgba(255,255,255,0.05)', border: '1px solid rgba(255,255,255,0.1)', color: 'white', outline: 'none', transition: 'border-color 0.2s', fontFamily: 'inherit' }} onFocus={e => e.currentTarget.style.borderColor = 'var(--color-primary)'} onBlur={e => e.currentTarget.style.borderColor = 'rgba(255,255,255,0.1)'} />
+                            <input type="number" min="2" value={rule.minTime} onChange={(e) => { const r = [...timeDiscounts]; r[idx].minTime = e.target.value; setTimeDiscounts(r); }} style={{ boxSizing: "border-box", width: "100%", padding: '10px 14px', borderRadius: 'var(--radius-sm)', background: 'rgba(255,255,255,0.05)', border: '1px solid rgba(255,255,255,0.1)', color: 'white', outline: 'none', transition: 'border-color 0.2s', fontFamily: 'inherit' }} onFocus={e => e.currentTarget.style.borderColor = 'var(--color-primary)'} onBlur={e => e.currentTarget.style.borderColor = 'rgba(255,255,255,0.1)'} />
                           </div>
                           <div>
                             <label style={{ display: 'block', color: 'var(--color-text-muted)', fontSize: '0.8rem', marginBottom: '8px', fontWeight: 500 }}>Tipo</label>
@@ -989,7 +989,7 @@ function NuevoServicioContent() {
                           </div>
                           <div>
                             <label style={{ display: 'block', color: 'var(--color-text-muted)', fontSize: '0.8rem', marginBottom: '8px', fontWeight: 500 }}>Valor</label>
-                            <input type="number" placeholder="Ej: 10" value={rule.value} onChange={(e) => { const r = [...timeDiscounts]; r[idx].value = e.target.value; setTimeDiscounts(r); }} style={{ width: '100%', padding: '10px 14px', borderRadius: 'var(--radius-sm)', background: 'rgba(255,255,255,0.05)', border: '1px solid rgba(255,255,255,0.1)', color: 'white', outline: 'none', transition: 'border-color 0.2s', fontFamily: 'inherit' }} onFocus={e => e.currentTarget.style.borderColor = 'var(--color-primary)'} onBlur={e => e.currentTarget.style.borderColor = 'rgba(255,255,255,0.1)'} />
+                            <input type="number" placeholder="Ej: 10" value={rule.value} onChange={(e) => { const r = [...timeDiscounts]; r[idx].value = e.target.value; setTimeDiscounts(r); }} style={{ boxSizing: "border-box", width: "100%", padding: '10px 14px', borderRadius: 'var(--radius-sm)', background: 'rgba(255,255,255,0.05)', border: '1px solid rgba(255,255,255,0.1)', color: 'white', outline: 'none', transition: 'border-color 0.2s', fontFamily: 'inherit' }} onFocus={e => e.currentTarget.style.borderColor = 'var(--color-primary)'} onBlur={e => e.currentTarget.style.borderColor = 'rgba(255,255,255,0.1)'} />
                           </div>
                           <button type="button" onClick={() => setTimeDiscounts(timeDiscounts.filter((_, i) => i !== idx))} style={{ background: 'transparent', border: '1px solid rgba(239, 68, 68, 0.3)', color: '#ef4444', width: '42px', height: '42px', borderRadius: '50%', cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center', transition: 'all 0.2s' }} onMouseEnter={e => { e.currentTarget.style.background = 'rgba(239, 68, 68, 0.1)'; e.currentTarget.style.borderColor = '#ef4444'; e.currentTarget.style.transform = 'scale(1.1)'; }} onMouseLeave={e => { e.currentTarget.style.background = 'transparent'; e.currentTarget.style.borderColor = 'rgba(239, 68, 68, 0.3)'; e.currentTarget.style.transform = 'scale(1)'; }}><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path d="M18 6L6 18M6 6l12 12"></path></svg></button>
                         </div>
@@ -1015,7 +1015,7 @@ function NuevoServicioContent() {
                         <div key={idx} style={{ display: 'grid', gridTemplateColumns: '1fr 1fr 1fr auto', gap: '16px', alignItems: 'end', background: 'rgba(0,0,0,0.3)', padding: '16px', borderRadius: 'var(--radius-md)', border: '1px solid rgba(255,255,255,0.05)', transition: 'background 0.2s, transform 0.2s', position: 'relative', zIndex: 10 - idx }} onMouseEnter={e => { e.currentTarget.style.background = 'rgba(255,255,255,0.05)'; e.currentTarget.style.transform = 'translateX(4px)'; }} onMouseLeave={e => { e.currentTarget.style.background = 'rgba(0,0,0,0.3)'; e.currentTarget.style.transform = 'translateX(0)'; }}>
                           <div>
                             <label style={{ display: 'block', color: 'var(--color-text-muted)', fontSize: '0.8rem', marginBottom: '8px', fontWeight: 500 }}>Días de Anticipación</label>
-                            <input type="number" min="1" value={rule.minDays} onChange={(e) => { const r = [...earlyBirdDiscounts]; r[idx].minDays = e.target.value; setEarlyBirdDiscounts(r); }} style={{ width: '100%', padding: '10px 14px', borderRadius: 'var(--radius-sm)', background: 'rgba(255,255,255,0.05)', border: '1px solid rgba(255,255,255,0.1)', color: 'white', outline: 'none', transition: 'border-color 0.2s', fontFamily: 'inherit' }} onFocus={e => e.currentTarget.style.borderColor = 'var(--color-primary)'} onBlur={e => e.currentTarget.style.borderColor = 'rgba(255,255,255,0.1)'} />
+                            <input type="number" min="1" value={rule.minDays} onChange={(e) => { const r = [...earlyBirdDiscounts]; r[idx].minDays = e.target.value; setEarlyBirdDiscounts(r); }} style={{ boxSizing: "border-box", width: "100%", padding: '10px 14px', borderRadius: 'var(--radius-sm)', background: 'rgba(255,255,255,0.05)', border: '1px solid rgba(255,255,255,0.1)', color: 'white', outline: 'none', transition: 'border-color 0.2s', fontFamily: 'inherit' }} onFocus={e => e.currentTarget.style.borderColor = 'var(--color-primary)'} onBlur={e => e.currentTarget.style.borderColor = 'rgba(255,255,255,0.1)'} />
                           </div>
                           <div>
                             <label style={{ display: 'block', color: 'var(--color-text-muted)', fontSize: '0.8rem', marginBottom: '8px', fontWeight: 500 }}>Tipo</label>
@@ -1023,7 +1023,7 @@ function NuevoServicioContent() {
                           </div>
                           <div>
                             <label style={{ display: 'block', color: 'var(--color-text-muted)', fontSize: '0.8rem', marginBottom: '8px', fontWeight: 500 }}>Valor</label>
-                            <input type="number" placeholder="Ej: 5" value={rule.value} onChange={(e) => { const r = [...earlyBirdDiscounts]; r[idx].value = e.target.value; setEarlyBirdDiscounts(r); }} style={{ width: '100%', padding: '10px 14px', borderRadius: 'var(--radius-sm)', background: 'rgba(255,255,255,0.05)', border: '1px solid rgba(255,255,255,0.1)', color: 'white', outline: 'none', transition: 'border-color 0.2s', fontFamily: 'inherit' }} onFocus={e => e.currentTarget.style.borderColor = 'var(--color-primary)'} onBlur={e => e.currentTarget.style.borderColor = 'rgba(255,255,255,0.1)'} />
+                            <input type="number" placeholder="Ej: 5" value={rule.value} onChange={(e) => { const r = [...earlyBirdDiscounts]; r[idx].value = e.target.value; setEarlyBirdDiscounts(r); }} style={{ boxSizing: "border-box", width: "100%", padding: '10px 14px', borderRadius: 'var(--radius-sm)', background: 'rgba(255,255,255,0.05)', border: '1px solid rgba(255,255,255,0.1)', color: 'white', outline: 'none', transition: 'border-color 0.2s', fontFamily: 'inherit' }} onFocus={e => e.currentTarget.style.borderColor = 'var(--color-primary)'} onBlur={e => e.currentTarget.style.borderColor = 'rgba(255,255,255,0.1)'} />
                           </div>
                           <button type="button" onClick={() => setEarlyBirdDiscounts(earlyBirdDiscounts.filter((_, i) => i !== idx))} style={{ background: 'transparent', border: '1px solid rgba(239, 68, 68, 0.3)', color: '#ef4444', width: '42px', height: '42px', borderRadius: '50%', cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center', transition: 'all 0.2s' }} onMouseEnter={e => { e.currentTarget.style.background = 'rgba(239, 68, 68, 0.1)'; e.currentTarget.style.borderColor = '#ef4444'; e.currentTarget.style.transform = 'scale(1.1)'; }} onMouseLeave={e => { e.currentTarget.style.background = 'transparent'; e.currentTarget.style.borderColor = 'rgba(239, 68, 68, 0.3)'; e.currentTarget.style.transform = 'scale(1)'; }}><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path d="M18 6L6 18M6 6l12 12"></path></svg></button>
                         </div>
@@ -1048,9 +1048,9 @@ function NuevoServicioContent() {
                       {seasonRules.map((rule, idx) => (
                         <div key={idx} style={{ display: 'flex', flexDirection: 'column', gap: '12px', background: 'rgba(0,0,0,0.3)', padding: '20px', borderRadius: 'var(--radius-md)', border: '1px solid rgba(255,255,255,0.05)', transition: 'background 0.2s', position: 'relative', zIndex: 10 - idx }} onMouseEnter={e => e.currentTarget.style.background = 'rgba(255,255,255,0.03)'} onMouseLeave={e => e.currentTarget.style.background = 'rgba(0,0,0,0.3)'}>
                           <div style={{ display: 'grid', gridTemplateColumns: '1fr auto', gap: '16px', alignItems: 'center' }}>
-                            <div style={{ width: '100%' }}>
+                            <div style={{ boxSizing: "border-box", width: "100%" }}>
                               <label style={{ display: 'block', color: 'var(--color-text-muted)', fontSize: '0.8rem', marginBottom: '8px', fontWeight: 500 }}>Nombre del Evento / Temporada</label>
-                              <input type="text" placeholder="Ej: Vacaciones de Invierno" value={rule.name} onChange={(e) => { const r = [...seasonRules]; r[idx].name = e.target.value; setSeasonRules(r); }} style={{ width: '100%', padding: '10px 14px', borderRadius: 'var(--radius-sm)', background: 'rgba(255,255,255,0.05)', border: '1px solid rgba(255,255,255,0.1)', color: 'white', outline: 'none', transition: 'border-color 0.2s', fontFamily: 'inherit' }} onFocus={e => e.currentTarget.style.borderColor = 'var(--color-primary)'} onBlur={e => e.currentTarget.style.borderColor = 'rgba(255,255,255,0.1)'} />
+                              <input type="text" placeholder="Ej: Vacaciones de Invierno" value={rule.name} onChange={(e) => { const r = [...seasonRules]; r[idx].name = e.target.value; setSeasonRules(r); }} style={{ boxSizing: "border-box", width: "100%", padding: '10px 14px', borderRadius: 'var(--radius-sm)', background: 'rgba(255,255,255,0.05)', border: '1px solid rgba(255,255,255,0.1)', color: 'white', outline: 'none', transition: 'border-color 0.2s', fontFamily: 'inherit' }} onFocus={e => e.currentTarget.style.borderColor = 'var(--color-primary)'} onBlur={e => e.currentTarget.style.borderColor = 'rgba(255,255,255,0.1)'} />
                             </div>
                             <button type="button" onClick={() => setSeasonRules(seasonRules.filter((_, i) => i !== idx))} style={{ background: 'transparent', border: '1px solid rgba(239, 68, 68, 0.3)', color: '#ef4444', width: '42px', height: '42px', borderRadius: '50%', cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center', transition: 'all 0.2s', alignSelf: 'flex-end' }} onMouseEnter={e => { e.currentTarget.style.background = 'rgba(239, 68, 68, 0.1)'; e.currentTarget.style.borderColor = '#ef4444'; e.currentTarget.style.transform = 'scale(1.1)'; }} onMouseLeave={e => { e.currentTarget.style.background = 'transparent'; e.currentTarget.style.borderColor = 'rgba(239, 68, 68, 0.3)'; e.currentTarget.style.transform = 'scale(1)'; }}><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path d="M18 6L6 18M6 6l12 12"></path></svg></button>
                           </div>
@@ -1077,7 +1077,7 @@ function NuevoServicioContent() {
                             </div>
                             <div>
                               <label style={{ display: 'block', color: 'var(--color-text-muted)', fontSize: '0.8rem', marginBottom: '8px', fontWeight: 500 }}>Valor</label>
-                              <input type="number" placeholder="Ej: 20" value={rule.value} onChange={(e) => { const r = [...seasonRules]; r[idx].value = e.target.value; setSeasonRules(r); }} style={{ width: '100%', padding: '10px 14px', borderRadius: 'var(--radius-sm)', background: 'rgba(255,255,255,0.05)', border: '1px solid rgba(255,255,255,0.1)', color: 'white', outline: 'none', transition: 'border-color 0.2s', fontFamily: 'inherit' }} onFocus={e => e.currentTarget.style.borderColor = 'var(--color-primary)'} onBlur={e => e.currentTarget.style.borderColor = 'rgba(255,255,255,0.1)'} />
+                              <input type="number" placeholder="Ej: 20" value={rule.value} onChange={(e) => { const r = [...seasonRules]; r[idx].value = e.target.value; setSeasonRules(r); }} style={{ boxSizing: "border-box", width: "100%", padding: '10px 14px', borderRadius: 'var(--radius-sm)', background: 'rgba(255,255,255,0.05)', border: '1px solid rgba(255,255,255,0.1)', color: 'white', outline: 'none', transition: 'border-color 0.2s', fontFamily: 'inherit' }} onFocus={e => e.currentTarget.style.borderColor = 'var(--color-primary)'} onBlur={e => e.currentTarget.style.borderColor = 'rgba(255,255,255,0.1)'} />
                             </div>
                           </div>
                         </div>

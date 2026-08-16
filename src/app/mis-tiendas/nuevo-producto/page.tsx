@@ -507,10 +507,10 @@ function NuevoProductoContent() {
                 {mediaPreview.map((media, idx) => (
                   <div key={idx} style={{ position: 'relative', width: '120px', height: '120px', borderRadius: 'var(--radius-md)', overflow: 'hidden', border: '1px solid var(--color-border)' }}>
                     {media.type === 'image' ? (
-                      <img src={media.url} alt="preview" style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
+                      <img src={media.url} alt="preview" style={{ boxSizing: "border-box", width: "100%", height: '100%', objectFit: 'cover' }} />
                     ) : (
                       <>
-                        <video src={media.url} style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
+                        <video src={media.url} style={{ boxSizing: "border-box", width: "100%", height: '100%', objectFit: 'cover' }} />
                         <div style={{ position: 'absolute', top: 0, left: 0, right: 0, bottom: 0, display: 'flex', alignItems: 'center', justifyContent: 'center', background: 'rgba(0,0,0,0.3)', pointerEvents: 'none' }}>
                           <svg width="32" height="32" viewBox="0 0 24 24" fill="var(--color-primary)" stroke="var(--color-primary)" strokeWidth="1" strokeLinejoin="round"><polygon points="5 3 19 12 5 21 5 3"></polygon></svg>
                         </div>
@@ -542,7 +542,7 @@ function NuevoProductoContent() {
               <label 
                 htmlFor="media-upload"
                 style={{
-                  width: '100%', height: '240px', borderRadius: 'var(--radius-md)',
+                  boxSizing: "border-box", width: "100%", height: '240px', borderRadius: 'var(--radius-md)',
                   background: 'rgba(0,0,0,0.2)', border: '2px dashed rgba(255, 115, 0, 0.3)',
                   display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center',
                   cursor: 'pointer', transition: 'all 0.2s',
@@ -577,7 +577,7 @@ function NuevoProductoContent() {
                 value={title}
                 onChange={(e) => setTitle(e.target.value)}
                 style={{
-                  width: '100%', padding: '14px 16px', borderRadius: 'var(--radius-md)',
+                  boxSizing: "border-box", width: "100%", padding: '14px 16px', borderRadius: 'var(--radius-md)',
                   background: 'rgba(0,0,0,0.3)', border: '1px solid var(--color-border)',
                   color: 'var(--color-text-main)', fontSize: '1rem', outline: 'none'
                 }}
@@ -596,7 +596,7 @@ function NuevoProductoContent() {
                 value={description}
                 onChange={(e) => setDescription(e.target.value)}
                 style={{
-                  width: '100%', padding: '16px', borderRadius: 'var(--radius-md)',
+                  boxSizing: "border-box", width: "100%", padding: '16px', borderRadius: 'var(--radius-md)',
                   background: 'rgba(0,0,0,0.3)', border: '1px solid var(--color-border)',
                   color: 'var(--color-text-main)', fontSize: '1rem', fontFamily: 'inherit', resize: 'vertical', outline: 'none'
                 }}
@@ -703,7 +703,7 @@ function NuevoProductoContent() {
                   value={price}
                   onChange={(e) => setPrice(e.target.value)}
                   style={{
-                    width: '100%', padding: '14px 80px 14px 32px', borderRadius: 'var(--radius-md)',
+                    boxSizing: "border-box", width: "100%", padding: '14px 80px 14px 32px', borderRadius: 'var(--radius-md)',
                     background: 'rgba(0,0,0,0.3)', border: '1px solid var(--color-border)',
                     color: 'var(--color-text-main)', fontSize: '1rem', outline: 'none'
                   }}
@@ -771,7 +771,7 @@ function NuevoProductoContent() {
                   onChange={(e) => setStock(e.target.value)}
                   min={1}
                   style={{
-                    width: '100%', padding: '14px 16px', borderRadius: 'var(--radius-md)',
+                    boxSizing: "border-box", width: "100%", padding: '14px 16px', borderRadius: 'var(--radius-md)',
                     background: 'rgba(0,0,0,0.3)', border: '1px solid var(--color-border)',
                     color: 'var(--color-text-main)', fontSize: '1rem', outline: 'none'
                   }}
@@ -813,7 +813,7 @@ function NuevoProductoContent() {
                   value={minUnits}
                   onChange={(e) => setMinUnits(e.target.value)}
                   style={{
-                    width: '100%', padding: '14px 16px', borderRadius: 'var(--radius-md)',
+                    boxSizing: "border-box", width: "100%", padding: '14px 16px', borderRadius: 'var(--radius-md)',
                     background: 'rgba(0,0,0,0.3)', border: '1px solid var(--color-border)',
                     color: 'var(--color-text-main)', fontSize: '1rem', outline: 'none'
                   }}
@@ -848,7 +848,7 @@ function NuevoProductoContent() {
                     value={shippingCost}
                     onChange={(e) => setShippingCost(e.target.value)}
                     style={{
-                      width: '100%', padding: '14px 80px 14px 32px', borderRadius: 'var(--radius-md)',
+                      boxSizing: "border-box", width: "100%", padding: '14px 80px 14px 32px', borderRadius: 'var(--radius-md)',
                       background: 'rgba(0,0,0,0.3)', border: '1px solid var(--color-border)',
                       color: 'var(--color-text-main)', fontSize: '1rem', outline: 'none'
                     }}
@@ -920,7 +920,7 @@ function NuevoProductoContent() {
                 <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(220px, 1fr))', gap: '24px' }}>
                   <div style={{ gridColumn: '1 / -1' }}>
                     <label style={{ display: 'block', color: 'var(--color-text-main)', fontSize: '0.9rem', marginBottom: '6px' }}>Nombre del Descuento</label>
-                    <input type="text" placeholder="Ej: Especial Día del Padre" value={discountName} onChange={(e) => setDiscountName(e.target.value)} style={{ width: '100%', padding: '10px 14px', borderRadius: 'var(--radius-md)', background: 'rgba(0,0,0,0.3)', border: '1px solid var(--color-border)', color: 'var(--color-text-main)', outline: 'none' }} />
+                    <input type="text" placeholder="Ej: Especial Día del Padre" value={discountName} onChange={(e) => setDiscountName(e.target.value)} style={{ boxSizing: "border-box", width: "100%", padding: '10px 14px', borderRadius: 'var(--radius-md)', background: 'rgba(0,0,0,0.3)', border: '1px solid var(--color-border)', color: 'var(--color-text-main)', outline: 'none' }} />
                   </div>
                   <div>
                     <label style={{ display: 'block', color: 'var(--color-text-main)', fontSize: '0.9rem', marginBottom: '6px' }}>Tipo de Descuento</label>
@@ -928,7 +928,7 @@ function NuevoProductoContent() {
                   </div>
                   <div>
                     <label style={{ display: 'block', color: 'var(--color-text-main)', fontSize: '0.9rem', marginBottom: '6px' }}>Valor del Descuento</label>
-                    <input type="number" placeholder={discountType === 'porcentaje' ? 'Ej: 15' : 'Ej: 500'} value={discountValue} onChange={(e) => setDiscountValue(e.target.value)} style={{ width: '100%', padding: '10px 14px', borderRadius: 'var(--radius-md)', background: 'rgba(0,0,0,0.3)', border: '1px solid var(--color-border)', color: 'var(--color-text-main)', outline: 'none' }} />
+                    <input type="number" placeholder={discountType === 'porcentaje' ? 'Ej: 15' : 'Ej: 500'} value={discountValue} onChange={(e) => setDiscountValue(e.target.value)} style={{ boxSizing: "border-box", width: "100%", padding: '10px 14px', borderRadius: 'var(--radius-md)', background: 'rgba(0,0,0,0.3)', border: '1px solid var(--color-border)', color: 'var(--color-text-main)', outline: 'none' }} />
                   </div>
                   <div style={{ gridColumn: "1 / -1" /* col-span-full */, marginTop: '16px', paddingTop: '16px', borderTop: '1px dashed rgba(255,115,0,0.3)' }}>
                     <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '12px', flexWrap: 'wrap', gap: '8px' }}>
@@ -950,7 +950,7 @@ function NuevoProductoContent() {
                             const newRules = [...volumeDiscounts];
                             newRules[idx].minQty = e.target.value;
                             setVolumeDiscounts(newRules);
-                          }} style={{ width: '100%', padding: '8px 12px', borderRadius: 'var(--radius-sm)', background: 'rgba(0,0,0,0.3)', border: '1px solid var(--color-border)', color: 'var(--color-text-main)', outline: 'none' }} />
+                          }} style={{ boxSizing: "border-box", width: "100%", padding: '8px 12px', borderRadius: 'var(--radius-sm)', background: 'rgba(0,0,0,0.3)', border: '1px solid var(--color-border)', color: 'var(--color-text-main)', outline: 'none' }} />
                         </div>
                         <div>
                           <label style={{ display: 'block', color: 'var(--color-text-muted)', fontSize: '0.8rem', marginBottom: '4px' }}>Tipo de Descuento</label>
@@ -961,7 +961,7 @@ function NuevoProductoContent() {
                               newRules[idx].type = e.target.value as any;
                               setVolumeDiscounts(newRules);
                             }}
-                            style={{ width: '100%', padding: '8px 12px', borderRadius: 'var(--radius-sm)', background: 'rgba(0,0,0,0.3)', border: '1px solid var(--color-border)', color: 'var(--color-text-main)', outline: 'none', cursor: 'pointer' }}
+                            style={{ boxSizing: "border-box", width: "100%", padding: '8px 12px', borderRadius: 'var(--radius-sm)', background: 'rgba(0,0,0,0.3)', border: '1px solid var(--color-border)', color: 'var(--color-text-main)', outline: 'none', cursor: 'pointer' }}
                           >
                             <option value="porcentaje">Porcentaje (%)</option>
                             <option value="fijo">Monto Fijo ($)</option>
@@ -973,7 +973,7 @@ function NuevoProductoContent() {
                             const newRules = [...volumeDiscounts];
                             newRules[idx].value = e.target.value;
                             setVolumeDiscounts(newRules);
-                          }} style={{ width: '100%', padding: '8px 12px', borderRadius: 'var(--radius-sm)', background: 'rgba(0,0,0,0.3)', border: '1px solid var(--color-border)', color: 'var(--color-text-main)', outline: 'none' }} />
+                          }} style={{ boxSizing: "border-box", width: "100%", padding: '8px 12px', borderRadius: 'var(--radius-sm)', background: 'rgba(0,0,0,0.3)', border: '1px solid var(--color-border)', color: 'var(--color-text-main)', outline: 'none' }} />
                         </div>
                         <button 
                           type="button" 
@@ -1106,7 +1106,7 @@ function NuevoProductoContent() {
             borderRadius: '24px',
             border: '1px solid rgba(255, 255, 255, 0.1)',
             boxShadow: '0 25px 50px -12px rgba(0, 0, 0, 0.5)',
-            width: '100%',
+            boxSizing: "border-box", width: "100%",
             maxWidth: '400px',
             textAlign: 'center',
             display: 'flex',
@@ -1116,7 +1116,7 @@ function NuevoProductoContent() {
           }}>
             <div style={{ position: 'relative', width: '80px', height: '80px', display: 'flex', justifyContent: 'center', alignItems: 'center' }}>
               <div style={{ 
-                position: 'absolute', width: '100%', height: '100%', borderRadius: '50%', 
+                position: 'absolute', boxSizing: "border-box", width: "100%", height: '100%', borderRadius: '50%', 
                 border: '4px solid rgba(255,255,255,0.1)', borderTopColor: 'var(--color-primary)', 
                 animation: 'spin 1s ease-in-out infinite' 
               }}></div>
@@ -1135,7 +1135,7 @@ function NuevoProductoContent() {
               {loadingText}
             </p>
 
-            <div style={{ width: '100%', height: '8px', background: 'rgba(255,255,255,0.1)', borderRadius: '4px', overflow: 'hidden' }}>
+            <div style={{ boxSizing: "border-box", width: "100%", height: '8px', background: 'rgba(255,255,255,0.1)', borderRadius: '4px', overflow: 'hidden' }}>
               <div style={{ 
                 width: `${loadingProgress}%`, 
                 height: '100%', 
