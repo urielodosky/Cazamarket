@@ -703,18 +703,18 @@ export default function VirtualAdvisorModal({ onClose, productId }: VirtualAdvis
                   )}
                 </>
               ) : builderMode === 'select' ? (
-                <div style={{ background: 'rgba(255,255,255,0.02)', padding: '40px', borderRadius: 'var(--radius-lg)', border: '1px solid rgba(255,255,255,0.05)', display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '32px' }}>
+                <div style={{ background: 'rgba(255,255,255,0.02)', padding: 'clamp(16px, 4vw, 40px)', borderRadius: 'var(--radius-lg)', border: '1px solid rgba(255,255,255,0.05)', display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '32px' }}>
                   <div style={{ textAlign: 'center' }}>
                     <h3 style={{ margin: '0 0 12px 0', color: 'var(--color-text-main)', fontSize: '1.5rem' }}>¿Cómo quieres crear esta regla?</h3>
                     <p style={{ color: 'var(--color-text-muted)', margin: 0 }}>Elige el formato de edición que prefieras.</p>
                   </div>
                   
-                  <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(300px, 1fr))', gap: '24px', width: '100%', maxWidth: '800px' }}>
+                  <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(min(100%, 250px), 1fr))', gap: '24px', width: '100%', maxWidth: '800px' }}>
                     
                     {/* Modo Visual */}
                     <div 
                       onClick={() => { setResponseType('options'); setBuilderMode('visual'); }}
-                      style={{ background: 'rgba(255, 115, 0, 0.05)', border: '1px solid rgba(255, 115, 0, 0.2)', padding: '32px', borderRadius: 'var(--radius-lg)', cursor: 'pointer', transition: 'all 0.3s ease', display: 'flex', flexDirection: 'column', alignItems: 'center', textAlign: 'center', gap: '16px' }}
+                      style={{ background: 'rgba(255, 115, 0, 0.05)', border: '1px solid rgba(255, 115, 0, 0.2)', padding: 'clamp(16px, 4vw, 32px)', borderRadius: 'var(--radius-lg)', cursor: 'pointer', transition: 'all 0.3s ease', display: 'flex', flexDirection: 'column', alignItems: 'center', textAlign: 'center', gap: '16px' }}
                       onMouseEnter={(e) => { e.currentTarget.style.transform = 'translateY(-4px)'; e.currentTarget.style.background = 'rgba(255, 115, 0, 0.1)'; e.currentTarget.style.boxShadow = '0 12px 24px rgba(255, 115, 0, 0.15)'; }}
                       onMouseLeave={(e) => { e.currentTarget.style.transform = 'translateY(0)'; e.currentTarget.style.background = 'rgba(255, 115, 0, 0.05)'; e.currentTarget.style.boxShadow = 'none'; }}
                     >
@@ -728,7 +728,7 @@ export default function VirtualAdvisorModal({ onClose, productId }: VirtualAdvis
                     {/* Modo Clásico */}
                     <div 
                       onClick={() => setBuilderMode('classic')}
-                      style={{ background: 'rgba(255, 255, 255, 0.03)', border: '1px solid rgba(255, 255, 255, 0.1)', padding: '32px', borderRadius: 'var(--radius-lg)', cursor: 'pointer', transition: 'all 0.3s ease', display: 'flex', flexDirection: 'column', alignItems: 'center', textAlign: 'center', gap: '16px' }}
+                      style={{ background: 'rgba(255, 255, 255, 0.03)', border: '1px solid rgba(255, 255, 255, 0.1)', padding: 'clamp(16px, 4vw, 32px)', borderRadius: 'var(--radius-lg)', cursor: 'pointer', transition: 'all 0.3s ease', display: 'flex', flexDirection: 'column', alignItems: 'center', textAlign: 'center', gap: '16px' }}
                       onMouseEnter={(e) => { e.currentTarget.style.transform = 'translateY(-4px)'; e.currentTarget.style.background = 'rgba(255, 255, 255, 0.06)'; e.currentTarget.style.boxShadow = '0 12px 24px rgba(0, 0, 0, 0.2)'; }}
                       onMouseLeave={(e) => { e.currentTarget.style.transform = 'translateY(0)'; e.currentTarget.style.background = 'rgba(255, 255, 255, 0.03)'; e.currentTarget.style.boxShadow = 'none'; }}
                     >
