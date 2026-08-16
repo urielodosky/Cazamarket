@@ -218,6 +218,7 @@ function NuevoServicioContent() {
     } catch (err) {
       console.error("Error cropping image:", err);
       alert("Hubo un error al recortar la imagen.");
+    }
     setPendingCropQueue(prev => prev.slice(1));
   };
 
