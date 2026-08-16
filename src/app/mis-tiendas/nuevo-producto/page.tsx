@@ -17,7 +17,7 @@ function NuevoProductoContent() {
   const router = useRouter();
   const searchParams = useSearchParams();
   const editId = searchParams?.get('editId');
-  const { username, avatar: userAvatar, supabaseUser } = useAuth();
+  const { username, avatar: userAvatar, supabaseUser, storeCategories: authStoreCategories, branches: authBranches } = useAuth();
   const { hasFeature, permissions } = usePlan();
   
   const canUseBot = hasFeature('botAsesor');
@@ -73,18 +73,15 @@ function NuevoProductoContent() {
   const [vendorLocations, setVendorLocations] = useState<any[]>([]);
 
   useEffect(() => {
-    const saved = localStorage.getItem('cazamarket_profile');
-    if (saved) {
-      try {
-        const parsed = JSON.parse(saved);
-        if (parsed.locations && Array.isArray(parsed.locations)) {
-          setVendorLocations(parsed.locations);
-        }
-        if (parsed.categories && Array.isArray(parsed.categories)) {
-          setStoreCategories(parsed.categories.filter((c: any) => typeof c === 'string' && c.trim() !== ''));
-        }
-      } catch(e) {}
+    if (authBranches && Array.isArray(authBranches)) {
+      setVendorLocations(authBranches);
     }
+    if (authStoreCategories && Array.isArray(authStoreCategories)) {
+      setStoreCategories(authStoreCategories.filter((c: any) => typeof c === 'string' && c.trim() !== ''));
+    }
+  }, [authBranches, authStoreCategories]);
+
+  useEffect(() => {
     
     // Load existing product if editId is present
     if (editId) {
