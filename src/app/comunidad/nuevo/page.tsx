@@ -98,7 +98,7 @@ export default function CrearTemaPage() {
               onChange={(e) => setTitulo(e.target.value)}
               placeholder="Ej: Recomendaciones de equipamiento para la Patagonia..."
               style={{ 
-                width: '100%', 
+                boxSizing: "border-box", width: "100%", 
                 padding: '12px 16px', 
                 background: 'rgba(0,0,0,0.3)', 
                 border: '1px solid rgba(255,255,255,0.1)', 
@@ -149,7 +149,7 @@ export default function CrearTemaPage() {
               onChange={(e) => setContenido(e.target.value)}
               placeholder="Explica detalladamente de qué trata tu tema..."
               style={{ 
-                width: '100%', 
+                boxSizing: "border-box", width: "100%", 
                 minHeight: '200px', 
                 padding: '16px', 
                 background: 'rgba(0,0,0,0.3)', 
@@ -165,7 +165,7 @@ export default function CrearTemaPage() {
           </div>
 
           {/* Botones de acción */}
-          <div style={{ display: 'flex', justifyContent: 'flex-end', gap: '16px', marginTop: '16px' }}>
+          <div style={{ display: 'flex', justifyContent: 'flex-end', flexWrap: 'wrap', gap: '16px', marginTop: '16px' }}>
             <Link href="/comunidad" style={{ textDecoration: 'none' }}>
               <button type="button" className="btn btn-outline" style={{ padding: '12px 24px', borderRadius: 'var(--radius-full)', color: 'var(--color-text-main)', border: '1px solid rgba(255,255,255,0.2)', background: 'transparent', cursor: 'pointer' }}>
                 Cancelar
