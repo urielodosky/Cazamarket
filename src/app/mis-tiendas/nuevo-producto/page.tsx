@@ -906,8 +906,8 @@ function NuevoProductoContent() {
             </div>
             
             <div style={{ gridColumn: "1 / -1" /* col-span-full */, background: 'rgba(255, 115, 0, 0.05)', padding: '20px', borderRadius: 'var(--radius-lg)', border: '1px solid rgba(255, 115, 0, 0.2)' }}>
-              <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: hasDiscount ? '16px' : '0' }}>
-                <div>
+              <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: hasDiscount ? '16px' : '0', flexWrap: 'wrap', gap: '12px' }}>
+                <div style={{ flex: '1 1 min-content' }}>
                   <h3 style={{ margin: '0 0 4px 0', color: 'var(--color-text-main)', fontSize: '1.1rem' }}>Descuentos Promocionales</h3>
                   <p style={{ margin: 0, color: 'var(--color-text-muted)', fontSize: '0.9rem' }}>¿Quieres agregar un descuento a este producto?</p>
                 </div>
@@ -931,12 +931,12 @@ function NuevoProductoContent() {
                     <input type="number" placeholder={discountType === 'porcentaje' ? 'Ej: 15' : 'Ej: 500'} value={discountValue} onChange={(e) => setDiscountValue(e.target.value)} style={{ width: '100%', padding: '10px 14px', borderRadius: 'var(--radius-md)', background: 'rgba(0,0,0,0.3)', border: '1px solid var(--color-border)', color: 'var(--color-text-main)', outline: 'none' }} />
                   </div>
                   <div style={{ gridColumn: "1 / -1" /* col-span-full */, marginTop: '16px', paddingTop: '16px', borderTop: '1px dashed rgba(255,115,0,0.3)' }}>
-                    <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '12px' }}>
-                      <label style={{ color: 'var(--color-text-main)', fontSize: '0.95rem', fontWeight: 600 }}>Descuentos por Cantidad (Mayorista)</label>
+                    <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '12px', flexWrap: 'wrap', gap: '8px' }}>
+                      <label style={{ color: 'var(--color-text-main)', fontSize: '0.95rem', fontWeight: 600, flex: '1 1 min-content' }}>Descuentos por Cantidad (Mayorista)</label>
                       <button 
                         type="button" 
                         onClick={() => setVolumeDiscounts([...volumeDiscounts, { minQty: '2', type: 'porcentaje', value: '' }])}
-                        style={{ background: 'transparent', border: '1px solid var(--color-primary)', color: 'var(--color-primary)', padding: '4px 12px', borderRadius: 'var(--radius-sm)', cursor: 'pointer', fontSize: '0.85rem' }}
+                        style={{ background: 'transparent', border: '1px solid var(--color-primary)', color: 'var(--color-primary)', padding: '4px 12px', borderRadius: 'var(--radius-sm)', cursor: 'pointer', fontSize: '0.85rem', flexShrink: 0 }}
                       >
                         + Agregar Regla
                       </button>

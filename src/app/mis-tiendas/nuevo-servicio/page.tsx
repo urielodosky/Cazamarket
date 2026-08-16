@@ -917,8 +917,8 @@ function NuevoServicioContent() {
             
             {/* Descuentos Promocionales */}
             <div style={{ gridColumn: "1 / -1" /* col-span-full */, background: 'rgba(255, 115, 0, 0.05)', padding: '20px', borderRadius: 'var(--radius-lg)', border: '1px solid rgba(255, 115, 0, 0.2)' }}>
-              <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: hasDiscount ? '16px' : '0' }}>
-                <div>
+              <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: hasDiscount ? '16px' : '0', flexWrap: 'wrap', gap: '12px' }}>
+                <div style={{ flex: '1 1 min-content' }}>
                   <h3 style={{ margin: '0 0 4px 0', color: 'var(--color-text-main)', fontSize: '1.1rem' }}>Descuentos Promocionales</h3>
                   <p style={{ margin: 0, color: 'var(--color-text-muted)', fontSize: '0.9rem' }}>¿Quieres agregar un descuento a este producto?</p>
                 </div>
@@ -932,13 +932,13 @@ function NuevoServicioContent() {
                   
                   {/* Descuento Base */}
                   <div style={{ padding: '24px', background: 'rgba(255,255,255,0.03)', backdropFilter: 'blur(10px)', borderRadius: 'var(--radius-lg)', border: '1px solid rgba(255,255,255,0.08)', boxShadow: '0 8px 32px rgba(0,0,0,0.2)', position: 'relative', zIndex: 40 }}>
-                    <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '20px' }}>
-                      <label style={{ color: 'var(--color-text-main)', fontSize: '1.1rem', fontWeight: 600, display: 'flex', alignItems: 'center', gap: '8px' }}>
+                    <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '20px', flexWrap: 'wrap', gap: '8px' }}>
+                      <label style={{ color: 'var(--color-text-main)', fontSize: '1.1rem', fontWeight: 600, display: 'flex', alignItems: 'center', gap: '8px', flex: '1 1 min-content' }}>
                         <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path d="M20.59 13.41l-7.17 7.17a2 2 0 0 1-2.83 0L2 12V2h10l8.59 8.59a2 2 0 0 1 0 2.82z"></path><line x1="7" y1="7" x2="7.01" y2="7"></line></svg>
                         Descuento Base del Servicio
                       </label>
                       {!hasBaseDiscount ? (
-                        <button type="button" onClick={() => setHasBaseDiscount(true)} style={{ background: 'rgba(255,115,0,0.1)', border: '1px solid rgba(255,115,0,0.3)', color: 'var(--color-primary)', padding: '8px 16px', borderRadius: 'var(--radius-full)', cursor: 'pointer', fontSize: '0.85rem', fontWeight: 600, transition: 'all 0.2s' }} onMouseEnter={e => { e.currentTarget.style.background = 'rgba(255,115,0,0.2)'; e.currentTarget.style.transform = 'translateY(-2px)'; }} onMouseLeave={e => { e.currentTarget.style.background = 'rgba(255,115,0,0.1)'; e.currentTarget.style.transform = 'translateY(0)'; }}>
+                        <button type="button" onClick={() => setHasBaseDiscount(true)} style={{ background: 'rgba(255,115,0,0.1)', border: '1px solid rgba(255,115,0,0.3)', color: 'var(--color-primary)', padding: '8px 16px', borderRadius: 'var(--radius-full)', cursor: 'pointer', fontSize: '0.85rem', fontWeight: 600, transition: 'all 0.2s', flexShrink: 0 }} onMouseEnter={e => { e.currentTarget.style.background = 'rgba(255,115,0,0.2)'; e.currentTarget.style.transform = 'translateY(-2px)'; }} onMouseLeave={e => { e.currentTarget.style.background = 'rgba(255,115,0,0.1)'; e.currentTarget.style.transform = 'translateY(0)'; }}>
                           + Añadir Descuento
                         </button>
                       ) : (
@@ -966,12 +966,12 @@ function NuevoServicioContent() {
 
                   {/* Descuentos por Cantidad / Tiempo */}
                   <div style={{ padding: '24px', background: 'rgba(255,255,255,0.03)', backdropFilter: 'blur(10px)', borderRadius: 'var(--radius-lg)', border: '1px solid rgba(255,255,255,0.08)', boxShadow: '0 8px 32px rgba(0,0,0,0.2)', position: 'relative', zIndex: 30 }}>
-                    <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '20px' }}>
-                      <label style={{ color: 'var(--color-text-main)', fontSize: '1.1rem', fontWeight: 600, display: 'flex', alignItems: 'center', gap: '8px' }}>
+                    <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '20px', flexWrap: 'wrap', gap: '8px' }}>
+                      <label style={{ color: 'var(--color-text-main)', fontSize: '1.1rem', fontWeight: 600, display: 'flex', alignItems: 'center', gap: '8px', flex: '1 1 min-content' }}>
                         <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="var(--color-primary)" strokeWidth="2"><circle cx="12" cy="12" r="10"></circle><polyline points="12 6 12 12 16 14"></polyline></svg>
                         Estadía Prolongada
                       </label>
-                      <button type="button" onClick={() => setTimeDiscounts([...timeDiscounts, { minTime: '2', type: 'porcentaje', value: '' }])} style={{ background: 'rgba(255,115,0,0.1)', border: '1px solid rgba(255,115,0,0.3)', color: 'var(--color-primary)', padding: '8px 16px', borderRadius: 'var(--radius-full)', cursor: 'pointer', fontSize: '0.85rem', fontWeight: 600, transition: 'all 0.2s' }} onMouseEnter={e => { e.currentTarget.style.background = 'rgba(255,115,0,0.2)'; e.currentTarget.style.transform = 'translateY(-2px)'; }} onMouseLeave={e => { e.currentTarget.style.background = 'rgba(255,115,0,0.1)'; e.currentTarget.style.transform = 'translateY(0)'; }}>
+                      <button type="button" onClick={() => setTimeDiscounts([...timeDiscounts, { minTime: '2', type: 'porcentaje', value: '' }])} style={{ background: 'rgba(255,115,0,0.1)', border: '1px solid rgba(255,115,0,0.3)', color: 'var(--color-primary)', padding: '8px 16px', borderRadius: 'var(--radius-full)', cursor: 'pointer', fontSize: '0.85rem', fontWeight: 600, transition: 'all 0.2s', flexShrink: 0 }} onMouseEnter={e => { e.currentTarget.style.background = 'rgba(255,115,0,0.2)'; e.currentTarget.style.transform = 'translateY(-2px)'; }} onMouseLeave={e => { e.currentTarget.style.background = 'rgba(255,115,0,0.1)'; e.currentTarget.style.transform = 'translateY(0)'; }}>
                         + Añadir Regla
                       </button>
                     </div>
@@ -1000,12 +1000,12 @@ function NuevoServicioContent() {
 
                   {/* Descuentos por Antelación (Early Bird) */}
                   <div style={{ padding: '24px', background: 'rgba(255,255,255,0.03)', backdropFilter: 'blur(10px)', borderRadius: 'var(--radius-lg)', border: '1px solid rgba(255,255,255,0.08)', boxShadow: '0 8px 32px rgba(0,0,0,0.2)', position: 'relative', zIndex: 20 }}>
-                    <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '20px' }}>
-                      <label style={{ color: 'var(--color-text-main)', fontSize: '1.1rem', fontWeight: 600, display: 'flex', alignItems: 'center', gap: '8px' }}>
+                    <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '20px', flexWrap: 'wrap', gap: '8px' }}>
+                      <label style={{ color: 'var(--color-text-main)', fontSize: '1.1rem', fontWeight: 600, display: 'flex', alignItems: 'center', gap: '8px', flex: '1 1 min-content' }}>
                         <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="var(--color-primary)" strokeWidth="2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path><polyline points="14 2 14 8 20 8"></polyline><line x1="16" y1="13" x2="8" y2="13"></line><line x1="16" y1="17" x2="8" y2="17"></line><polyline points="10 9 9 9 8 9"></polyline></svg>
                         Antelación (Early Bird)
                       </label>
-                      <button type="button" onClick={() => setEarlyBirdDiscounts([...earlyBirdDiscounts, { minDays: '30', type: 'porcentaje', value: '' }])} style={{ background: 'rgba(255,115,0,0.1)', border: '1px solid rgba(255,115,0,0.3)', color: 'var(--color-primary)', padding: '8px 16px', borderRadius: 'var(--radius-full)', cursor: 'pointer', fontSize: '0.85rem', fontWeight: 600, transition: 'all 0.2s' }} onMouseEnter={e => { e.currentTarget.style.background = 'rgba(255,115,0,0.2)'; e.currentTarget.style.transform = 'translateY(-2px)'; }} onMouseLeave={e => { e.currentTarget.style.background = 'rgba(255,115,0,0.1)'; e.currentTarget.style.transform = 'translateY(0)'; }}>
+                      <button type="button" onClick={() => setEarlyBirdDiscounts([...earlyBirdDiscounts, { minDays: '30', type: 'porcentaje', value: '' }])} style={{ background: 'rgba(255,115,0,0.1)', border: '1px solid rgba(255,115,0,0.3)', color: 'var(--color-primary)', padding: '8px 16px', borderRadius: 'var(--radius-full)', cursor: 'pointer', fontSize: '0.85rem', fontWeight: 600, transition: 'all 0.2s', flexShrink: 0 }} onMouseEnter={e => { e.currentTarget.style.background = 'rgba(255,115,0,0.2)'; e.currentTarget.style.transform = 'translateY(-2px)'; }} onMouseLeave={e => { e.currentTarget.style.background = 'rgba(255,115,0,0.1)'; e.currentTarget.style.transform = 'translateY(0)'; }}>
                         + Añadir Regla
                       </button>
                     </div>
