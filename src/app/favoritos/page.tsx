@@ -133,7 +133,7 @@ export default function FavoritosPage() {
             marginLeft: 'auto'
           }}
         >
-          ⭐ Mis Reseñas
+          Mis Reseñas
         </button>
       </div>
 
