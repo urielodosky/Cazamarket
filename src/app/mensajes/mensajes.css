@@ -85,21 +85,6 @@
     width: 100% !important;
   }
 
-  .virtual-advisor-overlay {
-    padding: 0 !important;
-  }
-
-  .virtual-advisor-modal {
-    border-radius: 0 !important;
-    height: 100vh !important;
-    max-height: 100vh !important;
-    border: none !important;
-  }
-
-  .virtual-advisor-content {
-    padding: 16px !important;
-  }
-
   .nested-options-container {
     padding-left: 0 !important;
     border-left: none !important;
