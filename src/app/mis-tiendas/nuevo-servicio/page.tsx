@@ -548,7 +548,7 @@ function NuevoServicioContent() {
             </div>
 
             {/* Category & Subcategory */}
-            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(280px, 1fr))', gap: '24px' }}>
+            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(220px, 1fr))', gap: '24px' }}>
               <div>
                 <label style={{ display: 'block', color: 'var(--color-text-main)', fontWeight: 600, marginBottom: '8px' }}>
                   Categoría Principal *
@@ -585,7 +585,7 @@ function NuevoServicioContent() {
           )}
 
           {currentStep === 2 && (
-            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(280px, 1fr))', gap: '24px' }}>
+            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(220px, 1fr))', gap: '24px' }}>
 
             {/* Price */}
             <div className="col-span-full">
@@ -1118,7 +1118,7 @@ function NuevoServicioContent() {
                 type="button" 
                 className="btn btn-outline"
                 onClick={handlePrev}
-                style={{ padding: '12px 24px', borderRadius: 'var(--radius-full)', flex: '1 1 auto', textAlign: 'center' }}
+                style={{ padding: '12px 20px', borderRadius: 'var(--radius-full)' }}
               >
                 Atrás
               </button>
@@ -1127,7 +1127,7 @@ function NuevoServicioContent() {
                 type="button" 
                 className="btn btn-outline"
                 onClick={() => router.push('/mis-tiendas')}
-                style={{ padding: '12px 24px', borderRadius: 'var(--radius-full)', flex: '1 1 auto', textAlign: 'center' }}
+                style={{ padding: '12px 20px', borderRadius: 'var(--radius-full)' }}
               >
                 Cancelar
               </button>
@@ -1138,7 +1138,7 @@ function NuevoServicioContent() {
                 type="button" 
                 className="btn btn-primary"
                 onClick={handleNext}
-                style={{ padding: '12px 32px', borderRadius: 'var(--radius-full)', flex: '1 1 auto', textAlign: 'center' }}
+                style={{ padding: '12px 24px', borderRadius: 'var(--radius-full)' }}
               >
                 Siguiente
               </button>
@@ -1148,7 +1148,7 @@ function NuevoServicioContent() {
                 className="btn btn-primary"
                 onClick={handleSubmit}
                 disabled={isSubmitting}
-                style={{ padding: '12px 32px', borderRadius: 'var(--radius-full)', opacity: isSubmitting ? 0.7 : 1, cursor: isSubmitting ? 'not-allowed' : 'pointer', flex: '1 1 auto', textAlign: 'center' }}
+                style={{ padding: '12px 24px', borderRadius: 'var(--radius-full)', opacity: isSubmitting ? 0.7 : 1, cursor: isSubmitting ? 'not-allowed' : 'pointer' }}
               >
                 {editId ? 'Guardar Servicio' : 'Publicar Servicio'}
               </button>
