@@ -665,10 +665,10 @@ function NuevoProductoContent() {
                     id="firearmsPermit"
                     checked={hasFirearmsPermit}
                     onChange={(e) => setHasFirearmsPermit(e.target.checked)}
-                    style={{ width: '20px', height: '20px', marginTop: '2px', cursor: 'pointer', accentColor: '#ffc107' }}
+                    style={{ width: '20px', height: '20px', minWidth: '20px', minHeight: '20px', flexShrink: 0, marginTop: '2px', cursor: 'pointer', accentColor: '#ffc107' }}
                   />
                   <label htmlFor="firearmsPermit" style={{ color: '#ffc107', fontSize: '0.9rem', cursor: 'pointer', lineHeight: 1.5 }}>
-                    <strong style={{ display: 'block', marginBottom: '4px' }}>Declaración Jurada (ANMaC)</strong>
+                    <strong style={{ display: 'block', marginBottom: '4px' }}>Declaración Jurada (ANMaC) *</strong>
                     Confirmo que poseo la documentación legal, inscripción comercial y permisos vigentes emitidos por ANMaC para la exhibición y venta de este material. Entiendo que CazaMarket opera exclusivamente como vidriera y no interviene en la transacción.
                   </label>
                 </div>
