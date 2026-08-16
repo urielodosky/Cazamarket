@@ -541,8 +541,8 @@ export default function VirtualAdvisorModal({ onClose, productId }: VirtualAdvis
   };
 
   return (
-    <div className="virtual-advisor-overlay" style={{ position: 'fixed', top: 0, left: 0, right: 0, bottom: 0, background: 'rgba(0,0,0,0.6)', zIndex: 1000, overflowY: 'auto', WebkitOverflowScrolling: 'touch', display: 'flex', flexDirection: 'column', alignItems: 'center', padding: '20px' }}>
-      <div className="glass-panel virtual-advisor-modal" style={{ width: '100%', maxWidth: isAdding && (responseType === 'options') ? '95vw' : '1100px', margin: 'auto', flexShrink: 0, borderRadius: 'var(--radius-lg)', display: 'flex', flexDirection: 'column', border: '1px solid var(--color-border)', background: themeColors.surfaceElevated, fontFamily: 'var(--font-inter), sans-serif', transition: 'max-width 0.3s ease' }}>
+    <div className="virtual-advisor-overlay" style={{ position: 'fixed', top: 0, left: 0, right: 0, bottom: 0, background: 'rgba(0,0,0,0.6)', zIndex: 99999, overflowY: 'auto', WebkitOverflowScrolling: 'touch', display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'flex-start', padding: '40px 20px' }}>
+      <div className="glass-panel virtual-advisor-modal" style={{ width: '100%', maxWidth: isAdding && (responseType === 'options') ? '95vw' : '1100px', flexShrink: 0, borderRadius: 'var(--radius-lg)', display: 'flex', flexDirection: 'column', border: '1px solid var(--color-border)', background: themeColors.surfaceElevated, fontFamily: 'var(--font-inter), sans-serif', transition: 'max-width 0.3s ease' }}>
         
         {/* Header */}
         <div style={{ padding: '16px 20px', borderBottom: '1px solid var(--color-border)', display: 'flex', justifyContent: 'space-between', alignItems: 'center', position: 'sticky', top: 0, background: themeColors.surfaceElevated, zIndex: 10 }}>
