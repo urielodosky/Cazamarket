@@ -207,13 +207,10 @@ export default function MensajesPage() {
     setMessages([]); // Clear messages while fetching
 
     const fetchMessages = async () => {
-      const { data } = await supabase
-        .from('messages')
-        .select('*')
-        .eq('chat_id', activeChatId)
-        .order('created_at', { ascending: true });
+      const { getDecryptedMessages } = await import('@/app/actions/chatActions');
+      const { success, data } = await getDecryptedMessages(activeChatId);
       
-      if (data) {
+      if (success && data) {
         let unreadIds: string[] = [];
         
         // Filter out messages deleted for me
@@ -251,10 +248,14 @@ export default function MensajesPage() {
         schema: 'public', 
         table: 'messages',
         filter: `chat_id=eq.${activeChatId}`
-      }, (payload) => {
+      }, async (payload) => {
+        const { decryptSingleMessage } = await import('@/app/actions/chatActions');
+        const decryptedMsg = await decryptSingleMessage(payload.new);
+        if (!decryptedMsg) return;
+        
         setMessages(prev => {
-          if (prev.some(m => m.id === payload.new.id)) return prev;
-          const msg = { ...payload.new };
+          if (prev.some(m => m.id === decryptedMsg.id)) return prev;
+          const msg = { ...decryptedMsg };
           if (msg.sender_id !== supabaseUser.id && msg.status !== 'read') {
              supabase.from('messages').update({ status: 'read' }).eq('id', msg.id).then();
              msg.status = 'read';
@@ -351,19 +352,19 @@ export default function MensajesPage() {
         }
       }
 
-      const { data: insertedMsg } = await supabase.from('messages').insert({
-        chat_id: targetChatId,
-        sender_id: supabaseUser.id,
-        content: userText || null,
-        attachment_url: attachmentUrl || null,
-        attachment_type: attachmentType || null
-      }).select().single();
+      const { sendEncryptedMessage } = await import('@/app/actions/chatActions');
+      const insertResult = await sendEncryptedMessage(
+        targetChatId, 
+        userText || null, 
+        attachmentUrl || null, 
+        attachmentType || null
+      );
 
       // Optimistically append the message so it shows up instantly
-      if (insertedMsg) {
+      if (insertResult.success && insertResult.data) {
         setMessages(prev => {
-           if (prev.some(m => m.id === insertedMsg.id)) return prev;
-           return [...prev, insertedMsg];
+           if (prev.some(m => m.id === insertResult.data.id)) return prev;
+           return [...prev, insertResult.data];
         });
       }
 
