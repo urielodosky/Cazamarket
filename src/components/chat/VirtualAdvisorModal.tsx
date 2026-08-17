@@ -957,7 +957,7 @@ export default function VirtualAdvisorModal({ onClose, productId }: VirtualAdvis
                   )}
 
                   {/* Main Canvas Area for Visual Mode */}
-                  {(builderMode === 'visual' || responseType === 'options' || responseType === 'input') && (
+                  {builderMode === 'visual' && (
                     <div style={{ flex: 1, minWidth: 0, padding: builderMode === 'visual' ? '0' : '0' }}>
                       <Suspense fallback={<div style={{ padding: '40px', textAlign: 'center', color: 'var(--color-text-muted)' }}>Cargando constructor visual...</div>}>
                         <VisualBotBuilder
