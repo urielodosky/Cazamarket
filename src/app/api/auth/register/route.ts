@@ -1,24 +1,22 @@
 import { createClient as createServerClient } from '@/lib/supabase/server';
 import { createClient as createAdminClient } from '@supabase/supabase-js';
 import { NextResponse } from 'next/server';
+import { registerSchema } from '@/lib/validations/authSchemas';
 
 export async function POST(request: Request) {
   try {
     const rawInput = await request.json();
-    let { email, password, username, person_type, birth_date, cuit, phone, contact_email } = rawInput;
-
-    if (!email || !password || !username) {
+    
+    // 5. Validación y Sanitización con Zod
+    const validationResult = registerSchema.safeParse(rawInput);
+    if (!validationResult.success) {
       return NextResponse.json(
-        { error: 'Faltan datos obligatorios' },
+        { error: 'Datos de registro inválidos', details: validationResult.error.errors },
         { status: 400 }
       );
     }
 
-    // 5. Validación y Sanitización
-    username = typeof username === 'string' ? username.trim().replace(/[<>]/g, '') : '';
-    phone = typeof phone === 'string' ? phone.trim().replace(/[<>]/g, '') : '';
-    cuit = typeof cuit === 'string' ? cuit.trim().replace(/[<>]/g, '') : '';
-    person_type = typeof person_type === 'string' ? person_type.trim().replace(/[<>]/g, '') : '';
+    let { email, password, username, person_type, birth_date, cuit, phone, contact_email } = validationResult.data;
 
     const supabase = await createServerClient();
     const supabaseAdmin = createAdminClient(
