@@ -13,20 +13,18 @@ export async function POST(request: Request) {
 
     const rawUpdates = await request.json();
 
-    // 5. Validación y Sanitización (Evitar Mass Assignment y XSS)
-    const allowedFields = ['full_name', 'phone', 'avatar_url'];
-    const safeUpdates: Record<string, string> = {};
+    // 5. Validación y Sanitización con Zod
+    const { profileUpdateSchema } = await import('@/lib/validations/marketplaceSchemas');
+    const validationResult = profileUpdateSchema.safeParse(rawUpdates);
 
-    for (const key of allowedFields) {
-      if (rawUpdates[key] !== undefined) {
-        // Importante: No importamos sanitize aquí directamente si no es necesario para strings simples,
-        // pero validamos que sean strings.
-        if (typeof rawUpdates[key] === 'string') {
-           // Basic string sanitization for profile fields
-           safeUpdates[key] = rawUpdates[key].trim().replace(/[<>]/g, ''); 
-        }
-      }
+    if (!validationResult.success) {
+      return NextResponse.json(
+        { error: 'Datos inválidos', details: validationResult.error.flatten().fieldErrors },
+        { status: 400 }
+      );
     }
+
+    const safeUpdates = validationResult.data;
 
     // Asegurarse de que no esté vacío
     if (Object.keys(safeUpdates).length === 0) {

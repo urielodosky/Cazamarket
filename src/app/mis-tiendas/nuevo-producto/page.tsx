@@ -395,12 +395,15 @@ function NuevoProductoContent() {
         volume_discounts: hasDiscount && volumeDiscounts.length > 0 ? volumeDiscounts : []
       };
 
-      if (editId) {
-        const { error } = await supabase.from('products').update(newProduct).eq('id', editId).eq('user_id', supabaseUser.id);
-        if (error) throw error;
-      } else {
-        const { error } = await supabase.from('products').insert([newProduct]);
-        if (error) throw error;
+      const { upsertProduct } = await import('@/app/actions/marketplaceActions');
+      const result = await upsertProduct(newProduct, editId || undefined);
+
+      if (!result.success) {
+        if (result.details) {
+          console.error('Validation errors:', result.details);
+          throw new Error('Datos inválidos: ' + Object.values(result.details).flat().join(', '));
+        }
+        throw new Error(result.error);
       }
       
       setLoadingText('¡Casi listo! Ajustando últimos detalles...');
