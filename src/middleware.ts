@@ -1,5 +1,6 @@
 import { NextResponse, type NextRequest } from 'next/server'
 import { updateSession } from '@/lib/supabase/middleware'
+import { jwtVerify } from 'jose'
 
 const rateLimitMap = new Map();
 
@@ -70,16 +71,29 @@ export default async function proxy(request: NextRequest) {
     }
   }
 
-  // 3. Admin Sudo Mode Protection
+  // 3. Admin Sudo Mode Protection — Verificación criptográfica con JWT
   if (request.nextUrl.pathname.startsWith('/admin') && !request.nextUrl.pathname.startsWith('/admin/login-sudo')) {
     // 3.1 Verify Supabase Auth Cookie exists
-    // The name of the cookie depends on the project reference ID. Usually it starts with sb- and ends with -auth-token
     const hasAuthCookie = request.cookies.getAll().some(cookie => cookie.name.startsWith('sb-') && cookie.name.endsWith('-auth-token'));
     
-    // 3.2 Verify Sudo Mode Cookie exists
+    // 3.2 Verify Sudo Mode JWT — verificar firma criptográfica y expiración
     const sudoCookie = request.cookies.get('admin_sudo_session');
-    
-    if (!hasAuthCookie || !sudoCookie || sudoCookie.value !== 'active') {
+    let isValidSudo = false;
+
+    if (hasAuthCookie && sudoCookie?.value) {
+      try {
+        const secret = process.env.ADMIN_JWT_SECRET;
+        if (secret) {
+          const key = new TextEncoder().encode(secret);
+          const { payload } = await jwtVerify(sudoCookie.value, key);
+          isValidSudo = payload.role === 'superadmin' && !!payload.sub;
+        }
+      } catch {
+        // Token expirado, firma inválida o manipulado → isValidSudo queda false
+      }
+    }
+
+    if (!isValidSudo) {
       const loginUrl = new URL('/admin/login-sudo', request.url);
       return NextResponse.redirect(loginUrl);
     }

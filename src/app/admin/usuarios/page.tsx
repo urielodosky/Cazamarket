@@ -1,14 +1,13 @@
-import { cookies } from 'next/headers';
 import { redirect } from 'next/navigation';
 import { createClient as createAdminClient } from '@supabase/supabase-js';
 import AdminUsersTable from '@/components/AdminUsersTable';
+import { verifySudoMode } from '@/lib/auth/verifySudo';
 
 export default async function AdminUsuariosPage() {
-  // 1. Verificación Fuerte de Seguridad
-  const cookieStore = await cookies();
-  const sudoSession = cookieStore.get('admin_sudo_session');
-  
-  if (!sudoSession || sudoSession.value !== 'active') {
+  // 1. Verificación Fuerte de Seguridad — JWT criptográfico
+  try {
+    await verifySudoMode();
+  } catch {
     redirect('/admin/login-sudo');
   }
 

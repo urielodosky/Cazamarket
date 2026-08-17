@@ -1,8 +1,8 @@
 'use server';
 
-import { cookies } from 'next/headers';
 import { createClient } from '@/lib/supabase/server';
 import { createClient as createAdminClient } from '@supabase/supabase-js';
+import { verifySudoMode } from '@/lib/auth/verifySudo';
 
 // We need an admin client to bypass RLS and update the profile
 const supabaseAdmin = createAdminClient(
@@ -12,12 +12,8 @@ const supabaseAdmin = createAdminClient(
 
 export async function grantFreePlan(targetUserId: string, planTier: string) {
   try {
-    // 1. Verificar la cookie del Sudo Mode
-    const cookieStore = await cookies();
-    const sudoCookie = cookieStore.get('admin_sudo_session');
-    if (!sudoCookie || sudoCookie.value !== 'active') {
-      return { success: false, error: 'Sudo mode requerido. La sesión segura ha expirado.' };
-    }
+    // 1. Verificar la sesión Sudo Mode con JWT criptográfico
+    await verifySudoMode();
 
     // 2. Verificar la sesión de Supabase del usuario actual (quien ejecuta la acción)
     const supabase = await createClient();

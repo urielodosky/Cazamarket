@@ -1,9 +1,9 @@
 import Link from 'next/link';
-import { cookies } from 'next/headers';
 import { redirect } from 'next/navigation';
 import { createClient } from '@/lib/supabase/server';
 import { createClient as createAdminClient } from '@supabase/supabase-js';
 import AdminUsersTable from '@/components/AdminUsersTable';
+import { verifySudoMode } from '@/lib/auth/verifySudo';
 
 // Precios de los planes en USD (Según configuración en planTypes.ts)
 const PLAN_PRICES: Record<string, number> = {
@@ -15,11 +15,10 @@ const PLAN_PRICES: Record<string, number> = {
 };
 
 export default async function AdminDashboardPage() {
-  // 1. Verificación Fuerte de Seguridad
-  const cookieStore = await cookies();
-  const sudoSession = cookieStore.get('admin_sudo_session');
-  
-  if (!sudoSession || sudoSession.value !== 'active') {
+  // 1. Verificación Fuerte de Seguridad — JWT criptográfico
+  try {
+    await verifySudoMode();
+  } catch {
     redirect('/admin/login-sudo');
   }
 

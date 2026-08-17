@@ -2,6 +2,7 @@
 
 import { cookies } from 'next/headers';
 import { createClient } from '@/lib/supabase/server';
+import { signAdminJwt, COOKIE_NAME } from '@/lib/auth/adminJwt';
 
 export async function loginSudoMode(password: string) {
   try {
@@ -34,15 +35,17 @@ export async function loginSudoMode(password: string) {
       return { success: false, error: 'Acceso denegado. No tienes permisos de administrador.' };
     }
 
-    // Si todo está correcto, establecemos la cookie Sudo Mode (1 hora = 3600 seg)
-    const MAX_AGE = 3600;
+    // Firmar un JWT criptográfico en lugar de almacenar texto plano
+    const token = await signAdminJwt(user.id);
+
+    const MAX_AGE = 3600; // 1 hora
     const cookieStore = await cookies();
-    cookieStore.set('admin_sudo_session', 'active', {
+    cookieStore.set(COOKIE_NAME, token, {
       httpOnly: true,
       secure: process.env.NODE_ENV === 'production',
       sameSite: 'strict',
       maxAge: MAX_AGE,
-      path: '/admin', // La cookie solo viaja hacia rutas de admin
+      path: '/admin',
     });
 
     return { success: true };
@@ -51,3 +54,4 @@ export async function loginSudoMode(password: string) {
     return { success: false, error: 'Ocurrió un error inesperado.' };
   }
 }
+
