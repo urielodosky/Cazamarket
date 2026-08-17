@@ -11,7 +11,7 @@ export async function POST(request: Request) {
     const validationResult = registerSchema.safeParse(rawInput);
     if (!validationResult.success) {
       return NextResponse.json(
-        { error: 'Datos de registro inválidos', details: validationResult.error.errors },
+        { error: 'Datos de registro inválidos', details: validationResult.error.flatten().fieldErrors },
         { status: 400 }
       );
     }
