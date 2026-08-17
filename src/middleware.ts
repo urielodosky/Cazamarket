@@ -2,7 +2,7 @@ import { NextResponse, type NextRequest } from 'next/server'
 import { updateSession } from '@/lib/supabase/middleware'
 import { jwtVerify } from 'jose'
 
-const rateLimitMap = new Map();
+import { globalRateLimit, authRateLimit } from '@/lib/security/ratelimit'
 
 export default async function proxy(request: NextRequest) {
   // 1. Force HTTPS in production
@@ -45,28 +45,30 @@ export default async function proxy(request: NextRequest) {
     }
   }
 
-  // 2. Rate Limiting for API routes
+  // 2. Upstash Rate Limiting for API routes
   if (request.nextUrl.pathname.startsWith('/api/')) {
-    const ip = request.headers.get('x-forwarded-for') || '127.0.0.1';
-    const limit = 60; // 60 requests per minute
-    const windowMs = 60 * 1000;
+    const ip = request.headers.get('x-forwarded-for') ?? '127.0.0.1';
+    
+    // Si es una ruta de autenticación, aplicamos el límite estricto
+    const isAuthRoute = request.nextUrl.pathname.startsWith('/api/auth/');
+    const limiter = isAuthRoute ? authRateLimit : globalRateLimit;
 
-    if (!rateLimitMap.has(ip)) {
-      rateLimitMap.set(ip, { count: 1, lastReset: Date.now() });
-    } else {
-      const data = rateLimitMap.get(ip);
-      if (Date.now() - data.lastReset > windowMs) {
-        data.count = 1;
-        data.lastReset = Date.now();
-      } else {
-        data.count++;
-        if (data.count > limit) {
-          return new NextResponse(
-            JSON.stringify({ error: 'Too Many Requests. Please try again later.' }),
-            { status: 429, headers: { 'Content-Type': 'application/json' } }
-          );
+    const { success, limit, reset, remaining } = await limiter.limit(ip);
+
+    if (!success) {
+      console.warn(`[SECURITY LOG] Rate limit excedido por IP: ${ip} en ruta ${request.nextUrl.pathname}`);
+      return new NextResponse(
+        JSON.stringify({ error: 'Too Many Requests. Please try again later.' }),
+        { 
+          status: 429, 
+          headers: { 
+            'Content-Type': 'application/json',
+            'X-RateLimit-Limit': limit.toString(),
+            'X-RateLimit-Remaining': remaining.toString(),
+            'X-RateLimit-Reset': reset.toString()
+          } 
         }
-      }
+      );
     }
   }
 

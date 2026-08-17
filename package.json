@@ -13,6 +13,8 @@
     "@supabase/ssr": "^0.12.3",
     "@supabase/supabase-js": "^2.110.8",
     "@types/qrcode.react": "^1.0.5",
+    "@upstash/ratelimit": "^2.0.8",
+    "@upstash/redis": "^1.38.2",
     "@xyflow/react": "^12.11.2",
     "cookie": "^2.0.1",
     "isomorphic-dompurify": "^3.19.0",
