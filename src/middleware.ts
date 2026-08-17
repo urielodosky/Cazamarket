@@ -22,13 +22,12 @@ export default async function proxy(request: NextRequest) {
       'https://cazamarket.vercel.app'
     ];
     if (process.env.NEXT_PUBLIC_SITE_URL) allowedOrigins.push(process.env.NEXT_PUBLIC_SITE_URL);
+    if (process.env.ALLOWED_ORIGIN) allowedOrigins.push(process.env.ALLOWED_ORIGIN);
     
     const origin = request.headers.get('origin');
     
     // Si la petición proviene de un navegador (tiene Origin) y no está en nuestra lista blanca
-    const isVercelPreview = origin && origin.endsWith('.vercel.app');
-    
-    if (origin && !allowedOrigins.includes(origin) && !isVercelPreview && process.env.NODE_ENV === 'production') {
+    if (origin && !allowedOrigins.includes(origin) && process.env.NODE_ENV === 'production') {
       console.warn(`[SECURITY LOG] Petición CORS bloqueada desde origen no autorizado: ${origin}`);
       return new NextResponse(
         JSON.stringify({ error: 'CORS policy violation: Origin not allowed' }),
