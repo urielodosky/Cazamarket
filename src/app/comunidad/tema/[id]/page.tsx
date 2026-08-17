@@ -139,7 +139,7 @@ export default function TemaPage({ params }: { params: Promise<{ id: string }> }
     const viewKey = `cazamarket_viewed_post_${id}`;
     if (!sessionStorage.getItem(viewKey)) {
       sessionStorage.setItem(viewKey, 'true');
-      supabase.from('forum_topics').update({ views_count: (topic.views_count || 0) + 1 }).eq('id', id).then();
+      supabase.rpc('increment_forum_view', { topic_id: id }).then();
     }
 
     return {
