@@ -57,7 +57,7 @@ function NestedOptionNode({
       <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', cursor: 'pointer' }} onClick={() => setIsExpanded(!isExpanded)}>
         <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
           <span style={{ background: 'var(--color-primary)', color: '#fff', padding: '4px 8px', borderRadius: '4px', fontSize: '0.8rem', fontWeight: 'bold' }}>{currentPath}</span>
-          <span style={{ color: themeColors.textWhite, fontWeight: 600 }}>{opt.label || 'Nueva Opción'}</span>
+          <span style={{ color: themeColors.textWhite, fontWeight: 600 }}>{opt.label === '__next__' ? 'Paso Automático' : (opt.label || 'Nueva Opción')}</span>
         </div>
         <div style={{ display: 'flex', gap: '12px', alignItems: 'center' }}>
           <span style={{ fontSize: '1.2rem', color: 'var(--color-text-muted)' }}>{isExpanded ? '▼' : '▶'}</span>
@@ -67,13 +67,17 @@ function NestedOptionNode({
 
       {isExpanded && (
         <div style={{ marginTop: '16px', paddingTop: '16px', borderTop: `1px solid ${themeColors.borderSubtle2}` }}>
-          <div style={{ marginBottom: '16px' }}>
-            <label style={{ display: 'block', marginBottom: '4px', color: 'var(--color-text-muted)', fontSize: '0.85rem' }}>Texto del Botón (Opción)</label>
-            <input type="text" value={opt.label} onChange={e => handleUpdateOption(index, { label: e.target.value })} placeholder="Ej: Ver Precios" style={{ width: '100%', padding: '10px', background: themeColors.bgSubtle3, color: themeColors.textWhite, border: '1px solid var(--color-border)', borderRadius: '4px', fontFamily: 'inherit', fontSize: '0.9rem', outline: 'none' }} />
-          </div>
+          {opt.label !== '__next__' && (
+            <div style={{ marginBottom: '16px' }}>
+              <label style={{ display: 'block', marginBottom: '4px', color: 'var(--color-text-muted)', fontSize: '0.85rem' }}>Texto del Botón (Opción)</label>
+              <input type="text" value={opt.label} onChange={e => handleUpdateOption(index, { label: e.target.value })} placeholder="Ej: Ver Precios" style={{ width: '100%', padding: '10px', background: themeColors.bgSubtle3, color: themeColors.textWhite, border: '1px solid var(--color-border)', borderRadius: '4px', fontFamily: 'inherit', fontSize: '0.9rem', outline: 'none' }} />
+            </div>
+          )}
 
           <div>
-            <label style={{ display: 'block', marginBottom: '4px', color: 'var(--color-text-muted)', fontSize: '0.85rem' }}>¿Qué responderá al tocar este botón?</label>
+            <label style={{ display: 'block', marginBottom: '4px', color: 'var(--color-text-muted)', fontSize: '0.85rem' }}>
+              {opt.label === '__next__' ? 'Tipo de mensaje automático' : '¿Qué responderá al tocar este botón?'}
+            </label>
               <CustomSelect options={[{ value: 'text', label: 'Solo Texto' }, { value: 'options', label: 'Sub-Opciones' }, { value: 'file', label: 'Archivo Adjunto' }, { value: 'input', label: 'Esperar Respuesta Textual' }, { value: 'whatsapp', label: 'Derivar a WhatsApp' }, { value: 'goto', label: 'Volver a un Menú / Reenviar Opciones' }]} value={opt.responseType} onChange={(val: any) => handleUpdateOption(index, { responseType: val })} />
 
             {opt.responseType === 'goto' ? (
