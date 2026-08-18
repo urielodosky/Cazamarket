@@ -806,10 +806,11 @@
   position: absolute;
   top: 50%;
   transform: translateY(-50%);
-  z-index: 10;
+  z-index: 200;
   width: 24px;
   height: 24px;
-  background: transparent;
+  background: rgba(255, 255, 255, 0.05);
+  border-radius: 50%;
   border: none;
   color: var(--color-text-main, #ffffff);
   display: flex;
