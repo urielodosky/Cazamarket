@@ -767,6 +767,7 @@
   display: flex;
   align-items: center;
   width: 100%;
+  box-sizing: border-box;
   background: var(--color-bg-base, #0f0f11);
   padding: 0 32px; /* Espacio fijo a los costados siempre visible */
 }
@@ -807,39 +808,43 @@
   top: 50%;
   transform: translateY(-50%);
   z-index: 200;
-  width: 24px;
-  height: 24px;
-  background: transparent;
+  width: 28px;
+  height: 40px;
+  background: var(--color-primary);
   border: none;
-  color: var(--color-text-main, #ffffff);
+  color: white;
   display: flex;
   align-items: center;
   justify-content: center;
   cursor: pointer;
   transition: all 0.2s ease;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
 }
 
 .filter-scroll-btn:hover {
-  color: var(--color-primary);
+  filter: brightness(1.1);
 }
 
 .filter-scroll-btn.left {
-  left: 4px;
+  left: 0;
+  border-radius: 0 50px 50px 0;
+  padding-right: 4px;
 }
 
 .filter-scroll-btn.right {
-  right: 4px;
+  right: 0;
+  border-radius: 50px 0 0 50px;
+  padding-left: 4px;
 }
 
 [data-theme="light"] .filter-scroll-btn {
-  background: transparent;
-  border: none;
-  color: #333;
-  box-shadow: none;
+  background: var(--color-primary);
+  color: white;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
 }
 
 [data-theme="light"] .filter-scroll-btn:hover {
-  color: var(--color-primary);
+  filter: brightness(1.1);
 }
 
 .filter-input-pill {
