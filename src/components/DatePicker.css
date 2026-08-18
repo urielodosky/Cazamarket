@@ -217,6 +217,7 @@
 }
 
 [data-theme="light"] .cal-cell.day {
+  background: transparent;
   color: #334155;
 }
 
