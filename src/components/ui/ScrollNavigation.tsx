@@ -61,8 +61,8 @@ export default function ScrollNavigation() {
         aria-label="Volver arriba"
         style={{
           position: 'fixed',
-          bottom: '24px',
-          left: '24px', // Placed on the left to not collide with WhatsApp FAB on the right
+          bottom: '85px', // Lifted to avoid MobileNav
+          right: '24px', // Moved to right since WhatsApp button is gone
           width: '50px',
           height: '50px',
           background: 'var(--color-bg-surface-elevated)',
