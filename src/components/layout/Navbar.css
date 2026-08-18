@@ -874,8 +874,10 @@
 .filter-input-pill::-webkit-outer-spin-button,
 .filter-input-pill::-webkit-inner-spin-button {
   -webkit-appearance: none;
+  appearance: none;
   margin: 0;
 }
 .filter-input-pill[type=number] {
   -moz-appearance: textfield;
+  appearance: textfield;
 }
