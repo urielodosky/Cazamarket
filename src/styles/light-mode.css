@@ -496,8 +496,8 @@
 
 /* ===== TRENDING SECTION ===== */
 [data-theme="light"] .trending-section {
-  background: #ffffff !important;
-  border-color: rgba(0, 0, 0, 0.06) !important;
+  background: transparent !important;
+  border: none !important;
 }
 
 /* ===== CARD CONTENT ===== */
