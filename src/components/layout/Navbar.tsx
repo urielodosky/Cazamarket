@@ -142,13 +142,17 @@ export default function Navbar() {
     setLocalidad('');
     const fetchLocalidades = async () => {
       try {
-        const res = await fetch(`https://apis.datos.gob.ar/georef/api/municipios?provincia=${encodeURIComponent(provincia)}&max=1000`, { cache: 'no-store' });
+        const res = await fetch(`https://apis.datos.gob.ar/georef/api/localidades?provincia=${encodeURIComponent(provincia)}&max=1000`, { cache: 'no-store' });
         if (!res.ok) return;
         const data = await res.json();
-        if (data && data.municipios) {
-          const opts = data.municipios.map((m: any) => ({ value: m.nombre, label: m.nombre }));
-          opts.sort((a: any, b: any) => a.label.localeCompare(b.label));
-          setLocalidades([{ value: '', label: 'Localidades' }, ...opts]);
+        if (data && data.localidades) {
+          const opts = data.localidades.map((m: any) => ({ value: m.nombre, label: m.nombre }));
+          
+          // Eliminar duplicados ya que localidades a veces devuelve nombres repetidos por parajes/censos
+          const uniqueOpts = Array.from(new Map(opts.map((item: any) => [item.value, item])).values()) as SelectOption[];
+          
+          uniqueOpts.sort((a: any, b: any) => a.label.localeCompare(b.label));
+          setLocalidades([{ value: '', label: 'Localidades' }, ...uniqueOpts]);
         }
       } catch (err) {
         setLocalidades([{ value: '', label: 'Localidades' }]);
