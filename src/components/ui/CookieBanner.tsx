@@ -8,9 +8,10 @@ export default function CookieBanner() {
   const [showBanner, setShowBanner] = useState(false);
 
   useEffect(() => {
-    // Check if user has already accepted cookies
+    // Solo si el usuario explícitamente aceptó ('true') ocultamos el banner.
+    // Si no hay valor o fue rechazado previamente (y limpiado), se muestra.
     const hasAccepted = localStorage.getItem('cazamarket_cookies_accepted');
-    if (!hasAccepted) {
+    if (hasAccepted !== 'true') {
       setShowBanner(true);
     }
   }, []);
@@ -22,7 +23,9 @@ export default function CookieBanner() {
   };
 
   const handleReject = () => {
-    localStorage.setItem('cazamarket_cookies_accepted', 'false');
+    // Si rechaza, borramos cualquier rastro previo para que en la próxima
+    // visita (reload) vuelva a preguntar, pero lo ocultamos por ahora.
+    localStorage.removeItem('cazamarket_cookies_accepted');
     posthog.opt_out_capturing();
     setShowBanner(false);
   };
