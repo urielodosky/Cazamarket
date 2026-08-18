@@ -180,6 +180,12 @@ function ProductosContent() {
     if (producto.price < minPrice) return false;
     if (producto.price > maxPrice) return false;
 
+    // Filtro Currency
+    const currencyStr = searchParams?.get('currency');
+    if (currencyStr && producto.currency?.toUpperCase() !== currencyStr.toUpperCase()) {
+      return false;
+    }
+
     // Filtro Tipo Vendedor
     const filterBusiness = searchParams?.get('businessType') || '';
     if (filterBusiness) {

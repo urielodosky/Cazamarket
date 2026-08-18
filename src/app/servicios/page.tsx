@@ -80,6 +80,12 @@ function ServiciosContent() {
     if (servicio.price < minPrice) return false;
     if (servicio.price > maxPrice) return false;
 
+    // Filtro Currency
+    const currencyStr = searchParams?.get('currency');
+    if (currencyStr && servicio.currency?.toUpperCase() !== currencyStr.toUpperCase()) {
+      return false;
+    }
+
     const filterRating = searchParams?.get('rating') || '';
     if (filterRating) {
       const r = Number(servicio.rating || 0);

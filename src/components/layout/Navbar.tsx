@@ -60,8 +60,19 @@ export default function Navbar() {
   );
   const [minPrice, setMinPrice] = useState(searchParams?.get('minPrice') || '');
   const [maxPrice, setMaxPrice] = useState(searchParams?.get('maxPrice') || '');
+  const [minPriceInput, setMinPriceInput] = useState(searchParams?.get('minPrice') || '');
+  const [maxPriceInput, setMaxPriceInput] = useState(searchParams?.get('maxPrice') || '');
+  const [currency, setCurrency] = useState(searchParams?.get('currency') || '');
   const [businessType, setBusinessType] = useState(searchParams?.get('businessType') || '');
-  
+
+  // Debounce para el precio
+  useEffect(() => {
+    const timeoutId = setTimeout(() => {
+      setMinPrice(minPriceInput);
+      setMaxPrice(maxPriceInput);
+    }, 600);
+    return () => clearTimeout(timeoutId);
+  }, [minPriceInput, maxPriceInput]);
   const [ofrece, setOfrece] = useState<any>('');
   const [tipo, setTipo] = useState('');
   const [permisos, setPermisos] = useState('');
@@ -169,6 +180,7 @@ export default function Navbar() {
     if (subcategorias.length > 0) params.set('subcategorias', subcategorias.join(','));
     if (minPrice) params.set('minPrice', minPrice);
     if (maxPrice) params.set('maxPrice', maxPrice);
+    if (currency) params.set('currency', currency);
     if (businessType) params.set('businessType', businessType);
     if (ofrece) params.set('ofrece', ofrece);
     if (tipo) params.set('tipo', tipo);
@@ -192,7 +204,7 @@ export default function Navbar() {
       return;
     }
     executeSearch();
-  }, [categoria, subcategorias, minPrice, maxPrice, businessType, ofrece, tipo, provincia, localidad, rating]);
+  }, [categoria, subcategorias, minPrice, maxPrice, currency, businessType, ofrece, tipo, provincia, localidad, rating]);
 
   const isBusinessProfile = pathname?.startsWith('/negocios/') && pathname !== '/negocios';
 
@@ -214,20 +226,30 @@ export default function Navbar() {
     <>
       {/* 1. Precio (Min/Max) */}
       {!pathname.startsWith('/comunidad') && (
-        <div className="filter-wrapper-item" style={{ flex: '0 0 auto', display: 'flex', gap: '4px', alignItems: 'center', minWidth: '170px' }}>
+        <div className="filter-wrapper-item" style={{ flex: '0 0 auto', display: 'flex', gap: '4px', alignItems: 'center', minWidth: '220px' }}>
+          <select 
+            value={currency} 
+            onChange={(e) => setCurrency(e.target.value)} 
+            className="filter-input-pill" 
+            style={{ width: '60px', padding: '0 8px', cursor: 'pointer' }}
+          >
+            <option value="">Moneda</option>
+            <option value="USD">USD</option>
+            <option value="ARS">ARS</option>
+          </select>
           <input 
             type="number" 
             placeholder="Mín ($)" 
-            value={minPrice} 
-            onChange={(e) => setMinPrice(e.target.value)} 
+            value={minPriceInput} 
+            onChange={(e) => setMinPriceInput(e.target.value)} 
             className="filter-input-pill"
           />
           <span style={{ color: 'var(--color-text-muted)' }}>-</span>
           <input 
             type="number" 
             placeholder="Máx ($)" 
-            value={maxPrice} 
-            onChange={(e) => setMaxPrice(e.target.value)} 
+            value={maxPriceInput} 
+            onChange={(e) => setMaxPriceInput(e.target.value)} 
             className="filter-input-pill"
           />
         </div>
