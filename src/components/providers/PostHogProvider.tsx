@@ -12,7 +12,13 @@ if (typeof window !== 'undefined') {
     person_profiles: 'identified_only',
     capture_pageview: false, // Disabling automatic pageview to handle it manually in Next.js App Router
     autocapture: true,
+    opt_out_capturing_by_default: true, // No rastrear por defecto hasta que acepten cookies
   });
+
+  // Si ya aceptaron antes, activar el rastreo
+  if (localStorage.getItem('cazamarket_cookies_accepted') === 'true') {
+    posthog.opt_in_capturing();
+  }
 }
 
 function PostHogPageViews() {

@@ -2,6 +2,7 @@
 
 import React, { useState, useEffect } from 'react';
 import Link from 'next/link';
+import posthog from 'posthog-js';
 
 export default function CookieBanner() {
   const [showBanner, setShowBanner] = useState(false);
@@ -16,6 +17,13 @@ export default function CookieBanner() {
 
   const handleAccept = () => {
     localStorage.setItem('cazamarket_cookies_accepted', 'true');
+    posthog.opt_in_capturing();
+    setShowBanner(false);
+  };
+
+  const handleReject = () => {
+    localStorage.setItem('cazamarket_cookies_accepted', 'false');
+    posthog.opt_out_capturing();
     setShowBanner(false);
   };
 
@@ -46,7 +54,30 @@ export default function CookieBanner() {
           Utilizamos cookies para mejorar la experiencia de navegación en nuestra plataforma.
         </p>
       </div>
-      <div>
+      <div style={{ display: 'flex', gap: '8px' }}>
+        <button
+          onClick={handleReject}
+          style={{
+            background: 'transparent',
+            color: 'var(--color-text-main)',
+            border: '1px solid var(--color-border)',
+            padding: '10px 16px',
+            borderRadius: 'var(--radius-md)',
+            fontWeight: 600,
+            cursor: 'pointer',
+            fontSize: '0.9rem',
+            whiteSpace: 'nowrap',
+            transition: 'all 0.2s'
+          }}
+          onMouseOver={(e) => {
+            e.currentTarget.style.background = 'rgba(0,0,0,0.05)';
+          }}
+          onMouseOut={(e) => {
+            e.currentTarget.style.background = 'transparent';
+          }}
+        >
+          Rechazar
+        </button>
         <button
           onClick={handleAccept}
           style={{
