@@ -767,12 +767,10 @@
   display: flex;
   align-items: center;
   width: 100%;
-  border-bottom: 1px solid rgba(255, 255, 255, 0.05);
   background: var(--color-bg-base, #0f0f11);
 }
 
 [data-theme="light"] .filters-carousel-wrapper {
-  border-bottom: 1px solid rgba(0, 0, 0, 0.05);
   background: var(--color-bg-base, #ffffff);
 }
 
@@ -805,7 +803,7 @@
 
 .global-filters-panel .filter-wrapper-item {
   flex: 0 0 auto !important;
-  min-width: 130px !important;
+  min-width: 160px !important;
 }
 
 /* Scroll Arrows */
