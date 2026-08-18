@@ -8,7 +8,6 @@ import { Suspense } from 'react';
 import Footer from "@/components/layout/Footer";
 import { Toaster } from 'react-hot-toast';
 import CookieBanner from "@/components/ui/CookieBanner";
-import FloatingContactButton from "@/components/ui/FloatingContactButton";
 import ScrollNavigation from "@/components/ui/ScrollNavigation";
 import "./globals.css";
 
@@ -123,7 +122,6 @@ export default function RootLayout({
             }}
           />
           <CookieBanner />
-          <FloatingContactButton />
           <ScrollNavigation />
         </Providers>
       </body>
