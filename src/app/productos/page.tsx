@@ -152,15 +152,41 @@ function ProductosContent() {
       if (!titleMatch && !descMatch && !featuresMatch) return false;
     }
     
-    // 2. Filtrar por categoría (ej: "armeria", "pesca", etc.)
-    // Note: Navbar uses lowercase 'armeria', product might be 'Armería'
+    // 2. Filtrar por categoría y subcategorías
+    const filterSubcategoriasStr = searchParams?.get('subcategorias');
+    const filterSubcategorias = filterSubcategoriasStr ? filterSubcategoriasStr.split(',') : [];
+    
     if (filterCategoria) {
       const pCat = producto.category?.toLowerCase() || '';
       const pSub = producto.subcategory?.toLowerCase() || '';
       const fCat = filterCategoria.toLowerCase();
       const normalize = (s: string) => s.normalize('NFD').replace(/[\u0300-\u036f]/g, '');
       const normFCat = normalize(fCat);
-      if (normalize(pCat) !== normFCat && normalize(pSub) !== normFCat) return false;
+      
+      if (filterSubcategorias.length > 0) {
+        const matchSub = filterSubcategorias.some(sub => normalize(pSub) === normalize(sub.toLowerCase()));
+        if (!matchSub) return false;
+      } else {
+        if (normalize(pCat) !== normFCat && normalize(pSub) !== normFCat) return false;
+      }
+    }
+
+    // Filtro Precio
+    const minPriceStr = searchParams?.get('minPrice');
+    const maxPriceStr = searchParams?.get('maxPrice');
+    const minPrice = minPriceStr ? Number(minPriceStr) : 0;
+    const maxPrice = maxPriceStr ? Number(maxPriceStr) : Infinity;
+    
+    if (producto.price < minPrice) return false;
+    if (producto.price > maxPrice) return false;
+
+    // Filtro Tipo Vendedor
+    const filterBusiness = searchParams?.get('businessType') || '';
+    if (filterBusiness) {
+      const sellerType = producto.seller?.businessType?.toLowerCase() || '';
+      if (filterBusiness === 'minorista' && sellerType !== 'minorista' && sellerType !== 'mixto') return false;
+      if (filterBusiness === 'mayorista' && sellerType !== 'mayorista' && sellerType !== 'mixto') return false;
+      if (filterBusiness === 'mixto' && sellerType !== 'mixto') return false;
     }
 
     // 3. Filtrar por tipo (Condición: 'nuevo' o 'usado')
@@ -210,7 +236,7 @@ function ProductosContent() {
   });
 
   return (
-    <div style={{ padding: 'var(--spacing-8) var(--spacing-4)', maxWidth: '1200px', margin: '0 auto', minHeight: '60vh', paddingBottom: 'var(--spacing-12)' }}>
+    <div style={{ padding: 'var(--spacing-4) var(--spacing-4)', maxWidth: '1200px', margin: '0 auto', minHeight: '60vh', paddingBottom: 'var(--spacing-12)' }}>
       {isVendorModeActive && (
         <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 'var(--spacing-6)' }}>
           <div>
@@ -532,7 +558,7 @@ function ProductosContent() {
 export default function ProductosPage() {
   return (
     <Suspense fallback={
-      <div style={{ padding: 'var(--spacing-8) var(--spacing-4)', maxWidth: '1200px', margin: '0 auto', minHeight: '60vh' }}>
+      <div style={{ padding: 'var(--spacing-4) var(--spacing-4)', maxWidth: '1200px', margin: '0 auto', minHeight: '60vh' }}>
         <div className="responsive-grid-250">
           <SkeletonCard />
           <SkeletonCard />

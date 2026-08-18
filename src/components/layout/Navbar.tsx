@@ -54,7 +54,14 @@ export default function Navbar() {
   }, []);
 
   // Filtros state
-  const [categoria, setCategoria] = useState('');
+  const [categoria, setCategoria] = useState(searchParams?.get('categoria') || '');
+  const [subcategorias, setSubcategorias] = useState<string[]>(
+    searchParams?.get('subcategorias') ? searchParams.get('subcategorias')!.split(',') : []
+  );
+  const [minPrice, setMinPrice] = useState(searchParams?.get('minPrice') || '');
+  const [maxPrice, setMaxPrice] = useState(searchParams?.get('maxPrice') || '');
+  const [businessType, setBusinessType] = useState(searchParams?.get('businessType') || '');
+  
   const [ofrece, setOfrece] = useState<any>('');
   const [tipo, setTipo] = useState('');
   const [permisos, setPermisos] = useState('');
@@ -155,6 +162,10 @@ export default function Navbar() {
     const params = new URLSearchParams();
     if (q) params.set('q', q);
     if (categoria) params.set('categoria', categoria);
+    if (subcategorias.length > 0) params.set('subcategorias', subcategorias.join(','));
+    if (minPrice) params.set('minPrice', minPrice);
+    if (maxPrice) params.set('maxPrice', maxPrice);
+    if (businessType) params.set('businessType', businessType);
     if (ofrece) params.set('ofrece', ofrece);
     if (tipo) params.set('tipo', tipo);
     if (provincia) params.set('provincia', provincia);
@@ -177,7 +188,7 @@ export default function Navbar() {
       return;
     }
     executeSearch();
-  }, [categoria, ofrece, tipo, provincia, localidad, rating]);
+  }, [categoria, subcategorias, minPrice, maxPrice, businessType, ofrece, tipo, provincia, localidad, rating]);
 
   const isBusinessProfile = pathname?.startsWith('/negocios/') && pathname !== '/negocios';
 
@@ -205,37 +216,102 @@ export default function Navbar() {
             const isServ = pathname.startsWith('/servicios');
             const source = isProd ? PRODUCT_MAIN_CATEGORIES : (isServ ? SERVICE_MAIN_CATEGORIES : CATEGORIES_DATA);
             
-            const selectedMainCat = source.find(m => 
-              m.name.toLowerCase() === categoria.toLowerCase() || 
-              m.subcategories.some(s => s.toLowerCase() === categoria.toLowerCase())
-            );
-
             const opts: SelectOption[] = [
               { value: '', label: 'Categoría (Todas)' }
             ];
 
             source.forEach(mainCat => {
               opts.push({ value: mainCat.name, label: mainCat.name });
-              
-              if (selectedMainCat && selectedMainCat.id === mainCat.id) {
-                mainCat.subcategories.forEach(sub => {
-                  opts.push({ value: sub, label: `• ${sub}` });
-                });
-              }
             });
 
             return opts;
           })()} 
           value={categoria} 
-          onChange={setCategoria} 
+          onChange={(val) => {
+            setCategoria(val);
+            setSubcategorias([]);
+          }} 
           placeholder="Categoría" 
           searchable
         />
       </div>
-      
+
+      {/* Subcategorías dinámicas */}
+      {categoria && (
+        <div className="filter-wrapper-item" style={{ flex: '1 1 calc(33.333% - 8px)', minWidth: '180px', zIndex: 119 }}>
+          <CustomSelect 
+            options={(() => {
+              const isProd = pathname.startsWith('/productos');
+              const isServ = pathname.startsWith('/servicios');
+              const source = isProd ? PRODUCT_MAIN_CATEGORIES : (isServ ? SERVICE_MAIN_CATEGORIES : CATEGORIES_DATA);
+              
+              const selectedMainCat = source.find(m => m.name.toLowerCase() === categoria.toLowerCase());
+              
+              const opts: SelectOption[] = [
+                { value: '', label: 'Subcategorías (Todas)' }
+              ];
+              
+              if (selectedMainCat && selectedMainCat.subcategories) {
+                selectedMainCat.subcategories.forEach(sub => {
+                  opts.push({ value: sub, label: sub });
+                });
+              }
+              
+              return opts;
+            })()} 
+            value={subcategorias} 
+            onChange={(val) => {
+              if (!val || val.length === 0 || val.includes('')) {
+                setSubcategorias([]);
+              } else if (val.length <= 2) {
+                setSubcategorias(val);
+              }
+            }} 
+            placeholder="Subcategorías (Hasta 2)" 
+            searchable
+            multiple
+          />
+        </div>
+      )}
+
       {/* Filtros adicionales (solo para secciones fuera de comunidad) */}
       {!pathname.startsWith('/comunidad') && (
         <>
+          {/* Precio (Min/Max) */}
+          <div className="filter-wrapper-item" style={{ flex: '0 0 auto', display: 'flex', gap: '4px', alignItems: 'center', minWidth: '170px' }}>
+            <input 
+              type="number" 
+              placeholder="Mín ($)" 
+              value={minPrice} 
+              onChange={(e) => setMinPrice(e.target.value)} 
+              className="filter-input-pill"
+            />
+            <span style={{ color: 'var(--color-text-muted)' }}>-</span>
+            <input 
+              type="number" 
+              placeholder="Máx ($)" 
+              value={maxPrice} 
+              onChange={(e) => setMaxPrice(e.target.value)} 
+              className="filter-input-pill"
+            />
+          </div>
+
+          {/* Tipo de Vendedor (solo productos) */}
+          {pathname.startsWith('/productos') && (
+            <div className="filter-wrapper-item" style={{ flex: '1 1 calc(33.333% - 8px)', minWidth: '150px', zIndex: 115 }}>
+              <CustomSelect 
+                options={[
+                  { value: '', label: 'Vendedor (Todos)' },
+                  { value: 'minorista', label: 'Minorista' },
+                  { value: 'mayorista', label: 'Mayorista' },
+                  { value: 'mixto', label: 'Mixto' },
+                ]} 
+                value={businessType} 
+                onChange={setBusinessType} 
+                placeholder="Tipo Vendedor" 
+              />
+            </div>
+          )}
           <div className="filter-wrapper-item" style={{ flex: '1 1 calc(33.333% - 8px)', minWidth: '130px', zIndex: 120 }}>
             <CustomSelect 
               options={

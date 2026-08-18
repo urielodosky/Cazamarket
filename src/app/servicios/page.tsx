@@ -53,14 +53,32 @@ function ServiciosContent() {
       if (!titleMatch && !descMatch) return false;
     }
 
+    const filterSubcategoriasStr = searchParams?.get('subcategorias');
+    const filterSubcategorias = filterSubcategoriasStr ? filterSubcategoriasStr.split(',') : [];
+
     if (filterCategoria) {
       const sCat = servicio.category?.toLowerCase() || '';
       const sSub = servicio.subcategory?.toLowerCase() || '';
       const fCat = filterCategoria.toLowerCase();
       const normalize = (s: string) => s.normalize('NFD').replace(/[\u0300-\u036f]/g, '');
       const normFCat = normalize(fCat);
-      if (normalize(sCat) !== normFCat && normalize(sSub) !== normFCat) return false;
+      
+      if (filterSubcategorias.length > 0) {
+        const matchSub = filterSubcategorias.some(sub => normalize(sSub) === normalize(sub.toLowerCase()));
+        if (!matchSub) return false;
+      } else {
+        if (normalize(sCat) !== normFCat && normalize(sSub) !== normFCat) return false;
+      }
     }
+
+    const minPriceStr = searchParams?.get('minPrice');
+    const maxPriceStr = searchParams?.get('maxPrice');
+    const minPrice = minPriceStr ? Number(minPriceStr) : 0;
+    const maxPrice = maxPriceStr ? Number(maxPriceStr) : Infinity;
+    
+    // Asumimos que los servicios tienen .price
+    if (servicio.price < minPrice) return false;
+    if (servicio.price > maxPrice) return false;
 
     const filterRating = searchParams?.get('rating') || '';
     if (filterRating) {
@@ -112,7 +130,7 @@ function ServiciosContent() {
   }, []);
 
   return (
-    <div style={{ padding: 'var(--spacing-8) var(--spacing-4)', maxWidth: '1200px', margin: '0 auto', minHeight: '60vh', paddingBottom: 'var(--spacing-12)' }}>
+    <div style={{ padding: 'var(--spacing-4) var(--spacing-4)', maxWidth: '1200px', margin: '0 auto', minHeight: '60vh', paddingBottom: 'var(--spacing-12)' }}>
       
       {(isVendorModeActive && permissions.maxServicios > 0) && (
         <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 'var(--spacing-6)' }}>
@@ -312,7 +330,7 @@ function ServiciosContent() {
 export default function ServiciosPage() {
   return (
     <Suspense fallback={
-      <div style={{ padding: 'var(--spacing-8) var(--spacing-4)', maxWidth: '1200px', margin: '0 auto', minHeight: '60vh' }}>
+      <div style={{ padding: 'var(--spacing-4) var(--spacing-4)', maxWidth: '1200px', margin: '0 auto', minHeight: '60vh' }}>
         <div className="responsive-grid-280">
           <SkeletonCard />
           <SkeletonCard />
