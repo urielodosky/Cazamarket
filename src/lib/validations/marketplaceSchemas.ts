@@ -39,7 +39,7 @@ export const productSchema = z.object({
     .transform(val => val ? sanitizeString(val) : null),
   price: z.number()
     .min(0, 'El precio no puede ser negativo')
-    .max(1000000000, 'Precio excede el límite permitido'),
+    .max(99999999, 'El precio no puede exceder las 8 cifras'),
   currency: z.enum(['ARS', 'USD', 'USDT']),
   category: z.string().transform(sanitizeString),
   subcategory: z.string().optional().nullable().transform(val => val ? sanitizeString(val) : null),
@@ -72,7 +72,7 @@ export const serviceSchema = z.object({
     .transform(val => val ? sanitizeString(val) : null),
   price: z.number()
     .min(0, 'El precio no puede ser negativo')
-    .max(1000000000, 'Precio excede el límite permitido'),
+    .max(99999999, 'El precio no puede exceder las 8 cifras'),
   currency: z.enum(['ARS', 'USD', 'USDT']),
   category: z.string().transform(sanitizeString),
   subcategory: z.string().optional().nullable().transform(val => val ? sanitizeString(val) : null),

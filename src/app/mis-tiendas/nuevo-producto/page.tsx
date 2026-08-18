@@ -718,6 +718,7 @@ function NuevoProductoContent() {
                 <span style={{ position: 'absolute', left: '16px', top: '50%', transform: 'translateY(-50%)', color: 'var(--color-text-muted)', fontSize: '1.1rem' }}>$</span>
                 <input
                   type="number"
+                  max="99999999"
                   placeholder="0.00"
                   value={price}
                   onChange={(e) => { setPrice(e.target.value); setFieldErrors(prev => ({...prev, price: []})) }}
