@@ -789,6 +789,7 @@ function NuevoProductoContent() {
               {stockMode === 'definido' && (
                 <input
                   type="number"
+                  max="1000"
                   placeholder="Ej: 10"
                   value={stock}
                   onChange={(e) => setStock(e.target.value)}
@@ -867,6 +868,7 @@ function NuevoProductoContent() {
                   <span style={{ position: 'absolute', left: '16px', top: '50%', transform: 'translateY(-50%)', color: 'var(--color-text-muted)', fontSize: '1.1rem' }}>$</span>
                   <input
                     type="number"
+                    max="999999"
                     placeholder="Ej: 5000 (vacío o 0 = a acordar)"
                     value={shippingCost}
                     onChange={(e) => setShippingCost(e.target.value)}

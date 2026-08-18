@@ -47,7 +47,7 @@ export const productSchema = z.object({
   image_urls: z.array(z.string().url('URL de imagen inválida')).max(10, 'Máximo 10 imágenes'),
   video_url: z.string().url('URL de video inválida').optional().nullable(),
   stock_mode: z.enum(['ilimitado', 'definido']).optional().default('ilimitado'),
-  stock: z.number().int().min(0, 'El stock no puede ser negativo').optional().nullable(),
+  stock: z.number().int().min(0, 'El stock no puede ser negativo').max(1000, 'El stock máximo es 1000. Usa "Ilimitado" si tienes más.').optional().nullable(),
   shipping_mode: z.enum(['acordar', 'gratis', 'costo_extra']).optional().default('acordar'),
   shipping_cost: z.string().optional().nullable().transform(val => val ? sanitizeString(val) : null),
   pickup_available: z.enum(['si', 'no']).optional().default('no'),

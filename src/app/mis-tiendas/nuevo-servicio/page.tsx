@@ -747,6 +747,7 @@ function NuevoServicioContent() {
               {stockMode === 'definido' && (
                 <input
                   type="number"
+                  max="1000"
                   placeholder="Ej: 10 (capacidad máxima de personas o reservas)"
                   value={stock}
                   onChange={(e) => setStock(e.target.value)}

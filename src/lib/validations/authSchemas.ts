@@ -10,7 +10,7 @@ export const registerSchema = z.object({
     .max(100, 'La contraseña es demasiado larga'),
   username: z.string()
     .min(3, 'El nombre de usuario debe tener al menos 3 caracteres')
-    .max(50, 'El nombre de usuario es demasiado largo')
+    .max(30, 'El nombre de usuario es demasiado largo')
     .transform(sanitizeString),
   person_type: z.enum(['fisica', 'juridica']).optional().default('fisica'),
   birth_date: z.string().optional().nullable(),
