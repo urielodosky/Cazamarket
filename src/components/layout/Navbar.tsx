@@ -226,33 +226,37 @@ export default function Navbar() {
     <>
       {/* 1. Precio (Min/Max) */}
       {!pathname.startsWith('/comunidad') && (
-        <div className="filter-wrapper-item" style={{ flex: '0 0 auto', display: 'flex', gap: '4px', alignItems: 'center', minWidth: '220px' }}>
-          <select 
-            value={currency} 
-            onChange={(e) => setCurrency(e.target.value)} 
-            className="filter-input-pill" 
-            style={{ width: '60px', padding: '0 8px', cursor: 'pointer' }}
-          >
-            <option value="">Moneda</option>
-            <option value="USD">USD</option>
-            <option value="ARS">ARS</option>
-          </select>
-          <input 
-            type="number" 
-            placeholder="Mín ($)" 
-            value={minPriceInput} 
-            onChange={(e) => setMinPriceInput(e.target.value)} 
-            className="filter-input-pill"
-          />
-          <span style={{ color: 'var(--color-text-muted)' }}>-</span>
-          <input 
-            type="number" 
-            placeholder="Máx ($)" 
-            value={maxPriceInput} 
-            onChange={(e) => setMaxPriceInput(e.target.value)} 
-            className="filter-input-pill"
-          />
-        </div>
+        <>
+          <div className="filter-wrapper-item" style={{ flex: '0 0 auto', minWidth: '110px', zIndex: 125 }}>
+            <CustomSelect
+              options={[
+                { value: '', label: 'Moneda' },
+                { value: 'USD', label: 'USD' },
+                { value: 'ARS', label: 'ARS' }
+              ]}
+              value={currency}
+              onChange={setCurrency}
+              placeholder="Moneda"
+            />
+          </div>
+          <div className="filter-wrapper-item" style={{ flex: '0 0 auto', display: 'flex', gap: '4px', alignItems: 'center', minWidth: '170px' }}>
+            <input 
+              type="number" 
+              placeholder="Mín ($)" 
+              value={minPriceInput} 
+              onChange={(e) => setMinPriceInput(e.target.value)} 
+              className="filter-input-pill"
+            />
+            <span style={{ color: 'var(--color-text-muted)' }}>-</span>
+            <input 
+              type="number" 
+              placeholder="Máx ($)" 
+              value={maxPriceInput} 
+              onChange={(e) => setMaxPriceInput(e.target.value)} 
+              className="filter-input-pill"
+            />
+          </div>
+        </>
       )}
 
       {/* 2. Categoría */}

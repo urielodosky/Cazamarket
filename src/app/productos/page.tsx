@@ -124,6 +124,17 @@ function ProductosContent() {
     }
   }, [isVendorModeActive]);
 
+  const [exchangeRate, setExchangeRate] = useState<number>(1400); // Default fallback
+
+  useEffect(() => {
+    fetch('/api/dolar')
+      .then(res => res.json())
+      .then(data => {
+        if (data.venta) setExchangeRate(data.venta);
+      })
+      .catch(err => console.error('Error fetching dollar rate:', err));
+  }, []);
+
   const searchParams = useSearchParams();
   const q = searchParams?.get('q')?.toLowerCase() || '';
   const filterCategoria = searchParams?.get('categoria') || '';
@@ -171,19 +182,33 @@ function ProductosContent() {
       }
     }
 
-    // Filtro Precio
+    // Filtro Precio con Conversión de Moneda
     const minPriceStr = searchParams?.get('minPrice');
     const maxPriceStr = searchParams?.get('maxPrice');
-    const minPrice = minPriceStr ? Number(minPriceStr) : 0;
-    const maxPrice = maxPriceStr ? Number(maxPriceStr) : Infinity;
-    
-    if (producto.price < minPrice) return false;
-    if (producto.price > maxPrice) return false;
-
-    // Filtro Currency
     const currencyStr = searchParams?.get('currency');
-    if (currencyStr && producto.currency?.toUpperCase() !== currencyStr.toUpperCase()) {
-      return false;
+
+    if (minPriceStr || maxPriceStr || currencyStr) {
+      const minPrice = minPriceStr ? Number(minPriceStr) : 0;
+      const maxPrice = maxPriceStr ? Number(maxPriceStr) : Infinity;
+      const targetCurrency = currencyStr ? currencyStr.toUpperCase() : 'USD'; // Por defecto asume USD si no se selecciona moneda
+      const productCurrency = producto.currency?.toUpperCase() || 'ARS';
+
+      // Normalizar el precio del producto a la moneda objetivo (targetCurrency)
+      let normalizedPrice = producto.price;
+      
+      if (productCurrency === 'ARS' && targetCurrency === 'USD') {
+        normalizedPrice = producto.price / exchangeRate;
+      } else if (productCurrency === 'USD' && targetCurrency === 'ARS') {
+        normalizedPrice = producto.price * exchangeRate;
+      }
+
+      if (normalizedPrice < minPrice) return false;
+      if (normalizedPrice > maxPrice) return false;
+      
+      // Si el usuario explícitamente seleccionó una moneda en el filtro, solo traemos productos que estén en esa moneda original
+      // (a menos que la regla sea mostrar todos y convertir, pero según la sugerencia "convertir esa cantidad a pesos con la api para buscarlos tambien en ese rango", significa que queremos buscar sin importar la moneda original, solo filtrando por valor equivalente)
+      // Como el usuario dice "buscar los productos en dolares dentro de ese rango y convertir esa cantidad a pesos... para buscarlos tambien", entonces NO filtramos de forma estricta por moneda si queremos que todos aparezcan dentro del rango.
+      // Si el selector de moneda "USD" o "ARS" es SOLO para indicar EN QUÉ MONEDA está ingresando el min/max, no filtramos `if (producto.currency !== currencyStr)`.
     }
 
     // Filtro Tipo Vendedor

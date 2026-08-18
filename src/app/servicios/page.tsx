@@ -73,17 +73,24 @@ function ServiciosContent() {
 
     const minPriceStr = searchParams?.get('minPrice');
     const maxPriceStr = searchParams?.get('maxPrice');
-    const minPrice = minPriceStr ? Number(minPriceStr) : 0;
-    const maxPrice = maxPriceStr ? Number(maxPriceStr) : Infinity;
-    
-    // Asumimos que los servicios tienen .price
-    if (servicio.price < minPrice) return false;
-    if (servicio.price > maxPrice) return false;
-
-    // Filtro Currency
     const currencyStr = searchParams?.get('currency');
-    if (currencyStr && servicio.currency?.toUpperCase() !== currencyStr.toUpperCase()) {
-      return false;
+    
+    if (minPriceStr || maxPriceStr || currencyStr) {
+      const minPrice = minPriceStr ? Number(minPriceStr) : 0;
+      const maxPrice = maxPriceStr ? Number(maxPriceStr) : Infinity;
+      const targetCurrency = currencyStr ? currencyStr.toUpperCase() : 'USD';
+      const serviceCurrency = servicio.currency?.toUpperCase() || 'ARS';
+
+      let normalizedPrice = servicio.price || 0;
+      
+      if (serviceCurrency === 'ARS' && targetCurrency === 'USD') {
+        normalizedPrice = (servicio.price || 0) / exchangeRate;
+      } else if (serviceCurrency === 'USD' && targetCurrency === 'ARS') {
+        normalizedPrice = (servicio.price || 0) * exchangeRate;
+      }
+
+      if (normalizedPrice < minPrice) return false;
+      if (normalizedPrice > maxPrice) return false;
     }
 
     const filterRating = searchParams?.get('rating') || '';
@@ -133,6 +140,17 @@ function ServiciosContent() {
       } catch (e) {}
     }
     setIsLoading(false);
+  }, []);
+
+  const [exchangeRate, setExchangeRate] = useState<number>(1400); // Default fallback
+
+  useEffect(() => {
+    fetch('/api/dolar')
+      .then(res => res.json())
+      .then(data => {
+        if (data.venta) setExchangeRate(data.venta);
+      })
+      .catch(err => console.error('Error fetching dollar rate:', err));
   }, []);
 
   return (
