@@ -791,13 +791,13 @@
 
 .global-filters-panel::before {
   content: '';
-  padding-left: 24px;
+  padding-left: 36px;
   flex-shrink: 0;
 }
 
 .global-filters-panel::after {
   content: '';
-  padding-right: 24px;
+  padding-right: 36px;
   flex-shrink: 0;
 }
 
@@ -812,8 +812,8 @@
   top: 50%;
   transform: translateY(-50%);
   z-index: 10;
-  width: 32px;
-  height: 32px;
+  width: 24px;
+  height: 24px;
   border-radius: 50%;
   background: var(--color-bg-surface-elevated, #1a1a1f);
   border: 1px solid rgba(255, 255, 255, 0.1);

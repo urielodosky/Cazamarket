@@ -208,7 +208,28 @@ export default function Navbar() {
 
   const renderFiltersContent = () => (
     <>
-      {/* Categoría */}
+      {/* 1. Precio (Min/Max) */}
+      {!pathname.startsWith('/comunidad') && (
+        <div className="filter-wrapper-item" style={{ flex: '0 0 auto', display: 'flex', gap: '4px', alignItems: 'center', minWidth: '170px' }}>
+          <input 
+            type="number" 
+            placeholder="Mín ($)" 
+            value={minPrice} 
+            onChange={(e) => setMinPrice(e.target.value)} 
+            className="filter-input-pill"
+          />
+          <span style={{ color: 'var(--color-text-muted)' }}>-</span>
+          <input 
+            type="number" 
+            placeholder="Máx ($)" 
+            value={maxPrice} 
+            onChange={(e) => setMaxPrice(e.target.value)} 
+            className="filter-input-pill"
+          />
+        </div>
+      )}
+
+      {/* 2. Categoría */}
       <div className="filter-wrapper-item" style={{ flex: '1 1 calc(33.333% - 8px)', minWidth: '130px', zIndex: 120 }}>
         <CustomSelect 
           options={(() => {
@@ -236,7 +257,7 @@ export default function Navbar() {
         />
       </div>
 
-      {/* Subcategorías dinámicas */}
+      {/* 3. Subcategorías dinámicas */}
       {categoria && (
         <div className="filter-wrapper-item" style={{ flex: '1 1 calc(33.333% - 8px)', minWidth: '180px', zIndex: 119 }}>
           <CustomSelect 
@@ -277,25 +298,6 @@ export default function Navbar() {
       {/* Filtros adicionales (solo para secciones fuera de comunidad) */}
       {!pathname.startsWith('/comunidad') && (
         <>
-          {/* Precio (Min/Max) */}
-          <div className="filter-wrapper-item" style={{ flex: '0 0 auto', display: 'flex', gap: '4px', alignItems: 'center', minWidth: '170px' }}>
-            <input 
-              type="number" 
-              placeholder="Mín ($)" 
-              value={minPrice} 
-              onChange={(e) => setMinPrice(e.target.value)} 
-              className="filter-input-pill"
-            />
-            <span style={{ color: 'var(--color-text-muted)' }}>-</span>
-            <input 
-              type="number" 
-              placeholder="Máx ($)" 
-              value={maxPrice} 
-              onChange={(e) => setMaxPrice(e.target.value)} 
-              className="filter-input-pill"
-            />
-          </div>
-
           {/* Tipo de Vendedor (solo productos) */}
           {pathname.startsWith('/productos') && (
             <div className="filter-wrapper-item" style={{ flex: '1 1 calc(33.333% - 8px)', minWidth: '150px', zIndex: 115 }}>
@@ -312,6 +314,8 @@ export default function Navbar() {
               />
             </div>
           )}
+
+          {/* Envío / Extras / Ofrece */}
           <div className="filter-wrapper-item" style={{ flex: '1 1 calc(33.333% - 8px)', minWidth: '130px', zIndex: 120 }}>
             <CustomSelect 
               options={
@@ -342,6 +346,7 @@ export default function Navbar() {
             />
           </div>
 
+          {/* Condición / Duración / Tipo */}
           <div className="filter-wrapper-item" style={{ flex: '1 1 calc(33.333% - 8px)', minWidth: '130px', zIndex: 110 }}>
             <CustomSelect 
               options={
@@ -372,6 +377,7 @@ export default function Navbar() {
             />
           </div>
 
+          {/* Rating */}
           <div className="filter-wrapper-item" style={{ flex: '1 1 calc(33.333% - 8px)', minWidth: '140px', zIndex: 105 }}>
             <CustomSelect 
               options={[
@@ -387,34 +393,31 @@ export default function Navbar() {
               placeholder="Rating" 
             />
           </div>
-        </>
-      )}
 
-      {/* Provincia (API) */}
-      {!pathname.startsWith('/comunidad') && (
-        <div className="filter-wrapper-item" style={{ flex: '1 1 calc(33.333% - 8px)', minWidth: '130px', zIndex: 100 }}>
-          <CustomSelect 
-            options={provincias.length > 0 ? provincias : [{ value: '', label: 'Cargando...' }]} 
-            value={provincia} 
-            onChange={setProvincia} 
-            placeholder="Provincia" 
-            searchable={true}
-          />
-        </div>
-      )}
-      
-      {/* Localidad (API) */}
-      {!pathname.startsWith('/comunidad') && (
-        <div className="filter-wrapper-item" style={{ flex: '1 1 calc(33.333% - 8px)', minWidth: '130px', zIndex: 100 }}>
-          <CustomSelect 
-            options={provincia ? (localidades.length > 0 ? localidades : [{ value: '', label: 'Cargando...' }]) : []} 
-            value={localidad} 
-            onChange={setLocalidad} 
-            placeholder="Localidades" 
-            searchable={true}
-            disabled={!provincia}
-          />
-        </div>
+          {/* Provincia (API) */}
+          <div className="filter-wrapper-item" style={{ flex: '1 1 calc(33.333% - 8px)', minWidth: '130px', zIndex: 100 }}>
+            <CustomSelect 
+              options={provincias.length > 0 ? provincias : [{ value: '', label: 'Cargando...' }]} 
+              value={provincia} 
+              onChange={setProvincia} 
+              placeholder="Provincia" 
+              searchable={true}
+            />
+          </div>
+          
+          {/* Localidad (dinámica: aparece solo si hay provincia) */}
+          {provincia && (
+            <div className="filter-wrapper-item" style={{ flex: '1 1 calc(33.333% - 8px)', minWidth: '130px', zIndex: 99 }}>
+              <CustomSelect 
+                options={localidades.length > 0 ? localidades : [{ value: '', label: 'Cargando...' }]} 
+                value={localidad} 
+                onChange={setLocalidad} 
+                placeholder="Localidades" 
+                searchable={true}
+              />
+            </div>
+          )}
+        </>
       )}
     </>
   );
