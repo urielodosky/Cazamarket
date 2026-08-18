@@ -7,6 +7,9 @@ import MobileNav from "@/components/layout/MobileNav";
 import { Suspense } from 'react';
 import Footer from "@/components/layout/Footer";
 import { Toaster } from 'react-hot-toast';
+import CookieBanner from "@/components/ui/CookieBanner";
+import FloatingContactButton from "@/components/ui/FloatingContactButton";
+import ScrollNavigation from "@/components/ui/ScrollNavigation";
 import "./globals.css";
 
 const inter = Inter({
@@ -97,13 +100,16 @@ export default function RootLayout({
         />
       </head>
       <body suppressHydrationWarning>
+        <a href="#main-content" className="skip-to-content">
+          Saltar al contenido principal
+        </a>
         <Providers>
           <Suspense fallback={null}>
             <PageTransitionLoader />
             <Navbar />
             <MobileNav />
           </Suspense>
-          <main>{children}</main>
+          <main id="main-content" style={{ outline: 'none' }} tabIndex={-1}>{children}</main>
           <Footer />
           <Toaster 
             position="top-right"
@@ -116,6 +122,9 @@ export default function RootLayout({
               }
             }}
           />
+          <CookieBanner />
+          <FloatingContactButton />
+          <ScrollNavigation />
         </Providers>
       </body>
     </html>

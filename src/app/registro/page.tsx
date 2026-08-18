@@ -17,6 +17,7 @@ export default function RegistroPage() {
   const [isLoading, setIsLoading] = useState(false);
   const [errorMsg, setErrorMsg] = useState('');
   const [successMsg, setSuccessMsg] = useState('');
+  const [fieldErrors, setFieldErrors] = useState<Record<string, string[]>>({});
   const [termsAccepted, setTermsAccepted] = useState(false);
   
   // Recuperar contraseña
@@ -326,6 +327,11 @@ export default function RegistroPage() {
 
         if (!res.ok || data.error) {
           setErrorMsg(data.error || 'Error al crear la cuenta');
+          if (data.details) {
+            setFieldErrors(data.details);
+          } else {
+            setFieldErrors({});
+          }
         } else {
           if (data.data?.session) {
             // Limpiar datos locales viejos
@@ -482,14 +488,18 @@ export default function RegistroPage() {
             </div>
             {isAwaitingPasswordResetOTP && (
               <div className="form-group">
-                <label htmlFor="newPassword">Nueva contraseña</label>
+                <label htmlFor="username">Nombre de Usuario o Marca</label>
                 <input 
-                  type="password" 
-                  id="newPassword" 
-                  value={newPassword}
-                  onChange={(e) => setNewPassword(e.target.value)}
+                  type="text" 
+                  id="username" 
+                  value={username}
+                  onChange={(e) => { setUsername(e.target.value); setFieldErrors(prev => ({...prev, username: []})) }}
+                  placeholder="Ej. Juan Perez o Mi Tienda Genial"
                   required 
                 />
+                {fieldErrors.username && fieldErrors.username.map((err, i) => (
+                  <span key={i} className="inline-error" style={{ color: '#ff4d4d', fontSize: '0.8rem', display: 'block', marginTop: '4px' }}>{err}</span>
+                ))}
               </div>
             )}
             </>
@@ -504,10 +514,13 @@ export default function RegistroPage() {
                       id="username" 
                       placeholder="Ej: CazadorPro" 
                       value={username}
-                      onChange={(e) => setUsername(e.target.value)}
+                      onChange={(e) => { setUsername(e.target.value); setFieldErrors(prev => ({...prev, username: []})) }}
                       minLength={3}
                       required 
                     />
+                    {fieldErrors.username && fieldErrors.username.map((err, i) => (
+                      <span key={i} className="inline-error" style={{ color: '#ff4d4d', fontSize: '0.8rem', display: 'block', marginTop: '4px' }}>{err}</span>
+                    ))}
                   </div>
                   
                   <div className="form-group">
@@ -554,15 +567,19 @@ export default function RegistroPage() {
 
                   {personType === 'Jurídica' && (
                     <div className="form-group">
-                      <label htmlFor="cuit">CUIT</label>
+                      <label htmlFor="cuit">Número de CUIT</label>
                       <input 
                         type="text" 
                         id="cuit" 
                         placeholder="Ej: 30-12345678-9" 
                         value={cuit}
-                        onChange={(e) => setCuit(e.target.value)}
+                        onChange={(e) => { setCuit(e.target.value); setFieldErrors(prev => ({...prev, cuit: []})) }}
                         required 
                       />
+                      {fieldErrors.cuit && fieldErrors.cuit.map((err, i) => (
+                        <span key={i} className="inline-error" style={{ color: '#ff4d4d', fontSize: '0.8rem', display: 'block', marginTop: '4px' }}>{err}</span>
+                      ))}
+                      <p className="input-hint" style={{ fontSize: '0.75rem', color: 'var(--color-text-muted)', marginTop: '4px' }}>Necesario para poder facturar los servicios</p>
                     </div>
                   )}
 
@@ -572,9 +589,12 @@ export default function RegistroPage() {
                       <DatePicker 
                         id="birthDate"
                         value={birthDate}
-                        onChange={(val) => setBirthDate(val)}
+                        onChange={(val) => { setBirthDate(val); setFieldErrors(prev => ({...prev, birth_date: []})) }}
                         required
                       />
+                      {fieldErrors.birth_date && fieldErrors.birth_date.map((err, i) => (
+                        <span key={i} className="inline-error" style={{ color: '#ff4d4d', fontSize: '0.8rem', display: 'block', marginTop: '4px' }}>{err}</span>
+                      ))}
                     </div>
                   )}
 
@@ -585,9 +605,12 @@ export default function RegistroPage() {
                       id="phone" 
                       placeholder="Ej: +54 9 11 1234-5678" 
                       value={phone}
-                      onChange={(e) => setPhone(e.target.value)}
+                      onChange={(e) => { setPhone(e.target.value); setFieldErrors(prev => ({...prev, phone: []})) }}
                       required 
                     />
+                    {fieldErrors.phone && fieldErrors.phone.map((err, i) => (
+                      <span key={i} className="inline-error" style={{ color: '#ff4d4d', fontSize: '0.8rem', display: 'block', marginTop: '4px' }}>{err}</span>
+                    ))}
                   </div>
                 </>
               )}
@@ -598,26 +621,30 @@ export default function RegistroPage() {
               id="email" 
               placeholder="tu@correo.com" 
               value={email}
-              onChange={(e) => setEmail(e.target.value)}
+              onChange={(e) => { setEmail(e.target.value); setFieldErrors(prev => ({...prev, email: []})) }}
               required 
             />
+            {fieldErrors.email && fieldErrors.email.map((err, i) => (
+              <span key={i} className="inline-error" style={{ color: '#ff4d4d', fontSize: '0.8rem', display: 'block', marginTop: '4px' }}>{err}</span>
+            ))}
           </div>
           
           {!isForgotPasswordView && (
             <div className="form-group">
               <label htmlFor="password">Contraseña</label>
-              <div style={{ position: 'relative', display: 'flex', alignItems: 'center' }}>
+              <div className="password-input-wrapper" style={{ position: 'relative', display: 'flex', alignItems: 'center' }}>
                 <input 
                   type={showPassword ? 'text' : 'password'} 
                   id="password" 
-                  placeholder="••••••••" 
+                  placeholder="Mínimo 8 caracteres" 
                   value={password}
-                  onChange={(e) => setPassword(e.target.value)}
+                  onChange={(e) => { setPassword(e.target.value); setFieldErrors(prev => ({...prev, password: []})) }}
                   required 
                   style={{ paddingRight: '40px' }}
                 />
                 <button 
                   type="button" 
+                  className="password-toggle"
                   onClick={() => setShowPassword(!showPassword)}
                   style={{ 
                     position: 'absolute', 
@@ -633,12 +660,15 @@ export default function RegistroPage() {
                   }}
                 >
                   {showPassword ? (
-                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M17.94 17.94A10.07 10.07 0 0 1 12 20c-7 0-11-8-11-8a18.45 18.45 0 0 1 5.06-5.94M9.9 4.24A9.12 9.12 0 0 1 12 4c7 0 11 8 11 8a18.5 18.5 0 0 1-2.16 3.19m-6.72-1.07a3 3 0 1 1-4.24-4.24"></path><line x1="1" y1="1" x2="23" y2="23"></line></svg>
+                    <svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M17.94 17.94A10.07 10.07 0 0 1 12 20c-7 0-11-8-11-8a18.45 18.45 0 0 1 5.06-5.94M9.9 4.24A9.12 9.12 0 0 1 12 4c7 0 11 8 11 8a18.5 18.5 0 0 1-2.16 3.19m-6.72-1.07a3 3 0 1 1-4.24-4.24"></path><line x1="1" y1="1" x2="23" y2="23"></line></svg>
                   ) : (
-                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"></path><circle cx="12" cy="12" r="3"></circle></svg>
+                    <svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"></path><circle cx="12" cy="12" r="3"></circle></svg>
                   )}
                 </button>
               </div>
+              {fieldErrors.password && fieldErrors.password.map((err, i) => (
+                <span key={i} className="inline-error" style={{ color: '#ff4d4d', fontSize: '0.8rem', display: 'block', marginTop: '4px' }}>{err}</span>
+              ))}
               {isLoginView && (
                 <div style={{ textAlign: 'right', marginTop: '8px' }}>
                   <button type="button" onClick={() => { setIsForgotPasswordView(true); setIsLoginView(false); setErrorMsg(''); setSuccessMsg(''); }} className="auth-link" style={{ fontSize: '0.85rem', background: 'transparent', border: 'none', padding: 0, cursor: 'pointer' }}>¿Olvidaste tu contraseña?</button>

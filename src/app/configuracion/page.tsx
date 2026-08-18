@@ -109,6 +109,8 @@ export default function ConfiguracionPage() {
     return v;
   };
 
+  const [fieldErrors, setFieldErrors] = useState<Record<string, string[]>>({});
+
   // Estados del formulario controlados
   const [formData, setFormData] = useState({
     username: '',
@@ -281,7 +283,7 @@ export default function ConfiguracionPage() {
     }
   }, [selectedProvincia]);
 
-  const handleInputChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {
+  const handleInputChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement | HTMLTextAreaElement>) => {
     const field = e.target.name || e.target.id;
     setFormData(prev => ({ ...prev, [field]: e.target.value }));
   };
@@ -325,7 +327,7 @@ export default function ConfiguracionPage() {
     setTimeout(() => setToast(null), 4000); // Ocultar después de 4 segundos
   };
 
-  const handleSave = (e: React.FormEvent) => {
+  const handleSave = async (e: React.FormEvent) => {
     e.preventDefault();
     
     // Validación de Persona Jurídica
@@ -397,7 +399,7 @@ export default function ConfiguracionPage() {
       }
     }
 
-    updateUser({
+    const updateResult = await updateUser({
       username: formData.username,
       avatar: (formData as any).avatar,
       personType: formData.tipoPersona,
@@ -418,6 +420,18 @@ export default function ConfiguracionPage() {
       schedules: horarios,
       role: !isVendor ? 'negocio' : undefined
     });
+
+    if (!updateResult.success) {
+      if (updateResult.errors) {
+        setFieldErrors(updateResult.errors);
+        showToast('Por favor, revisa los errores en el formulario.', 'error');
+      } else {
+        showToast('Error al guardar la configuración.', 'error');
+      }
+      return;
+    }
+
+    setFieldErrors({});
 
     // Actualizar retroactivamente el nombre de la tienda en los productos ya creados
     const existingStr = localStorage.getItem('cazamarket_my_products');
@@ -595,16 +609,39 @@ export default function ConfiguracionPage() {
           <div style={{ flex: '1 1 300px', display: 'flex', flexDirection: 'column', gap: '16px' }}>
             <div className="form-group-config">
               <label htmlFor="username">Nombre de Perfil</label>
-              <input type="text" id="username" value={formData.username || ''} onChange={handleInputChange} required />
+              <input type="text" id="username" value={formData.username || ''} onChange={(e) => { handleInputChange(e); setFieldErrors(prev => ({...prev, full_name: []})) }} required />
+              {fieldErrors.full_name && fieldErrors.full_name.map((err, i) => (
+                <span key={i} className="inline-error" style={{ color: '#ff4d4d', fontSize: '0.8rem', display: 'block', marginTop: '4px' }}>{err}</span>
+              ))}
+            </div>
+            <div className="form-group-config">
+              <label htmlFor="storeName">Nombre de la Tienda / Negocio</label>
+              <input type="text" id="storeName" value={formData.storeName || ''} onChange={(e) => { handleInputChange(e); setFieldErrors(prev => ({...prev, store_name: []})) }} placeholder="Ej. Mi Tienda Genial" required />
+              {fieldErrors.store_name && fieldErrors.store_name.map((err, i) => (
+                <span key={i} className="inline-error" style={{ color: '#ff4d4d', fontSize: '0.8rem', display: 'block', marginTop: '4px' }}>{err}</span>
+              ))}
+            </div>
+            <div className="form-group-config">
+              <label htmlFor="storeDescription">Descripción Corta</label>
+              <textarea id="storeDescription" value={formData.storeDescription || ''} onChange={(e) => { handleInputChange(e); setFieldErrors(prev => ({...prev, store_description: []})) }} placeholder="¿Qué vendes o qué ofreces?" rows={3} required></textarea>
+              {fieldErrors.store_description && fieldErrors.store_description.map((err, i) => (
+                <span key={i} className="inline-error" style={{ color: '#ff4d4d', fontSize: '0.8rem', display: 'block', marginTop: '4px' }}>{err}</span>
+              ))}
             </div>
             <div className="config-split-grid" style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '24px' }}>
               <div className="form-group-config">
                 <label htmlFor="nombre">Nombre Real</label>
-                <input type="text" id="nombre" value={formData.nombre || ''} onChange={handleInputChange} required />
+                <input type="text" id="nombre" value={formData.nombre || ''} onChange={(e) => { handleInputChange(e); setFieldErrors(prev => ({...prev, first_name: []})) }} required />
+                {fieldErrors.first_name && fieldErrors.first_name.map((err, i) => (
+                  <span key={i} className="inline-error" style={{ color: '#ff4d4d', fontSize: '0.8rem', display: 'block', marginTop: '4px' }}>{err}</span>
+                ))}
               </div>
               <div className="form-group-config">
                 <label htmlFor="apellido">Apellido</label>
-                <input type="text" id="apellido" value={formData.apellido || ''} onChange={handleInputChange} required />
+                <input type="text" id="apellido" value={formData.apellido || ''} onChange={(e) => { handleInputChange(e); setFieldErrors(prev => ({...prev, last_name: []})) }} required />
+                {fieldErrors.last_name && fieldErrors.last_name.map((err, i) => (
+                  <span key={i} className="inline-error" style={{ color: '#ff4d4d', fontSize: '0.8rem', display: 'block', marginTop: '4px' }}>{err}</span>
+                ))}
               </div>
             </div>
           </div>
@@ -623,11 +660,17 @@ export default function ConfiguracionPage() {
             </div>
             <div className="form-group-config">
               <label htmlFor="contactEmail">Correo de Contacto (Público)</label>
-              <input type="email" id="contactEmail" value={formData.contactEmail || ''} onChange={handleInputChange} placeholder="tu@correo.com" />
+              <input type="email" id="contactEmail" value={formData.contactEmail || ''} onChange={(e) => { handleInputChange(e); setFieldErrors(prev => ({...prev, contact_email: []})) }} placeholder="tu@correo.com" />
+              {fieldErrors.contact_email && fieldErrors.contact_email.map((err, i) => (
+                <span key={i} className="inline-error" style={{ color: '#ff4d4d', fontSize: '0.8rem', display: 'block', marginTop: '4px' }}>{err}</span>
+              ))}
             </div>
             <div className="form-group-config">
               <label htmlFor="telefono">Número de teléfono</label>
-              <input type="tel" id="telefono" value={formData.telefono || ''} onChange={handleInputChange} placeholder="+54 9 11 1234-5678" />
+              <input type="tel" id="telefono" value={formData.telefono || ''} onChange={(e) => { handleInputChange(e); setFieldErrors(prev => ({...prev, phone: []})) }} placeholder="+54 9 11 1234-5678" />
+              {fieldErrors.phone && fieldErrors.phone.map((err, i) => (
+                <span key={i} className="inline-error" style={{ color: '#ff4d4d', fontSize: '0.8rem', display: 'block', marginTop: '4px' }}>{err}</span>
+              ))}
             </div>
           </div>
 
@@ -860,6 +903,13 @@ export default function ConfiguracionPage() {
             <div className="form-group-config">
               <label htmlFor="numero">Número / Altura</label>
               <input type="text" id="numero" value={formData.numero || ''} onChange={handleInputChange} placeholder="Ej. 123" />
+            </div>
+            <div className="form-group-config">
+              <label htmlFor="cuit">Número de CUIT</label>
+              <input type="text" id="cuit" value={formData.cuit || ''} onChange={(e) => { handleInputChange(e); setFieldErrors(prev => ({...prev, cuit: []})) }} required placeholder="Sin guiones" />
+              {fieldErrors.cuit && fieldErrors.cuit.map((err, i) => (
+                <span key={i} className="inline-error" style={{ color: '#ff4d4d', fontSize: '0.8rem', display: 'block', marginTop: '4px' }}>{err}</span>
+              ))}
             </div>
           </div>
 

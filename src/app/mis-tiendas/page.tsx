@@ -294,6 +294,16 @@ export default function MiNegocioPage() {
   const handleDeleteProduct = async (e: React.MouseEvent, id: any) => {
     e.stopPropagation();
     if (supabaseUser) {
+      // 1. Sanear Archivo Huérfano en Storage
+      const product = myProducts.find(p => String(p.id) === String(id));
+      if (product?.image && product.image.includes('/storage/v1/object/public/MediaCazaMarket/')) {
+        const filePath = product.image.split('/storage/v1/object/public/MediaCazaMarket/')[1];
+        if (filePath) {
+          await supabase.storage.from('MediaCazaMarket').remove([filePath]);
+        }
+      }
+
+      // 2. Borrar registro en BD
       await supabase.from('products').delete().eq('id', id).eq('user_id', supabaseUser.id);
       const updated = myProducts.filter(p => String(p.id) !== String(id));
       setMyProducts(updated);
@@ -303,6 +313,16 @@ export default function MiNegocioPage() {
   const handleDeleteService = async (e: React.MouseEvent, id: any) => {
     e.stopPropagation();
     if (supabaseUser) {
+      // 1. Sanear Archivo Huérfano en Storage
+      const service = myServices.find(p => String(p.id) === String(id));
+      if (service?.image && service.image.includes('/storage/v1/object/public/MediaCazaMarket/')) {
+        const filePath = service.image.split('/storage/v1/object/public/MediaCazaMarket/')[1];
+        if (filePath) {
+          await supabase.storage.from('MediaCazaMarket').remove([filePath]);
+        }
+      }
+
+      // 2. Borrar registro en BD
       await supabase.from('services').delete().eq('id', id).eq('user_id', supabaseUser.id);
       const updated = myServices.filter(p => String(p.id) !== String(id));
       setMyServices(updated);

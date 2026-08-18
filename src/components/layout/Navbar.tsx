@@ -9,6 +9,7 @@ import { useThemeColors } from '@/hooks/useThemeColors';
 import UserMenu from './UserMenu';
 import { useAuth } from '@/contexts/AuthContext';
 import CustomSelect, { SelectOption } from '../ui/CustomSelect';
+import DarkModeToggle from '../ui/DarkModeToggle';
 import { CATEGORIES_DATA, PRODUCT_MAIN_CATEGORIES, SERVICE_MAIN_CATEGORIES } from '@/constants/categoriesData';
 import './Navbar.css';
 import logoPng from '../../../public/logo.png';
@@ -508,7 +509,8 @@ export default function Navbar() {
         )}
         </div>
 
-        <div className="navbar-actions">
+        <div className="navbar-actions" style={{ display: 'flex', alignItems: 'center', gap: '16px' }}>
+          <DarkModeToggle />
           {!isClient ? (
             <div style={{ width: '120px', height: '40px' }} />
           ) : isLoggedIn ? (

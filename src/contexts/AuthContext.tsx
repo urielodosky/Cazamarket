@@ -2,6 +2,7 @@
 
 import { createContext, useContext, useState, useEffect, ReactNode } from 'react';
 import { createClient } from '@/lib/supabase/client';
+import { profileUpdateSchema } from '@/lib/validations/marketplaceSchemas';
 
 type AuthContextType = {
   isLoggedIn: boolean;
@@ -42,7 +43,7 @@ type AuthContextType = {
     socialMedia?: any[], branches?: any[], schedules?: any[], role?: string, phone_verified?: boolean,
     storeTheme?: any, storeCategories?: any[], businessType?: string, coverUrl?: string,
     providers?: any[], distributors?: any[]
-  }) => Promise<void>;
+  }) => Promise<{ success: boolean; errors?: Record<string, string[]> }>;
   toggleVendorMode: () => void;
   upgradeToVendor: () => Promise<void>;
   supabaseUser: any;
@@ -81,7 +82,7 @@ const AuthContext = createContext<AuthContextType>({
   distributors: [],
   trustScore: 0,
   logout: async () => {},
-  updateUser: async () => {},
+  updateUser: async () => ({ success: false }),
   toggleVendorMode: () => {},
   upgradeToVendor: async () => {},
   supabaseUser: null,
@@ -256,7 +257,7 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
     socialMedia?: any[], branches?: any[], schedules?: any[], role?: string, phone_verified?: boolean,
     storeTheme?: any, storeCategories?: any[], businessType?: string, coverUrl?: string,
     providers?: any[], distributors?: any[]
-  }) => {
+  }): Promise<{ success: boolean; errors?: Record<string, string[]> }> => {
     // Actualizar base de datos
     if (supabaseUser) {
       const updates: any = {};
@@ -293,15 +294,20 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
       if (data.schedules !== undefined) updates.schedules = data.schedules;
       if (data.role !== undefined) updates.role = data.role;
       if (data.storeTheme !== undefined) updates.store_theme = data.storeTheme;
-      if (data.storeCategories !== undefined) { updates.store_categories = data.storeCategories; setStoreCategories(data.storeCategories); }
-      if (data.businessType !== undefined) { updates.business_type = data.businessType; setBusinessType(data.businessType); }
-      if (data.providers !== undefined) { updates.providers = data.providers; setProviders(data.providers); }
-      if (data.distributors !== undefined) { updates.distributors = data.distributors; setDistributors(data.distributors); }
-      if (data.coverUrl !== undefined) { updates.cover_url = data.coverUrl; setCoverUrl(data.coverUrl); }
-      const { error } = await supabase.from('profiles').update(updates).eq('id', supabaseUser.id);
+      if (data.storeCategories !== undefined) updates.store_categories = data.storeCategories;
+      if (data.businessType !== undefined) updates.business_type = data.businessType;
+      if (data.providers !== undefined) updates.providers = data.providers;
+      if (data.distributors !== undefined) updates.distributors = data.distributors;
+
+      const validationResult = profileUpdateSchema.safeParse(updates);
+      if (!validationResult.success) {
+        return { success: false, errors: validationResult.error.flatten().fieldErrors };
+      }
+
+      const { error } = await supabase.from('profiles').update(validationResult.data).eq('id', supabaseUser.id);
       if (error) {
         console.error("Error updating profile in Supabase:", error.message || 'Unknown error');
-        alert("Error al guardar en base de datos: " + (error.message || JSON.stringify(error)));
+        return { success: false };
       }
       if (data.username !== undefined) setUsername(data.username);
       if (data.avatar !== undefined) setAvatar(data.avatar);
@@ -323,13 +329,22 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
       if (data.branches !== undefined) setBranches(data.branches);
       if (data.schedules !== undefined) setSchedules(data.schedules);
       if (data.storeTheme !== undefined) setStoreTheme(data.storeTheme);
+      if (data.storeTheme !== undefined) setStoreTheme(data.storeTheme);
+      if (data.coverUrl !== undefined) setCoverUrl(data.coverUrl);
+      if (data.storeCategories !== undefined) setStoreCategories(data.storeCategories);
+      if (data.providers !== undefined) setProviders(data.providers);
+      if (data.distributors !== undefined) setDistributors(data.distributors);
+      if (data.businessType !== undefined) setBusinessType(data.businessType);
+      
       if (data.role === 'negocio') {
         setIsVendor(true);
         setIsVendorModeActive(true);
         localStorage.setItem('cazamarket_vendor_mode', 'true');
       }
+      return { success: true };
     } else {
       alert("Debes iniciar sesión con una cuenta real para guardar cambios.");
+      return { success: false };
     }
   };
 

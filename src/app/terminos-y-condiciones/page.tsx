@@ -10,8 +10,10 @@ export default function TerminosYCondicionesPage() {
       color: 'var(--color-text-main)',
       lineHeight: '1.6'
     }}>
-      <h1 style={{ color: 'var(--color-primary)', marginBottom: '32px', textAlign: 'center' }}>Términos y Condiciones de Uso – Cazamarket</h1>
-      
+      <h1 style={{ color: 'var(--color-primary)', marginBottom: '8px', textAlign: 'center' }}>Términos y Condiciones de Uso – Cazamarket</h1>
+      <p style={{ textAlign: 'center', color: 'var(--color-text-muted)', fontSize: '0.9rem', marginBottom: '32px' }}>
+        Última actualización: Agosto 2026
+      </p>
       <div style={{ background: 'rgba(255, 193, 7, 0.1)', border: '2px solid #ffc107', borderRadius: '8px', padding: '16px', marginBottom: '32px' }}>
         <h2 style={{ color: '#ffc107', marginTop: 0, marginBottom: '8px', fontSize: '1.2rem', display: 'flex', alignItems: 'center', gap: '8px' }}>
           <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><circle cx="12" cy="12" r="10"></circle><line x1="12" y1="8" x2="12" y2="12"></line><line x1="12" y1="16" x2="12.01" y2="16"></line></svg>

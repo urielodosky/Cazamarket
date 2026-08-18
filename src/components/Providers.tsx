@@ -7,22 +7,29 @@ import { PlanProvider } from '@/contexts/PlanContext';
 import { ThemeProvider } from '@/contexts/ThemeContext';
 import ToastNotifications from './ToastNotifications';
 import TermsAcceptanceModal from './TermsAcceptanceModal';
-import { ReactNode } from 'react';
+import UTMTracker from './ui/UTMTracker';
+import { ReactNode, Suspense } from 'react';
+import { PostHogProvider } from './providers/PostHogProvider';
 
 export default function Providers({ children }: { children: ReactNode }) {
   return (
-    <ThemeProvider>
+    <PostHogProvider>
+      <ThemeProvider>
       <AuthProvider>
         <PlanProvider>
           <FavoritesProvider>
             <CartProvider>
               <ToastNotifications />
               <TermsAcceptanceModal />
+              <Suspense fallback={null}>
+                <UTMTracker />
+              </Suspense>
               {children}
             </CartProvider>
           </FavoritesProvider>
         </PlanProvider>
       </AuthProvider>
     </ThemeProvider>
+    </PostHogProvider>
   );
 }

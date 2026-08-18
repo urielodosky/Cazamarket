@@ -42,6 +42,7 @@ function NuevoProductoContent() {
   const [stock, setStock] = useState('1');
   const [description, setDescription] = useState('');
   const [formError, setFormError] = useState<string | null>(null);
+  const [fieldErrors, setFieldErrors] = useState<Record<string, string[]>>({});
   const [hasFirearmsPermit, setHasFirearmsPermit] = useState(false);
 
   const [pendingCropQueue, setPendingCropQueue] = useState<{file: File, type: string, src: string}[]>([]);
@@ -399,15 +400,24 @@ function NuevoProductoContent() {
       const result = await upsertProduct(newProduct, editId || undefined);
 
       if (!result.success) {
-        if (result.details) {
-          console.error('Validation errors:', result.details);
-          throw new Error('Datos inválidos: ' + Object.values(result.details).flat().join(', '));
-        }
-        throw new Error(result.error);
+        setLoadingProgress(100);
+        setTimeout(() => {
+          setShowLoadingOverlay(false);
+          setIsSubmitting(false);
+          if (result.details) {
+            setFieldErrors(result.details);
+            setFormError('Por favor, revisa los errores en los campos del formulario.');
+          } else {
+            setFormError(result.error || 'Ocurrió un error al guardar el producto.');
+          }
+          window.scrollTo({ top: 0, behavior: 'smooth' });
+        }, 800);
+        return;
       }
       
+      setFieldErrors({});
+      setLoadingProgress(100);
       setLoadingText('¡Casi listo! Ajustando últimos detalles...');
-      setLoadingProgress(99);
       
       await new Promise(resolve => setTimeout(resolve, 800));
       setLoadingText('¡Producto publicado con éxito!');
@@ -578,13 +588,16 @@ function NuevoProductoContent() {
                 placeholder="Ej: Cuchillo Táctico de Supervivencia"
                 maxLength={30}
                 value={title}
-                onChange={(e) => setTitle(e.target.value)}
+                onChange={(e) => { setTitle(e.target.value); setFieldErrors(prev => ({...prev, name: []})) }}
                 style={{
                   boxSizing: "border-box", width: "100%", padding: '14px 16px', borderRadius: 'var(--radius-md)',
                   background: 'rgba(0,0,0,0.3)', border: '1px solid var(--color-border)',
                   color: 'var(--color-text-main)', fontSize: '1rem', outline: 'none'
                 }}
               />
+              {fieldErrors.name && fieldErrors.name.map((err, i) => (
+                  <span key={i} className="inline-error" style={{ color: '#ff4d4d', fontSize: '0.8rem', display: 'block', marginTop: '4px' }}>{err}</span>
+              ))}
             </div>
 
             <div>
@@ -597,13 +610,16 @@ function NuevoProductoContent() {
                 rows={5}
                 maxLength={500}
                 value={description}
-                onChange={(e) => setDescription(e.target.value)}
+                onChange={(e) => { setDescription(e.target.value); setFieldErrors(prev => ({...prev, description: []})) }}
                 style={{
                   boxSizing: "border-box", width: "100%", padding: '16px', borderRadius: 'var(--radius-md)',
                   background: 'rgba(0,0,0,0.3)', border: '1px solid var(--color-border)',
                   color: 'var(--color-text-main)', fontSize: '1rem', fontFamily: 'inherit', resize: 'vertical', outline: 'none'
                 }}
               />
+              {fieldErrors.description && fieldErrors.description.map((err, i) => (
+                  <span key={i} className="inline-error" style={{ color: '#ff4d4d', fontSize: '0.8rem', display: 'block', marginTop: '4px' }}>{err}</span>
+              ))}
             </div>
             
             <div>
@@ -704,7 +720,7 @@ function NuevoProductoContent() {
                   type="number"
                   placeholder="0.00"
                   value={price}
-                  onChange={(e) => setPrice(e.target.value)}
+                  onChange={(e) => { setPrice(e.target.value); setFieldErrors(prev => ({...prev, price: []})) }}
                   style={{
                     boxSizing: "border-box", width: "100%", padding: '14px 80px 14px 32px', borderRadius: 'var(--radius-md)',
                     background: 'rgba(0,0,0,0.3)', border: '1px solid var(--color-border)',
@@ -722,6 +738,9 @@ function NuevoProductoContent() {
                   />
                 </div>
               </div>
+              {fieldErrors.price && fieldErrors.price.map((err, i) => (
+                  <span key={i} className="inline-error" style={{ color: '#ff4d4d', fontSize: '0.8rem', display: 'block', marginTop: '4px' }}>{err}</span>
+              ))}
             </div>
 
             <div>

@@ -97,6 +97,17 @@ function ProductosContent() {
     e.stopPropagation();
     
     const supabase = createClient();
+    
+    // 1. Sanear Archivo Huérfano en Storage
+    const product = localProducts.find((p: any) => String(p.id) === String(id));
+    if (product?.image && product.image.includes('/storage/v1/object/public/MediaCazaMarket/')) {
+      const filePath = product.image.split('/storage/v1/object/public/MediaCazaMarket/')[1];
+      if (filePath) {
+        await supabase.storage.from('MediaCazaMarket').remove([filePath]);
+      }
+    }
+
+    // 2. Borrar registro en BD
     await supabase.from('products').delete().eq('id', id);
 
     mutate(localProducts.filter((p: any) => String(p.id) !== String(id)), false);

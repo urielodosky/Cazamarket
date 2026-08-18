@@ -10,8 +10,10 @@ export default function PoliticaDePrivacidadPage() {
       color: 'var(--color-text-main)',
       lineHeight: '1.6'
     }}>
-      <h1 style={{ color: 'var(--color-primary)', marginBottom: '32px', textAlign: 'center' }}>Políticas de Privacidad – Cazamarket</h1>
-      
+      <h1 style={{ color: 'var(--color-primary)', marginBottom: '8px', textAlign: 'center' }}>Políticas de Privacidad – Cazamarket</h1>
+      <p style={{ textAlign: 'center', color: 'var(--color-text-muted)', fontSize: '0.9rem', marginBottom: '32px' }}>
+        Última actualización: Agosto 2026
+      </p>
       <section style={{ marginBottom: '32px' }}>
         <h2 style={{ color: 'white', marginBottom: '16px', fontSize: '1.4rem' }}>1. Introducción y Responsable del Tratamiento</h2>
         <p style={{ marginBottom: '16px', color: 'var(--color-text-muted)' }}>
@@ -60,9 +62,12 @@ export default function PoliticaDePrivacidadPage() {
       </section>
 
       <section style={{ marginBottom: '32px' }}>
-        <h2 style={{ color: 'white', marginBottom: '16px', fontSize: '1.4rem' }}>4. Uso de Cookies</h2>
+        <h2 style={{ color: 'white', marginBottom: '16px', fontSize: '1.4rem' }}>4. Uso de Cookies y Tecnologías Similares</h2>
         <p style={{ marginBottom: '16px', color: 'var(--color-text-muted)' }}>
           La Plataforma emplea cookies operativas y tecnologías similares con el objetivo principal de mantener la sesión del Usuario abierta y activa, facilitando la navegación sin necesidad de ingresar las credenciales de acceso de forma reiterada. El Usuario puede configurar su navegador para rechazar o eliminar las cookies en cualquier momento; sin embargo, esto puede afectar el correcto funcionamiento o la experiencia de uso de la Plataforma.
+        </p>
+        <p style={{ marginBottom: '16px', color: 'var(--color-text-muted)' }}>
+          Asimismo, utilizamos almacenamiento local (<code>localStorage</code>) para guardar parámetros de campañas publicitarias (como <code>utm_source</code>, <code>utm_medium</code> y <code>utm_campaign</code>). El único fin de esta tecnología es medir el origen del tráfico y analizar la efectividad de nuestras estrategias de marketing. Esta información es estrictamente para uso analítico interno, no se comparte con terceros y el Usuario otorga su consentimiento para este uso al aceptar el banner informativo inicial.
         </p>
       </section>
 
@@ -93,7 +98,32 @@ export default function PoliticaDePrivacidadPage() {
       </section>
 
       <section style={{ marginBottom: '32px' }}>
-        <h2 style={{ color: 'white', marginBottom: '16px', fontSize: '1.4rem' }}>7. Derechos de los Titulares de los Datos</h2>
+        <h2 style={{ color: 'white', marginBottom: '16px', fontSize: '1.4rem' }}>7. Proveedores de Servicios a Terceros</h2>
+        <p style={{ marginBottom: '16px', color: 'var(--color-text-muted)' }}>
+          Para garantizar el correcto funcionamiento, alojamiento y seguridad de la Plataforma, la Empresa utiliza infraestructura de proveedores tecnológicos externos de primer nivel. Estos incluyen:
+        </p>
+        <ul style={{ paddingLeft: '20px', marginBottom: '16px', color: 'var(--color-text-muted)' }}>
+          <li style={{ marginBottom: '8px' }}><strong>Vercel:</strong> Para el alojamiento (hosting) y despliegue del código de la Plataforma.</li>
+          <li style={{ marginBottom: '8px' }}><strong>Supabase:</strong> Para el alojamiento encriptado de la base de datos, sistema de autenticación de usuarios y almacenamiento de archivos multimedia.</li>
+          <li style={{ marginBottom: '8px' }}><strong>MercadoPago y Stripe:</strong> Para el procesamiento seguro de transacciones, cobros y suscripciones.</li>
+        </ul>
+        <p style={{ marginBottom: '16px', color: 'var(--color-text-muted)' }}>
+          Estos proveedores operan bajo estrictos estándares de seguridad internacionales y no tienen autorización para utilizar los datos personales con fines publicitarios propios ni ajenos a la prestación del servicio.
+        </p>
+      </section>
+
+      <section style={{ marginBottom: '32px' }}>
+        <h2 style={{ color: 'white', marginBottom: '16px', fontSize: '1.4rem' }}>8. Asistencia Virtual y Mensajería Automática</h2>
+        <p style={{ marginBottom: '16px', color: 'var(--color-text-muted)' }}>
+          La Plataforma puede ofrecer módulos de atención o soporte interactivo mediante un "Asesor Virtual". Se aclara explícitamente que este sistema es una herramienta de <strong>mensajería automática basada en reglas de negocio predeterminadas</strong>, diseñada exclusivamente para facilitar las consultas comerciales básicas entre el visitante y el vendedor.
+        </p>
+        <p style={{ marginBottom: '16px', color: 'var(--color-text-muted)' }}>
+          Este sistema <strong>no utiliza Inteligencia Artificial (IA) generativa</strong> ni toma decisiones automatizadas sobre datos personales sensibles de los Usuarios. Ante cualquier consulta compleja o que requiera atención especializada, el flujo automático ofrecerá derivar la comunicación a un canal humano directo (ej. WhatsApp).
+        </p>
+      </section>
+
+      <section style={{ marginBottom: '32px' }}>
+        <h2 style={{ color: 'white', marginBottom: '16px', fontSize: '1.4rem' }}>9. Derechos de los Titulares de los Datos</h2>
         <p style={{ marginBottom: '16px', color: 'var(--color-text-muted)' }}>
           En cumplimiento de la Ley N° 25.326, el titular de los datos personales tiene la facultad de ejercer el derecho de acceso a los mismos en forma gratuita a intervalos no inferiores a seis meses. Asimismo, el Usuario tiene derecho a solicitar la rectificación, actualización o supresión de sus datos personales incluidos en nuestras bases de datos.
         </p>
@@ -106,7 +136,7 @@ export default function PoliticaDePrivacidadPage() {
       </section>
 
       <section style={{ marginBottom: '32px' }}>
-        <h2 style={{ color: 'white', marginBottom: '16px', fontSize: '1.4rem' }}>8. Cambios en esta Política</h2>
+        <h2 style={{ color: 'white', marginBottom: '16px', fontSize: '1.4rem' }}>10. Cambios en esta Política</h2>
         <p style={{ marginBottom: '16px', color: 'var(--color-text-muted)' }}>
           La Empresa se reserva el derecho de actualizar o modificar esta Política de Privacidad en cualquier momento. Se notificará a los Usuarios sobre cambios significativos a través de un aviso destacado en la Plataforma o mediante el envío de un correo electrónico a la dirección registrada.
         </p>

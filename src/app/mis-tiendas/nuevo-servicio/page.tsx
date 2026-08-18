@@ -78,6 +78,7 @@ function NuevoServicioContent() {
   const [stock, setStock] = useState('1');
   const [description, setDescription] = useState('');
   const [formError, setFormError] = useState<string | null>(null);
+  const [fieldErrors, setFieldErrors] = useState<Record<string, string[]>>({});
 
   const [pricePeriod, setPricePeriod] = useState('único');
   const [usesCalendar, setUsesCalendar] = useState(false);
@@ -365,12 +366,13 @@ function NuevoServicioContent() {
 
       if (!result.success) {
         if (result.details) {
-          console.error('Validation errors:', result.details);
-          throw new Error('Datos inválidos: ' + Object.values(result.details).flat().join(', '));
+          setFieldErrors(result.details);
+          throw new Error('Por favor, revisa los errores en los campos del formulario.');
         }
         throw new Error(result.error);
       }
       
+      setFieldErrors({});
       router.push('/mis-tiendas');
     } catch (error: any) {
       console.error('DB error:', error);
@@ -494,13 +496,18 @@ function NuevoServicioContent() {
                 placeholder="Ej: Guía de caza mayor..."
                 maxLength={30}
                 value={title}
-                onChange={(e) => setTitle(e.target.value)}
+                onChange={(e) => { setTitle(e.target.value); setFieldErrors(prev => ({...prev, name: []})) }}
                 style={{
                   boxSizing: "border-box", width: "100%", padding: '14px 16px', borderRadius: 'var(--radius-md)',
                   background: 'rgba(0,0,0,0.3)', border: '1px solid var(--color-border)',
-                  color: 'var(--color-text-main)', fontSize: '1rem', outline: 'none'
+                  color: 'white', outline: 'none', transition: 'border-color 0.2s', fontFamily: 'inherit'
                 }}
+                onFocus={e => e.currentTarget.style.borderColor = 'var(--color-primary)'}
+                onBlur={e => e.currentTarget.style.borderColor = 'rgba(255,255,255,0.1)'}
               />
+              {fieldErrors.name && fieldErrors.name.map((err, i) => (
+                <span key={i} className="inline-error" style={{ color: '#ff4d4d', fontSize: '0.8rem', display: 'block', marginTop: '4px' }}>{err}</span>
+              ))}
             </div>
 
             {/* Description */}
@@ -514,13 +521,19 @@ function NuevoServicioContent() {
                 rows={5}
                 maxLength={500}
                 value={description}
-                onChange={(e) => setDescription(e.target.value)}
+                onChange={(e) => { setDescription(e.target.value); setFieldErrors(prev => ({...prev, description: []})) }}
                 style={{
                   boxSizing: "border-box", width: "100%", padding: '16px', borderRadius: 'var(--radius-md)',
                   background: 'rgba(0,0,0,0.3)', border: '1px solid var(--color-border)',
-                  color: 'var(--color-text-main)', fontSize: '1rem', fontFamily: 'inherit', resize: 'vertical', outline: 'none'
+                  color: 'white', outline: 'none', transition: 'border-color 0.2s', fontFamily: 'inherit',
+                  resize: 'vertical'
                 }}
+                onFocus={e => e.currentTarget.style.borderColor = 'var(--color-primary)'}
+                onBlur={e => e.currentTarget.style.borderColor = 'rgba(255,255,255,0.1)'}
               />
+              {fieldErrors.description && fieldErrors.description.map((err, i) => (
+                <span key={i} className="inline-error" style={{ color: '#ff4d4d', fontSize: '0.8rem', display: 'block', marginTop: '4px' }}>{err}</span>
+              ))}
             </div>
             
             {/* Características */}
@@ -609,19 +622,19 @@ function NuevoServicioContent() {
                     type="number"
                     placeholder="0.00"
                     value={price}
-                    onChange={(e) => setPrice(e.target.value)}
+                    onChange={(e) => { setPrice(e.target.value); setFieldErrors(prev => ({...prev, price: []})) }}
                     style={{
                       boxSizing: "border-box", width: "100%", padding: '14px 80px 14px 32px', borderRadius: 'var(--radius-md)',
                       background: 'rgba(0,0,0,0.3)', border: '1px solid var(--color-border)',
-                      color: 'var(--color-text-main)', fontSize: '1rem', outline: 'none'
+                      color: 'white', outline: 'none', transition: 'border-color 0.2s', fontFamily: 'inherit'
                     }}
+                    onFocus={e => e.currentTarget.style.borderColor = 'var(--color-primary)'}
+                    onBlur={e => e.currentTarget.style.borderColor = 'rgba(255,255,255,0.1)'}
                   />
                   <div style={{ position: 'absolute', right: '4px', top: '4px', bottom: '4px', width: '90px', zIndex: 10 }}>
                     <CustomSelect 
-                      options={[
-                        { value: 'USD', label: 'USD' },
-                        { value: 'ARS', label: 'ARS' }
-                      ]}
+                      id="currency"
+                      options={[{value: 'ARS', label: 'ARS'}, {value: 'USD', label: 'USD'}, {value: 'BRL', label: 'BRL'}, {value: 'EUR', label: 'EUR'}]}
                       value={currency}
                       onChange={setCurrency}
                     />
@@ -645,6 +658,9 @@ function NuevoServicioContent() {
                   />
                 </div>
               </div>
+              {fieldErrors.price && fieldErrors.price.map((err, i) => (
+                <span key={i} className="inline-error" style={{ color: '#ff4d4d', fontSize: '0.8rem', display: 'block', marginTop: '4px' }}>{err}</span>
+              ))}
             </div>
 
             {/* Calendar */}
