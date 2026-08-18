@@ -510,7 +510,9 @@ export default function Navbar() {
         </div>
 
         <div className="navbar-actions" style={{ display: 'flex', alignItems: 'center', gap: '16px' }}>
-          <DarkModeToggle />
+          <div className={`theme-toggle-wrapper ${isFiltersOpen ? 'filters-open' : ''} ${(isFilterablePage && !isHome && !isBusinessProfile) ? 'has-searchbar' : ''}`}>
+            <DarkModeToggle />
+          </div>
           {!isClient ? (
             <div style={{ width: '120px', height: '40px' }} />
           ) : isLoggedIn ? (
