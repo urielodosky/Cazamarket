@@ -38,26 +38,27 @@ export default function CookieBanner() {
       bottom: '24px',
       left: '16px',
       right: '16px',
-      background: 'var(--color-bg-surface)',
+      background: 'color-mix(in srgb, var(--color-bg-surface) 95%, transparent)',
+      backdropFilter: 'blur(10px)',
+      WebkitBackdropFilter: 'blur(10px)',
       border: '1px solid var(--color-border)',
       padding: '16px 24px',
       borderRadius: 'var(--radius-lg)',
       display: 'flex',
-      flexDirection: 'row',
-      alignItems: 'center',
-      justifyContent: 'space-between',
+      flexDirection: 'column',
+      alignItems: 'stretch',
       gap: '16px',
       zIndex: 9999,
-      boxShadow: '0 8px 32px rgba(0, 0, 0, 0.4)',
-      maxWidth: '800px',
+      boxShadow: '0 8px 32px rgba(0, 0, 0, 0.3)',
+      maxWidth: '500px',
       margin: '0 auto'
     }}>
       <div style={{ flex: 1 }}>
-        <p style={{ margin: 0, fontSize: '0.9rem', color: 'var(--color-text-main)', lineHeight: 1.5 }}>
+        <p style={{ margin: 0, fontSize: '0.9rem', color: 'var(--color-text-main)', lineHeight: 1.5, textAlign: 'left' }}>
           Utilizamos cookies para mejorar la experiencia de navegación en nuestra plataforma.
         </p>
       </div>
-      <div style={{ display: 'flex', gap: '8px' }}>
+      <div style={{ display: 'flex', gap: '8px', justifyContent: 'flex-end' }}>
         <button
           onClick={handleReject}
           style={{
