@@ -517,21 +517,7 @@ function ProductosContent() {
                       return <span>A acordar</span>;
                     })()}
                   </div>
-                  <button 
-                    onClick={(e) => { e.stopPropagation(); router.push(`/productos/${producto.id}`); }}
-                    style={{ 
-                      padding: '4px 12px', 
-                      borderRadius: 'var(--radius-full)', 
-                      color: 'var(--color-primary)', 
-                      fontSize: '0.8rem',
-                      fontWeight: 600,
-                      background: 'transparent',
-                      border: '1px solid var(--color-primary)',
-                      cursor: 'pointer'
-                    }}
-                  >
-                    Ver
-                  </button>
+
                 </div>
               </div>
             </div>

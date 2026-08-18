@@ -865,24 +865,7 @@ export default function NegocioDetailPage({ params }: { params: Promise<{ id: st
                                                 return <span>A acordar</span>;
                                               })()}
                                             </div>
-                                            <button 
-                                              onClick={(e) => { e.stopPropagation(); router.push(`/productos/${id}`); }}
-                                              style={{ 
-                                                padding: '4px 12px', 
-                                                borderRadius: 'var(--radius-full)', 
-                                                color: 'var(--color-primary)', 
-                                                fontSize: '0.8rem',
-                                                fontWeight: 600,
-                                                background: 'transparent',
-                                                border: '1px solid var(--color-primary)',
-                                                cursor: 'pointer',
-                                                transition: 'all 0.2s'
-                                              }}
-                                              onMouseEnter={(e) => { e.currentTarget.style.background = 'rgba(255,115,0,0.1)'; }}
-                                              onMouseLeave={(e) => { e.currentTarget.style.background = 'transparent'; }}
-                                            >
-                                              Ver
-                                            </button>
+
                                           </div>
                                         </div>
                                       </div>
@@ -1029,24 +1012,7 @@ export default function NegocioDetailPage({ params }: { params: Promise<{ id: st
                                                 return <span>A acordar</span>;
                                               })()}
                                             </div>
-                                            <button 
-                                              onClick={(e) => { e.stopPropagation(); router.push(`/productos/${id}`); }}
-                                              style={{ 
-                                                padding: '4px 12px', 
-                                                borderRadius: 'var(--radius-full)', 
-                                                color: 'var(--color-primary)', 
-                                                fontSize: '0.8rem',
-                                                fontWeight: 600,
-                                                background: 'transparent',
-                                                border: '1px solid var(--color-primary)',
-                                                cursor: 'pointer',
-                                                transition: 'all 0.2s'
-                                              }}
-                                              onMouseEnter={(e) => { e.currentTarget.style.background = 'rgba(255,115,0,0.1)'; }}
-                                              onMouseLeave={(e) => { e.currentTarget.style.background = 'transparent'; }}
-                                            >
-                                              Ver
-                                            </button>
+
                                           </div>
                                         </div>
                                       </div>
@@ -1257,24 +1223,7 @@ export default function NegocioDetailPage({ params }: { params: Promise<{ id: st
                                       
                                       {/* Ver Button */}
                                       <div className="product-card-shipping-row" style={{ display: 'flex', justifyContent: 'flex-end', marginTop: '4px' }}>
-                                        <button 
-                                          onClick={(e) => { e.stopPropagation(); router.push(`/servicios/${servId}`); }}
-                                          style={{ 
-                                            padding: '4px 12px', 
-                                            borderRadius: 'var(--radius-full)', 
-                                            color: 'var(--color-primary)', 
-                                            fontSize: '0.8rem',
-                                            fontWeight: 600,
-                                            background: 'transparent',
-                                            border: '1px solid var(--color-primary)',
-                                            cursor: 'pointer',
-                                            transition: 'all 0.2s'
-                                          }}
-                                          onMouseEnter={(e) => { e.currentTarget.style.background = 'rgba(255,115,0,0.1)'; }}
-                                          onMouseLeave={(e) => { e.currentTarget.style.background = 'transparent'; }}
-                                        >
-                                          Ver
-                                        </button>
+
                                       </div>
                                     </div>
                                   </div>

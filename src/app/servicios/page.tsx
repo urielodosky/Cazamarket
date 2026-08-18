@@ -299,25 +299,6 @@ function ServiciosContent() {
                   </span>
                 </div>
                 
-                <button 
-                  onClick={(e) => {
-                    e.stopPropagation();
-                    router.push(`/servicios/${servicio.id}`);
-                  }}
-                  style={{ 
-                    padding: '8px 16px', 
-                    borderRadius: 'var(--radius-full)', 
-                    color: 'var(--color-primary)', 
-                    fontSize: '0.85rem',
-                    fontWeight: 600,
-                    whiteSpace: 'nowrap',
-                    background: 'transparent',
-                    border: '1px solid var(--color-primary)',
-                    cursor: 'pointer'
-                  }}
-                >
-                  Ver servicio
-                </button>
               </div>
             </div>
           </div>
