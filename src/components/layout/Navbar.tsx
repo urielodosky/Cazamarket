@@ -36,7 +36,6 @@ export default function Navbar() {
   const { isLoggedIn, isVendorModeActive, toggleVendorMode } = useAuth();
   
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
-  const [isFiltersOpen, setIsFiltersOpen] = useState(false);
   const [rating, setRating] = useState('');
   const [searchQuery, setSearchQuery] = useState(searchParams?.get('q') || '');
   const [isSearchFocused, setIsSearchFocused] = useState(false);
@@ -74,10 +73,33 @@ export default function Navbar() {
 
   // Cerrar filtros automáticamente al navegar a una página sin filtros
   useEffect(() => {
-    if (!isFilterablePage) {
-      setIsFiltersOpen(false);
+    setRating('');
+  }, [pathname]);
+
+  const filtersCarouselRef = useRef<HTMLDivElement>(null);
+  const [canScrollLeft, setCanScrollLeft] = useState(false);
+  const [canScrollRight, setCanScrollRight] = useState(true);
+
+  const updateScrollArrows = () => {
+    if (filtersCarouselRef.current) {
+      const { scrollLeft, scrollWidth, clientWidth } = filtersCarouselRef.current;
+      setCanScrollLeft(scrollLeft > 0);
+      setCanScrollRight(scrollLeft + clientWidth < scrollWidth - 1);
     }
-  }, [pathname, isFilterablePage]);
+  };
+
+  useEffect(() => {
+    updateScrollArrows();
+    window.addEventListener('resize', updateScrollArrows);
+    return () => window.removeEventListener('resize', updateScrollArrows);
+  }, []);
+
+  const scrollFilters = (direction: 'left' | 'right') => {
+    if (filtersCarouselRef.current) {
+      const scrollAmount = direction === 'left' ? -300 : 300;
+      filtersCarouselRef.current.scrollBy({ left: scrollAmount, behavior: 'smooth' });
+    }
+  };
 
   useEffect(() => {
     const fetchProvincias = async () => {
@@ -404,65 +426,7 @@ export default function Navbar() {
                   onKeyDown={(e) => { if (e.key === 'Enter') executeSearch(); }}
                   style={{ marginLeft: '12px', color: themeColors.textWhite, width: '100%', background: 'transparent', border: 'none', outline: 'none', height: '100%' }}
                 />
-                {isFilterablePage && <button 
-                  suppressHydrationWarning
-                  type="button"
-                  className="filter-btn-premium"
-                  onClick={(e) => {
-                    e.preventDefault();
-                    e.stopPropagation();
-                    setIsFiltersOpen(!isFiltersOpen);
-                  }}
-                  style={{ 
-                    borderRadius: '100px', 
-                    fontSize: '0.9rem', 
-                    fontWeight: 600,
-                    display: 'flex', 
-                    alignItems: 'center', 
-                    gap: '8px', 
-                    padding: '0 20px',
-                    height: '44px',
-                    marginLeft: 'auto',
-                    background: isFiltersOpen ? 'var(--color-primary)' : 'rgba(255,255,255,0.05)',
-                    border: 'none',
-                    color: isFiltersOpen ? 'white' : themeColors.textWhite,
-                    cursor: 'pointer',
-                    pointerEvents: 'auto',
-                    transition: 'all 0.4s cubic-bezier(0.4, 0, 0.2, 1)',
-                    flexShrink: 0
-                  }}
-                  onMouseEnter={(e) => {
-                    if (isFiltersOpen) return;
-                    e.currentTarget.style.background = 'rgba(255,255,255,0.08)';
-                  }}
-                  onMouseLeave={(e) => {
-                    if (isFiltersOpen) return;
-                    e.currentTarget.style.background = 'rgba(255,255,255,0.05)';
-                  }}
-                >
-                  <svg 
-                    width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" 
-                    style={{ 
-                      color: isFiltersOpen ? 'white' : 'var(--color-primary)',
-                      transition: 'transform 0.5s cubic-bezier(0.4, 0, 0.2, 1)',
-                      transform: isFiltersOpen ? 'rotate(180deg)' : 'rotate(0deg)',
-                      pointerEvents: 'none'
-                    }}
-                  >
-                    <circle cx="6" cy="14" r="3"></circle>
-                    <line x1="6" y1="3" x2="6" y2="11"></line>
-                    <line x1="6" y1="17" x2="6" y2="21"></line>
 
-                    <circle cx="12" cy="8" r="3"></circle>
-                    <line x1="12" y1="3" x2="12" y2="5"></line>
-                    <line x1="12" y1="11" x2="12" y2="21"></line>
-
-                    <circle cx="18" cy="16" r="3"></circle>
-                    <line x1="18" y1="3" x2="18" y2="13"></line>
-                    <line x1="18" y1="19" x2="18" y2="21"></line>
-                  </svg>
-                  <span className="filter-text-mobile">Filtros</span>
-                </button>}
               </div>
             {!isHome && <div className="divider-vertical-animated" style={{ display: 'none' }}></div>}
   
@@ -472,45 +436,11 @@ export default function Navbar() {
             </div>
           </div>
 
-        {/* Panel de Filtros Animado */}
-        {isFilterablePage && (
-          <div 
-            className="filters-panel"
-          style={{
-            width: isFiltersOpen ? (pathname.startsWith('/comunidad') ? '240px' : '580px') : '0px',
-            opacity: isFiltersOpen ? 1 : 0,
-            visibility: isFiltersOpen ? 'visible' : 'hidden',
-            overflow: isFiltersOpen ? 'visible' : 'hidden',
-            transition: 'width 0.5s cubic-bezier(0.4, 0, 0.2, 1), opacity 0.5s',
-            borderRadius: '20px',
-            padding: isFiltersOpen ? '14px 20px' : '0px',
-            height: '112px',
-            minHeight: '112px',
-            boxSizing: 'border-box',
-            display: 'flex',
-            flexDirection: 'column',
-            marginLeft: isFiltersOpen ? '0px' : '-16px',
-            zIndex: 5,
-            backgroundColor: 'var(--color-bg-surface-elevated)',
-            border: '1px solid rgba(255, 255, 255, 0.05)'
-          }}
-        >
-          <div style={{ 
-            display: 'flex', 
-            flexWrap: 'wrap',
-            gap: '12px', 
-            width: '100%', 
-            opacity: isFiltersOpen ? 1 : 0, 
-            transition: 'opacity 0.3s ease 0.2s' 
-          }}>
-            {renderFiltersContent()}
-          </div>
-        </div>
-        )}
+
         </div>
 
         <div className="navbar-actions" style={{ display: 'flex', alignItems: 'center', gap: '16px' }}>
-          <div className={`theme-toggle-wrapper ${isFiltersOpen ? 'filters-open' : ''} ${(isFilterablePage && !isHome && !isBusinessProfile) ? 'has-searchbar' : ''}`}>
+          <div className={`theme-toggle-wrapper ${(isFilterablePage && !isHome && !isBusinessProfile) ? 'has-searchbar' : ''}`}>
             <DarkModeToggle />
           </div>
           {!isClient ? (
@@ -591,10 +521,22 @@ export default function Navbar() {
         </div>
       </div>
 
-      {/* Mobile Filters Scroll View (debajo del navbar) */}
+      {/* Global Filters Horizontal Strip (debajo del navbar) */}
       {(isFilterablePage && !isBusinessProfile) && (
-        <div className="mobile-filters-panel">
-          {renderFiltersContent()}
+        <div className="filters-carousel-wrapper">
+          {canScrollLeft && (
+            <button className="filter-scroll-btn left" onClick={() => scrollFilters('left')} aria-label="Scroll left">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><polyline points="15 18 9 12 15 6"></polyline></svg>
+            </button>
+          )}
+          <div className="global-filters-panel" ref={filtersCarouselRef} onScroll={updateScrollArrows}>
+            {renderFiltersContent()}
+          </div>
+          {canScrollRight && (
+            <button className="filter-scroll-btn right" onClick={() => scrollFilters('right')} aria-label="Scroll right">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><polyline points="9 18 15 12 9 6"></polyline></svg>
+            </button>
+          )}
         </div>
       )}
     </header>

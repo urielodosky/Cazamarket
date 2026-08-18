@@ -1,4 +1,4 @@
-@import '../styles/tokens.css';
+﻿@import '../styles/tokens.css';
 @import '../styles/light-mode.css';
 
 /* Global utilities and animations can go here */
@@ -162,7 +162,7 @@ input[type="number"] {
   background: var(--color-primary);
 }
 
-/* Ocultar flechas (spinners) de los inputs numéricos globalmente */
+/* Ocultar flechas (spinners) de los inputs numÃ©ricos globalmente */
 input[type="number"]::-webkit-inner-spin-button,
 input[type="number"]::-webkit-outer-spin-button {
   -webkit-appearance: none;
@@ -373,7 +373,7 @@ input[type="number"] {
   background: var(--color-primary);
 }
 
-/* Ocultar flechas (spinners) de los inputs numéricos globalmente */
+/* Ocultar flechas (spinners) de los inputs numÃ©ricos globalmente */
 input[type="number"]::-webkit-inner-spin-button,
 input[type="number"]::-webkit-outer-spin-button {
   -webkit-appearance: none;
@@ -575,9 +575,9 @@ h1, h2, h3, h4, h5, h6, p, span { overflow-wrap: break-word; word-wrap: break-wo
 
 /* Print Styles */
 @media print {
-  /* Ocultar elementos de navegación y flotantes al imprimir */
+  /* Ocultar elementos de navegaciÃ³n y flotantes al imprimir */
   header, footer, nav, 
-  .mobile-filters-panel, 
+  .global-filters-panel, 
   .skip-to-content,
   button[aria-label="Volver arriba"],
   button[aria-label="Contactar por WhatsApp"],

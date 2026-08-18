@@ -324,8 +324,7 @@
 
 /* Desktop: hide mobile elements */
 @media (min-width: 769px) {
-  .mobile-menu-btn,
-  .mobile-filters-panel {
+  .mobile-menu-btn {
     display: none !important;
   }
   .guest-cta-desktop {
@@ -397,7 +396,7 @@
     height: 44px !important;
   }
 
-  /* Ocultar menú de hamburguesa nativo viejo y enlaces en móvil */
+  /* Ocultar menÃº de hamburguesa nativo viejo y enlaces en mÃ³vil */
   .mobile-menu-btn {
     display: none !important;
   }
@@ -461,46 +460,6 @@
     margin-left: 6px;
   }
 
-  /* Hide desktop filter button and panel on mobile */
-  .filter-btn-premium,
-  .filters-panel {
-    display: none !important;
-  }
-
-  /* Mobile Filters Panel Styles */
-  .mobile-filters-panel {
-    display: flex !important;
-    gap: 8px;
-    width: 100vw;
-    margin-left: -24px; /* Compensar padding de navbar-container nuevo (24px) */
-    padding: 10px 0; /* Horizontal padding goes to pseudo elements */
-    background: var(--color-bg-base, #0f0f11);
-    border-bottom: 1px solid rgba(255, 255, 255, 0.05);
-    overflow-x: auto;
-    -webkit-overflow-scrolling: touch;
-    scrollbar-width: none; /* Firefox */
-  }
-
-  .mobile-filters-panel::-webkit-scrollbar {
-    display: none; /* Chrome/Safari */
-  }
-  
-  .mobile-filters-panel::before {
-    content: '';
-    padding-left: 24px;
-    flex-shrink: 0;
-  }
-  
-  .mobile-filters-panel::after {
-    content: '';
-    padding-right: 24px;
-    flex-shrink: 0;
-  }
-
-  .mobile-filters-panel .filter-wrapper-item {
-    flex: 0 0 auto !important; /* No shrink, no grow */
-    min-width: 130px !important;
-  }
 
   .divider-vertical-animated {
     display: none !important;
@@ -737,7 +696,7 @@
   }
 }
 
-/* Búsqueda expandida en móvil */
+/* BÃºsqueda expandida en mÃ³vil */
 @media (max-width: 768px) {
   .navbar-logo, .navbar-actions, .mobile-menu-btn {
     transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
@@ -777,7 +736,7 @@
 /* Fix mobile line separation in light mode */
 @media (max-width: 768px) {
   [data-theme="light"] .navbar-header,
-  [data-theme="light"] .mobile-filters-panel,
+  [data-theme="light"] .global-filters-panel,
   [data-theme="light"] .navbar-container {
     border-bottom: none !important;
     border-top: none !important;
@@ -800,4 +759,92 @@
   .theme-toggle-wrapper.has-searchbar {
     display: none !important;
   }
+}
+
+/* Global Filters Horizontal Carousel Styles */
+.filters-carousel-wrapper {
+  position: relative;
+  display: flex;
+  align-items: center;
+  width: 100%;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+  background: var(--color-bg-base, #0f0f11);
+}
+
+[data-theme="light"] .filters-carousel-wrapper {
+  border-bottom: 1px solid rgba(0, 0, 0, 0.05);
+  background: var(--color-bg-base, #ffffff);
+}
+
+.global-filters-panel {
+  display: flex !important;
+  gap: 8px;
+  width: 100%;
+  padding: 10px 0;
+  overflow-x: auto;
+  -webkit-overflow-scrolling: touch;
+  scrollbar-width: none; /* Firefox */
+  scroll-behavior: smooth;
+}
+
+.global-filters-panel::-webkit-scrollbar {
+  display: none; /* Chrome/Safari */
+}
+
+.global-filters-panel::before {
+  content: '';
+  padding-left: 24px;
+  flex-shrink: 0;
+}
+
+.global-filters-panel::after {
+  content: '';
+  padding-right: 24px;
+  flex-shrink: 0;
+}
+
+.global-filters-panel .filter-wrapper-item {
+  flex: 0 0 auto !important;
+  min-width: 130px !important;
+}
+
+/* Scroll Arrows */
+.filter-scroll-btn {
+  position: absolute;
+  top: 50%;
+  transform: translateY(-50%);
+  z-index: 10;
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
+  background: var(--color-bg-surface-elevated, #1a1a1f);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  color: var(--color-text-main, #ffffff);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+  transition: all 0.2s ease;
+}
+
+.filter-scroll-btn:hover {
+  background: var(--color-primary);
+  border-color: var(--color-primary);
+  color: white;
+}
+
+.filter-scroll-btn.left {
+  left: 8px;
+}
+
+.filter-scroll-btn.right {
+  right: 8px;
+}
+
+[data-theme="light"] .filter-scroll-btn {
+  background: white;
+  border-color: rgba(0, 0, 0, 0.1);
+  color: #333;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
 }
