@@ -558,7 +558,7 @@ h1, h2, h3, h4, h5, h6, p, span { overflow-wrap: break-word; word-wrap: break-wo
 /* Accesibilidad */
 .skip-to-content {
   position: absolute;
-  top: -100px;
+  top: -40px;
   left: 0;
   background: var(--color-primary);
   color: white;
