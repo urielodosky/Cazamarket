@@ -106,14 +106,14 @@ function ServiciosContent() {
               description: servicio.description,
               price: servicio.price,
               currency: servicio.currency,
-              pricePeriod: servicio.price_period,
-              media: servicio.media || [],
-              image: servicio.image || null,
+              pricePeriod: null, // Removed
+              media: servicio.image_urls ? servicio.image_urls.map((u: string) => ({url: u})) : [],
+              image: servicio.image_urls && servicio.image_urls.length > 0 ? servicio.image_urls[0] : null,
               category: servicio.category,
               subcategory: servicio.subcategory,
               location: servicio.location,
               serviceLocation: servicio.location,
-              features: servicio.features || [],
+              features: [], // Removed
               rating: servicio.calc_rating ? parseFloat(servicio.calc_rating).toFixed(1) : 0,
               createdAt: servicio.created_at,
               seller: {
