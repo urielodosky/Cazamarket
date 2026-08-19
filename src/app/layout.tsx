@@ -25,6 +25,9 @@ export const viewport: Viewport = {
 export const metadata: Metadata = {
   title: "CazaMarket | Todo para el Cazador, Pescador y Campista",
   description: "CazaMarket es la plataforma web líder de Argentina para conectar a cazadores, pescadores y campistas con los mejores comercios, guías y servicios de la región. Únete hoy.",
+  icons: {
+    icon: '/icon.png',
+  },
   metadataBase: new URL('https://cazamarket.vercel.app'),
   alternates: {
     canonical: '/',
