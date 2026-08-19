@@ -326,8 +326,8 @@ export default function Navbar() {
           </button>
         </div>
       )}
-      {/* 1. Precio (Min/Max) */}
-      {!pathname.startsWith('/comunidad') && (
+        {/* 1. Precio (Min/Max) */}
+      {!pathname.startsWith('/comunidad') && !pathname.startsWith('/negocios') && (
         <>
           <div className="filter-wrapper-item" style={{ flex: '0 0 auto', minWidth: '110px', zIndex: 125 }}>
             <CustomSelect
@@ -438,7 +438,6 @@ export default function Navbar() {
                   { value: '', label: 'Vendedor (Todos)' },
                   { value: 'minorista', label: 'Minorista' },
                   { value: 'mayorista', label: 'Mayorista' },
-                  { value: 'mixto', label: 'Mixto' },
                 ]} 
                 value={businessType} 
                 onChange={setBusinessType} 
