@@ -769,7 +769,7 @@
   width: 100%;
   box-sizing: border-box;
   background: var(--color-bg-base, #0f0f11);
-  padding: 0 32px; /* Espacio fijo a los costados siempre visible */
+  padding: 0 48px; /* Mayor espacio a los costados para separar flechas de los filtros */
 }
 
 [data-theme="light"] .filters-carousel-wrapper {
@@ -778,17 +778,18 @@
 
 .global-filters-panel {
   display: flex !important;
-  gap: 8px;
-  width: 100%;
-  padding: 10px 0;
+  flex-direction: row;
   overflow-x: auto;
-  -webkit-overflow-scrolling: touch;
-  scrollbar-width: none; /* Firefox */
+  gap: 12px;
+  padding: 10px 0;
+  width: 100%;
+  scrollbar-width: none;
+  -ms-overflow-style: none;
   scroll-behavior: smooth;
 }
 
 .global-filters-panel::-webkit-scrollbar {
-  display: none; /* Chrome/Safari */
+  display: none;
 }
 
 /* Quitar pseudoelementos porque el padding ahora está en el wrapper padre */
@@ -812,7 +813,7 @@
   height: 40px;
   background: var(--color-bg-surface-elevated, #1a1a1f);
   border: 1px solid rgba(255, 255, 255, 0.1);
-  color: var(--color-text-main, #ffffff);
+  color: white;
   display: flex;
   align-items: center;
   justify-content: center;
@@ -826,17 +827,17 @@
 }
 
 .filter-scroll-btn.left {
-  left: 0;
-  border-radius: 50px 0 0 50px;
-  border-right: none;
-  padding-right: 2px;
+  left: 8px;
+  border-radius: 0 50px 50px 0;
+  border-left: none;
+  padding-right: 4px;
 }
 
 .filter-scroll-btn.right {
-  right: 0;
-  border-radius: 0 50px 50px 0;
-  border-left: none;
-  padding-left: 2px;
+  right: 8px;
+  border-radius: 50px 0 0 50px;
+  border-right: none;
+  padding-left: 4px;
 }
 
 [data-theme="light"] .filter-scroll-btn {
