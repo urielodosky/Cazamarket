@@ -4,6 +4,7 @@ import { useRef, useState, useEffect } from 'react';
 import Image from 'next/image';
 import './config.css';
 import { useAuth } from '@/contexts/AuthContext';
+import { useBusinessProfile } from '@/contexts/BusinessProfileContext';
 import { usePlan } from '@/contexts/PlanContext';
 import { createClient } from '@/lib/supabase/client';
 import CustomSelect, { SelectOption } from '@/components/ui/CustomSelect';
@@ -80,9 +81,12 @@ export default function ConfiguracionPage() {
   const { 
     username, email, avatar, updateUser, isVendor, upgradeToVendor,
     personType, birthDate, cuit, phone, contactEmail,
-    firstName, lastName, storeName, storeDescription, street, streetNumber, province, locality,
-    socialMedia, branches, schedules 
+    firstName, lastName 
   } = useAuth();
+  const { 
+    storeName, storeDescription, street, streetNumber, province, locality,
+    socialMedia, branches, schedules, updateBusinessProfile 
+  } = useBusinessProfile();
   const { planDisplayName, isPaidPlan, productPlanTier, servicePlanTier, permissions } = usePlan();
   const fileInputRef = useRef<HTMLInputElement>(null);
   const [isUploading, setIsUploading] = useState(false);
@@ -400,31 +404,35 @@ export default function ConfiguracionPage() {
       }
     }
 
-    const updateResult = await updateUser({
-      username: formData.username,
-      avatar: (formData as any).avatar,
-      personType: formData.tipoPersona,
-      birthDate: formData.dob,
-      cuit: formData.cuit,
-      phone: formData.telefono,
-      contactEmail: formData.contactEmail,
-      firstName: formData.nombre,
-      lastName: formData.apellido,
-      storeName: formData.storeName,
-      storeDescription: formData.storeDescription,
-      street: formData.calle,
-      streetNumber: formData.numero,
-      province: selectedProvincia,
-      locality: selectedLocalidad,
-      socialMedia: redesSociales,
-      branches: sucursales,
-      schedules: horarios,
-      role: !isVendor ? 'negocio' : undefined
-    });
+    const [authUpdateResult, businessUpdateResult] = await Promise.all([
+      updateUser({
+        username: formData.username,
+        avatar: (formData as any).avatar,
+        personType: formData.tipoPersona,
+        birthDate: formData.dob,
+        cuit: formData.cuit,
+        phone: formData.telefono,
+        contactEmail: formData.contactEmail,
+        firstName: formData.nombre,
+        lastName: formData.apellido,
+        role: !isVendor ? 'negocio' : undefined
+      }),
+      updateBusinessProfile({
+        storeName: formData.storeName,
+        storeDescription: formData.storeDescription,
+        street: formData.calle,
+        streetNumber: formData.numero,
+        province: selectedProvincia,
+        locality: selectedLocalidad,
+        socialMedia: redesSociales,
+        branches: sucursales,
+        schedules: horarios,
+      })
+    ]);
 
-    if (!updateResult.success) {
-      if (updateResult.errors) {
-        setFieldErrors(updateResult.errors);
+    if (!authUpdateResult.success || !businessUpdateResult.success) {
+      if (authUpdateResult.errors || businessUpdateResult.errors) {
+        setFieldErrors({ ...(authUpdateResult.errors || {}), ...(businessUpdateResult.errors || {}) });
         showToast('Por favor, revisa los errores en el formulario.', 'error');
       } else {
         showToast('Error al guardar la configuración.', 'error');

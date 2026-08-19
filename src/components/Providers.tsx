@@ -4,6 +4,7 @@ import { AuthProvider } from '@/contexts/AuthContext';
 import { FavoritesProvider } from '@/contexts/FavoritesContext';
 import { CartProvider } from '@/contexts/CartContext';
 import { PlanProvider } from '@/contexts/PlanContext';
+import { BusinessProfileProvider } from '@/contexts/BusinessProfileContext';
 import { ThemeProvider } from '@/contexts/ThemeContext';
 import ToastNotifications from './ToastNotifications';
 import TermsAcceptanceModal from './TermsAcceptanceModal';
@@ -16,18 +17,20 @@ export default function Providers({ children }: { children: ReactNode }) {
     <PostHogProvider>
       <ThemeProvider>
       <AuthProvider>
-        <PlanProvider>
-          <FavoritesProvider>
-            <CartProvider>
-              <ToastNotifications />
-              <TermsAcceptanceModal />
-              <Suspense fallback={null}>
-                <UTMTracker />
-              </Suspense>
-              {children}
-            </CartProvider>
-          </FavoritesProvider>
-        </PlanProvider>
+        <BusinessProfileProvider>
+          <PlanProvider>
+            <FavoritesProvider>
+              <CartProvider>
+                <ToastNotifications />
+                <TermsAcceptanceModal />
+                <Suspense fallback={null}>
+                  <UTMTracker />
+                </Suspense>
+                {children}
+              </CartProvider>
+            </FavoritesProvider>
+          </PlanProvider>
+        </BusinessProfileProvider>
       </AuthProvider>
     </ThemeProvider>
     </PostHogProvider>

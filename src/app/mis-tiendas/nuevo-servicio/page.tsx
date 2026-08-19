@@ -7,6 +7,7 @@ import { useRouter, useSearchParams } from 'next/navigation';
 import dynamic from 'next/dynamic';
 import CustomSelect from '@/components/ui/CustomSelect';
 import { useAuth } from '@/contexts/AuthContext';
+import { useBusinessProfile } from '@/contexts/BusinessProfileContext';
 import { createClient } from '@/lib/supabase/client';
 import { usePlan } from '@/contexts/PlanContext';
 import VirtualAdvisorModal from '@/components/chat/VirtualAdvisorModal';
@@ -58,7 +59,8 @@ function NuevoServicioContent() {
   const router = useRouter();
   const searchParams = useSearchParams();
   const editId = searchParams?.get('editId');
-  const { username, avatar: userAvatar, supabaseUser, storeCategories: authStoreCategories, branches: authBranches } = useAuth();
+  const { username, avatar: userAvatar, supabaseUser } = useAuth();
+  const { storeCategories: authStoreCategories, branches: authBranches } = useBusinessProfile();
   const { hasFeature, permissions } = usePlan();
   
   const canUseBot = hasFeature('botAsesor');

@@ -2,6 +2,7 @@
 
 import React, { useState } from 'react';
 import { useAuth } from '@/contexts/AuthContext';
+import { useBusinessProfile } from '@/contexts/BusinessProfileContext';
 import { usePlan } from '@/contexts/PlanContext';
 import { useThemeColors } from '@/hooks/useThemeColors';
 import Link from 'next/link';
@@ -108,7 +109,8 @@ const ensureCategoriesArray = (raw: any, targetLen: number = 3): string[] => {
 };
 
 export default function MiNegocioPage() {
-  const { isVendorModeActive, username, email, avatar, coverUrl, updateUser, storeDescription, businessType: authBusinessType, storeCategories, storeTheme, phone, province, locality, street, streetNumber, branches, socialMedia, supabaseUser, providers, distributors } = useAuth();
+  const { isVendorModeActive, username, email, avatar, updateUser, phone, supabaseUser } = useAuth();
+  const { coverUrl, storeDescription, businessType: authBusinessType, storeCategories, storeTheme, province, locality, street, streetNumber, branches, socialMedia, providers, distributors, updateBusinessProfile } = useBusinessProfile();
   const { permissions, planTier, planDisplayName } = usePlan();
   const themeColors = useThemeColors();
   const [activeTab, setActiveTab] = useState<'productos' | 'servicios' | 'alianzas' | 'informacion' | 'apariencia'>('productos');
@@ -202,19 +204,19 @@ export default function MiNegocioPage() {
 
   const handleDescChange = (newDesc: string) => {
     setDescription(newDesc);
-    updateUser({ storeDescription: newDesc });
+    updateBusinessProfile({ storeDescription: newDesc });
   };
 
   const handleThemeChange = (field: string, value: any) => {
     const newTheme = { ...theme, [field]: value };
     setTheme(newTheme);
-    updateUser({ storeTheme: newTheme });
+    updateBusinessProfile({ storeTheme: newTheme });
   };
 
   const handleResetTheme = () => {
     const defaultTheme = { primaryColor: '#ff7300', textColor: '#ffffff', bgColor: '#111310', forceCustom: false };
     setTheme(defaultTheme);
-    updateUser({ storeTheme: defaultTheme });
+    updateBusinessProfile({ storeTheme: defaultTheme });
   };
 
   const handleAvatarChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -279,7 +281,7 @@ export default function MiNegocioPage() {
         updateUser({ avatar: data.publicUrl });
       } else {
         setStoreBanner(data.publicUrl);
-        updateUser({ coverUrl: data.publicUrl });
+        updateBusinessProfile({ coverUrl: data.publicUrl });
       }
       
       setCropImageSrc(null);
@@ -499,7 +501,7 @@ export default function MiNegocioPage() {
                   value={businessType || ''}
                   onChange={(val) => {
                     setBusinessType(val);
-                    updateUser({ businessType: val });
+                    updateBusinessProfile({ businessType: val });
                   }}
                   placeholder="Tipo de Negocio"
                 />
@@ -521,7 +523,7 @@ export default function MiNegocioPage() {
                         const newCats = ensureCategoriesArray(categories, permissions.maxCategorias || 3);
                         newCats[index] = val;
                         setCategories(newCats);
-                        updateUser({ storeCategories: newCats });
+                        updateBusinessProfile({ storeCategories: newCats });
                       }}
                       placeholder={`Categoría ${index + 1}`}
                     />
@@ -1071,7 +1073,7 @@ export default function MiNegocioPage() {
                       tags={providersList} 
                       onChange={(tags) => {
                         setProvidersList(tags);
-                        updateUser({ providers: tags });
+                        updateBusinessProfile({ providers: tags });
                       }} 
                       placeholder="Buscar o escribir nombre de proveedor..." 
                     />
@@ -1083,7 +1085,7 @@ export default function MiNegocioPage() {
                       tags={distributorsList} 
                       onChange={(tags) => {
                         setDistributorsList(tags);
-                        updateUser({ distributors: tags });
+                        updateBusinessProfile({ distributors: tags });
                       }} 
                       placeholder="Buscar o escribir nombre de distribuidor..." 
                     />

@@ -7,6 +7,7 @@ import { useRouter, useSearchParams } from 'next/navigation';
 import { LightBulbIcon } from '@heroicons/react/24/outline';
 import CustomSelect from '@/components/ui/CustomSelect';
 import { useAuth } from '@/contexts/AuthContext';
+import { useBusinessProfile } from '@/contexts/BusinessProfileContext';
 import { createClient } from '@/lib/supabase/client';
 import ImageCropperModal from '@/components/ImageCropperModal';
 import getCroppedImg from '@/utils/cropImage';
@@ -18,7 +19,8 @@ function NuevoProductoContent() {
   const router = useRouter();
   const searchParams = useSearchParams();
   const editId = searchParams?.get('editId');
-  const { username, avatar: userAvatar, supabaseUser, storeCategories: authStoreCategories, branches: authBranches } = useAuth();
+  const { username, avatar: userAvatar, supabaseUser } = useAuth();
+  const { storeCategories: authStoreCategories, branches: authBranches } = useBusinessProfile();
   const { hasFeature, permissions } = usePlan();
   
   const canUseBot = hasFeature('botAsesor');
