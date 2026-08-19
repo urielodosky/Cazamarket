@@ -206,6 +206,32 @@ export default function Navbar() {
   };
 
   const isInitialMount = useRef(true);
+  const isSyncing = useRef(false);
+
+  // Sync state with URL when navigating (e.g., from home page links or back button)
+  useEffect(() => {
+    isSyncing.current = true;
+    setSearchQuery(searchParams?.get('q') || '');
+    setCategoria(searchParams?.get('categoria') || '');
+    const sub = searchParams?.get('subcategorias');
+    setSubcategorias(sub ? sub.split(',') : []);
+    setMinPrice(searchParams?.get('minPrice') || '');
+    setMaxPrice(searchParams?.get('maxPrice') || '');
+    setMinPriceInput(searchParams?.get('minPrice') || '');
+    setMaxPriceInput(searchParams?.get('maxPrice') || '');
+    setCurrency(searchParams?.get('currency') || '');
+    setBusinessType(searchParams?.get('businessType') || '');
+    setOfrece(searchParams?.get('ofrece') || '');
+    setTipo(searchParams?.get('tipo') || '');
+    setProvincia(searchParams?.get('provincia') || '');
+    setLocalidad(searchParams?.get('localidad') || '');
+    setRating(searchParams?.get('rating') || '');
+    
+    // Allow React to process these state updates before re-enabling auto-search
+    setTimeout(() => {
+      isSyncing.current = false;
+    }, 50);
+  }, [searchParams]);
 
   // Auto-search effect for filters
   useEffect(() => {
@@ -213,6 +239,7 @@ export default function Navbar() {
       isInitialMount.current = false;
       return;
     }
+    if (isSyncing.current) return; // Don't push router if we are just syncing from it
     executeSearch();
   }, [searchQuery, categoria, subcategorias, minPrice, maxPrice, currency, businessType, ofrece, tipo, provincia, localidad, rating]);
 
