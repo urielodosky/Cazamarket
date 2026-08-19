@@ -9,38 +9,39 @@ interface PaginationProps {
 }
 
 export default function Pagination({ currentPage, totalPages, onPageChange }: PaginationProps) {
-  if (totalPages <= 1) return null;
+  // Ensure totalPages is at least 1 so it always shows page 1
+  const safeTotalPages = Math.max(1, totalPages);
 
   const handlePrevious = () => {
     if (currentPage > 1) onPageChange(currentPage - 1);
   };
 
   const handleNext = () => {
-    if (currentPage < totalPages) onPageChange(currentPage + 1);
+    if (currentPage < safeTotalPages) onPageChange(currentPage + 1);
   };
 
   const getPageNumbers = () => {
     const pages = [];
     
-    if (totalPages <= 6) {
-      for (let i = 1; i <= totalPages; i++) pages.push(i);
+    if (safeTotalPages <= 6) {
+      for (let i = 1; i <= safeTotalPages; i++) pages.push(i);
       return pages;
     }
     
-    if (currentPage >= totalPages - 3) {
+    if (currentPage >= safeTotalPages - 3) {
       pages.push(1, '...');
-      for (let i = totalPages - 4; i <= totalPages; i++) {
+      for (let i = safeTotalPages - 4; i <= safeTotalPages; i++) {
         pages.push(i);
       }
     } else if (currentPage <= 4) {
       for (let i = 1; i <= 5; i++) {
         pages.push(i);
       }
-      pages.push('...', totalPages);
+      pages.push('...', safeTotalPages);
     } else {
       pages.push(1, '...');
       pages.push(currentPage - 1, currentPage, currentPage + 1);
-      pages.push('...', totalPages);
+      pages.push('...', safeTotalPages);
     }
     
     return pages;
@@ -74,7 +75,7 @@ export default function Pagination({ currentPage, totalPages, onPageChange }: Pa
       
       <button 
         onClick={handleNext} 
-        disabled={currentPage === totalPages}
+        disabled={currentPage === safeTotalPages}
         className="pagination-btn pagination-arrow"
         aria-label="Página siguiente"
       >

@@ -160,6 +160,10 @@ function ServiciosContent() {
       .catch(err => console.error('Error fetching dollar rate:', err));
   }, []);
 
+  const ITEMS_PER_PAGE = 24;
+  const totalPages = Math.ceil(displayData.length / ITEMS_PER_PAGE);
+  const paginatedData = displayData.slice((currentPage - 1) * ITEMS_PER_PAGE, currentPage * ITEMS_PER_PAGE);
+
   return (
     <div style={{ padding: 'var(--spacing-4) var(--spacing-4)', maxWidth: '1200px', margin: '0 auto', minHeight: '60vh', paddingBottom: 'var(--spacing-12)' }}>
       
@@ -204,7 +208,7 @@ function ServiciosContent() {
             )}
           </div>
         ) : (
-          displayData.map(servicio => {
+          paginatedData.map(servicio => {
             const cardTheme = (servicio.storeId === 1 && permissions.coloresPersonalizados && theme) ? theme : (servicio.seller?.theme ? servicio.seller.theme : null);
             const cardStyles = cardTheme ? {
               '--color-primary': cardTheme.primaryColor,
@@ -354,6 +358,15 @@ function ServiciosContent() {
           );
         }))}
       </div>
+      
+      <Pagination 
+        currentPage={currentPage} 
+        totalPages={totalPages} 
+        onPageChange={(page) => {
+          setCurrentPage(page);
+          window.scrollTo({ top: 0, behavior: 'smooth' });
+        }} 
+      />
     </div>
   );
 }
