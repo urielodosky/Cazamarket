@@ -73,15 +73,12 @@ export default function MensajesPage() {
       // In a real app we'd join with profiles to get names and avatars.
       // We will do a basic fetch for now.
       const { data, error } = await supabase
-        .from('chats')
-        .select('*, buyer:profiles!buyer_id(store_name, avatar_url, first_name, last_name), seller:profiles!seller_id(store_name, avatar_url, first_name, last_name)')
-        .or(`buyer_id.eq.${supabaseUser.id},seller_id.eq.${supabaseUser.id}`)
-        .order('updated_at', { ascending: false });
+        .rpc('get_chats_with_last_message', { user_uuid: supabaseUser.id });
 
       if (data) {
         // Filter out duplicate test chats (keep only the newest)
         let foundTestChat = false;
-        const filteredData = data.filter(c => {
+        const filteredData = data.filter((c: any) => {
            if (c.buyer_id === supabaseUser.id && c.seller_id === supabaseUser.id) {
              if (foundTestChat) return false;
              foundTestChat = true;
@@ -91,10 +88,16 @@ export default function MensajesPage() {
         });
 
         // Map data to UI expected format
-        const mappedChats = await Promise.all(filteredData.map(async c => {
+        const mappedChats = filteredData.map((c: any) => {
           const isTestChat = c.buyer_id === supabaseUser.id && c.seller_id === supabaseUser.id;
           const isBuyer = c.buyer_id === supabaseUser.id;
-          const otherParty = isTestChat ? c.seller : (isBuyer ? c.seller : c.buyer);
+          
+          const otherParty = isTestChat 
+            ? { store_name: c.seller_store_name, avatar_url: c.seller_avatar_url, first_name: c.seller_first_name, last_name: c.seller_last_name }
+            : (isBuyer 
+              ? { store_name: c.seller_store_name, avatar_url: c.seller_avatar_url, first_name: c.seller_first_name, last_name: c.seller_last_name }
+              : { store_name: c.buyer_store_name, avatar_url: c.buyer_avatar_url, first_name: c.buyer_first_name, last_name: c.buyer_last_name });
+              
           const type = isTestChat ? 'negocios' : (isBuyer ? 'negocios' : 'clientes'); 
           
           let name = 'Usuario';
@@ -107,13 +110,9 @@ export default function MensajesPage() {
           const isPinned = isBuyer ? c.pinned_by_buyer : c.pinned_by_seller;
           
           let lastMessage = 'Abrir chat para ver mensajes';
-          const { data: lastMsgData } = await supabase.from('messages').select('content, attachment_url, bot_options, is_bot').eq('chat_id', c.id).order('created_at', { ascending: false }).limit(1);
-          if (lastMsgData && lastMsgData.length > 0) {
-             const m = lastMsgData[0];
-             if (m.attachment_url) lastMessage = 'Archivo adjunto';
-             else if (m.bot_options && Object.keys(m.bot_options).length > 0) lastMessage = m.content || 'Botón interactivo';
-             else lastMessage = m.content || 'Mensaje';
-          }
+          if (c.last_message_attachment_url) lastMessage = 'Archivo adjunto';
+          else if (c.last_message_bot_options && Object.keys(c.last_message_bot_options).length > 0) lastMessage = c.last_message_content || 'Botón interactivo';
+          else if (c.last_message_content) lastMessage = c.last_message_content;
 
           return {
             id: c.id,
@@ -124,20 +123,24 @@ export default function MensajesPage() {
             time: new Date(c.updated_at).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
             lastMessage: lastMessage,
             unread: 0,
-            dbChat: c,
+            dbChat: {
+              ...c,
+              buyer: { store_name: c.buyer_store_name, avatar_url: c.buyer_avatar_url, first_name: c.buyer_first_name, last_name: c.buyer_last_name },
+              seller: { store_name: c.seller_store_name, avatar_url: c.seller_avatar_url, first_name: c.seller_first_name, last_name: c.seller_last_name }
+            },
             isPinned: isPinned
           };
-        }));
+        });
 
         // Sort mappedChats: pinned first, then by updated_at descending
-        mappedChats.sort((a, b) => {
+        mappedChats.sort((a: any, b: any) => {
           if (a.isPinned && !b.isPinned) return -1;
           if (!a.isPinned && b.isPinned) return 1;
           return new Date(b.dbChat?.updated_at || 0).getTime() - new Date(a.dbChat?.updated_at || 0).getTime();
         });
 
         // Inject a virtual test chat if it doesn't exist and user can use bot
-        const hasTestChat = filteredData.some(c => c.buyer_id === supabaseUser.id && c.seller_id === supabaseUser.id);
+        const hasTestChat = filteredData.some((c: any) => c.buyer_id === supabaseUser.id && c.seller_id === supabaseUser.id);
         if (!hasTestChat && canUseBot) {
           mappedChats.unshift({
             id: 'bot-test-chat',

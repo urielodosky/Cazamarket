@@ -27,7 +27,7 @@ function ProductosContent() {
   const [currentPage, setCurrentPage] = useState(1);
   const fetcher = async () => {
     const supabase = createClient();
-    let query = supabase.from('products').select('id, user_id, name, description, price, currency, image, category, subcategory, condition, shipping_mode, shipping_cost, stock, stock_mode, pickup_available, features, rating, title, profiles(first_name, last_name, full_name, avatar_url, store_name, branches, business_type, store_theme)');
+    let query = supabase.from('products').select('*, profiles(first_name, last_name, full_name, avatar_url, store_name, branches, business_type)');
     
     const { data: userData } = await supabase.auth.getUser();
     if (isVendorModeActive && userData?.user) {
@@ -81,17 +81,8 @@ function ProductosContent() {
         store: profileObj?.store_name || profileObj?.full_name || fallbackStore || `${profileObj?.first_name || ''} ${profileObj?.last_name || ''}`.trim() || 'Usuario Anónimo',
         avatar: profileObj?.avatar_url || fallbackAvatar,
         branches: profileObj?.branches || (isOwn && parsedProf?.branches ? parsedProf.branches : []),
-        calculatedRating: averageRating,
-        storeId: p.user_id,
-        verified: true,
-        stockMode: p.stock_mode,
-        seller: {
-          shippingCost: p.shipping_cost,
-          branches: profileObj?.branches || (isOwn && parsedProf?.branches ? parsedProf.branches : []),
-          theme: profileObj?.store_theme,
-          businessType: profileObj?.business_type
-        }
-      } as any;
+        calculatedRating: averageRating
+      };
     });
   };
 
@@ -224,7 +215,7 @@ function ProductosContent() {
 
       // Filtro Tipo Vendedor
       if (filterBusiness) {
-        const sellerType = producto.seller?.businessType?.toLowerCase() || '';
+        const sellerType = producto.seller?.businessType?.toLowerCase() || producto.profiles?.business_type?.toLowerCase() || '';
         if (filterBusiness === 'minorista' && sellerType !== 'minorista' && sellerType !== 'mixto') return false;
         if (filterBusiness === 'mayorista' && sellerType !== 'mayorista' && sellerType !== 'mixto') return false;
         if (filterBusiness === 'mixto' && sellerType !== 'mixto') return false;

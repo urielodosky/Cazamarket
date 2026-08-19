@@ -30,7 +30,7 @@ export default function NegociosPage() {
       try {
         const { data: profiles, error } = await supabase
           .from('profiles')
-          .select('id, role, product_plan_tier, service_plan_tier, province, locality, branches, store_name, full_name, cover_url, banner_url, store_image, avatar_url, store_description, business_type, store_categories, store_theme')
+          .select('*')
           .eq('role', 'negocio');
 
         if (error) {
