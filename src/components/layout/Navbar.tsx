@@ -210,7 +210,7 @@ export default function Navbar() {
       return;
     }
     executeSearch();
-  }, [categoria, subcategorias, minPrice, maxPrice, currency, businessType, ofrece, tipo, provincia, localidad, rating]);
+  }, [searchQuery, categoria, subcategorias, minPrice, maxPrice, currency, businessType, ofrece, tipo, provincia, localidad, rating]);
 
   const isBusinessProfile = pathname?.startsWith('/negocios/') && pathname !== '/negocios';
 
@@ -245,12 +245,8 @@ export default function Navbar() {
     setProvincia('');
     setLocalidad('');
     setRating('');
-    
-    let basePath = pathname || '/productos';
-    if (basePath === '/' || basePath.includes('mis-tiendas') || basePath.includes('configuracion') || basePath.includes('registro')) {
-       basePath = '/productos';
-    }
-    router.push(basePath);
+    // El useEffect detectará estos cambios y llamará a executeSearch(),
+    // el cual se encargará de hacer router.push() una sola vez.
   };
 
   const renderFiltersContent = () => (
