@@ -1,6 +1,6 @@
 'use client';
 
-import React, { createContext, useContext, useState, useEffect } from 'react';
+import React, { createContext, useContext, useState, useEffect, useCallback, useMemo } from 'react';
 
 type FavoriteType = 'negocios' | 'productos' | 'servicios';
 
@@ -38,7 +38,13 @@ export function FavoritesProvider({ children }: { children: React.ReactNode }) {
     }
   }, [favorites, isLoaded]);
 
-  const toggleFavorite = (type: FavoriteType, id: string) => {
+  const favSets = useMemo(() => ({
+    negocios: new Set(favorites.negocios),
+    productos: new Set(favorites.productos),
+    servicios: new Set(favorites.servicios)
+  }), [favorites]);
+
+  const toggleFavorite = useCallback((type: FavoriteType, id: string) => {
     setFavorites(prev => {
       const currentList = prev[type];
       if (currentList.includes(id)) {
@@ -47,11 +53,11 @@ export function FavoritesProvider({ children }: { children: React.ReactNode }) {
         return { ...prev, [type]: [...currentList, id] };
       }
     });
-  };
+  }, []);
 
-  const isFavorite = (type: FavoriteType, id: string) => {
-    return favorites[type].includes(id);
-  };
+  const isFavorite = useCallback((type: FavoriteType, id: string) => {
+    return favSets[type].has(id);
+  }, [favSets]);
 
   return (
     <FavoritesContext.Provider value={{ favorites, toggleFavorite, isFavorite }}>

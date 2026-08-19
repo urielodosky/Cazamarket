@@ -1,7 +1,7 @@
 'use client';
 
 import Image from 'next/image';
-import { useState, useEffect, Suspense } from 'react';
+import { useState, useEffect, Suspense, useMemo } from 'react';
 import useSWR from 'swr';
 import { useAuth } from '@/contexts/AuthContext';
 import Link from 'next/link';
@@ -27,7 +27,7 @@ function ProductosContent() {
   const [currentPage, setCurrentPage] = useState(1);
   const fetcher = async () => {
     const supabase = createClient();
-    let query = supabase.from('products').select('*, profiles(first_name, last_name, full_name, avatar_url, store_name, branches)');
+    let query = supabase.from('products').select('id, user_id, name, description, price, currency, image, category, subcategory, condition, shipping_mode, shipping_cost, stock, stock_mode, pickup_available, features, rating, title, profiles(first_name, last_name, full_name, avatar_url, store_name, branches, business_type, store_theme)');
     
     const { data: userData } = await supabase.auth.getUser();
     if (isVendorModeActive && userData?.user) {
@@ -81,8 +81,17 @@ function ProductosContent() {
         store: profileObj?.store_name || profileObj?.full_name || fallbackStore || `${profileObj?.first_name || ''} ${profileObj?.last_name || ''}`.trim() || 'Usuario Anónimo',
         avatar: profileObj?.avatar_url || fallbackAvatar,
         branches: profileObj?.branches || (isOwn && parsedProf?.branches ? parsedProf.branches : []),
-        calculatedRating: averageRating
-      };
+        calculatedRating: averageRating,
+        storeId: p.user_id,
+        verified: true,
+        stockMode: p.stock_mode,
+        seller: {
+          shippingCost: p.shipping_cost,
+          branches: profileObj?.branches || (isOwn && parsedProf?.branches ? parsedProf.branches : []),
+          theme: profileObj?.store_theme,
+          businessType: profileObj?.business_type
+        }
+      } as any;
     });
   };
 
@@ -158,125 +167,111 @@ function ProductosContent() {
   const allowedLocalProducts = localProducts.slice(0, permissions.maxProductos);
   const rawMergedData = [...allowedLocalProducts];
   
-  const mergedData = rawMergedData.filter((producto) => {
-    // 1. Filtrar por búsqueda de texto (q)
-    if (q) {
-      const titleMatch = producto.name?.toLowerCase().includes(q);
-      const descMatch = producto.description?.toLowerCase().includes(q);
-      
-      // Buscar en características si existen
-      let featuresMatch = false;
-      if (producto.features && Array.isArray(producto.features)) {
-        featuresMatch = producto.features.some((f: any) => 
-          f.name?.toLowerCase().includes(q) || f.value?.toLowerCase().includes(q)
-        );
+  const normalize = (s: string) => s.normalize('NFD').replace(/[\u0300-\u036f]/g, '').toLowerCase();
+  const normFCat = filterCategoria ? normalize(filterCategoria) : '';
+
+  const mergedData = useMemo(() => {
+    return rawMergedData.filter((producto) => {
+      // 1. Filtrar por búsqueda de texto (q)
+      if (q) {
+        const titleMatch = producto.name?.toLowerCase().includes(q);
+        const descMatch = producto.description?.toLowerCase().includes(q);
+        
+        // Buscar en características si existen
+        let featuresMatch = false;
+        if (producto.features && Array.isArray(producto.features)) {
+          featuresMatch = producto.features.some((f: any) => 
+            f.name?.toLowerCase().includes(q) || f.value?.toLowerCase().includes(q)
+          );
+        }
+        
+        if (!titleMatch && !descMatch && !featuresMatch) return false;
       }
       
-      if (!titleMatch && !descMatch && !featuresMatch) return false;
-    }
-    
-    // 2. Filtrar por categoría y subcategorías
-    const filterSubcategoriasStr = searchParams?.get('subcategorias');
-    const filterSubcategorias = filterSubcategoriasStr ? filterSubcategoriasStr.split(',') : [];
-    
-    if (filterCategoria) {
-      const pCat = producto.category?.toLowerCase() || '';
-      const pSub = producto.subcategory?.toLowerCase() || '';
-      const fCat = filterCategoria.toLowerCase();
-      const normalize = (s: string) => s.normalize('NFD').replace(/[\u0300-\u036f]/g, '');
-      const normFCat = normalize(fCat);
+      // 2. Filtrar por categoría y subcategorías
+      const filterSubcategorias = filterSubcategoriasStr ? filterSubcategoriasStr.split(',') : [];
       
-      if (filterSubcategorias.length > 0) {
-        const matchSub = filterSubcategorias.some(sub => normalize(pSub) === normalize(sub.toLowerCase()));
-        if (!matchSub) return false;
-      } else {
-        if (normalize(pCat) !== normFCat && normalize(pSub) !== normFCat) return false;
-      }
-    }
-
-    // Filtro Precio con Conversión de Moneda
-    const minPriceStr = searchParams?.get('minPrice');
-    const maxPriceStr = searchParams?.get('maxPrice');
-    const currencyStr = searchParams?.get('currency');
-
-    if (minPriceStr || maxPriceStr || currencyStr) {
-      const minPrice = minPriceStr ? Number(minPriceStr) : 0;
-      const maxPrice = maxPriceStr ? Number(maxPriceStr) : Infinity;
-      const targetCurrency = currencyStr ? currencyStr.toUpperCase() : 'USD'; // Por defecto asume USD si no se selecciona moneda
-      const productCurrency = producto.currency?.toUpperCase() || 'ARS';
-
-      // Normalizar el precio del producto a la moneda objetivo (targetCurrency)
-      let normalizedPrice = producto.price;
-      
-      if (productCurrency === 'ARS' && targetCurrency === 'USD') {
-        normalizedPrice = producto.price / exchangeRate;
-      } else if (productCurrency === 'USD' && targetCurrency === 'ARS') {
-        normalizedPrice = producto.price * exchangeRate;
+      if (filterCategoria) {
+        const pCat = producto.category?.toLowerCase() || '';
+        const pSub = producto.subcategory?.toLowerCase() || '';
+        
+        if (filterSubcategorias.length > 0) {
+          const matchSub = filterSubcategorias.some(sub => normalize(pSub) === normalize(sub.toLowerCase()));
+          if (!matchSub) return false;
+        } else {
+          if (normalize(pCat) !== normFCat && normalize(pSub) !== normFCat) return false;
+        }
       }
 
-      if (normalizedPrice < minPrice) return false;
-      if (normalizedPrice > maxPrice) return false;
-      
-      // Si el usuario explícitamente seleccionó una moneda en el filtro, solo traemos productos que estén en esa moneda original
-      // (a menos que la regla sea mostrar todos y convertir, pero según la sugerencia "convertir esa cantidad a pesos con la api para buscarlos tambien en ese rango", significa que queremos buscar sin importar la moneda original, solo filtrando por valor equivalente)
-      // Como el usuario dice "buscar los productos en dolares dentro de ese rango y convertir esa cantidad a pesos... para buscarlos tambien", entonces NO filtramos de forma estricta por moneda si queremos que todos aparezcan dentro del rango.
-      // Si el selector de moneda "USD" o "ARS" es SOLO para indicar EN QUÉ MONEDA está ingresando el min/max, no filtramos `if (producto.currency !== currencyStr)`.
-    }
+      // Filtro Precio con Conversión de Moneda
+      if (minPriceStr || maxPriceStr || currencyStr) {
+        const minPrice = minPriceStr ? Number(minPriceStr) : 0;
+        const maxPrice = maxPriceStr ? Number(maxPriceStr) : Infinity;
+        const targetCurrency = currencyStr ? currencyStr.toUpperCase() : 'USD';
+        const productCurrency = producto.currency?.toUpperCase() || 'ARS';
 
-    // Filtro Tipo Vendedor
-    const filterBusiness = searchParams?.get('businessType') || '';
-    if (filterBusiness) {
-      const sellerType = producto.seller?.businessType?.toLowerCase() || '';
-      if (filterBusiness === 'minorista' && sellerType !== 'minorista' && sellerType !== 'mixto') return false;
-      if (filterBusiness === 'mayorista' && sellerType !== 'mayorista' && sellerType !== 'mixto') return false;
-      if (filterBusiness === 'mixto' && sellerType !== 'mixto') return false;
-    }
+        let normalizedPrice = producto.price;
+        
+        if (productCurrency === 'ARS' && targetCurrency === 'USD') {
+          normalizedPrice = producto.price / exchangeRate;
+        } else if (productCurrency === 'USD' && targetCurrency === 'ARS') {
+          normalizedPrice = producto.price * exchangeRate;
+        }
 
-    // 3. Filtrar por tipo (Condición: 'nuevo' o 'usado')
-    if (filterTipo && producto.condition?.toLowerCase() !== filterTipo.toLowerCase()) {
-      return false;
-    }
-
-    // 4. Filtrar por ofrece (Envío, Envío gratis, Retiro)
-    if (filterOfrece) {
-      // In a real app we'd check real properties. We approximate for now.
-      if (filterOfrece === 'envio_gratis') {
-        // Assume seller.shippingCost === 0 means free shipping, or product has it
-        if (producto.seller?.shippingCost !== 0 && producto.shippingCost !== 0) return false;
+        if (normalizedPrice < minPrice) return false;
+        if (normalizedPrice > maxPrice) return false;
       }
-      // 'retiro' implies branches exist
-      if (filterOfrece === 'retiro') {
+
+      // Filtro Tipo Vendedor
+      if (filterBusiness) {
+        const sellerType = producto.seller?.businessType?.toLowerCase() || '';
+        if (filterBusiness === 'minorista' && sellerType !== 'minorista' && sellerType !== 'mixto') return false;
+        if (filterBusiness === 'mayorista' && sellerType !== 'mayorista' && sellerType !== 'mixto') return false;
+        if (filterBusiness === 'mixto' && sellerType !== 'mixto') return false;
+      }
+
+      // 3. Filtrar por tipo (Condición: 'nuevo' o 'usado')
+      if (filterTipo && producto.condition?.toLowerCase() !== filterTipo.toLowerCase()) {
+        return false;
+      }
+
+      // 4. Filtrar por ofrece (Envío, Envío gratis, Retiro)
+      if (filterOfrece) {
+        if (filterOfrece === 'envio_gratis') {
+          if (producto.seller?.shippingCost !== 0 && producto.shippingCost !== 0 && producto.shipping_mode !== 'gratis') return false;
+        }
+        if (filterOfrece === 'retiro') {
+          if (!producto.seller?.branches || producto.seller.branches.length === 0) return false;
+        }
+      }
+      
+      // 5. Filtrar por provincia
+      if (filterProvincia) {
         if (!producto.seller?.branches || producto.seller.branches.length === 0) return false;
+        const hasProvincia = producto.seller.branches.some((b: any) => b.province === filterProvincia);
+        if (!hasProvincia) return false;
       }
-    }
-    
-    // 5. Filtrar por provincia
-    if (filterProvincia) {
-      if (!producto.seller?.branches || producto.seller.branches.length === 0) return false;
-      const hasProvincia = producto.seller.branches.some((b: any) => b.province === filterProvincia);
-      if (!hasProvincia) return false;
-    }
 
-    // 6. Filtrar por localidad
-    if (filterLocalidad) {
-      if (!producto.seller?.branches || producto.seller.branches.length === 0) return false;
-      const hasLocalidad = producto.seller.branches.some((b: any) => b.city === filterLocalidad);
-      if (!hasLocalidad) return false;
-    }
+      // 6. Filtrar por localidad
+      if (filterLocalidad) {
+        if (!producto.seller?.branches || producto.seller.branches.length === 0) return false;
+        const hasLocalidad = producto.seller.branches.some((b: any) => b.city === filterLocalidad);
+        if (!hasLocalidad) return false;
+      }
 
-    // 7. Filtrar por rating
-    const filterRating = searchParams?.get('rating') || '';
-    if (filterRating) {
-      const r = Number(producto.rating || 0);
-      if (filterRating === '5' && r < 5) return false;
-      if (filterRating === '4' && r < 4) return false;
-      if (filterRating === '3' && r < 3) return false;
-      if (filterRating === 'menos_3' && (r >= 3 || r === 0)) return false;
-      if (filterRating === 'nuevo' && r !== 0) return false;
-    }
+      // 7. Filtrar por rating
+      if (filterRating) {
+        const r = Number(producto.rating || 0);
+        if (filterRating === '5' && r < 5) return false;
+        if (filterRating === '4' && r < 4) return false;
+        if (filterRating === '3' && r < 3) return false;
+        if (filterRating === 'menos_3' && (r >= 3 || r === 0)) return false;
+        if (filterRating === 'nuevo' && r !== 0) return false;
+      }
 
-    return true;
-  });
+      return true;
+    });
+  }, [rawMergedData, q, filterCategoria, normFCat, filterSubcategoriasStr, minPriceStr, maxPriceStr, currencyStr, exchangeRate, filterBusiness, filterTipo, filterOfrece, filterProvincia, filterLocalidad, filterRating]);
 
   const ITEMS_PER_PAGE = 24;
   const totalPages = Math.ceil(mergedData.length / ITEMS_PER_PAGE);

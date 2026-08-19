@@ -2,7 +2,7 @@
 import { useAuth } from '@/contexts/AuthContext';
 import Link from 'next/link';
 import { useRouter, useSearchParams } from 'next/navigation';
-import { useState, useEffect, Suspense } from 'react';
+import { useState, useEffect, Suspense, useMemo } from 'react';
 import SkeletonCard from '@/components/ui/SkeletonCard';
 import LoadingScreen from '@/components/ui/LoadingScreen';
 import Pagination from '@/components/ui/Pagination';
@@ -58,60 +58,72 @@ function ServiciosContent() {
   const allowedMisServicios = localServices.slice(0, permissions.maxServicios);
   const rawDisplayData = isVendorModeActive ? allowedMisServicios : [...localServices, ...SERVICIOS_DATA];
   
-  const displayData = rawDisplayData.filter(servicio => {
-    if (q) {
-      const titleMatch = servicio.name?.toLowerCase().includes(q);
-      const descMatch = servicio.description?.toLowerCase().includes(q);
-      if (!titleMatch && !descMatch) return false;
-    }
+  const normalize = (s: string) => s.normalize('NFD').replace(/[\u0300-\u036f]/g, '').toLowerCase();
+  const normFCat = filterCategoria ? normalize(filterCategoria) : '';
 
-    const filterSubcategoriasStr = searchParams?.get('subcategorias');
-    const filterSubcategorias = filterSubcategoriasStr ? filterSubcategoriasStr.split(',') : [];
+  const [exchangeRate, setExchangeRate] = useState<number>(1400); // Default fallback
 
-    if (filterCategoria) {
-      const sCat = servicio.category?.toLowerCase() || '';
-      const sSub = servicio.subcategory?.toLowerCase() || '';
-      const fCat = filterCategoria.toLowerCase();
-      const normalize = (s: string) => s.normalize('NFD').replace(/[\u0300-\u036f]/g, '');
-      const normFCat = normalize(fCat);
-      
-      if (filterSubcategorias.length > 0) {
-        const matchSub = filterSubcategorias.some(sub => normalize(sSub) === normalize(sub.toLowerCase()));
-        if (!matchSub) return false;
-      } else {
-        if (normalize(sCat) !== normFCat && normalize(sSub) !== normFCat) return false;
-      }
-    }
+  useEffect(() => {
+    fetch('/api/dolar')
+      .then(res => res.json())
+      .then(data => {
+        if (data.venta) setExchangeRate(data.venta);
+      })
+      .catch(err => console.error('Error fetching dollar rate:', err));
+  }, []);
 
-    if (minPriceStr || maxPriceStr || currencyStr) {
-      const minPrice = minPriceStr ? Number(minPriceStr) : 0;
-      const maxPrice = maxPriceStr ? Number(maxPriceStr) : Infinity;
-      const targetCurrency = currencyStr ? currencyStr.toUpperCase() : 'USD';
-      const serviceCurrency = servicio.currency?.toUpperCase() || 'ARS';
-
-      let normalizedPrice = servicio.price || 0;
-      
-      if (serviceCurrency === 'ARS' && targetCurrency === 'USD') {
-        normalizedPrice = (servicio.price || 0) / exchangeRate;
-      } else if (serviceCurrency === 'USD' && targetCurrency === 'ARS') {
-        normalizedPrice = (servicio.price || 0) * exchangeRate;
+  const displayData = useMemo(() => {
+    return rawDisplayData.filter(servicio => {
+      if (q) {
+        const titleMatch = servicio.name?.toLowerCase().includes(q);
+        const descMatch = servicio.description?.toLowerCase().includes(q);
+        if (!titleMatch && !descMatch) return false;
       }
 
-      if (normalizedPrice < minPrice) return false;
-      if (normalizedPrice > maxPrice) return false;
-    }
+      const filterSubcategorias = filterSubcategoriasStr ? filterSubcategoriasStr.split(',') : [];
 
-    if (filterRating) {
-      const r = Number(servicio.rating || 0);
-      if (filterRating === '5' && r < 5) return false;
-      if (filterRating === '4' && r < 4) return false;
-      if (filterRating === '3' && r < 3) return false;
-      if (filterRating === 'menos_3' && (r >= 3 || r === 0)) return false;
-      if (filterRating === 'nuevo' && r !== 0) return false;
-    }
+      if (filterCategoria) {
+        const sCat = servicio.category?.toLowerCase() || '';
+        const sSub = servicio.subcategory?.toLowerCase() || '';
+        
+        if (filterSubcategorias.length > 0) {
+          const matchSub = filterSubcategorias.some(sub => normalize(sSub) === normalize(sub.toLowerCase()));
+          if (!matchSub) return false;
+        } else {
+          if (normalize(sCat) !== normFCat && normalize(sSub) !== normFCat) return false;
+        }
+      }
 
-    return true;
-  });
+      if (minPriceStr || maxPriceStr || currencyStr) {
+        const minPrice = minPriceStr ? Number(minPriceStr) : 0;
+        const maxPrice = maxPriceStr ? Number(maxPriceStr) : Infinity;
+        const targetCurrency = currencyStr ? currencyStr.toUpperCase() : 'USD';
+        const serviceCurrency = servicio.currency?.toUpperCase() || 'ARS';
+
+        let normalizedPrice = servicio.price || 0;
+        
+        if (serviceCurrency === 'ARS' && targetCurrency === 'USD') {
+          normalizedPrice = (servicio.price || 0) / exchangeRate;
+        } else if (serviceCurrency === 'USD' && targetCurrency === 'ARS') {
+          normalizedPrice = (servicio.price || 0) * exchangeRate;
+        }
+
+        if (normalizedPrice < minPrice) return false;
+        if (normalizedPrice > maxPrice) return false;
+      }
+
+      if (filterRating) {
+        const r = Number(servicio.rating || 0);
+        if (filterRating === '5' && r < 5) return false;
+        if (filterRating === '4' && r < 4) return false;
+        if (filterRating === '3' && r < 3) return false;
+        if (filterRating === 'menos_3' && (r >= 3 || r === 0)) return false;
+        if (filterRating === 'nuevo' && r !== 0) return false;
+      }
+
+      return true;
+    });
+  }, [rawDisplayData, q, filterCategoria, normFCat, filterSubcategoriasStr, minPriceStr, maxPriceStr, currencyStr, exchangeRate, filterRating]);
 
   const router = useRouter();
   const [isLoading, setIsLoading] = useState(true);
@@ -147,17 +159,6 @@ function ServiciosContent() {
       } catch (e) {}
     }
     setIsLoading(false);
-  }, []);
-
-  const [exchangeRate, setExchangeRate] = useState<number>(1400); // Default fallback
-
-  useEffect(() => {
-    fetch('/api/dolar')
-      .then(res => res.json())
-      .then(data => {
-        if (data.venta) setExchangeRate(data.venta);
-      })
-      .catch(err => console.error('Error fetching dollar rate:', err));
   }, []);
 
   const ITEMS_PER_PAGE = 24;

@@ -1,5 +1,5 @@
 'use client';
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useMemo } from 'react';
 import { useAuth } from '@/contexts/AuthContext';
 import { usePlan } from '@/contexts/PlanContext';
 import Link from 'next/link';
@@ -14,7 +14,7 @@ import { useThemeColors } from '@/hooks/useThemeColors';
 import { createClient } from '@/lib/supabase/client';
 
 export default function NegociosPage() {
-  const supabase = createClient();
+  const supabase = useMemo(() => createClient(), []);
   const router = useRouter();
   const { isFavorite, toggleFavorite } = useFavorites();
   const { isVendorModeActive, supabaseUser } = useAuth();
@@ -30,7 +30,7 @@ export default function NegociosPage() {
       try {
         const { data: profiles, error } = await supabase
           .from('profiles')
-          .select('*')
+          .select('id, role, product_plan_tier, service_plan_tier, province, locality, branches, store_name, full_name, cover_url, banner_url, store_image, avatar_url, store_description, business_type, store_categories, store_theme')
           .eq('role', 'negocio');
 
         if (error) {
@@ -122,36 +122,39 @@ export default function NegociosPage() {
     setCurrentPage(1);
   }, [q, filterCategoria, filterProvincia, filterLocalidad, filterTipo, filterRating]);
 
-  const filteredNegocios = negocios.filter(negocio => {
-    if (q) {
-      const matchName = negocio.name?.toLowerCase().includes(q);
-      const matchDesc = negocio.description?.toLowerCase().includes(q);
-      if (!matchName && !matchDesc) return false;
-    }
-    if (filterCategoria) {
-      const normalize = (s: string) => s.normalize('NFD').replace(/[\u0300-\u036f]/g, '').toLowerCase();
-      const normFCat = normalize(filterCategoria);
-      if (!negocio.categories || !negocio.categories.some((c: string) => normalize(c).includes(normFCat) || normFCat.includes(normalize(c)))) return false;
-    }
-    if (filterProvincia) {
-      if (!negocio.locations || !negocio.locations.some((l: any) => l.province === filterProvincia)) return false;
-    }
-    if (filterLocalidad) {
-      if (!negocio.locations || !negocio.locations.some((l: any) => l.city === filterLocalidad)) return false;
-    }
-    if (filterTipo) {
-      if (!negocio.businessType || negocio.businessType.toLowerCase() !== filterTipo.toLowerCase()) return false;
-    }
-    if (filterRating) {
-      const r = Number(negocio.calculatedRating || negocio.rating || 0);
-      if (filterRating === '5' && r < 5) return false;
-      if (filterRating === '4' && r < 4) return false;
-      if (filterRating === '3' && r < 3) return false;
-      if (filterRating === 'menos_3' && (r >= 3 || r === 0)) return false;
-      if (filterRating === 'nuevo' && r !== 0) return false;
-    }
-    return true;
-  });
+  const normalize = (s: string) => s.normalize('NFD').replace(/[\u0300-\u036f]/g, '').toLowerCase();
+  const normFCat = filterCategoria ? normalize(filterCategoria) : '';
+
+  const filteredNegocios = useMemo(() => {
+    return negocios.filter(negocio => {
+      if (q) {
+        const matchName = negocio.name?.toLowerCase().includes(q);
+        const matchDesc = negocio.description?.toLowerCase().includes(q);
+        if (!matchName && !matchDesc) return false;
+      }
+      if (filterCategoria) {
+        if (!negocio.categories || !negocio.categories.some((c: string) => normalize(c).includes(normFCat) || normFCat.includes(normalize(c)))) return false;
+      }
+      if (filterProvincia) {
+        if (!negocio.locations || !negocio.locations.some((l: any) => l.province === filterProvincia)) return false;
+      }
+      if (filterLocalidad) {
+        if (!negocio.locations || !negocio.locations.some((l: any) => l.city === filterLocalidad)) return false;
+      }
+      if (filterTipo) {
+        if (!negocio.businessType || negocio.businessType.toLowerCase() !== filterTipo.toLowerCase()) return false;
+      }
+      if (filterRating) {
+        const r = Number(negocio.calculatedRating || negocio.rating || 0);
+        if (filterRating === '5' && r < 5) return false;
+        if (filterRating === '4' && r < 4) return false;
+        if (filterRating === '3' && r < 3) return false;
+        if (filterRating === 'menos_3' && (r >= 3 || r === 0)) return false;
+        if (filterRating === 'nuevo' && r !== 0) return false;
+      }
+      return true;
+    });
+  }, [negocios, q, filterCategoria, normFCat, filterProvincia, filterLocalidad, filterTipo, filterRating]);
 
   const ITEMS_PER_PAGE = 24;
   const totalPages = Math.ceil(filteredNegocios.length / ITEMS_PER_PAGE);
