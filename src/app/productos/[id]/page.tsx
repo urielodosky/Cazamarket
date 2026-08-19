@@ -15,7 +15,7 @@ export async function generateMetadata(
 
   const { data: product } = await supabase
     .from('products')
-    .select('name, description, image, profiles!user_id(store_name, full_name)')
+    .select('name, description, image, price, profiles!user_id(store_name, full_name)')
     .eq('id', id)
     .single();
 
@@ -40,6 +40,39 @@ export async function generateMetadata(
   };
 }
 
-export default function Page(props: Props) {
-  return <ProductPageClient params={props.params} />;
+export default async function Page(props: Props) {
+  const id = (await props.params).id;
+  const supabase = await createClient();
+
+  const { data: product } = await supabase
+    .from('products')
+    .select('name, description, image, price')
+    .eq('id', id)
+    .single();
+
+  const jsonLd = product ? {
+    '@context': 'https://schema.org',
+    '@type': 'Product',
+    name: product.name,
+    image: product.image,
+    description: product.description,
+    offers: {
+      '@type': 'Offer',
+      price: product.price || 0,
+      priceCurrency: 'ARS',
+      availability: 'https://schema.org/InStock'
+    }
+  } : null;
+
+  return (
+    <>
+      {jsonLd && (
+        <script
+          type="application/ld+json"
+          dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
+        />
+      )}
+      <ProductPageClient params={props.params} />
+    </>
+  );
 }

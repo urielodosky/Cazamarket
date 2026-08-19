@@ -5,10 +5,10 @@ import { Redis } from '@upstash/redis';
 // Usa automáticamente las variables UPSTASH_REDIS_REST_URL y UPSTASH_REDIS_REST_TOKEN
 const redis = Redis.fromEnv();
 
-// Límite global para toda la API: 100 peticiones por cada 10 segundos por IP
+// Límite global para toda la API: 20 peticiones por cada 10 segundos por IP
 export const globalRateLimit = new Ratelimit({
   redis: redis,
-  limiter: Ratelimit.slidingWindow(100, '10 s'),
+  limiter: Ratelimit.slidingWindow(20, '10 s'),
   analytics: true,
   prefix: '@upstash/ratelimit/global',
 });
