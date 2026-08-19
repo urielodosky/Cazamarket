@@ -769,7 +769,7 @@
   width: 100%;
   box-sizing: border-box;
   background: var(--color-bg-base, #0f0f11);
-  padding: 0 64px; /* Aumentamos el padding para evitar choques con las flechas */
+  padding: 0 56px; /* Ajustamos el padding para eliminar el espacio gigante al extremo */
 }
 
 [data-theme="light"] .filters-carousel-wrapper {
