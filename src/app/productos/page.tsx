@@ -71,8 +71,8 @@ function ProductosContent() {
     });
 
     if (error) {
-      console.error('RPC Error details:', JSON.stringify(error, null, 2));
-      throw new Error(`RPC Error: ${error.message || JSON.stringify(error)}`);
+      console.error('RPC Error details:', error);
+      throw new Error(`Error al buscar productos.`);
     }
     
     const localProf = localStorage.getItem('cazamarket_profile');
@@ -103,8 +103,6 @@ function ProductosContent() {
         verified: profileObj?.verified || false
       };
     });
-
-    console.log('RPC Data:', data, 'RPC Error:', error, 'Mapped:', formattedProducts);
 
     return { products: formattedProducts, totalCount };
   };
@@ -209,11 +207,6 @@ function ProductosContent() {
             <SkeletonCard />
             <SkeletonCard />
           </>
-        ) : productsError ? (
-          <div style={{ gridColumn: '1 / -1', padding: '20px', background: 'rgba(255,0,0,0.1)', color: 'red', borderRadius: '8px' }}>
-            <h3>Error de Base de Datos</h3>
-            <pre style={{ whiteSpace: 'pre-wrap', fontSize: '12px' }}>{productsError.message || JSON.stringify(productsError)}</pre>
-          </div>
         ) : localProducts.length === 0 ? (
           <div style={{ gridColumn: '1 / -1', display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', padding: '60px 20px', textAlign: 'center', background: 'rgba(0,0,0,0.2)', borderRadius: 'var(--radius-lg)', border: '1px dashed rgba(255,255,255,0.1)' }}>
             <svg width="64" height="64" viewBox="0 0 24 24" fill="none" stroke="rgba(255,255,255,0.2)" strokeWidth="1" strokeLinecap="round" strokeLinejoin="round" style={{ marginBottom: '16px' }}><path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z"></path><polyline points="3.27 6.96 12 12.01 20.73 6.96"></polyline><line x1="12" y1="22.08" x2="12" y2="12"></line></svg>
