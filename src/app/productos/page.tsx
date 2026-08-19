@@ -8,6 +8,7 @@ import Link from 'next/link';
 import { useRouter, useSearchParams } from 'next/navigation';
 import SkeletonCard from '@/components/ui/SkeletonCard';
 import LoadingScreen from '@/components/ui/LoadingScreen';
+import Pagination from '@/components/ui/Pagination';
 
 import { useFavorites } from '@/contexts/FavoritesContext';
 import { useCart } from '@/contexts/CartContext';
@@ -23,6 +24,7 @@ function ProductosContent() {
   const { addToCart, canAddToCart } = useCart();
   const [openMenuId, setOpenMenuId] = useState<number | null>(null);
   const [theme, setTheme] = useState<{primaryColor?: string, textColor?: string, bgColor?: string} | null>(null);
+  const [currentPage, setCurrentPage] = useState(1);
   const fetcher = async () => {
     const supabase = createClient();
     let query = supabase.from('products').select('*, profiles(first_name, last_name, full_name, avatar_url, store_name, branches)');
@@ -138,10 +140,20 @@ function ProductosContent() {
   const searchParams = useSearchParams();
   const q = searchParams?.get('q')?.toLowerCase() || '';
   const filterCategoria = searchParams?.get('categoria') || '';
+  const filterSubcategoriasStr = searchParams?.get('subcategorias');
+  const minPriceStr = searchParams?.get('minPrice');
+  const maxPriceStr = searchParams?.get('maxPrice');
+  const currencyStr = searchParams?.get('currency');
+  const filterBusiness = searchParams?.get('businessType') || '';
+  const filterTipo = searchParams?.get('tipo') || '';
+  const filterOfrece = searchParams?.get('ofrece') || '';
   const filterProvincia = searchParams?.get('provincia') || '';
   const filterLocalidad = searchParams?.get('localidad') || '';
-  const filterOfrece = searchParams?.get('ofrece') || '';
-  const filterTipo = searchParams?.get('tipo') || '';
+  const filterRating = searchParams?.get('rating') || '';
+
+  useEffect(() => {
+    setCurrentPage(1);
+  }, [q, filterCategoria, filterSubcategoriasStr, minPriceStr, maxPriceStr, currencyStr, filterBusiness, filterTipo, filterOfrece, filterProvincia, filterLocalidad, filterRating]);
 
   const allowedLocalProducts = localProducts.slice(0, permissions.maxProductos);
   const rawMergedData = [...allowedLocalProducts];
@@ -266,6 +278,10 @@ function ProductosContent() {
     return true;
   });
 
+  const ITEMS_PER_PAGE = 24;
+  const totalPages = Math.ceil(mergedData.length / ITEMS_PER_PAGE);
+  const paginatedData = mergedData.slice((currentPage - 1) * ITEMS_PER_PAGE, currentPage * ITEMS_PER_PAGE);
+
   return (
     <div style={{ padding: 'var(--spacing-4) var(--spacing-4)', maxWidth: '1200px', margin: '0 auto', minHeight: '60vh', paddingBottom: 'var(--spacing-12)' }}>
       {isVendorModeActive && (
@@ -308,8 +324,7 @@ function ProductosContent() {
               </>
             )}
           </div>
-        ) : (
-          mergedData.map(producto => {
+        ) : paginatedData.map(producto => {
             const cardTheme = (producto.storeId === 1 && permissions.coloresPersonalizados && theme) ? theme : (producto.seller?.theme ? producto.seller.theme : null);
             const cardStyles = cardTheme ? {
               '--color-primary': cardTheme.primaryColor,
@@ -580,8 +595,19 @@ function ProductosContent() {
             </div>
           </div>
           );
-        }))}
+        })}
       </div>
+      
+      {totalPages > 1 && (
+        <Pagination 
+          currentPage={currentPage} 
+          totalPages={totalPages} 
+          onPageChange={(page) => {
+            setCurrentPage(page);
+            window.scrollTo({ top: 0, behavior: 'smooth' });
+          }} 
+        />
+      )}
     </div>
   );
 }

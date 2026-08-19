@@ -5,6 +5,7 @@ import { useRouter, useSearchParams } from 'next/navigation';
 import { useState, useEffect, Suspense } from 'react';
 import SkeletonCard from '@/components/ui/SkeletonCard';
 import LoadingScreen from '@/components/ui/LoadingScreen';
+import Pagination from '@/components/ui/Pagination';
 
 import { useFavorites } from '@/contexts/FavoritesContext';
 import { useCart } from '@/contexts/CartContext';
@@ -42,6 +43,17 @@ function ServiciosContent() {
   const searchParams = useSearchParams();
   const q = searchParams?.get('q')?.toLowerCase() || '';
   const filterCategoria = searchParams?.get('categoria') || '';
+  const filterSubcategoriasStr = searchParams?.get('subcategorias');
+  const minPriceStr = searchParams?.get('minPrice');
+  const maxPriceStr = searchParams?.get('maxPrice');
+  const currencyStr = searchParams?.get('currency');
+  const filterRating = searchParams?.get('rating') || '';
+
+  const [currentPage, setCurrentPage] = useState(1);
+
+  useEffect(() => {
+    setCurrentPage(1);
+  }, [q, filterCategoria, filterSubcategoriasStr, minPriceStr, maxPriceStr, currencyStr, filterRating]);
 
   const allowedMisServicios = localServices.slice(0, permissions.maxServicios);
   const rawDisplayData = isVendorModeActive ? allowedMisServicios : [...localServices, ...SERVICIOS_DATA];
@@ -71,10 +83,6 @@ function ServiciosContent() {
       }
     }
 
-    const minPriceStr = searchParams?.get('minPrice');
-    const maxPriceStr = searchParams?.get('maxPrice');
-    const currencyStr = searchParams?.get('currency');
-    
     if (minPriceStr || maxPriceStr || currencyStr) {
       const minPrice = minPriceStr ? Number(minPriceStr) : 0;
       const maxPrice = maxPriceStr ? Number(maxPriceStr) : Infinity;
@@ -93,7 +101,6 @@ function ServiciosContent() {
       if (normalizedPrice > maxPrice) return false;
     }
 
-    const filterRating = searchParams?.get('rating') || '';
     if (filterRating) {
       const r = Number(servicio.rating || 0);
       if (filterRating === '5' && r < 5) return false;

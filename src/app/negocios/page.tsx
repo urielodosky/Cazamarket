@@ -8,6 +8,7 @@ import { useRouter, useSearchParams } from 'next/navigation';
 import { useFavorites } from '@/contexts/FavoritesContext';
 import { PlanTier, isAtLeast } from '@/types/planTypes';
 import SkeletonCard from '@/components/ui/SkeletonCard';
+import Pagination from '@/components/ui/Pagination';
 
 import { useThemeColors } from '@/hooks/useThemeColors';
 import { createClient } from '@/lib/supabase/client';
@@ -22,6 +23,7 @@ export default function NegociosPage() {
   const themeColors = useThemeColors();
   const [negocios, setNegocios] = useState<any[]>([]);
   const [isLoading, setIsLoading] = useState(true);
+  const [currentPage, setCurrentPage] = useState(1);
 
   useEffect(() => {
     const loadBusinesses = async () => {
@@ -116,6 +118,10 @@ export default function NegociosPage() {
   const filterTipo = searchParams?.get('tipo') || '';
   const filterRating = searchParams?.get('rating') || '';
 
+  useEffect(() => {
+    setCurrentPage(1);
+  }, [q, filterCategoria, filterProvincia, filterLocalidad, filterTipo, filterRating]);
+
   const filteredNegocios = negocios.filter(negocio => {
     if (q) {
       const matchName = negocio.name?.toLowerCase().includes(q);
@@ -146,6 +152,10 @@ export default function NegociosPage() {
     }
     return true;
   });
+
+  const ITEMS_PER_PAGE = 24;
+  const totalPages = Math.ceil(filteredNegocios.length / ITEMS_PER_PAGE);
+  const paginatedNegocios = filteredNegocios.slice((currentPage - 1) * ITEMS_PER_PAGE, currentPage * ITEMS_PER_PAGE);
 
   return (
     <div className="container-page" style={{ maxWidth: '1200px', margin: '0 auto', minHeight: '60vh', paddingBottom: 'var(--spacing-12)' }}>
@@ -190,7 +200,7 @@ export default function NegociosPage() {
               Crea tu primer negocio
             </button>
           </div>
-        ) : filteredNegocios.map(negocio => {
+        ) : paginatedNegocios.map(negocio => {
           const isCustomColorsAllowed = negocio.id === 1 ? permissions.coloresPersonalizados : isAtLeast(negocio.planTier, 'empresarial');
           const useForceCustom = isCustomColorsAllowed && negocio.theme && negocio.theme.forceCustom;
           const customStyles = (isCustomColorsAllowed && negocio.theme) ? {
@@ -432,6 +442,17 @@ export default function NegociosPage() {
           </div>
         )})}
       </div>
+      
+      {totalPages > 1 && (
+        <Pagination 
+          currentPage={currentPage} 
+          totalPages={totalPages} 
+          onPageChange={(page) => {
+            setCurrentPage(page);
+            window.scrollTo({ top: 0, behavior: 'smooth' });
+          }} 
+        />
+      )}
     </div>
   );
 }
