@@ -403,9 +403,9 @@
     height: 44px !important;
   }
 
-  /* Ocultar menú de hamburguesa nativo viejo y enlaces en móvil (RESTAURADO) */
+  /* Ocultar menú de hamburguesa nativo viejo y enlaces en móvil */
   .mobile-menu-btn {
-    display: flex !important;
+    display: none !important;
   }
 
   .navbar-links,
