@@ -5,6 +5,7 @@ import { useRouter } from 'next/navigation';
 import { useAuth } from '@/contexts/AuthContext';
 import { usePlan } from '@/contexts/PlanContext';
 import LoadingScreen from '@/components/ui/LoadingScreen';
+import { mockPremiumPayment } from '@/app/actions/mockPayment';
 import {
   PRODUCT_PLANS,
   SERVICE_PLANS,
@@ -32,6 +33,7 @@ export default function PlanesPage() {
   const { isLoggedIn, isVendor, phone, personType, birthDate, cuit, updateUser } = useAuth();
   const [activeTab, setActiveTab] = useState<PlanCategory>('productos');
   const [isActivating, setIsActivating] = useState(false);
+  const [isMockLoading, setIsMockLoading] = useState(false);
   const [authModal, setAuthModal] = useState<{show: boolean, type: 'login' | 'vendor'}>({show: false, type: 'login'});
   const [expandedPlans, setExpandedPlans] = useState<Record<string, boolean>>({});
   const router = useRouter();
@@ -161,6 +163,59 @@ export default function PlanesPage() {
     <div className="planes-container">
       <h1 className="sr-only" style={{ position: 'absolute', width: '1px', height: '1px', padding: 0, margin: '-1px', overflow: 'hidden', clip: 'rect(0, 0, 0, 0)', whiteSpace: 'nowrap', borderWidth: 0 }}>Planes y Precios</h1>
       <div className="planes-hero" style={{ paddingTop: '10px' }}>
+        
+        {/* BOTÓN MOCK SOLO PARA DESARROLLO */}
+        {process.env.NODE_ENV === 'development' && (
+          <div style={{ display: 'flex', justifyContent: 'center', marginBottom: '20px' }}>
+            <button 
+              className="btn" 
+              onClick={async () => {
+                if (!isLoggedIn) {
+                  setAuthModal({ show: true, type: 'login' });
+                  return;
+                }
+                setIsMockLoading(true);
+                try {
+                  const res = await mockPremiumPayment();
+                  if (res.success) {
+                    // Sincronizar UI instantáneamente sin recargar
+                    updateUser({ role: 'negocio' });
+                    selectPlan('empresarial', 'mixto');
+                    alert('¡Simulación Exitosa! Ahora eres Empresarial.');
+                    router.push('/configuracion');
+                  } else {
+                    alert('Error en simulación: ' + res.error);
+                  }
+                } catch (error) {
+                  console.error(error);
+                } finally {
+                  setIsMockLoading(false);
+                }
+              }}
+              style={{ 
+                background: 'linear-gradient(90deg, #ff00cc, #333399)', 
+                color: 'white', 
+                border: 'none', 
+                padding: '10px 20px', 
+                borderRadius: '8px',
+                fontWeight: 'bold',
+                cursor: 'pointer',
+                display: 'flex',
+                alignItems: 'center',
+                gap: '8px',
+                boxShadow: '0 4px 15px rgba(255, 0, 204, 0.4)'
+              }}
+              disabled={isMockLoading}
+            >
+              {isMockLoading ? (
+                 <span style={{ animation: 'spin 1s linear infinite', display: 'inline-block' }}>⚙️</span>
+              ) : (
+                 <span>🚀 Simular Pago Premium (DEV)</span>
+              )}
+            </button>
+          </div>
+        )}
+
         <div className="planes-tabs-wrapper">
           <div className="planes-tabs glass-panel">
             <button
