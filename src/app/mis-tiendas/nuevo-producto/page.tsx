@@ -2,6 +2,7 @@
 
 import React, { useState, useEffect } from 'react';
 import Link from 'next/link';
+import Image from 'next/image';
 import { useRouter, useSearchParams } from 'next/navigation';
 import { LightBulbIcon } from '@heroicons/react/24/outline';
 import CustomSelect from '@/components/ui/CustomSelect';
@@ -532,7 +533,7 @@ function NuevoProductoContent() {
                 {mediaPreview.map((media, idx) => (
                   <div key={idx} style={{ position: 'relative', width: '120px', height: '120px', borderRadius: 'var(--radius-md)', overflow: 'hidden', border: '1px solid var(--color-border)' }}>
                     {media.type === 'image' ? (
-                      <img src={media.url} alt="preview" style={{ boxSizing: "border-box", width: "100%", height: '100%', objectFit: 'cover' }} />
+                      <Image src={media.url} alt="preview" fill style={{ objectFit: 'cover' }} />
                     ) : (
                       <>
                         <video src={media.url} style={{ boxSizing: "border-box", width: "100%", height: '100%', objectFit: 'cover' }} />

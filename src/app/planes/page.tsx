@@ -2,6 +2,7 @@
 
 import { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
+import Image from 'next/image';
 import { useAuth } from '@/contexts/AuthContext';
 import { usePlan } from '@/contexts/PlanContext';
 import LoadingScreen from '@/components/ui/LoadingScreen';
@@ -491,10 +492,12 @@ export default function PlanesPage() {
                       overflow: 'hidden'
                     }}>
                       {/* eslint-disable-next-line @next/next/no-img-element */}
-                      <img 
+                      <Image 
                         src="/mercadopago-logo.png" 
                         alt="Mercado Pago" 
-                        style={{ width: '44px', height: '44px', objectFit: 'contain' }}
+                        width={44}
+                        height={44}
+                        style={{ objectFit: 'contain' }}
                       />
                     </div>
                     <div style={{ flex: 1 }}>

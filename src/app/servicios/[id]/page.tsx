@@ -3,6 +3,7 @@
 import React, { useState, use, useEffect } from 'react';
 import dynamic from 'next/dynamic';
 import Link from 'next/link';
+import Image from 'next/image';
 import ReportModal from '@/components/ReportModal';
 
 const LocationMap = dynamic(() => import('@/components/ui/LocationMap'), { ssr: false });
@@ -384,11 +385,11 @@ export default function ServicioDetailPage({ params }: { params: Promise<{ id: s
             onMouseEnter={() => setIsHoveringImage(true)}
             onMouseLeave={() => setIsHoveringImage(false)}
           >
-            <img
+            <Image
               src={(service.media && service.media.length > 0 ? service.media.map((m: any) => m.url) : [service.image || 'https://images.unsplash.com/photo-1542673898-7c85854b73b2?q=80&w=1200&auto=format&fit=crop'])[activeImage]}
               alt={service.name}
-              onError={(e) => { e.currentTarget.src = 'https://images.unsplash.com/photo-1542673898-7c85854b73b2?q=80&w=1200&auto=format&fit=crop'; }}
-              style={{ width: '100%', height: '100%', objectFit: 'cover' }}
+              fill
+              style={{ objectFit: 'cover' }}
             />
             {/* Botón Anterior */}
             <button
@@ -435,7 +436,7 @@ export default function ServicioDetailPage({ params }: { params: Promise<{ id: s
                   background: 'none'
                 }}
               >
-                <img src={img} alt={`Vista ${idx + 1}`} onError={(e) => { e.currentTarget.src = 'https://images.unsplash.com/photo-1542673898-7c85854b73b2?q=80&w=1200&auto=format&fit=crop'; }} style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
+                <Image src={img} alt={`Vista ${idx + 1}`} fill style={{ objectFit: 'cover' }} />
               </button>
             ))}
           </div>
@@ -451,7 +452,7 @@ export default function ServicioDetailPage({ params }: { params: Promise<{ id: s
             <div style={{ display: 'flex', alignItems: 'center', gap: '12px', marginBottom: '16px' }}>
               {service.seller.id === 1 && !hasFeature('tiendaVirtual') ? (
                 <div style={{ position: 'relative', width: '40px', height: '40px' }}>
-                  <img src={service.seller.avatar || `https://ui-avatars.com/api/?name=${encodeURIComponent(service.seller.name)}&background=ff7300&color=fff`} alt={service.seller.name} onError={(e) => { e.currentTarget.src = `https://ui-avatars.com/api/?name=${encodeURIComponent(service.seller.name)}&background=ff7300&color=fff`; }} style={{ width: '100%', height: '100%', objectFit: 'cover', borderRadius: '50%', border: '2px solid rgba(255,255,255,0.1)' }} />
+                  <Image src={service.seller.avatar || `https://ui-avatars.com/api/?name=${encodeURIComponent(service.seller.name)}&background=ff7300&color=fff`} alt={service.seller.name} width={40} height={40} style={{ borderRadius: '50%', objectFit: 'cover', border: '2px solid rgba(255,255,255,0.1)' }} />
                   {(service.seller.id === 1 ? hasFeature('insigniaVerificada') : service.seller.verified) && (
                     <div style={{ position: 'absolute', bottom: -2, right: -2, background: 'var(--color-primary)', borderRadius: '50%', width: '14px', height: '14px', display: 'flex', alignItems: 'center', justifyContent: 'center', border: '2px solid var(--color-bg-base)' }}>
                       <svg width="8" height="8" viewBox="0 0 24 24" fill="none" stroke="white" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round"><polyline points="20 6 9 17 4 12"></polyline></svg>
@@ -461,7 +462,7 @@ export default function ServicioDetailPage({ params }: { params: Promise<{ id: s
               ) : (
                 <Link href={`/negocios/${service.seller.id}`}>
                   <div style={{ position: 'relative', width: '40px', height: '40px' }}>
-                    <img src={service.seller.avatar || `https://ui-avatars.com/api/?name=${encodeURIComponent(service.seller.name)}&background=ff7300&color=fff`} alt={service.seller.name} onError={(e) => { e.currentTarget.src = `https://ui-avatars.com/api/?name=${encodeURIComponent(service.seller.name)}&background=ff7300&color=fff`; }} style={{ width: '100%', height: '100%', objectFit: 'cover', borderRadius: '50%', border: '2px solid rgba(255,255,255,0.1)' }} />
+                    <Image src={service.seller.avatar || `https://ui-avatars.com/api/?name=${encodeURIComponent(service.seller.name)}&background=ff7300&color=fff`} alt={service.seller.name} width={40} height={40} style={{ borderRadius: '50%', objectFit: 'cover', border: '2px solid rgba(255,255,255,0.1)' }} />
                     {(service.seller.id === 1 ? hasFeature('insigniaVerificada') : service.seller.verified) && (
                       <div style={{ position: 'absolute', bottom: -2, right: -2, background: 'var(--color-primary)', borderRadius: '50%', width: '14px', height: '14px', display: 'flex', alignItems: 'center', justifyContent: 'center', border: '2px solid var(--color-bg-base)' }}>
                         <svg width="8" height="8" viewBox="0 0 24 24" fill="none" stroke="white" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round"><polyline points="20 6 9 17 4 12"></polyline></svg>
@@ -968,7 +969,7 @@ export default function ServicioDetailPage({ params }: { params: Promise<{ id: s
                   onMouseLeave={(e) => e.currentTarget.style.transform = 'none'}>
                   <div style={{ height: '180px', background: 'rgba(255,255,255,0.03)', display: 'flex', alignItems: 'center', justifyContent: 'center', borderBottom: '1px solid var(--color-border)', position: 'relative' }}>
                     {servImage ? (
-                      <img src={servImage} alt={other.name} style={{ width: '100%', height: '100%', objectFit: 'cover' }} onError={(e) => { e.currentTarget.src = 'https://images.unsplash.com/photo-1542673898-7c85854b73b2?q=80&w=1200&auto=format&fit=crop'; }} />
+                      <Image src={servImage} alt={other.name} fill style={{ objectFit: 'cover' }} />
                     ) : (
                       <span style={{ opacity: 0.3, fontSize: '0.9rem' }}>Sin Imagen</span>
                     )}

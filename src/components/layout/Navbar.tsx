@@ -570,10 +570,13 @@ export default function Navbar() {
 
         <div className="navbar-logo">
           <Link href="/">
-            <img 
+            <Image 
               src={logoPng.src}
               alt="CazaMarket Logo" 
+              width={180}
+              height={50}
               className="navbar-logo-img"
+              style={{ objectFit: 'contain' }}
             />
           </Link>
         </div>

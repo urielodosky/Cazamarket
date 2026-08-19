@@ -5,6 +5,7 @@ import { useAuth } from '@/contexts/AuthContext';
 import { usePlan } from '@/contexts/PlanContext';
 import { useThemeColors } from '@/hooks/useThemeColors';
 import Link from 'next/link';
+import Image from 'next/image';
 import { useRouter } from 'next/navigation';
 import { isAtLeast } from '@/types/planTypes';
 import CustomSelect from '@/components/ui/CustomSelect';
@@ -714,7 +715,7 @@ export default function MiNegocioPage() {
                         {/* Banner */}
                         {(isAtLeast(planTier, 'emprendedor') && storeBanner) && (
                           <div className="aspect-image-16-9" style={{ minHeight: '120px', height: '120px', borderTopLeftRadius: 'var(--radius-lg)', borderTopRightRadius: 'var(--radius-lg)', position: 'relative', overflow: 'hidden' }}>
-                            <img src={storeBanner} alt="Banner" style={{ position: 'absolute', top: 0, left: 0, width: '100%', height: '100%', objectFit: 'cover' }} />
+                            <Image src={storeBanner} alt="Banner" fill style={{ objectFit: 'cover' }} />
                             <div style={{ position: 'absolute', inset: 0, background: 'linear-gradient(to bottom, rgba(0,0,0,0.1), rgba(0,0,0,0.6))' }} />
                           </div>
                         )}

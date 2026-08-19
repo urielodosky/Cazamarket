@@ -2,6 +2,7 @@
 
 import React, { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
+import Image from 'next/image';
 import { useAuth } from '@/contexts/AuthContext';
 import { useThemeColors } from '@/hooks/useThemeColors';
 import { createClient } from '@/lib/supabase/client';
@@ -367,24 +368,14 @@ export default function ResenasPage() {
                               <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap', gap: '12px' }}>
                                 
   <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
-    <img 
-      src={getSafeImageUrl(item.profiles?.avatar_url, 'avatar')} 
-      alt="Avatar" 
-      style={{ width: '40px', height: '40px', borderRadius: '50%', objectFit: 'cover' }} 
-      onError={(e) => { e.currentTarget.src = 'https://ui-avatars.com/api/?name=' + (item.profiles?.first_name || 'U'); }} 
-    />
+    <Image src={getSafeImageUrl(item.profiles?.avatar_url, 'avatar')} alt="Avatar" width={40} height={40} style={{ borderRadius: '50%', objectFit: 'cover' }} />
     <div>
       <h4 style={{ margin: '0 0 4px', color: 'var(--color-text-main)', fontSize: '1.1rem' }}>
         {item.profiles?.first_name ? `${item.profiles.first_name} ${item.profiles.last_name || ''}` : 'Usuario'}
       </h4>
       <div style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
         {item.products?.image && (
-          <img 
-            src={getSafeImageUrl(item.products.image, 'product')} 
-            alt="Producto" 
-            style={{ width: '20px', height: '20px', borderRadius: '4px', objectFit: 'cover' }} 
-            onError={(e) => { e.currentTarget.style.display = 'none'; }} 
-          />
+          <Image src={getSafeImageUrl(item.products.image, 'product')} alt="Producto" width={20} height={20} style={{ borderRadius: '4px', objectFit: 'cover' }} />
         )}
         <span style={{ color: 'var(--color-text-muted)', fontSize: '0.85rem' }}>
           {item.products ? `Compra: ${item.products.name}` : 'Interacción: General/Servicio'}
@@ -417,24 +408,14 @@ export default function ResenasPage() {
                                 <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: '12px', flexWrap: 'wrap', gap: '8px' }}>
                                   
   <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
-    <img 
-      src={getSafeImageUrl(item.profiles?.avatar_url, 'avatar')} 
-      alt="Avatar" 
-      style={{ width: '40px', height: '40px', borderRadius: '50%', objectFit: 'cover' }} 
-      onError={(e) => { e.currentTarget.src = 'https://ui-avatars.com/api/?name=' + (item.profiles?.first_name || 'U'); }} 
-    />
+    <Image src={getSafeImageUrl(item.profiles?.avatar_url, 'avatar')} alt="Avatar" width={40} height={40} style={{ borderRadius: '50%', objectFit: 'cover' }} />
     <div>
       <h4 style={{ margin: '0 0 4px', color: 'var(--color-text-main)', fontSize: '1.1rem' }}>
         {item.profiles?.first_name ? `${item.profiles.first_name} ${item.profiles.last_name || ''}` : 'Usuario'}
       </h4>
       <div style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
         {item.products?.image && (
-          <img 
-            src={getSafeImageUrl(item.products.image, 'product')} 
-            alt="Producto" 
-            style={{ width: '20px', height: '20px', borderRadius: '4px', objectFit: 'cover' }} 
-            onError={(e) => { e.currentTarget.style.display = 'none'; }} 
-          />
+          <Image src={getSafeImageUrl(item.products.image, 'product')} alt="Producto" width={20} height={20} style={{ borderRadius: '4px', objectFit: 'cover' }} />
         )}
         <span style={{ color: 'var(--color-text-muted)', fontSize: '0.85rem' }}>
           {item.products ? `Compra: ${item.products.name}` : 'Interacción: General/Servicio'}
@@ -466,24 +447,14 @@ export default function ResenasPage() {
                               <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', flexWrap: 'wrap', gap: '8px' }}>
                                 
   <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
-    <img 
-      src={getSafeImageUrl(item.profiles?.avatar_url, 'avatar')} 
-      alt="Avatar" 
-      style={{ width: '40px', height: '40px', borderRadius: '50%', objectFit: 'cover' }} 
-      onError={(e) => { e.currentTarget.src = 'https://ui-avatars.com/api/?name=' + (item.profiles?.first_name || 'U'); }} 
-    />
+    <Image src={getSafeImageUrl(item.profiles?.avatar_url, 'avatar')} alt="Avatar" width={40} height={40} style={{ borderRadius: '50%', objectFit: 'cover' }} />
     <div>
       <h4 style={{ margin: '0 0 4px', color: 'var(--color-text-main)', fontSize: '1.1rem' }}>
         {item.profiles?.first_name ? `${item.profiles.first_name} ${item.profiles.last_name || ''}` : 'Usuario'}
       </h4>
       <div style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
         {item.products?.image && (
-          <img 
-            src={getSafeImageUrl(item.products.image, 'product')} 
-            alt="Producto" 
-            style={{ width: '20px', height: '20px', borderRadius: '4px', objectFit: 'cover' }} 
-            onError={(e) => { e.currentTarget.style.display = 'none'; }} 
-          />
+          <Image src={getSafeImageUrl(item.products.image, 'product')} alt="Producto" width={20} height={20} style={{ borderRadius: '4px', objectFit: 'cover' }} />
         )}
         <span style={{ color: 'var(--color-text-muted)', fontSize: '0.85rem' }}>
           {item.products ? `Compra: ${item.products.name}` : 'Interacción: General/Servicio'}
@@ -579,12 +550,7 @@ export default function ResenasPage() {
       </h4>
       <div style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
         {item.products?.image && (
-          <img 
-            src={getSafeImageUrl(item.products.image, 'product')} 
-            alt="Producto" 
-            style={{ width: '20px', height: '20px', borderRadius: '4px', objectFit: 'cover' }} 
-            onError={(e) => { e.currentTarget.style.display = 'none'; }} 
-          />
+          <Image src={getSafeImageUrl(item.products.image, 'product')} alt="Producto" width={20} height={20} style={{ borderRadius: '4px', objectFit: 'cover' }} />
         )}
         <span style={{ color: 'var(--color-text-muted)', fontSize: '0.85rem' }}>
           {item.products ? `Producto: ${item.products.name}` : 'Interacción: General/Servicio'}
@@ -625,12 +591,7 @@ export default function ResenasPage() {
       </h4>
       <div style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
         {item.products?.image && (
-          <img 
-            src={getSafeImageUrl(item.products.image, 'product')} 
-            alt="Producto" 
-            style={{ width: '20px', height: '20px', borderRadius: '4px', objectFit: 'cover' }} 
-            onError={(e) => { e.currentTarget.style.display = 'none'; }} 
-          />
+          <Image src={getSafeImageUrl(item.products.image, 'product')} alt="Producto" width={20} height={20} style={{ borderRadius: '4px', objectFit: 'cover' }} />
         )}
         <span style={{ color: 'var(--color-text-muted)', fontSize: '0.85rem' }}>
           {item.products ? `Producto: ${item.products.name}` : 'Interacción: General/Servicio'}

@@ -2,6 +2,7 @@
 
 import React, { useState, useRef, useEffect } from 'react';
 import { createPortal } from 'react-dom';
+import Image from 'next/image';
 import { useAuth } from '@/contexts/AuthContext';
 import { usePlan } from '@/contexts/PlanContext';
 import VirtualAdvisorModal from '@/components/chat/VirtualAdvisorModal';
@@ -846,7 +847,7 @@ export default function MensajesPage() {
                   onClick={() => setActiveChatId(chat.id)}
                 >
                 <div style={{ position: 'relative', width: '52px', height: '52px', flexShrink: 0 }}>
-                  <img src={chat.avatar} alt={chat.name} style={{ width: '100%', height: '100%', borderRadius: '50%', objectFit: 'cover' }} />
+                  <Image src={chat.avatar} alt={chat.name} fill style={{ borderRadius: '50%', objectFit: 'cover' }} />
                 </div>
                 <div style={{ flex: 1, minWidth: 0 }}>
                   <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '4px' }}>
@@ -899,7 +900,7 @@ export default function MensajesPage() {
                   >
                     <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><polyline points="15 18 9 12 15 6"></polyline></svg>
                   </button>
-                  <img src={activeChat.avatar} alt={activeChat.name} style={{ width: '40px', height: '40px', borderRadius: '50%', objectFit: 'cover' }} />
+                  <Image src={activeChat.avatar} alt={activeChat.name} width={40} height={40} style={{ borderRadius: '50%', objectFit: 'cover' }} />
                   <div>
                     <h3 style={{ margin: '0 0 2px 0', fontSize: '1.1rem', color: 'var(--color-text-main)' }}>{activeChat.name}</h3>
                   </div>
@@ -996,10 +997,12 @@ export default function MensajesPage() {
                               {msg.attachment_url && (
                                 <div style={{ width: '100%' }}>
                                   {msg.attachment_type === 'image' && (
-                                    <img 
+                                    <Image 
                                       src={msg.attachment_url} 
                                       alt="Adjunto" 
-                                      style={{ maxWidth: '250px', maxHeight: '300px', objectFit: 'cover', borderRadius: '8px', cursor: 'pointer', border: '1px solid var(--color-border)' }} 
+                                      width={250}
+                                      height={300}
+                                      style={{ objectFit: 'cover', borderRadius: '8px', cursor: 'pointer', border: '1px solid var(--color-border)', width: 'auto', height: 'auto', maxWidth: '250px', maxHeight: '300px' }} 
                                       onClick={() => setPreviewImage(msg.attachment_url)} 
                                     />
                                   )}
@@ -1164,7 +1167,9 @@ export default function MensajesPage() {
           <button onClick={() => setPreviewImage(null)} style={{ position: 'absolute', top: '24px', right: '24px', background: 'transparent', border: 'none', color: '#fff', cursor: 'pointer', padding: '8px' }}>
             <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg>
           </button>
-          <img src={previewImage} alt="Preview" style={{ maxWidth: '100%', maxHeight: '100%', objectFit: 'contain', borderRadius: '8px' }} onClick={(e) => e.stopPropagation()} />
+          <div style={{ position: 'relative', width: '90vw', height: '90vh' }} onClick={(e) => e.stopPropagation()}>
+            <Image src={previewImage} alt="Preview" fill style={{ objectFit: 'contain', borderRadius: '8px' }} />
+          </div>
         </div>,
         document.body
       )}

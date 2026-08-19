@@ -3,6 +3,7 @@ import { useState, useEffect, useMemo } from 'react';
 import { useAuth } from '@/contexts/AuthContext';
 import { usePlan } from '@/contexts/PlanContext';
 import Link from 'next/link';
+import Image from 'next/image';
 import { useRouter, useSearchParams } from 'next/navigation';
 
 import { useFavorites } from '@/contexts/FavoritesContext';
@@ -195,11 +196,11 @@ export default function NegociosPage() {
 
             {(isAtLeast(negocio.planTier, 'emprendedor') && negocio.image) && (
               <div className="aspect-image-16-9" style={{ minHeight: '120px', height: '120px', borderTopLeftRadius: 'var(--radius-lg)', borderTopRightRadius: 'var(--radius-lg)', position: 'relative', overflow: 'hidden' }}>
-                <img 
+                <Image 
                   src={negocio.image} 
                   alt={negocio.name || "Negocio"} 
-                  loading="lazy" 
-                  style={{ position: 'absolute', top: 0, left: 0, boxSizing: "border-box", width: "100%", height: '100%', objectFit: 'cover' }} 
+                  fill
+                  style={{ objectFit: 'cover' }} 
                 />
                 <div style={{ position: 'absolute', top: 0, left: 0, right: 0, bottom: 0, background: 'linear-gradient(to bottom, rgba(0,0,0,0.1), rgba(0,0,0,0.6))' }} />
               </div>

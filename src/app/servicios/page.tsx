@@ -3,6 +3,7 @@ import { useAuth } from '@/contexts/AuthContext';
 import Link from 'next/link';
 import { useRouter, useSearchParams } from 'next/navigation';
 import { useState, useEffect, Suspense, useMemo } from 'react';
+import Image from 'next/image';
 import SkeletonCard from '@/components/ui/SkeletonCard';
 import LoadingScreen from '@/components/ui/LoadingScreen';
 import Pagination from '@/components/ui/Pagination';
@@ -289,11 +290,11 @@ function ServiciosContent() {
               </div>
             )}
             <div className="aspect-image-16-9" style={{ position: 'relative', overflow: 'hidden' }}>
-              <img 
+              <Image 
                 src={(servicio.media && servicio.media.length > 0 ? servicio.media[0].url : servicio.image) || 'https://images.unsplash.com/photo-1595246140625-573b715d11dc?q=80&w=1200&auto=format&fit=crop'} 
                 alt={servicio.title || servicio.name || "Servicio"} 
-                loading="lazy" 
-                style={{ position: 'absolute', top: 0, left: 0, boxSizing: "border-box", width: "100%", height: '100%', objectFit: 'cover' }} 
+                fill
+                style={{ objectFit: 'cover' }} 
               />
               <span style={{ position: 'absolute', bottom: '10px', left: '10px', background: 'rgba(0,0,0,0.7)', color: '#fff', padding: '4px 8px', borderRadius: '4px', fontSize: '0.8rem', fontWeight: 'bold', display: 'flex', alignItems: 'center', gap: '4px', maxWidth: '85%', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
                 <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="var(--color-primary)" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" style={{ flexShrink: 0 }}><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"></path><circle cx="12" cy="10" r="3"></circle></svg>
@@ -311,11 +312,12 @@ function ServiciosContent() {
                    }}
                  >
                    <div style={{ position: 'relative', width: '36px', height: '36px', flexShrink: 0 }}>
-                     <img 
+                     <Image 
                        src={servicio.avatar || `https://ui-avatars.com/api/?name=${encodeURIComponent(servicio.store || servicio.provider || 'Mi Negocio')}&background=ff7300&color=fff`} 
                        alt={servicio.provider || servicio.store || 'Vendedor'} 
-                       onError={(e) => { e.currentTarget.src = `https://ui-avatars.com/api/?name=${encodeURIComponent(servicio.store || servicio.provider || 'Mi Negocio')}&background=ff7300&color=fff`; }}
-                       style={{ boxSizing: "border-box", width: "100%", height: '100%', borderRadius: '50%', objectFit: 'cover', border: '1px solid var(--color-border)' }} 
+                       width={36}
+                       height={36}
+                       style={{ borderRadius: '50%', objectFit: 'cover', border: '1px solid var(--color-border)' }} 
                      />
                      {(servicio.storeId === 1 ? hasFeature('insigniaVerificada') : servicio.verified) && (
                        <span title="Negocio Verificado" style={{ position: 'absolute', bottom: '-2px', right: '-2px', width: '16px', height: '16px', borderRadius: '50%', background: 'var(--color-primary)', display: 'flex', alignItems: 'center', justifyContent: 'center', border: '2px solid var(--color-bg-base)' }}>

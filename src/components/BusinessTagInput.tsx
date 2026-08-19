@@ -2,6 +2,7 @@
 
 import React, { useState, useEffect, useRef } from 'react';
 import { createClient } from '@/lib/supabase/client';
+import Image from 'next/image';
 
 export type BusinessTag = {
   id?: string;
@@ -104,7 +105,7 @@ export default function BusinessTagInput({ label, tags, onChange, placeholder }:
             fontSize: '0.85rem'
           }}>
             {tag.avatar ? (
-              <img src={tag.avatar} alt={tag.name} style={{ width: '24px', height: '24px', borderRadius: '50%', objectFit: 'cover' }} />
+              <Image src={tag.avatar} alt={tag.name} width={24} height={24} style={{ borderRadius: '50%', objectFit: 'cover' }} />
             ) : (
               <div style={{ width: '24px', height: '24px', borderRadius: '50%', background: 'var(--color-border)', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
                 <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="var(--color-text-muted)" strokeWidth="2"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path><circle cx="12" cy="7" r="4"></circle></svg>
@@ -183,7 +184,7 @@ export default function BusinessTagInput({ label, tags, onChange, placeholder }:
                     onMouseEnter={(e) => e.currentTarget.style.background = 'rgba(255,255,255,0.05)'}
                     onMouseLeave={(e) => e.currentTarget.style.background = 'transparent'}
                   >
-                    <img src={s.avatar_url || '/placeholder.jpg'} style={{ width: '32px', height: '32px', borderRadius: '50%', objectFit: 'cover' }} />
+                    <Image src={s.avatar_url || '/placeholder.jpg'} alt={s.store_name || s.full_name} width={32} height={32} style={{ borderRadius: '50%', objectFit: 'cover' }} />
                     <div>
                       <div style={{ color: 'var(--color-text-main)', fontWeight: 600 }}>{s.store_name || s.full_name}</div>
                       <div style={{ color: 'var(--color-text-muted)', fontSize: '0.8rem' }}>Negocio verificado</div>

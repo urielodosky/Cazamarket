@@ -1,6 +1,7 @@
 'use client';
 
 import { useRef, useState, useEffect } from 'react';
+import Image from 'next/image';
 import './config.css';
 import { useAuth } from '@/contexts/AuthContext';
 import { usePlan } from '@/contexts/PlanContext';
@@ -590,7 +591,7 @@ export default function ConfiguracionPage() {
                    <span style={{ fontSize: '0.8rem' }}>Subiendo...</span>
                 </div>
               ) : (formData as any).avatar ? (
-                <img src={(formData as any).avatar} alt="Avatar" style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
+                <Image src={(formData as any).avatar} alt="Avatar" width={120} height={120} style={{ objectFit: 'cover' }} />
               ) : (
                 <svg viewBox="0 0 24 24" fill="none" stroke="rgba(255,255,255,0.5)" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" style={{ width: '50px', height: '50px' }}>
                   <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path>

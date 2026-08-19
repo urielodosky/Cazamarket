@@ -3,6 +3,7 @@
 import React, { useState, use, useEffect, useRef } from 'react';
 import Link from 'next/link';
 import { useRouter, useSearchParams } from 'next/navigation';
+import Image from 'next/image';
 import CustomSelect from '@/components/ui/CustomSelect';
 import LoadingScreen from '@/components/ui/LoadingScreen';
 import { PlanTier, isAtLeast } from '@/types/planTypes';
@@ -1421,7 +1422,7 @@ export default function NegocioDetailPage({ params }: { params: Promise<{ id: st
                                }} onMouseEnter={p.id ? (e) => { e.currentTarget.style.borderColor = 'var(--color-primary)'; e.currentTarget.style.background = 'rgba(255,115,0,0.05)'; } : undefined}
                                   onMouseLeave={p.id ? (e) => { e.currentTarget.style.borderColor = 'var(--color-border)'; e.currentTarget.style.background = 'rgba(255,255,255,0.03)'; } : undefined}>
                                  {p.avatar ? (
-                                   <img src={p.avatar} alt={p.name} style={{ width: '28px', height: '28px', borderRadius: '50%', objectFit: 'cover' }} />
+                                   <Image src={p.avatar} alt={p.name} width={28} height={28} style={{ borderRadius: '50%', objectFit: 'cover' }} />
                                  ) : (
                                    <div style={{ width: '28px', height: '28px', borderRadius: '50%', background: 'var(--color-border)', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
                                      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="var(--color-text-muted)" strokeWidth="2"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path><circle cx="12" cy="7" r="4"></circle></svg>
@@ -1448,7 +1449,7 @@ export default function NegocioDetailPage({ params }: { params: Promise<{ id: st
                                }} onMouseEnter={d.id ? (e) => { e.currentTarget.style.borderColor = 'var(--color-primary)'; e.currentTarget.style.background = 'rgba(255,115,0,0.05)'; } : undefined}
                                   onMouseLeave={d.id ? (e) => { e.currentTarget.style.borderColor = 'var(--color-border)'; e.currentTarget.style.background = 'rgba(255,255,255,0.03)'; } : undefined}>
                                  {d.avatar ? (
-                                   <img src={d.avatar} alt={d.name} style={{ width: '28px', height: '28px', borderRadius: '50%', objectFit: 'cover' }} />
+                                   <Image src={d.avatar} alt={d.name} width={28} height={28} style={{ borderRadius: '50%', objectFit: 'cover' }} />
                                  ) : (
                                    <div style={{ width: '28px', height: '28px', borderRadius: '50%', background: 'var(--color-border)', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
                                      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="var(--color-text-muted)" strokeWidth="2"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path><circle cx="12" cy="7" r="4"></circle></svg>
@@ -1527,7 +1528,7 @@ export default function NegocioDetailPage({ params }: { params: Promise<{ id: st
                         <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: '12px' }}>
                           <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
                             {review.buyerAvatar ? (
-                              <img src={review.buyerAvatar} alt={review.buyerName} style={{ width: '40px', height: '40px', borderRadius: '50%', objectFit: 'cover' }} />
+                              <Image src={review.buyerAvatar} alt={review.buyerName} width={40} height={40} style={{ borderRadius: '50%', objectFit: 'cover' }} />
                             ) : (
                               <div style={{ width: '40px', height: '40px', borderRadius: '50%', background: 'var(--color-primary)', display: 'flex', alignItems: 'center', justifyContent: 'center', color: '#fff', fontWeight: 'bold' }}>
                                 {review.buyerName.charAt(0).toUpperCase()}

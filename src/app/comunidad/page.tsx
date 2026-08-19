@@ -1,6 +1,7 @@
 'use client';
 import React, { useState, useEffect } from 'react';
 import Link from 'next/link';
+import Image from 'next/image';
 import { useRouter, useSearchParams } from 'next/navigation';
 import { useAuth } from '@/contexts/AuthContext';
 import { formatTimeAgo } from '@/utils/formatTime';
@@ -253,7 +254,7 @@ export default function ComunidadPage() {
                   {/* 1. FILA SUPERIOR: Foto + Autor + Insignia + Última Actividad + Categoría / Subcategoría AL LADO */}
                   <div className="forum-post-meta" style={{ display: 'flex', alignItems: 'center', gap: '8px', fontSize: '0.85rem', color: 'var(--color-text-muted)', flexWrap: 'wrap', marginBottom: '10px' }}>
                     {authorImg ? (
-                      <img src={authorImg} alt={post.author} style={{ width: '26px', height: '26px', borderRadius: '50%', objectFit: 'cover' }} />
+                      <Image src={authorImg} alt={post.author} width={26} height={26} style={{ borderRadius: '50%', objectFit: 'cover' }} />
                     ) : (
                       <span style={{ width: '26px', height: '26px', borderRadius: '50%', background: 'var(--color-primary)', display: 'inline-flex', alignItems: 'center', justifyContent: 'center', fontSize: '0.75rem', fontWeight: 'bold', color: '#fff' }}>
                         {post.author.charAt(0).toUpperCase()}

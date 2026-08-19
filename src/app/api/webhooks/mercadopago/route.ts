@@ -40,9 +40,8 @@ export async function POST(req: Request) {
         return NextResponse.json({ error: 'Firma de webhook inválida' }, { status: 403 });
       }
     } else {
-      console.warn('Falta firma criptográfica en el webhook de Mercado Pago o no está configurada la llave secreta.');
-      // En modo estricto podríamos rechazar:
-      // return NextResponse.json({ error: 'Falta la firma criptográfica (x-signature)' }, { status: 400 });
+      console.warn('Intento de acceso bloqueado: Falta firma criptográfica en el webhook de Mercado Pago.');
+      return NextResponse.json({ error: 'Unauthorized - Missing or Invalid Signature' }, { status: 400 });
     }
 
     // --- Seguridad Nivel 2: Verificación Activa contra la API Oficial ---

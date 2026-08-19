@@ -2,6 +2,7 @@
 
 import { useState, useRef, useEffect } from 'react';
 import Link from 'next/link';
+import Image from 'next/image';
 import { useAuth } from '@/contexts/AuthContext';
 import { useTheme } from '@/contexts/ThemeContext';
 import { usePlan } from '@/contexts/PlanContext';
@@ -35,7 +36,7 @@ export default function UserMenu() {
         >
           <div className="user-avatar-trigger">
             {avatar ? (
-              <img src={avatar} alt="Avatar" />
+              <Image src={avatar} alt="Avatar" width={32} height={32} style={{ borderRadius: '50%', objectFit: 'cover' }} />
             ) : (
               <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">
                 <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path>
@@ -49,13 +50,13 @@ export default function UserMenu() {
           <div className="user-dropdown-menu">
             {/* Logo en móvil (agregado al dropdown según pedido) */}
             <div className="mobile-only-logo">
-              <img src="/logo.png" alt="CazaMarket Logo" />
+              <Image src="/logo.png" alt="CazaMarket Logo" width={140} height={40} style={{ objectFit: 'contain' }} />
             </div>
             {/* Header del Perfil */}
             <div className="user-dropdown-header">
               <div className="user-header-avatar">
                 {avatar ? (
-                  <img src={avatar} alt="Avatar" />
+                  <Image src={avatar} alt="Avatar" width={48} height={48} style={{ borderRadius: '50%', objectFit: 'cover' }} />
                 ) : (
                   <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">
                     <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path>

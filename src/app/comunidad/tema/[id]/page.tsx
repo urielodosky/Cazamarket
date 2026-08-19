@@ -1,6 +1,7 @@
 'use client';
 import React, { useState, useEffect, use, useRef } from 'react';
 import Link from 'next/link';
+import Image from 'next/image';
 import { useRouter } from 'next/navigation';
 import LoadingScreen from '@/components/ui/LoadingScreen';
 import { useAuth } from '@/contexts/AuthContext';
@@ -465,10 +466,11 @@ export default function TemaPage({ params }: { params: Promise<{ id: string }> }
           <div style={{ display: 'flex', alignItems: 'center', gap: '14px' }}>
             <div style={{ width: '48px', height: '48px', borderRadius: '50%', overflow: 'hidden', background: 'linear-gradient(135deg, var(--color-primary), #ff9900)', padding: '2px', boxShadow: '0 4px 14px rgba(255,115,0,0.35)', flexShrink: 0, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
               {postAuthorAvatar ? (
-                <img 
+                <Image 
                   src={postAuthorAvatar} 
                   alt={post.author} 
-                  style={{ width: '100%', height: '100%', borderRadius: '50%', objectFit: 'cover' }} 
+                  fill 
+                  style={{ borderRadius: '50%', objectFit: 'cover' }} 
                 />
               ) : (
                 <div style={{ width: '100%', height: '100%', borderRadius: '50%', background: 'var(--color-primary)', display: 'flex', alignItems: 'center', justifyContent: 'center', fontWeight: 700, color: '#fff', fontSize: '1.2rem' }}>
@@ -747,10 +749,11 @@ export default function TemaPage({ params }: { params: Promise<{ id: string }> }
                       <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
                         <div style={{ width: '40px', height: '40px', borderRadius: '50%', overflow: 'hidden', background: 'linear-gradient(135deg, var(--color-primary), #ff9900)', padding: '1.5px', flexShrink: 0, display: 'flex', alignItems: 'center', justifyContent: 'center', boxShadow: '0 3px 10px rgba(0,0,0,0.4)' }}>
                           {replyAvatar ? (
-                            <img 
+                            <Image 
                               src={replyAvatar} 
                               alt={reply.author} 
-                              style={{ width: '100%', height: '100%', borderRadius: '50%', objectFit: 'cover' }} 
+                              fill 
+                              style={{ borderRadius: '50%', objectFit: 'cover' }} 
                             />
                           ) : (
                             <div style={{ width: '100%', height: '100%', borderRadius: '50%', background: 'rgba(255,255,255,0.1)', display: 'flex', alignItems: 'center', justifyContent: 'center', fontWeight: 700, color: 'var(--color-primary)', fontSize: '1rem' }}>
@@ -973,7 +976,7 @@ export default function TemaPage({ params }: { params: Promise<{ id: string }> }
                               <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
                                 <div style={{ width: '32px', height: '32px', borderRadius: '50%', overflow: 'hidden', background: 'linear-gradient(135deg, var(--color-primary), #ff9900)', padding: '1px', flexShrink: 0, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
                                   {subAvatar ? (
-                                    <img src={subAvatar} alt={sub.author} style={{ width: '100%', height: '100%', borderRadius: '50%', objectFit: 'cover' }} />
+                                    <Image src={subAvatar} alt={sub.author} fill style={{ borderRadius: '50%', objectFit: 'cover' }} />
                                   ) : (
                                     <div style={{ width: '100%', height: '100%', borderRadius: '50%', background: 'rgba(255,255,255,0.1)', display: 'flex', alignItems: 'center', justifyContent: 'center', fontWeight: 700, color: 'var(--color-primary)', fontSize: '0.85rem' }}>
                                       {sub.author.charAt(0).toUpperCase()}
