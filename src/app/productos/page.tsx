@@ -84,19 +84,24 @@ function ProductosContent() {
 
     const formattedProducts = data.map((p: any) => {
       const isOwn = userData?.user?.id === p.user_id;
-      const profileObj = p.profiles_obj || p.profiles;
+      const profileObj = p.profiles_obj || p.profiles || {};
       const fallbackStore = isOwn && parsedProf ? (parsedProf.storeName || parsedProf.username || parsedProf.firstName) : 'Usuario Anónimo';
       const fallbackAvatar = isOwn && parsedProf?.avatar ? parsedProf.avatar : 'https://images.unsplash.com/photo-1511497584788-876760111969?q=80&w=200&auto=format&fit=crop';
       
       return {
         ...p,
+        storeId: isOwn ? 1 : p.user_id, // Map current user to 1 for legacy UI logic
         store: profileObj?.store_name || profileObj?.full_name || fallbackStore || `${profileObj?.first_name || ''} ${profileObj?.last_name || ''}`.trim() || 'Usuario Anónimo',
         avatar: profileObj?.avatar_url || fallbackAvatar,
         branches: profileObj?.branches || (isOwn && parsedProf?.branches ? parsedProf.branches : []),
         calculatedRating: p.calculated_rating || p.calc_rating,
-        profiles: profileObj
+        profiles: profileObj,
+        seller: profileObj, // Alias para UI antigua
+        verified: profileObj?.verified || false
       };
     });
+
+    console.log('RPC Data:', data, 'RPC Error:', error, 'Mapped:', formattedProducts);
 
     return { products: formattedProducts, totalCount };
   };
