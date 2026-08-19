@@ -1,14 +1,8 @@
 'use server';
 
 import { createClient } from '@/lib/supabase/server';
-import { createClient as createAdminClient } from '@supabase/supabase-js';
 import { verifySudoMode } from '@/lib/auth/verifySudo';
-
-// We need an admin client to bypass RLS and update the profile
-const supabaseAdmin = createAdminClient(
-  process.env.NEXT_PUBLIC_SUPABASE_URL!,
-  process.env.SUPABASE_SERVICE_ROLE_KEY!
-);
+// Eliminado el cliente con SERVICE_ROLE_KEY (Modo Dios) para cumplir con el Principio de Privilegio Mínimo
 
 export async function grantFreePlan(targetUserId: string, planTier: string) {
   try {
@@ -39,7 +33,7 @@ export async function grantFreePlan(targetUserId: string, planTier: string) {
     const expirationDate = new Date();
     expirationDate.setFullYear(expirationDate.getFullYear() + 10);
 
-    const { error: updateError } = await supabaseAdmin
+    const { error: updateError } = await supabase
       .from('profiles')
       .update({
         plan_tier: planTier,

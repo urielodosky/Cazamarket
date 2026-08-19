@@ -1,17 +1,12 @@
 'use server';
 
-import { createClient as createAdminClient } from '@supabase/supabase-js';
+import { createClient } from '@/lib/supabase/server';
 import { verifySudoMode } from '@/lib/auth/verifySudo';
-
-// Cliente Admin para bypass RLS
-const supabaseAdmin = createAdminClient(
-  process.env.NEXT_PUBLIC_SUPABASE_URL!,
-  process.env.SUPABASE_SERVICE_ROLE_KEY!
-);
 
 export async function adminChangePlan(userId: string, newPlanTier: string) {
   try {
     await verifySudoMode();
+    const supabase = await createClient();
 
     const expirationDate = new Date();
     expirationDate.setFullYear(expirationDate.getFullYear() + 10);
@@ -29,7 +24,7 @@ export async function adminChangePlan(userId: string, newPlanTier: string) {
       updates.plan_expires_at = null;
     }
 
-    const { error } = await supabaseAdmin
+    const { error } = await supabase
       .from('profiles')
       .update(updates)
       .eq('id', userId);
@@ -46,8 +41,9 @@ export async function adminChangePlan(userId: string, newPlanTier: string) {
 export async function adminToggleBlock(userId: string, currentlyBlocked: boolean) {
   try {
     await verifySudoMode();
+    const supabase = await createClient();
 
-    const { error } = await supabaseAdmin
+    const { error } = await supabase
       .from('profiles')
       .update({ is_blocked: !currentlyBlocked })
       .eq('id', userId);
