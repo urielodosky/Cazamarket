@@ -10,8 +10,7 @@ import Pagination from '@/components/ui/Pagination';
 import { useFavorites } from '@/contexts/FavoritesContext';
 import { useCart } from '@/contexts/CartContext';
 import { usePlan } from '@/contexts/PlanContext';
-
-const SERVICIOS_DATA: any[] = [];
+import { createClient } from '@/lib/supabase/client';
 
 function formatAddress(raw: string) {
   if (!raw) return 'Ubicación a consultar';
@@ -34,13 +33,14 @@ function formatAddress(raw: string) {
 }
 
 function ServiciosContent() {
-  const { isVendorModeActive } = useAuth();
+  const { isVendorModeActive, supabaseUser } = useAuth();
   const { hasFeature, permissions } = usePlan();
-  const [localServices, setLocalServices] = useState<any[]>([]);
+  const [servicios, setServicios] = useState<any[]>([]);
   const [openMenuId, setOpenMenuId] = useState<number | null>(null);
   const [theme, setTheme] = useState<{primaryColor?: string, textColor?: string, bgColor?: string} | null>(null);
   
   const searchParams = useSearchParams();
+  const supabase = useMemo(() => createClient(), []);
   const q = searchParams?.get('q')?.toLowerCase() || '';
   const filterCategoria = searchParams?.get('categoria') || '';
   const filterSubcategoriasStr = searchParams?.get('subcategorias');
@@ -50,16 +50,9 @@ function ServiciosContent() {
   const filterRating = searchParams?.get('rating') || '';
 
   const [currentPage, setCurrentPage] = useState(1);
-
-  useEffect(() => {
-    setCurrentPage(1);
-  }, [q, filterCategoria, filterSubcategoriasStr, minPriceStr, maxPriceStr, currencyStr, filterRating]);
-
-  const allowedMisServicios = localServices.slice(0, permissions.maxServicios);
-  const rawDisplayData = isVendorModeActive ? allowedMisServicios : [...localServices, ...SERVICIOS_DATA];
-  
-  const normalize = (s: string) => s.normalize('NFD').replace(/[\u0300-\u036f]/g, '').toLowerCase();
-  const normFCat = filterCategoria ? normalize(filterCategoria) : '';
+  const [totalPages, setTotalPages] = useState(1);
+  const [serviciosError, setServiciosError] = useState<any>(null);
+  const ITEMS_PER_PAGE = 24;
 
   const [exchangeRate, setExchangeRate] = useState<number>(1400); // Default fallback
 
@@ -72,85 +65,104 @@ function ServiciosContent() {
       .catch(err => console.error('Error fetching dollar rate:', err));
   }, []);
 
-  const displayData = useMemo(() => {
-    return rawDisplayData.filter(servicio => {
-      if (q) {
-        const titleMatch = servicio.name?.toLowerCase().includes(q);
-        const descMatch = servicio.description?.toLowerCase().includes(q);
-        if (!titleMatch && !descMatch) return false;
-      }
+  useEffect(() => {
+    const loadServices = async () => {
+      setIsLoading(true);
+      setServiciosError(null);
 
-      const filterSubcategorias = filterSubcategoriasStr ? filterSubcategoriasStr.split(',') : [];
+      try {
+        const { data, error } = await supabase.rpc('search_services', {
+          p_search_term: q,
+          p_category: filterCategoria,
+          p_subcategories: filterSubcategoriasStr ? filterSubcategoriasStr.split(',') : [],
+          p_min_price: minPriceStr ? Number(minPriceStr) : null,
+          p_max_price: maxPriceStr ? Number(maxPriceStr) : null,
+          p_target_currency: currencyStr ? currencyStr.toUpperCase() : 'USD',
+          p_exchange_rate: exchangeRate,
+          p_rating: filterRating,
+          p_vendor_user_id: isVendorModeActive ? supabaseUser?.id : null,
+          p_page_number: currentPage,
+          p_items_per_page: ITEMS_PER_PAGE
+        });
 
-      if (filterCategoria) {
-        const sCat = servicio.category?.toLowerCase() || '';
-        const sSub = servicio.subcategory?.toLowerCase() || '';
-        
-        if (filterSubcategorias.length > 0) {
-          const matchSub = filterSubcategorias.some(sub => normalize(sSub) === normalize(sub.toLowerCase()));
-          if (!matchSub) return false;
-        } else {
-          if (normalize(sCat) !== normFCat && normalize(sSub) !== normFCat) return false;
-        }
-      }
-
-      if (minPriceStr || maxPriceStr || currencyStr) {
-        const minPrice = minPriceStr ? Number(minPriceStr) : 0;
-        const maxPrice = maxPriceStr ? Number(maxPriceStr) : Infinity;
-        const targetCurrency = currencyStr ? currencyStr.toUpperCase() : 'USD';
-        const serviceCurrency = servicio.currency?.toUpperCase() || 'ARS';
-
-        let normalizedPrice = servicio.price || 0;
-        
-        if (serviceCurrency === 'ARS' && targetCurrency === 'USD') {
-          normalizedPrice = (servicio.price || 0) / exchangeRate;
-        } else if (serviceCurrency === 'USD' && targetCurrency === 'ARS') {
-          normalizedPrice = (servicio.price || 0) * exchangeRate;
+        if (error) {
+          console.error('Error fetching services:', error);
+          setServiciosError(error);
+          setIsLoading(false);
+          return;
         }
 
-        if (normalizedPrice < minPrice) return false;
-        if (normalizedPrice > maxPrice) return false;
-      }
+        if (data) {
+          const total = data.length > 0 ? Number(data[0].total_count) : 0;
+          setTotalPages(Math.ceil(total / ITEMS_PER_PAGE) || 1);
 
-      if (filterRating) {
-        const r = Number(servicio.rating || 0);
-        if (filterRating === '5' && r < 5) return false;
-        if (filterRating === '4' && r < 4) return false;
-        if (filterRating === '3' && r < 3) return false;
-        if (filterRating === 'menos_3' && (r >= 3 || r === 0)) return false;
-        if (filterRating === 'nuevo' && r !== 0) return false;
-      }
+          const mappedServices = data.map((servicio: any) => {
+            const sellerProf = servicio.profiles_obj || {};
+            return {
+              id: servicio.id,
+              userId: servicio.user_id,
+              name: servicio.name,
+              title: servicio.name,
+              description: servicio.description,
+              price: servicio.price,
+              currency: servicio.currency,
+              pricePeriod: servicio.price_period,
+              media: servicio.media || [],
+              image: servicio.image || null,
+              category: servicio.category,
+              subcategory: servicio.subcategory,
+              location: servicio.location,
+              serviceLocation: servicio.location,
+              features: servicio.features || [],
+              rating: servicio.calc_rating ? parseFloat(servicio.calc_rating).toFixed(1) : 0,
+              createdAt: servicio.created_at,
+              seller: {
+                name: sellerProf.store_name || sellerProf.full_name || 'Mi Negocio',
+                avatar: sellerProf.avatar_url,
+                businessType: sellerProf.business_type,
+                verified: sellerProf.verified,
+                theme: sellerProf.theme
+              },
+              store: sellerProf.store_name || sellerProf.full_name || 'Mi Negocio',
+              provider: sellerProf.store_name || sellerProf.full_name || 'Mi Negocio',
+              avatar: sellerProf.avatar_url,
+              verified: sellerProf.verified
+            };
+          });
 
-      return true;
-    });
-  }, [rawDisplayData, q, filterCategoria, normFCat, filterSubcategoriasStr, minPriceStr, maxPriceStr, currencyStr, exchangeRate, filterRating]);
+          setServicios(mappedServices);
+        }
+      } catch (err) {
+        console.error('Unexpected error loading services:', err);
+        setServiciosError(err);
+      }
+      setIsLoading(false);
+    };
+
+    // Only load if we have exchange rate initialized (or if it defaults fast)
+    loadServices();
+  }, [supabase, q, filterCategoria, filterSubcategoriasStr, minPriceStr, maxPriceStr, currencyStr, filterRating, exchangeRate, isVendorModeActive, supabaseUser?.id, currentPage]);
 
   const router = useRouter();
   const [isLoading, setIsLoading] = useState(true);
   const { isFavorite, toggleFavorite } = useFavorites();
   const { addToCart, canAddToCart } = useCart();
 
-  const handleDeleteService = (e: React.MouseEvent, id: any) => {
+  const handleDeleteService = async (e: React.MouseEvent, id: any) => {
     e.stopPropagation();
-    const updated = localServices.filter(s => String(s.id) !== String(id));
-    setLocalServices(updated);
-    localStorage.setItem('cazamarket_my_services', JSON.stringify(updated));
-
-    const prodsStr = localStorage.getItem('cazamarket_my_products');
-    if (prodsStr) {
-      try {
-        const prods = JSON.parse(prodsStr);
-        const updatedProds = prods.filter((p: any) => String(p.id) !== String(id));
-        localStorage.setItem('cazamarket_my_products', JSON.stringify(updatedProds));
-      } catch (err) {}
+    if (!confirm('¿Estás seguro de que deseas eliminar este servicio?')) return;
+    
+    try {
+      const { error } = await supabase.from('services').delete().eq('id', id);
+      if (error) throw error;
+      setServicios(prev => prev.filter(s => s.id !== id));
+    } catch (err) {
+      console.error('Error deleting service:', err);
+      alert('Error al eliminar el servicio.');
     }
   };
 
   useEffect(() => {
-    const existingStr = localStorage.getItem('cazamarket_my_services');
-    if (existingStr) {
-      setLocalServices(JSON.parse(existingStr));
-    }
     const savedProfile = localStorage.getItem('cazamarket_profile');
     if (savedProfile) {
       try {
@@ -158,12 +170,7 @@ function ServiciosContent() {
         if (parsed.theme) setTheme(parsed.theme);
       } catch (e) {}
     }
-    setIsLoading(false);
   }, []);
-
-  const ITEMS_PER_PAGE = 24;
-  const totalPages = Math.ceil(displayData.length / ITEMS_PER_PAGE);
-  const paginatedData = displayData.slice((currentPage - 1) * ITEMS_PER_PAGE, currentPage * ITEMS_PER_PAGE);
 
   return (
     <div style={{ padding: 'var(--spacing-4) var(--spacing-4)', maxWidth: '1200px', margin: '0 auto', minHeight: '60vh', paddingBottom: 'var(--spacing-12)' }}>
@@ -190,7 +197,12 @@ function ServiciosContent() {
             <SkeletonCard />
             <SkeletonCard />
           </>
-        ) : displayData.length === 0 ? (
+        ) : serviciosError ? (
+          <div style={{ gridColumn: '1 / -1', padding: '20px', background: 'rgba(255,0,0,0.1)', color: 'red', borderRadius: '8px' }}>
+            <h3>Error de Base de Datos (Servicios)</h3>
+            <pre style={{ whiteSpace: 'pre-wrap', fontSize: '12px' }}>{serviciosError.message || JSON.stringify(serviciosError)}</pre>
+          </div>
+        ) : servicios.length === 0 ? (
           <div style={{ gridColumn: '1 / -1', display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', padding: '60px 20px', textAlign: 'center', background: 'rgba(0,0,0,0.2)', borderRadius: 'var(--radius-lg)', border: '1px dashed rgba(255,255,255,0.1)' }}>
             <svg width="64" height="64" viewBox="0 0 24 24" fill="none" stroke="rgba(255,255,255,0.2)" strokeWidth="1" strokeLinecap="round" strokeLinejoin="round" style={{ marginBottom: '16px' }}><polygon points="12 2 2 7 12 12 22 7 12 2"></polygon><polyline points="2 17 12 22 22 17"></polyline><polyline points="2 12 12 17 22 12"></polyline></svg>
             {(isVendorModeActive && permissions.maxServicios > 0) ? (
@@ -204,12 +216,12 @@ function ServiciosContent() {
             ) : (
               <>
                 <h3 style={{ wordBreak: 'break-word', overflowWrap: 'anywhere', color: 'var(--color-text-main)', fontSize: '1.2rem', marginBottom: '8px' }}>No hay servicios disponibles</h3>
-                <p style={{ wordBreak: 'break-word', overflowWrap: 'anywhere', color: 'var(--color-text-muted)', maxWidth: '400px' }}>Aún no hay servicios publicados en esta categoría.</p>
+                <p style={{ wordBreak: 'break-word', overflowWrap: 'anywhere', color: 'var(--color-text-muted)', maxWidth: '400px' }}>Aún no hay servicios publicados con esos filtros.</p>
               </>
             )}
           </div>
         ) : (
-          paginatedData.map(servicio => {
+          servicios.map(servicio => {
             const cardTheme = (servicio.storeId === 1 && permissions.coloresPersonalizados && theme) ? theme : (servicio.seller?.theme ? servicio.seller.theme : null);
             const cardStyles = cardTheme ? {
               '--color-primary': cardTheme.primaryColor,
@@ -243,7 +255,7 @@ function ServiciosContent() {
             </div>
 
             {/* Menú de 3 Puntos (Editar / Eliminar) */}
-            {(isVendorModeActive || localServices.some(s => s.id === servicio.id)) && (
+            {(isVendorModeActive && servicio.userId === supabaseUser?.id) && (
               <div style={{ position: 'absolute', top: '15px', right: '15px', zIndex: 20 }}>
                 <button 
                   onClick={(e) => { e.stopPropagation(); setOpenMenuId(openMenuId === servicio.id ? null : servicio.id); }}

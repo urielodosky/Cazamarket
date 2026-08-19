@@ -24,36 +24,59 @@ export default function NegociosPage() {
   const [negocios, setNegocios] = useState<any[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [currentPage, setCurrentPage] = useState(1);
+  const [totalPages, setTotalPages] = useState(1);
+  const [negociosError, setNegociosError] = useState<any>(null);
+
+  const ITEMS_PER_PAGE = 24;
+
+  const q = searchParams?.get('q')?.toLowerCase() || '';
+  const filterCategoria = searchParams?.get('categoria') || '';
+  const filterProvincia = searchParams?.get('provincia') || '';
+  const filterLocalidad = searchParams?.get('localidad') || '';
+  const filterTipo = searchParams?.get('tipo') || '';
+  const filterRating = searchParams?.get('rating') || '';
 
   useEffect(() => {
     const loadBusinesses = async () => {
+      setIsLoading(true);
+      setNegociosError(null);
+      
       try {
         const { data: businesses, error } = await supabase
-          .rpc('get_negocios_con_conteos');
+          .rpc('search_businesses', {
+            p_search_term: q,
+            p_category: filterCategoria,
+            p_province: filterProvincia,
+            p_locality: filterLocalidad,
+            p_business_type: filterTipo,
+            p_rating: filterRating,
+            p_page_number: currentPage,
+            p_items_per_page: ITEMS_PER_PAGE
+          });
 
         if (error) {
           console.error('Error fetching businesses:', error);
+          setNegociosError(error);
           setIsLoading(false);
           return;
         }
 
         if (businesses) {
-          const paidBusinesses = businesses.filter((p: any) => 
-            p.product_plan_tier !== 'gratis' || p.service_plan_tier !== 'gratis'
-          );
+          const total = businesses.length > 0 ? Number(businesses[0].total_count) : 0;
+          setTotalPages(Math.ceil(total / ITEMS_PER_PAGE) || 1);
 
-          const mappedBusinesses = paidBusinesses.map((parsed: any) => {
-            const pCount = parsed.products_count || 0;
-            const sCount = parsed.services_count || 0;
+          const mappedBusinesses = businesses.map((parsed: any) => {
+            const pCount = parsed.productos_count || 0;
+            const sCount = parsed.servicios_count || 0;
 
             const parsedLocations: any[] = [];
-            if (parsed.province || parsed.locality) {
-              parsedLocations.push({ province: parsed.province || '', city: parsed.locality || '' });
-            }
             if (parsed.branches && Array.isArray(parsed.branches)) {
               parsed.branches.forEach((suc: any) => {
-                if (suc.provincia || suc.localidad) {
-                  parsedLocations.push({ province: suc.provincia || '', city: suc.localidad || '' });
+                if (suc.provincia || suc.localidad || suc.province || suc.city) {
+                  parsedLocations.push({ 
+                    province: suc.provincia || suc.province || '', 
+                    city: suc.localidad || suc.city || '' 
+                  });
                 }
               });
             }
@@ -68,9 +91,9 @@ export default function NegociosPage() {
             return {
               id: parsed.id,
               name: parsed.store_name || parsed.full_name || 'Mi Negocio',
-              rating: 0, // rating: parsed.trust_score ? (parsed.trust_score / 20).toFixed(1) : 0,
+              rating: 0, 
               reviews: 0,
-              image: parsed.cover_url || parsed.banner_url || parsed.store_image || null,
+              image: parsed.cover_url || parsed.store_image || null,
               avatar: parsed.avatar_url || 'https://ui-avatars.com/api/?name=Mi+Negocio&background=ff7300&color=fff',
               planTier: planTierStr,
               description: parsed.store_description || 'Bienvenido a mi tienda oficial en CazaMarket.',
@@ -80,7 +103,7 @@ export default function NegociosPage() {
               productsCount: pCount,
               servicesCount: sCount,
               theme: parsed.store_theme || null,
-              verified: true
+              verified: parsed.verified || false
             };
           });
           
@@ -88,61 +111,17 @@ export default function NegociosPage() {
         }
       } catch (err) {
         console.error("Unexpected error loading businesses:", err);
+        setNegociosError(err);
       }
       setIsLoading(false);
     };
     
     loadBusinesses();
-  }, [supabase]);
-
-  const q = searchParams?.get('q')?.toLowerCase() || '';
-  const filterCategoria = searchParams?.get('categoria') || '';
-  const filterProvincia = searchParams?.get('provincia') || '';
-  const filterLocalidad = searchParams?.get('localidad') || '';
-  const filterTipo = searchParams?.get('tipo') || '';
-  const filterRating = searchParams?.get('rating') || '';
+  }, [supabase, q, filterCategoria, filterProvincia, filterLocalidad, filterTipo, filterRating, currentPage]);
 
   useEffect(() => {
     setCurrentPage(1);
   }, [q, filterCategoria, filterProvincia, filterLocalidad, filterTipo, filterRating]);
-
-  const normalize = (s: string) => s.normalize('NFD').replace(/[\u0300-\u036f]/g, '').toLowerCase();
-  const normFCat = filterCategoria ? normalize(filterCategoria) : '';
-
-  const filteredNegocios = useMemo(() => {
-    return negocios.filter(negocio => {
-      if (q) {
-        const matchName = negocio.name?.toLowerCase().includes(q);
-        const matchDesc = negocio.description?.toLowerCase().includes(q);
-        if (!matchName && !matchDesc) return false;
-      }
-      if (filterCategoria) {
-        if (!negocio.categories || !negocio.categories.some((c: string) => normalize(c).includes(normFCat) || normFCat.includes(normalize(c)))) return false;
-      }
-      if (filterProvincia) {
-        if (!negocio.locations || !negocio.locations.some((l: any) => l.province === filterProvincia)) return false;
-      }
-      if (filterLocalidad) {
-        if (!negocio.locations || !negocio.locations.some((l: any) => l.city === filterLocalidad)) return false;
-      }
-      if (filterTipo) {
-        if (!negocio.businessType || negocio.businessType.toLowerCase() !== filterTipo.toLowerCase()) return false;
-      }
-      if (filterRating) {
-        const r = Number(negocio.calculatedRating || negocio.rating || 0);
-        if (filterRating === '5' && r < 5) return false;
-        if (filterRating === '4' && r < 4) return false;
-        if (filterRating === '3' && r < 3) return false;
-        if (filterRating === 'menos_3' && (r >= 3 || r === 0)) return false;
-        if (filterRating === 'nuevo' && r !== 0) return false;
-      }
-      return true;
-    });
-  }, [negocios, q, filterCategoria, normFCat, filterProvincia, filterLocalidad, filterTipo, filterRating]);
-
-  const ITEMS_PER_PAGE = 24;
-  const totalPages = Math.ceil(filteredNegocios.length / ITEMS_PER_PAGE);
-  const paginatedNegocios = filteredNegocios.slice((currentPage - 1) * ITEMS_PER_PAGE, currentPage * ITEMS_PER_PAGE);
 
   return (
     <div className="container-page" style={{ maxWidth: '1200px', margin: '0 auto', minHeight: '60vh', paddingBottom: 'var(--spacing-12)' }}>
@@ -161,7 +140,12 @@ export default function NegociosPage() {
       <div className="responsive-grid-300">
         {isLoading ? (
           <>{Array.from({ length: 6 }).map((_, i) => <SkeletonCard key={i} />)}</>
-        ) : filteredNegocios.length === 0 ? (
+        ) : negociosError ? (
+          <div style={{ gridColumn: '1 / -1', padding: '20px', background: 'rgba(255,0,0,0.1)', color: 'red', borderRadius: '8px' }}>
+            <h3>Error de Base de Datos (Negocios)</h3>
+            <pre style={{ whiteSpace: 'pre-wrap', fontSize: '12px' }}>{negociosError.message || JSON.stringify(negociosError)}</pre>
+          </div>
+        ) : negocios.length === 0 ? (
           <div style={{ gridColumn: '1 / -1', textAlign: 'center', padding: '60px 20px', background: 'rgba(255,255,255,0.02)', borderRadius: 'var(--radius-lg)', border: '1px dashed var(--color-border)' }}>
             <div style={{ marginBottom: '16px', display: 'flex', justifyContent: 'center', opacity: 0.5 }}>
               <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"></path><polyline points="9 22 9 12 15 12 15 22"></polyline></svg>
@@ -172,7 +156,7 @@ export default function NegociosPage() {
               Crea tu primer negocio
             </button>
           </div>
-        ) : paginatedNegocios.map(negocio => {
+        ) : negocios.map(negocio => {
           const isCustomColorsAllowed = negocio.id === 1 ? permissions.coloresPersonalizados : isAtLeast(negocio.planTier, 'empresarial');
           const useForceCustom = isCustomColorsAllowed && negocio.theme && negocio.theme.forceCustom;
           const customStyles = (isCustomColorsAllowed && negocio.theme) ? {
