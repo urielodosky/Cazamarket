@@ -197,7 +197,8 @@ export default function Navbar() {
     if (basePath === '/' || basePath.includes('mis-tiendas') || basePath.includes('configuracion') || basePath.includes('registro')) {
        basePath = '/productos';
     }
-    router.push(`${basePath}?${params.toString()}`);
+    const queryString = params.toString();
+    router.push(queryString ? `${basePath}?${queryString}` : basePath);
   };
 
   const isInitialMount = useRef(true);

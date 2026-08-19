@@ -769,7 +769,7 @@
   width: 100%;
   box-sizing: border-box;
   background: var(--color-bg-base, #0f0f11);
-  padding: 0 56px; /* Ajustamos el padding para eliminar el espacio gigante al extremo */
+  padding: 0 64px;
 }
 
 [data-theme="light"] .filters-carousel-wrapper {
@@ -790,6 +790,7 @@
 
 .global-filters-panel::-webkit-scrollbar {
   display: none;
+  height: 0;
 }
 
 /* Quitar pseudoelementos porque el padding ahora está en el wrapper padre */
@@ -828,11 +829,11 @@
 }
 
 .filter-scroll-btn.left {
-  left: 16px;
+  left: 12px;
 }
 
 .filter-scroll-btn.right {
-  right: 16px;
+  right: 12px;
 }
 
 [data-theme="light"] .filter-scroll-btn {
