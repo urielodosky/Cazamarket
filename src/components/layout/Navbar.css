@@ -882,3 +882,10 @@
   -moz-appearance: textfield;
   appearance: textfield;
 }
+
+/* Loading state for filters */
+.filters-loading {
+  opacity: 0.4;
+  pointer-events: none;
+  transition: opacity 0.2s ease;
+}

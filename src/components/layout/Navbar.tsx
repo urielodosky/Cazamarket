@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect, useRef } from 'react';
+import { useState, useEffect, useRef, useTransition } from 'react';
 import { usePathname, useRouter, useSearchParams } from 'next/navigation';
 import Link from 'next/link';
 import Image from 'next/image';
@@ -24,6 +24,7 @@ const NavLinks = () => (
   </nav>
 );
 export default function Navbar() {
+  const [isPending, startTransition] = useTransition();
   const pathname = usePathname();
   const isHome = pathname === '/';
   // Solo mostrar filtros en las páginas donde tiene sentido buscar/filtrar
@@ -198,7 +199,10 @@ export default function Navbar() {
        basePath = '/productos';
     }
     const queryString = params.toString();
-    router.push(queryString ? `${basePath}?${queryString}` : basePath);
+    const finalUrl = queryString ? `${basePath}?${queryString}` : basePath;
+    startTransition(() => {
+      router.push(finalUrl, { scroll: false });
+    });
   };
 
   const isInitialMount = useRef(true);
@@ -685,7 +689,7 @@ export default function Navbar() {
 
       {/* Global Filters Horizontal Strip (debajo del navbar) */}
       {(isFilterablePage && !isBusinessProfile) && (
-        <div className="filters-carousel-wrapper">
+        <div className={`filters-carousel-wrapper ${isPending ? 'filters-loading' : ''}`}>
           {canScrollLeft && (
             <button className="filter-scroll-btn left" onClick={() => scrollFilters('left')} aria-label="Scroll left">
               <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><polyline points="15 18 9 12 15 6"></polyline></svg>
