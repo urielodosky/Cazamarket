@@ -214,9 +214,14 @@ export default function Navbar() {
 
   const isInitialMount = useRef(true);
   const isSyncing = useRef(false);
+  const lastUrlRef = useRef((pathname || '') + '?' + (searchParams?.toString() || ''));
 
   // Sync state with URL when navigating (e.g., from home page links or back button)
   useEffect(() => {
+    const currentUrl = (pathname || '') + '?' + (searchParams?.toString() || '');
+    if (currentUrl === lastUrlRef.current) return;
+    lastUrlRef.current = currentUrl;
+
     isSyncing.current = true;
     setSearchQuery(searchParams?.get('q') || '');
     setCategoria(searchParams?.get('categoria') || '');
@@ -244,7 +249,7 @@ export default function Navbar() {
     setTimeout(() => {
       isSyncing.current = false;
     }, 50);
-  }, [searchParams]);
+  }, [searchParams, pathname]);
 
   // Auto-search effect for filters
   useEffect(() => {
