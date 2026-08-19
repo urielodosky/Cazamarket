@@ -328,6 +328,18 @@ function NuevoProductoContent() {
       return;
     }
 
+    if (stockMode === 'definido' && Number(stock) < 0) {
+      setFormError('El stock no puede ser un valor negativo.');
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+      return;
+    }
+    
+    if (Number(price) < 0) {
+      setFormError('El precio no puede ser un valor negativo.');
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+      return;
+    }
+
     setIsSubmitting(true);
     setShowLoadingOverlay(true);
     setLoadingText('Preparando tu producto...');
@@ -719,6 +731,7 @@ function NuevoProductoContent() {
                 <input
                   type="number"
                   max="99999999"
+                  min="0"
                   placeholder="0.00"
                   value={price}
                   onChange={(e) => { setPrice(e.target.value); setFieldErrors(prev => ({...prev, price: []})) }}
@@ -789,11 +802,11 @@ function NuevoProductoContent() {
               {stockMode === 'definido' && (
                 <input
                   type="number"
+                  min="0"
                   max="1000"
                   placeholder="Ej: 10"
                   value={stock}
                   onChange={(e) => setStock(e.target.value)}
-                  min={1}
                   style={{
                     boxSizing: "border-box", width: "100%", padding: '14px 16px', borderRadius: 'var(--radius-md)',
                     background: 'rgba(0,0,0,0.3)', border: '1px solid var(--color-border)',
@@ -833,6 +846,7 @@ function NuevoProductoContent() {
                 <input
                   type="number"
                   min="1"
+                  max="99999"
                   placeholder="Ej: 5"
                   value={minUnits}
                   onChange={(e) => setMinUnits(e.target.value)}

@@ -295,6 +295,11 @@ export default function MensajesPage() {
 
     const userText = text?.trim() || '';
 
+    if (userText.length > 500) {
+      alert("El mensaje es demasiado largo. Máximo 500 caracteres permitidos.");
+      return;
+    }
+
     // Optimistic UI for text
     if (userText && !attachmentUrl) {
       setMessageInput('');
@@ -1090,7 +1095,8 @@ export default function MensajesPage() {
                 
                 <input 
                   type="text" 
-                  placeholder="Escribe un mensaje..." 
+                  maxLength={500}
+                  placeholder="Escribe un mensaje... (Máx 500 caracteres)" 
                   value={messageInput}
                   onChange={(e) => setMessageInput(e.target.value)}
                   onKeyDown={(e) => { if (e.key === 'Enter') handleSendMessage(messageInput); }}

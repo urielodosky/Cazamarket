@@ -609,21 +609,21 @@ export default function ConfiguracionPage() {
           <div style={{ flex: '1 1 300px', display: 'flex', flexDirection: 'column', gap: '16px' }}>
             <div className="form-group-config">
               <label htmlFor="username">Nombre de Perfil</label>
-              <input type="text" id="username" value={formData.username || ''} onChange={(e) => { handleInputChange(e); setFieldErrors(prev => ({...prev, full_name: []})) }} required />
+              <input type="text" id="username" maxLength={30} value={formData.username || ''} onChange={(e) => { handleInputChange(e); setFieldErrors(prev => ({...prev, full_name: []})) }} required />
               {fieldErrors.full_name && fieldErrors.full_name.map((err, i) => (
                 <span key={i} className="inline-error" style={{ color: '#ff4d4d', fontSize: '0.8rem', display: 'block', marginTop: '4px' }}>{err}</span>
               ))}
             </div>
             <div className="form-group-config">
               <label htmlFor="storeName">Nombre de la Tienda / Negocio</label>
-              <input type="text" id="storeName" value={formData.storeName || ''} onChange={(e) => { handleInputChange(e); setFieldErrors(prev => ({...prev, store_name: []})) }} placeholder="Ej. Mi Tienda Genial" required />
+              <input type="text" id="storeName" maxLength={50} value={formData.storeName || ''} onChange={(e) => { handleInputChange(e); setFieldErrors(prev => ({...prev, store_name: []})) }} placeholder="Ej. Mi Tienda Genial" required />
               {fieldErrors.store_name && fieldErrors.store_name.map((err, i) => (
                 <span key={i} className="inline-error" style={{ color: '#ff4d4d', fontSize: '0.8rem', display: 'block', marginTop: '4px' }}>{err}</span>
               ))}
             </div>
             <div className="form-group-config">
               <label htmlFor="storeDescription">Descripción Corta</label>
-              <textarea id="storeDescription" value={formData.storeDescription || ''} onChange={(e) => { handleInputChange(e); setFieldErrors(prev => ({...prev, store_description: []})) }} placeholder="¿Qué vendes o qué ofreces?" rows={3} required></textarea>
+              <textarea id="storeDescription" maxLength={500} value={formData.storeDescription || ''} onChange={(e) => { handleInputChange(e); setFieldErrors(prev => ({...prev, store_description: []})) }} placeholder="¿Qué vendes o qué ofreces?" rows={3} required></textarea>
               {fieldErrors.store_description && fieldErrors.store_description.map((err, i) => (
                 <span key={i} className="inline-error" style={{ color: '#ff4d4d', fontSize: '0.8rem', display: 'block', marginTop: '4px' }}>{err}</span>
               ))}
@@ -631,14 +631,14 @@ export default function ConfiguracionPage() {
             <div className="config-split-grid" style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '24px' }}>
               <div className="form-group-config">
                 <label htmlFor="nombre">Nombre Real</label>
-                <input type="text" id="nombre" value={formData.nombre || ''} onChange={(e) => { handleInputChange(e); setFieldErrors(prev => ({...prev, first_name: []})) }} required />
+                <input type="text" id="nombre" maxLength={50} value={formData.nombre || ''} onChange={(e) => { handleInputChange(e); setFieldErrors(prev => ({...prev, first_name: []})) }} required />
                 {fieldErrors.first_name && fieldErrors.first_name.map((err, i) => (
                   <span key={i} className="inline-error" style={{ color: '#ff4d4d', fontSize: '0.8rem', display: 'block', marginTop: '4px' }}>{err}</span>
                 ))}
               </div>
               <div className="form-group-config">
                 <label htmlFor="apellido">Apellido</label>
-                <input type="text" id="apellido" value={formData.apellido || ''} onChange={(e) => { handleInputChange(e); setFieldErrors(prev => ({...prev, last_name: []})) }} required />
+                <input type="text" id="apellido" maxLength={50} value={formData.apellido || ''} onChange={(e) => { handleInputChange(e); setFieldErrors(prev => ({...prev, last_name: []})) }} required />
                 {fieldErrors.last_name && fieldErrors.last_name.map((err, i) => (
                   <span key={i} className="inline-error" style={{ color: '#ff4d4d', fontSize: '0.8rem', display: 'block', marginTop: '4px' }}>{err}</span>
                 ))}
