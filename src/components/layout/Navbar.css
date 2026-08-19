@@ -649,7 +649,7 @@
 /* ========================================
    MOBILE RESPONSIVENESS
    ======================================== */
-  /* Removed broken mobile responsiveness block */
+@media (max-width: 768px) {
 
   .navbar-middle-area {
     flex: 1;
