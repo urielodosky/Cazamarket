@@ -25,75 +25,108 @@ function ProductosContent() {
   const [openMenuId, setOpenMenuId] = useState<number | null>(null);
   const [theme, setTheme] = useState<{primaryColor?: string, textColor?: string, bgColor?: string} | null>(null);
   const [currentPage, setCurrentPage] = useState(1);
-  const fetcher = async () => {
+  const [exchangeRate, setExchangeRate] = useState<number>(1400); // Default fallback
+
+  const searchParams = useSearchParams();
+  const q = searchParams?.get('q')?.toLowerCase() || '';
+  const filterCategoria = searchParams?.get('categoria') || '';
+  const filterSubcategoriasStr = searchParams?.get('subcategorias');
+  const minPriceStr = searchParams?.get('minPrice');
+  const maxPriceStr = searchParams?.get('maxPrice');
+  const currencyStr = searchParams?.get('currency');
+  const filterBusiness = searchParams?.get('businessType') || '';
+  const filterTipo = searchParams?.get('tipo') || '';
+  const filterOfrece = searchParams?.get('ofrece') || '';
+  const filterProvincia = searchParams?.get('provincia') || '';
+  const filterLocalidad = searchParams?.get('localidad') || '';
+  const filterRating = searchParams?.get('rating') || '';
+  const fetcher = async ([_, vendorMode, page, searchTerm, cat, subcatStr, minP, maxP, cur, fxRate, busType, cond, ofrece, prov, loc, rating]: any[]) => {
     const supabase = createClient();
-    let query = supabase.from('products').select('*, profiles(first_name, last_name, full_name, avatar_url, store_name, branches, business_type)');
     
+    let vendorUserId = null;
     const { data: userData } = await supabase.auth.getUser();
-    if (isVendorModeActive && userData?.user) {
-      query = query.eq('user_id', userData.user.id);
+    if (vendorMode && userData?.user) {
+      vendorUserId = userData.user.id;
     }
-    
-    const { data, error } = await query;
+
+    let subcategories = subcatStr ? subcatStr.split(',') : [];
+
+    const { data, error } = await supabase.rpc('search_products', {
+      p_search_term: searchTerm || '',
+      p_category: cat || '',
+      p_subcategories: subcategories,
+      p_min_price: minP ? Number(minP) : null,
+      p_max_price: maxP ? Number(maxP) : null,
+      p_target_currency: cur ? cur.toUpperCase() : 'USD',
+      p_exchange_rate: fxRate || 1400,
+      p_business_type: busType || '',
+      p_condition: cond || '',
+      p_ofrece: ofrece || '',
+      p_province: prov || '',
+      p_locality: loc || '',
+      p_rating: rating || '',
+      p_vendor_user_id: vendorUserId,
+      p_page_number: page,
+      p_items_per_page: 24
+    });
+
     if (error) throw error;
-    if (!data) return [];
-
-    const ratingsMap: Record<number, { sum: number, count: number }> = {};
-    try {
-      const { data: allReviews, error: revError } = await supabase
-        .from('reviews')
-        .select('product_rating, interactions!inner(product_id)')
-        .eq('interactions.status', 'published')
-        .not('interactions.product_id', 'is', null);
-        
-      if (allReviews && !revError) {
-        allReviews.forEach((r: any) => {
-          const pId = r.interactions?.product_id;
-          if (pId && r.product_rating) {
-            if (!ratingsMap[pId]) ratingsMap[pId] = { sum: 0, count: 0 };
-            ratingsMap[pId].sum += r.product_rating;
-            ratingsMap[pId].count += 1;
-          }
-        });
-      }
-    } catch (e) {
-      console.warn('Could not fetch reviews rating', e);
-    }
-
+    
     const localProf = localStorage.getItem('cazamarket_profile');
     let parsedProf: any = null;
     if (localProf) {
       try { parsedProf = JSON.parse(localProf); } catch (e) {}
     }
-    
-    return data.map(p => {
+
+    if (!data || data.length === 0) return { products: [], totalCount: 0 };
+
+    const totalCount = data[0].total_count;
+
+    const formattedProducts = data.map((p: any) => {
       const isOwn = userData?.user?.id === p.user_id;
+      const profileObj = p.profiles_obj || p.profiles;
       const fallbackStore = isOwn && parsedProf ? (parsedProf.storeName || parsedProf.username || parsedProf.firstName) : 'Usuario Anónimo';
       const fallbackAvatar = isOwn && parsedProf?.avatar ? parsedProf.avatar : 'https://images.unsplash.com/photo-1511497584788-876760111969?q=80&w=200&auto=format&fit=crop';
       
-      const ratingData = ratingsMap[p.id];
-      const averageRating = ratingData ? (ratingData.sum / ratingData.count).toFixed(1) : null;
-      
-      const profileObj = Array.isArray(p.profiles) ? p.profiles[0] : p.profiles;
-
       return {
         ...p,
         store: profileObj?.store_name || profileObj?.full_name || fallbackStore || `${profileObj?.first_name || ''} ${profileObj?.last_name || ''}`.trim() || 'Usuario Anónimo',
         avatar: profileObj?.avatar_url || fallbackAvatar,
         branches: profileObj?.branches || (isOwn && parsedProf?.branches ? parsedProf.branches : []),
-        calculatedRating: averageRating
+        calculatedRating: p.calculated_rating || p.calc_rating,
+        profiles: profileObj
       };
     });
+
+    return { products: formattedProducts, totalCount };
   };
 
-  const { data: productsData, error: productsError, mutate } = useSWR(
-    ['productos', isVendorModeActive],
+  const { data: fetchResult, error: productsError, isLoading: swrLoading, mutate } = useSWR(
+    [
+      'productos', 
+      isVendorModeActive, 
+      currentPage, 
+      q, 
+      filterCategoria, 
+      filterSubcategoriasStr, 
+      minPriceStr, 
+      maxPriceStr, 
+      currencyStr, 
+      exchangeRate, 
+      filterBusiness, 
+      filterTipo, 
+      filterOfrece, 
+      filterProvincia, 
+      filterLocalidad, 
+      filterRating
+    ],
     fetcher,
-    { revalidateOnFocus: false }
+    { revalidateOnFocus: false, keepPreviousData: true }
   );
 
-  const localProducts = productsData || [];
-  const isLoading = !productsData && !productsError;
+  const localProducts = fetchResult?.products || [];
+  const totalCount = fetchResult?.totalCount || 0;
+  const isLoading = swrLoading || (!fetchResult && !productsError);
 
   const handleDeleteProduct = async (e: React.MouseEvent, id: any) => {
     e.stopPropagation();
@@ -125,9 +158,6 @@ function ProductosContent() {
       } catch (e) {}
     }
   }, [isVendorModeActive]);
-
-  const [exchangeRate, setExchangeRate] = useState<number>(1400); // Default fallback
-
   useEffect(() => {
     fetch('/api/dolar')
       .then(res => res.json())
@@ -137,136 +167,15 @@ function ProductosContent() {
       .catch(err => console.error('Error fetching dollar rate:', err));
   }, []);
 
-  const searchParams = useSearchParams();
-  const q = searchParams?.get('q')?.toLowerCase() || '';
-  const filterCategoria = searchParams?.get('categoria') || '';
-  const filterSubcategoriasStr = searchParams?.get('subcategorias');
-  const minPriceStr = searchParams?.get('minPrice');
-  const maxPriceStr = searchParams?.get('maxPrice');
-  const currencyStr = searchParams?.get('currency');
-  const filterBusiness = searchParams?.get('businessType') || '';
-  const filterTipo = searchParams?.get('tipo') || '';
-  const filterOfrece = searchParams?.get('ofrece') || '';
-  const filterProvincia = searchParams?.get('provincia') || '';
-  const filterLocalidad = searchParams?.get('localidad') || '';
-  const filterRating = searchParams?.get('rating') || '';
+
 
   useEffect(() => {
     setCurrentPage(1);
   }, [q, filterCategoria, filterSubcategoriasStr, minPriceStr, maxPriceStr, currencyStr, filterBusiness, filterTipo, filterOfrece, filterProvincia, filterLocalidad, filterRating]);
 
-  const allowedLocalProducts = localProducts.slice(0, permissions.maxProductos);
-  const rawMergedData = [...allowedLocalProducts];
-  
-  const normalize = (s: string) => s.normalize('NFD').replace(/[\u0300-\u036f]/g, '').toLowerCase();
-  const normFCat = filterCategoria ? normalize(filterCategoria) : '';
-
-  const mergedData = useMemo(() => {
-    return rawMergedData.filter((producto) => {
-      // 1. Filtrar por búsqueda de texto (q)
-      if (q) {
-        const titleMatch = producto.name?.toLowerCase().includes(q);
-        const descMatch = producto.description?.toLowerCase().includes(q);
-        
-        // Buscar en características si existen
-        let featuresMatch = false;
-        if (producto.features && Array.isArray(producto.features)) {
-          featuresMatch = producto.features.some((f: any) => 
-            f.name?.toLowerCase().includes(q) || f.value?.toLowerCase().includes(q)
-          );
-        }
-        
-        if (!titleMatch && !descMatch && !featuresMatch) return false;
-      }
-      
-      // 2. Filtrar por categoría y subcategorías
-      const filterSubcategorias = filterSubcategoriasStr ? filterSubcategoriasStr.split(',') : [];
-      
-      if (filterCategoria) {
-        const pCat = producto.category?.toLowerCase() || '';
-        const pSub = producto.subcategory?.toLowerCase() || '';
-        
-        if (filterSubcategorias.length > 0) {
-          const matchSub = filterSubcategorias.some(sub => normalize(pSub) === normalize(sub.toLowerCase()));
-          if (!matchSub) return false;
-        } else {
-          if (normalize(pCat) !== normFCat && normalize(pSub) !== normFCat) return false;
-        }
-      }
-
-      // Filtro Precio con Conversión de Moneda
-      if (minPriceStr || maxPriceStr || currencyStr) {
-        const minPrice = minPriceStr ? Number(minPriceStr) : 0;
-        const maxPrice = maxPriceStr ? Number(maxPriceStr) : Infinity;
-        const targetCurrency = currencyStr ? currencyStr.toUpperCase() : 'USD';
-        const productCurrency = producto.currency?.toUpperCase() || 'ARS';
-
-        let normalizedPrice = producto.price;
-        
-        if (productCurrency === 'ARS' && targetCurrency === 'USD') {
-          normalizedPrice = producto.price / exchangeRate;
-        } else if (productCurrency === 'USD' && targetCurrency === 'ARS') {
-          normalizedPrice = producto.price * exchangeRate;
-        }
-
-        if (normalizedPrice < minPrice) return false;
-        if (normalizedPrice > maxPrice) return false;
-      }
-
-      // Filtro Tipo Vendedor
-      if (filterBusiness) {
-        const sellerType = producto.seller?.businessType?.toLowerCase() || producto.profiles?.business_type?.toLowerCase() || '';
-        if (filterBusiness === 'minorista' && sellerType !== 'minorista' && sellerType !== 'mixto') return false;
-        if (filterBusiness === 'mayorista' && sellerType !== 'mayorista' && sellerType !== 'mixto') return false;
-        if (filterBusiness === 'mixto' && sellerType !== 'mixto') return false;
-      }
-
-      // 3. Filtrar por tipo (Condición: 'nuevo' o 'usado')
-      if (filterTipo && producto.condition?.toLowerCase() !== filterTipo.toLowerCase()) {
-        return false;
-      }
-
-      // 4. Filtrar por ofrece (Envío, Envío gratis, Retiro)
-      if (filterOfrece) {
-        if (filterOfrece === 'envio_gratis') {
-          if (producto.seller?.shippingCost !== 0 && producto.shippingCost !== 0 && producto.shipping_mode !== 'gratis') return false;
-        }
-        if (filterOfrece === 'retiro') {
-          if (!producto.seller?.branches || producto.seller.branches.length === 0) return false;
-        }
-      }
-      
-      // 5. Filtrar por provincia
-      if (filterProvincia) {
-        if (!producto.seller?.branches || producto.seller.branches.length === 0) return false;
-        const hasProvincia = producto.seller.branches.some((b: any) => b.province === filterProvincia);
-        if (!hasProvincia) return false;
-      }
-
-      // 6. Filtrar por localidad
-      if (filterLocalidad) {
-        if (!producto.seller?.branches || producto.seller.branches.length === 0) return false;
-        const hasLocalidad = producto.seller.branches.some((b: any) => b.city === filterLocalidad);
-        if (!hasLocalidad) return false;
-      }
-
-      // 7. Filtrar por rating
-      if (filterRating) {
-        const r = Number(producto.rating || 0);
-        if (filterRating === '5' && r < 5) return false;
-        if (filterRating === '4' && r < 4) return false;
-        if (filterRating === '3' && r < 3) return false;
-        if (filterRating === 'menos_3' && (r >= 3 || r === 0)) return false;
-        if (filterRating === 'nuevo' && r !== 0) return false;
-      }
-
-      return true;
-    });
-  }, [rawMergedData, q, filterCategoria, normFCat, filterSubcategoriasStr, minPriceStr, maxPriceStr, currencyStr, exchangeRate, filterBusiness, filterTipo, filterOfrece, filterProvincia, filterLocalidad, filterRating]);
-
   const ITEMS_PER_PAGE = 24;
-  const totalPages = Math.ceil(mergedData.length / ITEMS_PER_PAGE);
-  const paginatedData = mergedData.slice((currentPage - 1) * ITEMS_PER_PAGE, currentPage * ITEMS_PER_PAGE);
+  const totalPages = Math.ceil(totalCount / ITEMS_PER_PAGE);
+  const paginatedData = localProducts;
 
   return (
     <div style={{ padding: 'var(--spacing-4) var(--spacing-4)', maxWidth: '1200px', margin: '0 auto', minHeight: '60vh', paddingBottom: 'var(--spacing-12)' }}>
@@ -292,7 +201,7 @@ function ProductosContent() {
             <SkeletonCard />
             <SkeletonCard />
           </>
-        ) : mergedData.length === 0 ? (
+        ) : localProducts.length === 0 ? (
           <div style={{ gridColumn: '1 / -1', display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', padding: '60px 20px', textAlign: 'center', background: 'rgba(0,0,0,0.2)', borderRadius: 'var(--radius-lg)', border: '1px dashed rgba(255,255,255,0.1)' }}>
             <svg width="64" height="64" viewBox="0 0 24 24" fill="none" stroke="rgba(255,255,255,0.2)" strokeWidth="1" strokeLinecap="round" strokeLinejoin="round" style={{ marginBottom: '16px' }}><path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z"></path><polyline points="3.27 6.96 12 12.01 20.73 6.96"></polyline><line x1="12" y1="22.08" x2="12" y2="12"></line></svg>
             {isVendorModeActive ? (
@@ -310,7 +219,7 @@ function ProductosContent() {
               </>
             )}
           </div>
-        ) : paginatedData.map(producto => {
+        ) : paginatedData.map((producto: any) => {
             const cardTheme = (producto.storeId === 1 && permissions.coloresPersonalizados && theme) ? theme : (producto.seller?.theme ? producto.seller.theme : null);
             const cardStyles = cardTheme ? {
               '--color-primary': cardTheme.primaryColor,

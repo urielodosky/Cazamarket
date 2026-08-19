@@ -1123,9 +1123,7 @@ export default function MensajesPage() {
 
       {isAdvisorModalOpen && <VirtualAdvisorModal onClose={() => setIsAdvisorModalOpen(false)} />}
       
-      <style dangerouslySetInnerHTML={{__html: `
-        @keyframes spin { 100% { transform: rotate(360deg); } }
-      `}} />
+
 
       {/* Delete Chat Modal */}
       {chatToDelete && (

@@ -105,25 +105,7 @@ export default function PromoSlider() {
         animation: "fadeIn 1s ease-out 0.2s both",
       }}
     >
-      <style dangerouslySetInnerHTML={{__html: `
-        @media (max-width: 768px) {
-          .slider-arrow-btn { display: none !important; }
-          .slider-container { min-height: 280px !important; }
-          .slide-bg { 
-            background-size: cover !important; 
-            background-position: center !important; 
-            background-color: transparent !important; 
-            min-height: 280px !important;
-            padding: 20px !important;
-          }
-          .slider-badge { font-size: 0.65rem !important; padding: 4px 10px !important; margin-bottom: 8px !important; }
-          .slider-title { font-size: 1.3rem !important; margin-bottom: 6px !important; }
-          .slider-desc { font-size: 0.85rem !important; margin-bottom: 12px !important; line-height: 1.3 !important; max-width: 100% !important; }
-          .slider-btn { padding: 8px 16px !important; font-size: 0.85rem !important; min-height: auto !important; }
-          .slider-title-cta { font-size: 1.5rem !important; margin-bottom: 6px !important; }
-          .slider-desc-cta { font-size: 0.85rem !important; margin-bottom: 12px !important; line-height: 1.3 !important; max-width: 100% !important; }
-        }
-      `}} />
+
       <div
         className="ad-banner-container"
         style={{ padding: "0 var(--spacing-4)", width: "100%" }}

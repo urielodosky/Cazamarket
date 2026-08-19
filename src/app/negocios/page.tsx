@@ -28,10 +28,8 @@ export default function NegociosPage() {
   useEffect(() => {
     const loadBusinesses = async () => {
       try {
-        const { data: profiles, error } = await supabase
-          .from('profiles')
-          .select('*')
-          .eq('role', 'negocio');
+        const { data: businesses, error } = await supabase
+          .rpc('get_negocios_con_conteos');
 
         if (error) {
           console.error('Error fetching businesses:', error);
@@ -39,28 +37,14 @@ export default function NegociosPage() {
           return;
         }
 
-        if (profiles) {
-          const paidBusinesses = profiles.filter(p => 
+        if (businesses) {
+          const paidBusinesses = businesses.filter((p: any) => 
             p.product_plan_tier !== 'gratis' || p.service_plan_tier !== 'gratis'
           );
 
-          // Optimized parallel individual counting
-          let prodCountMap: Record<string, number> = {};
-          let servCountMap: Record<string, number> = {};
-          
-          const results = await Promise.all(paidBusinesses.map(async (p) => {
-            const [{ count: pc }, { count: sc }] = await Promise.all([
-              supabase.from('products').select('*', { count: 'exact', head: true }).eq('user_id', p.id),
-              supabase.from('services').select('*', { count: 'exact', head: true }).eq('user_id', p.id),
-            ]);
-            return { id: p.id, pc: pc || 0, sc: sc || 0 };
-          }));
-          
-          results.forEach(r => { prodCountMap[r.id] = r.pc; servCountMap[r.id] = r.sc; });
-          
-          const mappedBusinesses = paidBusinesses.map((parsed) => {
-            const pCount = prodCountMap[parsed.id] || 0;
-            const sCount = servCountMap[parsed.id] || 0;
+          const mappedBusinesses = paidBusinesses.map((parsed: any) => {
+            const pCount = parsed.products_count || 0;
+            const sCount = parsed.services_count || 0;
 
             const parsedLocations: any[] = [];
             if (parsed.province || parsed.locality) {
@@ -173,22 +157,7 @@ export default function NegociosPage() {
           </button>
         </div>
       )}
-      <style dangerouslySetInnerHTML={{__html: `
-        .loc-tooltip-container { position: relative; display: inline-flex; align-items: center; }
-        .loc-tooltip { 
-          visibility: hidden; opacity: 0; position: absolute; bottom: calc(100% + 6px); left: 50%;
-          transform: translateX(-50%) translateY(4px); transition: all 0.2s; 
-          background: #1a1e16; border: 1px solid color-mix(in srgb, var(--color-primary) 30%, transparent);
-          padding: 8px 14px; border-radius: var(--radius-md); box-shadow: 0 10px 25px rgba(0,0,0,0.85);
-          white-space: nowrap; z-index: 100; color: var(--color-text-main);
-          pointer-events: none;
-        }
-        .loc-tooltip-container:hover .loc-tooltip { visibility: visible; opacity: 1; transform: translateX(-50%) translateY(0); }
-        .loc-tooltip::after {
-          content: ''; position: absolute; top: 100%; left: 50%; transform: translateX(-50%);
-          border-width: 5px; border-style: solid; border-color: #1a1e16 transparent transparent transparent;
-        }
-      `}} />
+
       <div className="responsive-grid-300">
         {isLoading ? (
           <>{Array.from({ length: 6 }).map((_, i) => <SkeletonCard key={i} />)}</>

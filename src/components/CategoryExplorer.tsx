@@ -106,19 +106,7 @@ export default function CategoryExplorer() {
         ))}
       </div>
 
-      <style dangerouslySetInnerHTML={{__html: `
-        .category-card:hover .category-bg {
-          transform: scale(1.1);
-        }
-        .category-card {
-          box-shadow: 0 4px 6px rgba(0,0,0,0.1);
-          transition: transform 0.2s, box-shadow 0.2s;
-        }
-        .category-card:hover {
-          transform: translateY(-5px);
-          box-shadow: 0 8px 15px rgba(0,0,0,0.3);
-        }
-      `}} />
+
     </section>
   );
 }

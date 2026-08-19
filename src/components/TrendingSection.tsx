@@ -136,12 +136,7 @@ export default function TrendingSection() {
         )}
       </div>
 
-      <style dangerouslySetInnerHTML={{__html: `
-        .trending-item-hover:hover {
-          background-color: rgba(255,255,255,0.05);
-          transform: translateX(5px);
-        }
-      `}} />
+
     </section>
   );
 }
