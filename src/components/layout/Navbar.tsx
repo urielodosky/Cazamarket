@@ -254,28 +254,6 @@ export default function Navbar() {
 
   const renderFiltersContent = () => (
     <>
-      {hasActiveFilters && (
-        <div className="filter-wrapper-item" style={{ flex: '0 0 auto', zIndex: 130 }}>
-          <button 
-            onClick={handleResetFilters}
-            className="filter-input-pill"
-            style={{ 
-              background: 'rgba(255, 77, 77, 0.1)', 
-              color: '#ff4d4d', 
-              border: '1px solid rgba(255, 77, 77, 0.2)',
-              cursor: 'pointer',
-              display: 'flex',
-              alignItems: 'center',
-              gap: '6px',
-              padding: '0 12px',
-              fontWeight: 500
-            }}
-          >
-            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg>
-            Limpiar
-          </button>
-        </div>
-      )}
       {/* 1. Precio (Min/Max) */}
       {!pathname.startsWith('/comunidad') && (
         <>
@@ -497,6 +475,29 @@ export default function Navbar() {
                 placeholder="Localidades" 
                 searchable={true}
               />
+            </div>
+          )}
+
+          {hasActiveFilters && (
+            <div className="filter-wrapper-item" style={{ flex: '0 0 auto', zIndex: 98 }}>
+              <button 
+                onClick={handleResetFilters}
+                className="filter-input-pill"
+                style={{ 
+                  background: 'rgba(255, 115, 0, 0.1)', 
+                  color: 'var(--color-primary)', 
+                  border: '1px solid rgba(255, 115, 0, 0.2)',
+                  cursor: 'pointer',
+                  display: 'flex',
+                  alignItems: 'center',
+                  gap: '6px',
+                  padding: '0 12px',
+                  fontWeight: 500
+                }}
+              >
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg>
+                Restablecer filtros
+              </button>
             </div>
           )}
         </>
