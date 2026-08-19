@@ -200,6 +200,13 @@ export default function Navbar() {
     }
     const queryString = params.toString();
     const finalUrl = queryString ? `${basePath}?${queryString}` : basePath;
+    
+    // Prevent pushing identical URL which causes useTransition to hang indefinitely in Next.js
+    const currentUrl = searchParams?.toString() ? `${pathname}?${searchParams.toString()}` : (pathname || '');
+    if (finalUrl === currentUrl) {
+      return;
+    }
+
     startTransition(() => {
       router.push(finalUrl, { scroll: false });
     });
@@ -213,8 +220,14 @@ export default function Navbar() {
     isSyncing.current = true;
     setSearchQuery(searchParams?.get('q') || '');
     setCategoria(searchParams?.get('categoria') || '');
-    const sub = searchParams?.get('subcategorias');
-    setSubcategorias(sub ? sub.split(',') : []);
+    
+    const subStr = searchParams?.get('subcategorias');
+    setSubcategorias(prev => {
+      const newSub = subStr ? subStr.split(',') : [];
+      if (prev.length === newSub.length && prev.every((v, i) => v === newSub[i])) return prev;
+      return newSub;
+    });
+
     setMinPrice(searchParams?.get('minPrice') || '');
     setMaxPrice(searchParams?.get('maxPrice') || '');
     setMinPriceInput(searchParams?.get('minPrice') || '');
