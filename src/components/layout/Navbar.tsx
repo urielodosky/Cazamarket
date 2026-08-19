@@ -227,8 +227,55 @@ export default function Navbar() {
 
   let navbarModeClass = (!isFilterablePage || isHome || isBusinessProfile) ? 'business-mode' : 'expanded-mode';
 
+  const hasActiveFilters = Boolean(categoria || subcategorias.length > 0 || minPriceInput || maxPriceInput || currency || businessType || ofrece || tipo || provincia || localidad || rating || searchQuery);
+
+  const handleResetFilters = () => {
+    setSearchQuery('');
+    setCategoria('');
+    setSubcategorias([]);
+    setMinPrice('');
+    setMaxPrice('');
+    setMinPriceInput('');
+    setMaxPriceInput('');
+    setCurrency('');
+    setBusinessType('');
+    setOfrece('');
+    setTipo('');
+    setProvincia('');
+    setLocalidad('');
+    setRating('');
+    
+    let basePath = pathname || '/productos';
+    if (basePath === '/' || basePath.includes('mis-tiendas') || basePath.includes('configuracion') || basePath.includes('registro')) {
+       basePath = '/productos';
+    }
+    router.push(basePath);
+  };
+
   const renderFiltersContent = () => (
     <>
+      {hasActiveFilters && (
+        <div className="filter-wrapper-item" style={{ flex: '0 0 auto', zIndex: 130 }}>
+          <button 
+            onClick={handleResetFilters}
+            className="filter-input-pill"
+            style={{ 
+              background: 'rgba(255, 77, 77, 0.1)', 
+              color: '#ff4d4d', 
+              border: '1px solid rgba(255, 77, 77, 0.2)',
+              cursor: 'pointer',
+              display: 'flex',
+              alignItems: 'center',
+              gap: '6px',
+              padding: '0 12px',
+              fontWeight: 500
+            }}
+          >
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg>
+            Limpiar
+          </button>
+        </div>
+      )}
       {/* 1. Precio (Min/Max) */}
       {!pathname.startsWith('/comunidad') && (
         <>
