@@ -6,6 +6,7 @@ import { useRouter } from 'next/navigation';
 import LoadingScreen from '@/components/ui/LoadingScreen';
 import { HeartIcon } from '@heroicons/react/24/solid';
 import { sanitizeInput } from '@/lib/sanitize';
+import parse from 'html-react-parser';
 import { useCart } from '@/contexts/CartContext';
 import { useFavorites } from '@/contexts/FavoritesContext';
 import { useAuth } from '@/contexts/AuthContext';
@@ -379,8 +380,9 @@ export default function ProductoDetailPage({ params }: { params: Promise<{ id: s
             <h3 className="pp-section-title">Descripción del Producto</h3>
             <div 
               className="pp-description-text"
-              dangerouslySetInnerHTML={{ __html: sanitizeInput(product.description) }}
-            />
+            >
+              {parse(sanitizeInput(product.description))}
+            </div>
           </div>
 
           {product.features && product.features.length > 0 && (

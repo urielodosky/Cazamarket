@@ -17,6 +17,7 @@
     "@upstash/redis": "^1.38.2",
     "@xyflow/react": "^12.11.2",
     "cookie": "^2.0.1",
+    "html-react-parser": "^6.1.7",
     "isomorphic-dompurify": "^3.19.0",
     "jose": "^6.2.9",
     "leaflet": "^1.9.4",

@@ -164,8 +164,8 @@ export default function MiNegocioPage() {
     const fetchProductsAndServices = async () => {
       if (supabaseUser) {
         try {
-          const { data: prods } = await supabase.from('products').select('*').eq('user_id', supabaseUser.id);
-          const { data: servs } = await supabase.from('services').select('*').eq('user_id', supabaseUser.id);
+          const { data: prods } = await supabase.from('products').select('id, name, price, image, currency, category, condition, status, created_at').eq('user_id', supabaseUser.id);
+          const { data: servs } = await supabase.from('services').select('id, name, price, image_urls, currency, category, status, created_at').eq('user_id', supabaseUser.id);
 
           if (prods) setMyProducts(prods);
           if (servs) setMyServices(servs);

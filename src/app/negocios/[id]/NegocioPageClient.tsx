@@ -137,11 +137,11 @@ export default function NegocioDetailPage({ params }: { params: Promise<{ id: st
       // It's a Supabase UUID, load from Supabase
       const loadSupabaseProfile = async () => {
         const supabase = createClient();
-        const { data: profile } = await supabase.from('profiles').select('*').eq('id', unwrappedParams.id).single();
+        const { data: profile } = await supabase.from('profiles').select('id, store_name, full_name, cover_url, banner_url, store_image, store_description, avatar_url, phone, providers, distributors, verified, business_type').eq('id', unwrappedParams.id).single();
         
         if (profile) {
-          const { data: prods } = await supabase.from('products').select('*').eq('user_id', unwrappedParams.id).limit(permissions.maxProductos);
-          const { data: servs } = await supabase.from('services').select('*').eq('user_id', unwrappedParams.id).limit(permissions.maxServicios);
+          const { data: prods } = await supabase.from('products').select('id, name, description, price, image, category, condition, currency, stock').eq('user_id', unwrappedParams.id).limit(permissions.maxProductos);
+          const { data: servs } = await supabase.from('services').select('id, name, description, price, image_urls, category, currency').eq('user_id', unwrappedParams.id).limit(permissions.maxServicios);
           
           let avgRating = 0;
           let totalReviews = 0;
@@ -334,7 +334,7 @@ export default function NegocioDetailPage({ params }: { params: Promise<{ id: st
             reviewsList: reviewList
           }));
 
-          const { data, error } = await supabase.from('products').select('*').eq('user_id', userData.user.id).limit(permissions.maxProductos);
+          const { data, error } = await supabase.from('products').select('id, name, description, price, image, category, condition, currency, stock').eq('user_id', userData.user.id).limit(permissions.maxProductos);
           if (data && !error && data.length > 0) {
             setNegocio((prev: any) => {
               const hasSection = prev.productSections.some((s: any) => s.name === 'Mis Productos');

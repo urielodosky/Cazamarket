@@ -312,7 +312,7 @@ export default function MensajesPage() {
       // Handle the virtual test chat
       if (activeChatId === 'bot-test-chat') {
         const { data: existingChat } = await supabase.from('chats')
-          .select('*')
+          .select('id, buyer_id, seller_id, product_id, created_at, updated_at')
           .eq('buyer_id', supabaseUser.id)
           .eq('seller_id', supabaseUser.id)
           .is('product_id', null)
@@ -523,17 +523,17 @@ export default function MensajesPage() {
       
       if (productId) {
         // Try to fetch specific bot rules first
-        const { data: specificRules } = await supabase.from('bot_rules').select('*').eq('seller_id', sellerId).eq('product_id', productId);
+        const { data: specificRules } = await supabase.from('bot_rules').select('id, condition_type, condition_value, options, response_text, attachment_url, attachment_type, response_type, fire_once, cooldown_hours, reactivation_text, parent_rule_id').eq('seller_id', sellerId).eq('product_id', productId);
         if (specificRules && specificRules.length > 0) {
           rules = specificRules;
         } else {
           // Fallback to general bot if no specific rules exist
-          const { data: generalRules } = await supabase.from('bot_rules').select('*').eq('seller_id', sellerId).is('product_id', null);
+          const { data: generalRules } = await supabase.from('bot_rules').select('id, condition_type, condition_value, options, response_text, attachment_url, attachment_type, response_type, fire_once, cooldown_hours, reactivation_text, parent_rule_id').eq('seller_id', sellerId).is('product_id', null);
           rules = generalRules || [];
         }
       } else {
         // No product ID in chat, just fetch general bot
-        const { data: generalRules } = await supabase.from('bot_rules').select('*').eq('seller_id', sellerId).is('product_id', null);
+        const { data: generalRules } = await supabase.from('bot_rules').select('id, condition_type, condition_value, options, response_text, attachment_url, attachment_type, response_type, fire_once, cooldown_hours, reactivation_text, parent_rule_id').eq('seller_id', sellerId).is('product_id', null);
         rules = generalRules || [];
       }
 
@@ -543,7 +543,7 @@ export default function MensajesPage() {
       const normalizedUserText = normalizeText(userText);
       
       // Check Cooldown and Fire Once
-      const { data: currentChat } = await supabase.from('chats').select('*').eq('id', chatId).single();
+      const { data: currentChat } = await supabase.from('chats').select('id, bot_fired_once, bot_cooldown_until, bot_waiting_node_id, bot_waiting_rule_id').eq('id', chatId).single();
       if (!currentChat) return;
 
       let matchedRule: any = null;
