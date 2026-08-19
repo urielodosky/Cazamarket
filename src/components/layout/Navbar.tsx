@@ -112,6 +112,11 @@ export default function Navbar() {
     return () => window.removeEventListener('resize', updateScrollArrows);
   }, []);
 
+  // Update scroll arrows when dynamic items might appear
+  useEffect(() => {
+    setTimeout(updateScrollArrows, 50);
+  }, [provincia, categoria, subcategorias.length]);
+
   const scrollFilters = (direction: 'left' | 'right') => {
     if (filtersCarouselRef.current) {
       const scrollAmount = direction === 'left' ? -300 : 300;
