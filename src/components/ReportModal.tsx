@@ -75,7 +75,11 @@ export default function ReportModal({ isOpen, onClose, reportedType, reportedId 
   };
 
   return (
-    <div style={{
+    <div 
+      role="dialog"
+      aria-modal="true"
+      aria-labelledby="report-modal-title"
+      style={{
       position: 'fixed',
       top: 0, left: 0, right: 0, bottom: 0,
       backgroundColor: 'rgba(0,0,0,0.7)',
@@ -95,7 +99,7 @@ export default function ReportModal({ isOpen, onClose, reportedType, reportedId 
         width: '100%',
         boxShadow: '0 10px 30px rgba(0,0,0,0.5)',
       }}>
-        <h3 style={{ fontSize: '1.25rem', color: 'var(--color-text-main)', margin: '0 0 16px 0' }}>
+        <h3 id="report-modal-title" style={{ fontSize: '1.25rem', color: 'var(--color-text-main)', margin: '0 0 16px 0' }}>
           Denunciar Publicación
         </h3>
 

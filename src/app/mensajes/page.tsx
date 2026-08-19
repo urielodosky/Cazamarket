@@ -1137,13 +1137,19 @@ export default function MensajesPage() {
       {/* Delete Chat Modal */}
       {chatToDelete && (
         <div className="custom-modal-overlay" onClick={() => setChatToDelete(null)}>
-          <div className="custom-modal-content" onClick={e => e.stopPropagation()}>
+          <div 
+            className="custom-modal-content" 
+            role="dialog"
+            aria-modal="true"
+            aria-labelledby="delete-chat-title"
+            onClick={e => e.stopPropagation()}
+          >
             <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="var(--color-danger, #ff4444)" strokeWidth="1.5" style={{ margin: '0 auto' }}>
               <path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"></path>
               <line x1="12" y1="9" x2="12" y2="13"></line>
               <line x1="12" y1="17" x2="12.01" y2="17"></line>
             </svg>
-            <h3 className="custom-modal-title">¿Eliminar chat?</h3>
+            <h3 id="delete-chat-title" className="custom-modal-title">¿Eliminar chat?</h3>
             <p className="custom-modal-desc">
               {chats.find(c => c.id === chatToDelete)?.dbChat?.buyer_id === chats.find(c => c.id === chatToDelete)?.dbChat?.seller_id || chatToDelete === 'bot-test-chat'
                 ? '¿Estás seguro que deseas vaciar el historial de mensajes de este chat de prueba? Esta acción no se puede deshacer.'
@@ -1163,8 +1169,14 @@ export default function MensajesPage() {
 
       {/* Image Preview Modal */}
       {previewImage && typeof window !== 'undefined' && createPortal(
-        <div style={{ position: 'fixed', top: 0, left: 0, right: 0, bottom: 0, background: 'rgba(0,0,0,0.85)', zIndex: 10000, display: 'flex', alignItems: 'center', justifyContent: 'center', padding: '24px' }} onClick={() => setPreviewImage(null)}>
-          <button onClick={() => setPreviewImage(null)} style={{ position: 'absolute', top: '24px', right: '24px', background: 'transparent', border: 'none', color: '#fff', cursor: 'pointer', padding: '8px' }}>
+        <div 
+          role="dialog"
+          aria-modal="true"
+          aria-label="Vista previa de imagen"
+          style={{ position: 'fixed', top: 0, left: 0, right: 0, bottom: 0, background: 'rgba(0,0,0,0.85)', zIndex: 10000, display: 'flex', alignItems: 'center', justifyContent: 'center', padding: '24px' }} 
+          onClick={() => setPreviewImage(null)}
+        >
+          <button aria-label="Cerrar vista previa" onClick={() => setPreviewImage(null)} style={{ position: 'absolute', top: '24px', right: '24px', background: 'transparent', border: 'none', color: '#fff', cursor: 'pointer', padding: '8px' }}>
             <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg>
           </button>
           <div style={{ position: 'relative', width: '90vw', height: '90vh' }} onClick={(e) => e.stopPropagation()}>

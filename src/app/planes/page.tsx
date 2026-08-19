@@ -352,12 +352,17 @@ export default function PlanesPage() {
           backgroundColor: 'rgba(0, 0, 0, 0.8)', display: 'flex', alignItems: 'center', justifyContent: 'center',
           zIndex: 9999, backdropFilter: 'blur(5px)', padding: '20px'
         }}>
-          <div style={{
+          <div 
+            role="dialog"
+            aria-modal="true"
+            aria-labelledby="auth-modal-title"
+            style={{
             background: '#1a1a1a', borderRadius: '16px', width: '100%', maxWidth: '450px',
             padding: '30px', position: 'relative', border: '1px solid #333',
             boxShadow: '0 10px 40px rgba(0,0,0,0.8)', textAlign: 'center'
           }}>
             <button 
+              aria-label="Cerrar"
               onClick={() => setAuthModal({ show: false, type: 'login' })}
               style={{ position: 'absolute', top: '15px', right: '15px', background: 'none', border: 'none', color: '#888', fontSize: '1.5rem', cursor: 'pointer' }}
             >×</button>
@@ -368,7 +373,7 @@ export default function PlanesPage() {
               color: 'var(--color-primary)', fontSize: '2rem', fontWeight: 'bold', border: '2px solid var(--color-primary)'
             }}>!</div>
             
-            <h3 style={{ margin: '0 0 10px 0', fontSize: '1.3rem', color: 'white' }}>
+            <h3 id="auth-modal-title" style={{ margin: '0 0 10px 0', fontSize: '1.3rem', color: 'white' }}>
               {authModal.type === 'login' ? 'Inicia sesión para continuar' : 'Configura tu Negocio'}
             </h3>
             
@@ -399,7 +404,11 @@ export default function PlanesPage() {
           backgroundColor: 'rgba(0, 0, 0, 0.85)', display: 'flex', alignItems: 'center', justifyContent: 'center',
           zIndex: 9999, backdropFilter: 'blur(8px)', padding: '20px'
         }}>
-          <div style={{
+          <div 
+            role="dialog"
+            aria-modal="true"
+            aria-label="Proceso de pago"
+            style={{
             background: 'linear-gradient(135deg, #1a1a1a 0%, #111 100%)', borderRadius: '20px', width: '100%', maxWidth: '480px',
             padding: '0', position: 'relative', border: '1px solid #2a2a2a',
             boxShadow: '0 20px 60px rgba(0,0,0,0.9)', overflow: 'hidden'

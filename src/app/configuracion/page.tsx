@@ -9,6 +9,7 @@ import { usePlan } from '@/contexts/PlanContext';
 import { createClient } from '@/lib/supabase/client';
 import CustomSelect, { SelectOption } from '@/components/ui/CustomSelect';
 import { isValidCuit } from '@/utils/validateCuit';
+import { toast } from 'react-hot-toast';
 
 function SucursalEditor({ index, sucursal, provincias, onChange, onRemove }: { index: number, sucursal: any, provincias: SelectOption[], onChange: (updated: any) => void, onRemove: () => void }) {
   const [localidades, setLocalidades] = useState<SelectOption[]>([]);
@@ -324,12 +325,10 @@ export default function ConfiguracionPage() {
     setFormData(prev => ({ ...prev, dob: masked }));
   };
 
-  // Sistema de notificaciones Toast premium
-  const [toast, setToast] = useState<{ text: string; type: 'success' | 'error' | 'info' } | null>(null);
-  
   const showToast = (text: string, type: 'success' | 'error' | 'info' = 'info') => {
-    setToast({ text, type });
-    setTimeout(() => setToast(null), 4000); // Ocultar después de 4 segundos
+    if (type === 'success') toast.success(text);
+    else if (type === 'error') toast.error(text);
+    else toast(text, { icon: 'ℹ️' });
   };
 
   const handleSave = async (e: React.FormEvent) => {
@@ -432,8 +431,10 @@ export default function ConfiguracionPage() {
 
     if (!authUpdateResult.success || !businessUpdateResult.success) {
       if (authUpdateResult.errors || businessUpdateResult.errors) {
-        setFieldErrors({ ...(authUpdateResult.errors || {}), ...(businessUpdateResult.errors || {}) });
-        showToast('Por favor, revisa los errores en el formulario.', 'error');
+        const allErrs = { ...(authUpdateResult.errors || {}), ...(businessUpdateResult.errors || {}) };
+        setFieldErrors(allErrs);
+        const firstError = Object.values(allErrs).flat()[0] as string;
+        showToast(firstError || 'Por favor, revisa los errores en el formulario.', 'error');
       } else {
         showToast('Error al guardar la configuración.', 'error');
       }
@@ -512,22 +513,6 @@ export default function ConfiguracionPage() {
   return (
     <div className="config-container compact">
       <h1 className="sr-only" style={{ position: 'absolute', width: '1px', height: '1px', padding: 0, margin: '-1px', overflow: 'hidden', clip: 'rect(0, 0, 0, 0)', whiteSpace: 'nowrap', borderWidth: 0 }}>Configuración de Cuenta</h1>
-      
-      {/* Toast Notification Container */}
-      {toast && (
-        <div className={`config-toast toast-${toast.type}`}>
-          {toast.type === 'error' && (
-            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><circle cx="12" cy="12" r="10"></circle><line x1="12" y1="8" x2="12" y2="12"></line><line x1="12" y1="16" x2="12.01" y2="16"></line></svg>
-          )}
-          {toast.type === 'success' && (
-            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"></path><polyline points="22 4 12 14.01 9 11.01"></polyline></svg>
-          )}
-          {toast.type === 'info' && (
-            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><circle cx="12" cy="12" r="10"></circle><line x1="12" y1="16" x2="12" y2="12"></line><line x1="12" y1="8" x2="12.01" y2="8"></line></svg>
-          )}
-          <span>{toast.text}</span>
-        </div>
-      )}
 
       <form onSubmit={handleSave} className="config-card glass-panel" style={{ display: 'flex', flexDirection: 'column', gap: '32px', padding: '32px' }}>
         

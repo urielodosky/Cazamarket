@@ -5,6 +5,7 @@ import { useRouter } from 'next/navigation';
 import Link from 'next/link';
 import { createClient } from '@/lib/supabase/client';
 import DatePicker from '@/components/DatePicker';
+import { toast } from 'react-hot-toast';
 import './registro.css';
 
 export default function RegistroPage() {
@@ -49,6 +50,14 @@ export default function RegistroPage() {
       }
     }
   }, []);
+
+  useEffect(() => {
+    if (errorMsg) toast.error(errorMsg);
+  }, [errorMsg]);
+
+  useEffect(() => {
+    if (successMsg) toast.success(successMsg);
+  }, [successMsg]);
 
   useEffect(() => {
     let timer: NodeJS.Timeout;
@@ -326,10 +335,12 @@ export default function RegistroPage() {
         const data = await res.json();
 
         if (!res.ok || data.error) {
-          setErrorMsg(data.error || 'Error al crear la cuenta');
           if (data.details) {
             setFieldErrors(data.details);
+            const firstError = Object.values(data.details).flat()[0] as string;
+            setErrorMsg(firstError || data.error || 'Error al crear la cuenta');
           } else {
+            setErrorMsg(data.error || 'Error al crear la cuenta');
             setFieldErrors({});
           }
         } else {
@@ -444,18 +455,6 @@ export default function RegistroPage() {
               : 'Únete a la comunidad más grande de caza y pesca.'}
           </p>
         </div>
-
-        {errorMsg && (
-          <div style={{ background: 'rgba(255,50,50,0.1)', color: '#ff4444', padding: '12px', borderRadius: '8px', marginBottom: '16px', fontSize: '0.9rem' }}>
-            {errorMsg}
-          </div>
-        )}
-        
-        {successMsg && (
-          <div style={{ background: 'rgba(50,255,50,0.1)', color: '#4CAF50', padding: '12px', borderRadius: '8px', marginBottom: '16px', fontSize: '0.9rem' }}>
-            {successMsg}
-          </div>
-        )}
 
         <form className="auth-form" onSubmit={isAwaitingMFA ? handleVerifyMFA : isAwaitingOTP ? handleVerifyOTP : (isAwaitingPasswordResetOTP ? handleVerifyResetOTP : (isForgotPasswordView ? handleResetPasswordSubmit : handleSubmit))}>
           {isAwaitingMFA ? (
