@@ -125,7 +125,7 @@ export default function NegociosPage() {
   }, [q, filterCategoria, filterProvincia, filterLocalidad, filterTipo, filterRating]);
 
   return (
-    <div className="container-page" style={{ maxWidth: '1200px', margin: '0 auto', minHeight: '60vh', paddingTop: '32px', paddingBottom: 'var(--spacing-12)' }}>
+    <div className="container-page" style={{ maxWidth: '1200px', margin: '0 auto', minHeight: '60vh', paddingTop: '64px', paddingBottom: 'var(--spacing-12)' }}>
       {isVendorModeActive && (
         <div style={{ display: 'flex', flexWrap: 'wrap', gap: '16px', justifyContent: 'space-between', alignItems: 'center', marginBottom: 'var(--spacing-6)' }}>
           <div>
@@ -138,7 +138,7 @@ export default function NegociosPage() {
         </div>
       )}
 
-      <div className="responsive-grid-300">
+      <div className="responsive-grid-300" style={{ marginTop: isVendorModeActive ? '0' : '32px' }}>
         {isLoading ? (
           <>{Array.from({ length: 6 }).map((_, i) => <SkeletonCard key={i} />)}</>
         ) : negociosError ? (
