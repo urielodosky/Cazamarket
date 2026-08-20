@@ -2,7 +2,8 @@ import { createClient as createServerClient } from '@/lib/supabase/server';
 import { createClient as createAdminClient } from '@supabase/supabase-js';
 import { NextResponse } from 'next/server';
 import { registerSchema } from '@/lib/validations/authSchemas';
-
+import { trackUserRegistered } from '@/utils/tracking';
+import { handleCriticalError } from '@/utils/errorHandler';
 export async function POST(request: Request) {
   try {
     const rawInput = await request.json();
@@ -147,11 +148,14 @@ export async function POST(request: Request) {
       error = signUpRes.error;
 
     } catch (err: any) {
+       await handleCriticalError(err, null, { severity: 'ERROR', action: 'auth_registration_steps', step });
        return NextResponse.json({ error: `Falló en paso ${step}: ${err.message}` }, { status: 500 });
     }
 
     if (error) {
       console.error(`[SECURITY LOG] Error DB registro (Email: ${email}):`, JSON.stringify(error));
+      
+      await handleCriticalError(error, null, { severity: 'ERROR', action: 'auth_registration_supabase_signup', email });
       
       let finalErrorMessage = error.message || 'Error al procesar el registro';
       
@@ -164,11 +168,24 @@ export async function POST(request: Request) {
     }
 
     // Respuesta exitosa
+    if (data?.user) {
+      trackUserRegistered(data.user.id, {
+        personType: person_type || 'usuario',
+        email: email
+      });
+    }
+    
     return NextResponse.json({ success: true, data });
 
   } catch (error: any) {
     console.error('[SECURITY LOG] Error critico en /api/auth/register:', error?.message || 'Unknown error');
     console.error('FULL ERROR OBJECT:', JSON.stringify(error, null, 2));
+    
+    await handleCriticalError(error, null, {
+      severity: 'CRITICAL',
+      action: 'auth_registration_catch_all'
+    });
+
     return NextResponse.json(
       { error: error?.message || 'Ocurrio un error inesperado al procesar el registro.' },
       { status: error?.status || 500 }
