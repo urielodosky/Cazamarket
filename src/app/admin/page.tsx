@@ -5,14 +5,12 @@ import { createClient as createAdminClient } from '@supabase/supabase-js';
 import AdminUsersTable from '@/components/AdminUsersTable';
 import { verifySudoMode } from '@/lib/auth/verifySudo';
 
-// Precios de los planes en USD (Según configuración en planTypes.ts)
-const PLAN_PRICES: Record<string, number> = {
-  gratis: 0,
-  basico: 14,
-  emprendedor: 30,
-  comercial: 52,
-  empresarial: 80,
-};
+// Definición de tipos para las métricas del panel
+interface AdminMetrics {
+  total_users: number;
+  paid_users_count: number;
+  mrr_usd: number;
+}
 
 export default async function AdminDashboardPage() {
   // 1. Verificación Fuerte de Seguridad — JWT criptográfico
@@ -42,11 +40,12 @@ export default async function AdminDashboardPage() {
   );
 
   // 2. Fetch de Métricas (Server-side)
-  // a) Obtener todos los usuarios para la tabla y métricas
+  // a) Obtener los últimos 25 usuarios para la tabla (paginado para no colapsar la memoria)
   const { data: usersData, error: usersError } = await supabaseAdmin
     .from('profiles')
     .select('id, contact_email, full_name, person_type, product_plan_tier, created_at, is_superadmin, is_blocked')
-    .order('created_at', { ascending: false });
+    .order('created_at', { ascending: false })
+    .range(0, 24);
 
   const users = usersData?.map(u => ({
     ...u,
@@ -94,19 +93,15 @@ export default async function AdminDashboardPage() {
     });
   }
 
-  // 3. Cálculos de KPIs
-  const totalUsers = users.length;
-  let paidUsersCount = 0;
-  let mrrUSD = 0;
+  // 3. Obtener KPIs desde PostgreSQL (RPC súper ligero)
+  const { data: metricsData, error: metricsError } = await supabaseAdmin
+    .rpc('get_admin_metrics')
+    .single();
 
-  users.forEach(u => {
-    const tier = u.plan_tier || 'gratis';
-    // Ignoramos a los superadmins del conteo de MRR
-    if (tier !== 'gratis' && !u.is_superadmin) {
-      paidUsersCount++;
-      mrrUSD += (PLAN_PRICES[tier] || 0);
-    }
-  });
+  const metrics = metricsData as AdminMetrics | null;
+  const totalUsers = metrics?.total_users || 0;
+  const paidUsersCount = metrics?.paid_users_count || 0;
+  const mrrUSD = metrics?.mrr_usd || 0;
 
   return (
     <div>
