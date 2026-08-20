@@ -556,7 +556,7 @@ export default function TemaPage({ params }: { params: Promise<{ id: string }> }
         </div>
 
         {/* 2. Título (Debajo de quien lo publicó) */}
-        <h1 className="tema-post-title" style={{ fontSize: '1.85rem', color: 'var(--color-text-main)', margin: '0 0 16px 0', lineHeight: 1.3, fontWeight: 700, letterSpacing: '-0.3px' }}>
+        <h1 className="tema-post-title" style={{ fontSize: '1.85rem', color: 'var(--color-text-main)', margin: '0 0 16px 0', lineHeight: 1.3, fontWeight: 700, letterSpacing: '-0.3px', wordBreak: 'break-word', overflowWrap: 'anywhere' }}>
           {post.title}
         </h1>
 
@@ -582,7 +582,7 @@ export default function TemaPage({ params }: { params: Promise<{ id: string }> }
         )}
 
         {/* 4. Contenido del Mensaje */}
-        <div style={{ color: themeColors.textMuted90, fontSize: '1.05rem', lineHeight: 1.7, whiteSpace: 'pre-wrap', marginBottom: '24px' }}>
+        <div style={{ color: themeColors.textMuted90, fontSize: '1.05rem', lineHeight: 1.7, whiteSpace: 'pre-wrap', marginBottom: '24px', wordBreak: 'break-word', overflowWrap: 'anywhere' }}>
           {post.content}
         </div>
 
@@ -865,7 +865,7 @@ export default function TemaPage({ params }: { params: Promise<{ id: string }> }
                     </div>
 
                     {/* Reply Content */}
-                    <p style={{ margin: 0, color: themeColors.textMuted90, fontSize: '0.98rem', lineHeight: 1.6, paddingLeft: '52px', whiteSpace: 'pre-wrap' }}>
+                    <p style={{ margin: 0, color: themeColors.textMuted90, fontSize: '0.98rem', lineHeight: 1.6, paddingLeft: '52px', whiteSpace: 'pre-wrap', wordBreak: 'break-word', overflowWrap: 'anywhere' }}>
                       {reply.content}
                     </p>
                   </div>
@@ -1068,7 +1068,7 @@ export default function TemaPage({ params }: { params: Promise<{ id: string }> }
                                 )}
                               </div>
                             </div>
-                            <p style={{ margin: 0, color: themeColors.textMuted90, fontSize: '0.92rem', lineHeight: 1.5, paddingLeft: '42px', whiteSpace: 'pre-wrap' }}>
+                            <p style={{ margin: 0, color: themeColors.textMuted90, fontSize: '0.92rem', lineHeight: 1.5, paddingLeft: '42px', whiteSpace: 'pre-wrap', wordBreak: 'break-word', overflowWrap: 'anywhere' }}>
                               {sub.content}
                             </p>
                           </div>
