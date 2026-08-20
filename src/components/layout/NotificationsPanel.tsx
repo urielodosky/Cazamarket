@@ -88,7 +88,7 @@ export default function NotificationsPanel({
           <h3 style={{ fontWeight: 600, color: 'var(--color-text-main)', margin: 0, fontSize: '1rem' }}>Notificaciones</h3>
         </div>
         {unreadCount > 0 && (
-          <button onClick={onMarkAllAsRead} className="notif-mark-all">
+          <button onClick={onMarkAllAsRead} className="notif-mark-all" style={{ whiteSpace: 'nowrap', flexShrink: 0 }}>
             Marcar todas como leídas
           </button>
         )}
@@ -116,15 +116,15 @@ export default function NotificationsPanel({
                   {getIconForType(n.type)}
                 </div>
                 <div style={{ display: 'flex', flexDirection: 'column', gap: '4px', flex: 1, minWidth: 0 }}>
-                  <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', gap: '8px' }}>
-                    <span style={{ fontSize: '14px', margin: 0, fontWeight: n.is_read ? 500 : 700, color: n.is_read ? 'var(--color-text-main)' : 'var(--color-primary)' }}>
+                  <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', gap: '8px', minWidth: 0 }}>
+                    <span style={{ fontSize: '14px', margin: 0, fontWeight: n.is_read ? 500 : 700, color: n.is_read ? 'var(--color-text-main)' : 'var(--color-primary)', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap', flex: 1 }}>
                       {n.title}
                     </span>
                     <span style={{ fontSize: '10px', color: 'var(--color-text-muted)', flexShrink: 0, whiteSpace: 'nowrap' }}>
                       {new Date(n.created_at).toLocaleDateString('es-AR', { month: 'short', day: 'numeric' })}
                     </span>
                   </div>
-                  <p style={{ fontSize: '12px', color: 'var(--color-text-muted)', margin: 0, display: '-webkit-box', WebkitLineClamp: 2, WebkitBoxOrient: 'vertical', overflow: 'hidden', wordBreak: 'break-word' }}>
+                  <p style={{ fontSize: '12px', color: 'var(--color-text-muted)', margin: 0, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
                     {n.message}
                   </p>
                 </div>
