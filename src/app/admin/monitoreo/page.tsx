@@ -3,6 +3,8 @@ import Link from 'next/link';
 import { createClient } from '@/lib/supabase/server';
 import { verifySudoMode } from '@/lib/auth/verifySudo';
 
+import { headers } from 'next/headers';
+
 export default async function MonitoreoPage() {
   // 1. Verificacion de seguridad Sudo Mode + Superadmin
   try {
@@ -23,6 +25,11 @@ export default async function MonitoreoPage() {
     .single();
 
   if (!profile?.is_superadmin) redirect('/');
+
+  const headersList = await headers();
+  const host = headersList.get('host') || 'tu-dominio.vercel.app';
+  const protocol = host.includes('localhost') ? 'http' : 'https';
+  const webhookUrl = `${protocol}://${host}/api/webhooks/posthog`;
 
   const posthogDashboardUrl = process.env.NEXT_PUBLIC_POSTHOG_SHARED_DASHBOARD || '';
 
@@ -170,7 +177,7 @@ export default async function MonitoreoPage() {
           Para recibir alertas automaticas cuando PostHog detecte errores criticos, configura el siguiente endpoint como Webhook en PostHog:
         </p>
         <code style={{ display: 'block', background: 'var(--color-bg-base)', padding: '12px 16px', borderRadius: '8px', fontSize: '0.85rem', color: 'var(--color-primary)', wordBreak: 'break-all', border: '1px solid var(--color-border)' }}>
-          POST https://tu-dominio.vercel.app/api/webhooks/posthog
+          POST {webhookUrl}
         </code>
         <p style={{ color: 'var(--color-text-muted)', fontSize: '0.8rem', margin: '12px 0 0 0' }}>
           Configurable en: PostHog → Data Pipelines → Destinations → Webhook.
