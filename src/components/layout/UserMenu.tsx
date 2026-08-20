@@ -91,7 +91,7 @@ export default function UserMenu() {
                   </div>
                   <div className="user-header-info">
                     {isVendor ? (
-                      <Link href="/negocios/1" style={{ textDecoration: 'none' }} onClick={() => setIsOpen(false)}>
+                      <Link href={`/negocios/${supabaseUser?.id || '1'}`} style={{ textDecoration: 'none' }} onClick={() => setIsOpen(false)}>
                         <p className="user-name" style={{ display: 'flex', alignItems: 'center', gap: '6px', cursor: 'pointer', transition: 'color 0.2s' }} onMouseEnter={(e) => e.currentTarget.style.color = 'var(--color-primary)'} onMouseLeave={(e) => e.currentTarget.style.color = ''}>
                           {username || 'Usuario'}
                           <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" style={{ opacity: 0.7 }}><path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"></path><polyline points="15 3 21 3 21 9"></polyline><line x1="10" y1="14" x2="21" y2="3"></line></svg>
@@ -164,7 +164,7 @@ export default function UserMenu() {
                     )}
                   </Link>
 
-                  {isVendor && (
+                  {isVendorModeActive && (
                     <>
                       <Link href="/mis-tiendas" className="dropdown-item" onClick={() => setIsOpen(false)}>
                         <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
@@ -175,14 +175,16 @@ export default function UserMenu() {
                     </>
                   )}
 
-                  <Link href="/carrito" className="dropdown-item" onClick={() => setIsOpen(false)}>
-                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-                      <circle cx="9" cy="21" r="1"></circle>
-                      <circle cx="20" cy="21" r="1"></circle>
-                      <path d="M1 1h4l2.68 13.39a2 2 0 0 0 2 1.61h9.72a2 2 0 0 0 2-1.61L23 6H6"></path>
-                    </svg>
-                    <span>Mi carrito</span>
-                  </Link>
+                  {!isVendorModeActive && (
+                    <Link href="/carrito" className="dropdown-item" onClick={() => setIsOpen(false)}>
+                      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                        <circle cx="9" cy="21" r="1"></circle>
+                        <circle cx="20" cy="21" r="1"></circle>
+                        <path d="M1 1h4l2.68 13.39a2 2 0 0 0 2 1.61h9.72a2 2 0 0 0 2-1.61L23 6H6"></path>
+                      </svg>
+                      <span>Mi carrito</span>
+                    </Link>
+                  )}
 
                   <Link href="/mensajes" className="dropdown-item" onClick={() => setIsOpen(false)}>
                     <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
@@ -198,12 +200,14 @@ export default function UserMenu() {
                     <span>Planes</span>
                   </Link>
 
-                  <Link href="/favoritos" className="dropdown-item" onClick={() => setIsOpen(false)}>
-                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-                      <path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"></path>
-                    </svg>
-                    <span>Favoritos y Reseñas</span>
-                  </Link>
+                  {!isVendorModeActive && (
+                    <Link href="/favoritos" className="dropdown-item" onClick={() => setIsOpen(false)}>
+                      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                        <path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"></path>
+                      </svg>
+                      <span>Favoritos y Reseñas</span>
+                    </Link>
+                  )}
 
                   <Link href="/ayuda" className="dropdown-item" onClick={() => setIsOpen(false)}>
                     <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
