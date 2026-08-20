@@ -22,6 +22,7 @@ export default function AdminUsersTable({ users: initialUsers }: { users: Profil
   const [currentPage, setCurrentPage] = useState(1);
   const [isUpdating, setIsUpdating] = useState(false);
   const [showNotificationModal, setShowNotificationModal] = useState<{userId: string | null, isGlobal: boolean, title: string, message: string} | null>(null);
+  const [showBlockModal, setShowBlockModal] = useState<{userId: string, isBlocked: boolean, reason: string, duration: '24h' | '7d' | '30d' | 'permanent'} | null>(null);
   const itemsPerPage = 10;
 
   const filteredUsers = useMemo(() => {
@@ -43,6 +44,23 @@ export default function AdminUsersTable({ users: initialUsers }: { users: Profil
   const handleSearch = (e: React.ChangeEvent<HTMLInputElement>) => {
     setSearchTerm(e.target.value);
     setCurrentPage(1); // Reset page on search
+  };
+
+  const handleBlockAction = async () => {
+    if (!showBlockModal) return;
+    setIsUpdating(true);
+    const { userId, isBlocked, reason, duration } = showBlockModal;
+    
+    // Si ya está bloqueado y confirmamos, lo desbloqueamos
+    const res = await adminToggleBlock(userId, isBlocked, reason, duration);
+    if (res.success) {
+      setUsers(prev => prev.map(u => u.id === userId ? { ...u, is_blocked: !isBlocked } : u));
+      toast.success(isBlocked ? 'Usuario desbloqueado' : 'Usuario bloqueado');
+      setShowBlockModal(null);
+    } else {
+      toast.error(res.error || 'Error al modificar estado');
+    }
+    setIsUpdating(false);
   };
 
   const handleSendNotification = async () => {
@@ -224,17 +242,21 @@ export default function AdminUsersTable({ users: initialUsers }: { users: Profil
                         <button
                           disabled={isUpdating}
                           onClick={async () => {
-                            if (!confirm(`¿Estás seguro de que quieres ${user.is_blocked ? 'desbloquear' : 'bloquear'} a este usuario?`)) return;
-                            setIsUpdating(true);
-                          const res = await adminToggleBlock(user.id, user.is_blocked || false);
-                          if (res.success) {
-                            setUsers(prev => prev.map(u => u.id === user.id ? { ...u, is_blocked: !user.is_blocked } : u));
-                            toast.success(user.is_blocked ? 'Usuario desbloqueado' : 'Usuario bloqueado');
-                          } else {
-                            toast.error(res.error || 'Error al modificar estado');
-                          }
-                          setIsUpdating(false);
-                        }}
+                            if (user.is_blocked) {
+                              if (!confirm(`¿Estás seguro de que quieres desbloquear a este usuario?`)) return;
+                              setIsUpdating(true);
+                              const res = await adminToggleBlock(user.id, true);
+                              if (res.success) {
+                                setUsers(prev => prev.map(u => u.id === user.id ? { ...u, is_blocked: false } : u));
+                                toast.success('Usuario desbloqueado');
+                              } else {
+                                toast.error(res.error || 'Error al desbloquear');
+                              }
+                              setIsUpdating(false);
+                            } else {
+                              setShowBlockModal({ userId: user.id, isBlocked: false, reason: '', duration: '24h' });
+                            }
+                          }}
                         style={{ padding: '6px 12px', borderRadius: '6px', background: user.is_blocked ? 'rgba(34, 197, 94, 0.1)' : 'rgba(239, 68, 68, 0.1)', border: `1px solid ${user.is_blocked ? 'rgba(34, 197, 94, 0.5)' : 'rgba(239, 68, 68, 0.5)'}`, color: user.is_blocked ? '#22c55e' : '#ef4444', fontSize: '0.8rem', fontWeight: 600, cursor: 'pointer' }}
                       >
                         {user.is_blocked ? 'Desbloquear' : 'Bloquear'}
@@ -320,6 +342,56 @@ export default function AdminUsersTable({ users: initialUsers }: { users: Profil
                   style={{ padding: '8px 16px', borderRadius: '8px', background: 'var(--color-primary)', border: 'none', color: '#000', fontWeight: 600, cursor: (!showNotificationModal.title || !showNotificationModal.message) ? 'not-allowed' : 'pointer', opacity: (!showNotificationModal.title || !showNotificationModal.message) ? 0.5 : 1 }}
                 >
                   {isUpdating ? 'Enviando...' : 'Enviar'}
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+      {showBlockModal && (
+        <div style={{ position: 'fixed', inset: 0, background: 'rgba(0,0,0,0.5)', display: 'flex', alignItems: 'center', justifyContent: 'center', zIndex: 9999, padding: '20px' }}>
+          <div style={{ background: 'var(--color-bg-surface-elevated)', border: '1px solid var(--color-border)', borderRadius: '16px', padding: '24px', width: '100%', maxWidth: '400px' }}>
+            <h3 style={{ margin: '0 0 16px 0', color: '#ef4444', fontSize: '1.2rem', display: 'flex', alignItems: 'center', gap: '8px' }}>
+              <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"></path><line x1="12" y1="9" x2="12" y2="13"></line><line x1="12" y1="17" x2="12.01" y2="17"></line></svg>
+              Sancionar Usuario
+            </h3>
+            <div style={{ display: 'flex', flexDirection: 'column', gap: '16px' }}>
+              <div>
+                <label style={{ display: 'block', fontSize: '0.85rem', color: 'var(--color-text-muted)', marginBottom: '6px' }}>Motivo del Bloqueo</label>
+                <input 
+                  type="text" 
+                  value={showBlockModal.reason}
+                  onChange={(e) => setShowBlockModal({ ...showBlockModal, reason: e.target.value })}
+                  style={{ width: '100%', padding: '10px', borderRadius: '8px', border: '1px solid var(--color-border)', background: 'var(--color-bg-base)', color: 'var(--color-text-main)' }}
+                  placeholder="Ej: Infracción a los términos de uso"
+                />
+              </div>
+              <div>
+                <label style={{ display: 'block', fontSize: '0.85rem', color: 'var(--color-text-muted)', marginBottom: '6px' }}>Duración</label>
+                <select 
+                  value={showBlockModal.duration}
+                  onChange={(e) => setShowBlockModal({ ...showBlockModal, duration: e.target.value as any })}
+                  style={{ width: '100%', padding: '10px', borderRadius: '8px', border: '1px solid var(--color-border)', background: 'var(--color-bg-base)', color: 'var(--color-text-main)' }}
+                >
+                  <option value="24h">24 Horas</option>
+                  <option value="7d">7 Días</option>
+                  <option value="30d">30 Días</option>
+                  <option value="permanent">Permanente</option>
+                </select>
+              </div>
+              <div style={{ display: 'flex', gap: '12px', justifyContent: 'flex-end', marginTop: '8px' }}>
+                <button 
+                  onClick={() => setShowBlockModal(null)}
+                  disabled={isUpdating}
+                  style={{ padding: '8px 16px', borderRadius: '8px', background: 'transparent', border: '1px solid var(--color-border)', color: 'var(--color-text-muted)', cursor: 'pointer' }}
+                >
+                  Cancelar
+                </button>
+                <button 
+                  onClick={handleBlockAction}
+                  disabled={isUpdating || !showBlockModal.reason}
+                  style={{ padding: '8px 16px', borderRadius: '8px', background: '#ef4444', border: 'none', color: '#fff', fontWeight: 600, cursor: (!showBlockModal.reason) ? 'not-allowed' : 'pointer', opacity: (!showBlockModal.reason) ? 0.5 : 1 }}
+                >
+                  {isUpdating ? 'Aplicando...' : 'Bloquear'}
                 </button>
               </div>
             </div>

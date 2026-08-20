@@ -47,14 +47,34 @@ export async function adminChangePlan(userId: string, planField: 'product_plan_t
   }
 }
 
-export async function adminToggleBlock(userId: string, currentlyBlocked: boolean) {
+export async function adminToggleBlock(userId: string, currentlyBlocked: boolean, reason?: string, duration?: '24h' | '7d' | '30d' | 'permanent') {
   try {
     await verifySudoMode();
     const supabase = await createClient();
 
+    const updates: any = { is_blocked: !currentlyBlocked };
+
+    if (!currentlyBlocked) {
+      // Blocking
+      updates.block_reason = reason || 'Infracción de las políticas';
+      if (duration === '24h') {
+        const d = new Date(); d.setHours(d.getHours() + 24); updates.block_expires_at = d.toISOString();
+      } else if (duration === '7d') {
+        const d = new Date(); d.setDate(d.getDate() + 7); updates.block_expires_at = d.toISOString();
+      } else if (duration === '30d') {
+        const d = new Date(); d.setDate(d.getDate() + 30); updates.block_expires_at = d.toISOString();
+      } else {
+        updates.block_expires_at = null; // permanent
+      }
+    } else {
+      // Unblocking
+      updates.block_reason = null;
+      updates.block_expires_at = null;
+    }
+
     const { error } = await supabase
       .from('profiles')
-      .update({ is_blocked: !currentlyBlocked })
+      .update(updates)
       .eq('id', userId);
 
     if (error) throw error;
