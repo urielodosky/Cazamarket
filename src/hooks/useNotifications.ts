@@ -7,7 +7,7 @@ import { useAuth } from '@/contexts/AuthContext';
 export interface AppNotification {
   id: string;
   user_id: string;
-  type: 'billing' | 'message' | 'bot' | 'review' | 'system';
+  type: 'billing' | 'message' | 'bot' | 'review' | 'system' | 'global';
   title: string;
   message: string;
   action_url: string | null;

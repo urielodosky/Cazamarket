@@ -161,7 +161,7 @@ export async function adminSendGlobalNotification(title: string, message: string
 
     const notifications = profiles.map(profile => ({
       user_id: profile.id,
-      type: 'system',
+      type: 'global',
       title,
       message,
       is_read: false
