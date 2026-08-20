@@ -347,6 +347,7 @@ export default function AdminUsersTable({ users: initialUsers }: { users: Profil
             </div>
           </div>
         </div>
+      )}
       {showBlockModal && (
         <div style={{ position: 'fixed', inset: 0, background: 'rgba(0,0,0,0.5)', display: 'flex', alignItems: 'center', justifyContent: 'center', zIndex: 9999, padding: '20px' }}>
           <div style={{ background: 'var(--color-bg-surface-elevated)', border: '1px solid var(--color-border)', borderRadius: '16px', padding: '24px', width: '100%', maxWidth: '400px' }}>
