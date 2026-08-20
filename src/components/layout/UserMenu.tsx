@@ -74,7 +74,6 @@ export default function UserMenu() {
 
         {isOpen && (
           <div className="user-dropdown-menu overflow-hidden">
-              <>
                 <div className="mobile-only-logo">
                   <Image src="/logo.png" alt="CazaMarket Logo" width={140} height={40} style={{ objectFit: 'contain' }} />
                 </div>
@@ -235,8 +234,6 @@ export default function UserMenu() {
                     <span>Cerrar sesión</span>
                   </button>
                 </div>
-                </div>
-              </>
           </div>
         )}
       </div>
