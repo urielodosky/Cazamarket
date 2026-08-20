@@ -957,7 +957,7 @@ export default function ConfiguracionPage() {
         {/* Acordeón 3: Datos Obligatorios */}
         <details className="config-accordion">
           <summary>
-            Datos Obligatorios 
+            Datos Obligatorios y Seguridad 
             <svg className="accordion-icon" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><polyline points="6 9 12 15 18 9"></polyline></svg>
           </summary>
           <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(250px, 1fr))', gap: '24px', marginTop: '24px' }}>
