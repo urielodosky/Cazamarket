@@ -3,7 +3,7 @@
 import { createClient } from '@/lib/supabase/server';
 import { verifySudoMode } from '@/lib/auth/verifySudo';
 
-export async function adminChangePlan(userId: string, newPlanTier: string) {
+export async function adminChangePlan(userId: string, planField: 'product_plan_tier' | 'service_plan_tier', newPlanTier: string) {
   try {
     await verifySudoMode();
     const supabase = await createClient();
@@ -12,11 +12,19 @@ export async function adminChangePlan(userId: string, newPlanTier: string) {
     expirationDate.setFullYear(expirationDate.getFullYear() + 10);
 
     const updates: any = {
-      product_plan_tier: newPlanTier,
-      service_plan_tier: newPlanTier
+      [planField]: newPlanTier
     };
 
-    if (newPlanTier !== 'gratis') {
+    const { data: profile } = await supabase
+      .from('profiles')
+      .select('product_plan_tier, service_plan_tier')
+      .eq('id', userId)
+      .single();
+    
+    const otherPlanField = planField === 'product_plan_tier' ? 'service_plan_tier' : 'product_plan_tier';
+    const otherPlanTier = profile?.[otherPlanField] || 'gratis';
+
+    if (newPlanTier !== 'gratis' || otherPlanTier !== 'gratis') {
       updates.plan_status = 'activo';
       updates.plan_expires_at = expirationDate.toISOString();
     } else {

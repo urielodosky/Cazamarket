@@ -43,14 +43,13 @@ export default async function AdminDashboardPage() {
   // a) Obtener los últimos 25 usuarios para la tabla (paginado para no colapsar la memoria)
   const { data: usersData, error: usersError } = await supabaseAdmin
     .from('profiles')
-    .select('id, contact_email, full_name, person_type, product_plan_tier, created_at, is_superadmin, is_blocked')
+    .select('id, contact_email, full_name, person_type, product_plan_tier, service_plan_tier, created_at, is_superadmin, is_blocked')
     .order('created_at', { ascending: false })
     .range(0, 24);
 
   const users = usersData?.map(u => ({
     ...u,
     email: u.contact_email, // mapeamos a email para que la tabla lo entienda
-    plan_tier: u.product_plan_tier // mapeamos a plan_tier
   })) || [];
   
   // b) Contar denuncias pendientes

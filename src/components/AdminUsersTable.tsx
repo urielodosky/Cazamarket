@@ -9,7 +9,8 @@ type Profile = {
   email: string;
   full_name?: string;
   person_type?: string;
-  plan_tier?: string;
+  product_plan_tier?: string;
+  service_plan_tier?: string;
   created_at?: string;
   is_superadmin?: boolean;
   is_blocked?: boolean;
@@ -43,20 +44,18 @@ export default function AdminUsersTable({ users: initialUsers }: { users: Profil
     setCurrentPage(1); // Reset page on search
   };
 
-  const getPlanBadge = (tier: string) => {
-    const defaultStyle = { padding: '4px 8px', borderRadius: '12px', fontSize: '0.8rem', fontWeight: 600, whiteSpace: 'nowrap' as const };
+  const getPlanBadge = (tier: string, type: string) => {
+    if (!tier || tier === 'gratis') return null;
+    const defaultStyle = { padding: '4px 8px', borderRadius: '6px', fontSize: '0.75rem', fontWeight: 600, whiteSpace: 'nowrap' as const, display: 'inline-block', marginBottom: '4px', border: '1px solid var(--color-border)' };
+    let bg, color, border;
     switch (tier) {
-      case 'empresarial':
-        return <span style={{ ...defaultStyle, background: 'rgba(168, 85, 247, 0.2)', color: '#d8b4fe', border: '1px solid rgba(168, 85, 247, 0.5)' }}>Empresarial</span>;
-      case 'comercial':
-        return <span style={{ ...defaultStyle, background: 'rgba(255, 115, 0, 0.2)', color: 'var(--color-primary)', border: '1px solid rgba(255, 115, 0, 0.5)' }}>Comercial</span>;
-      case 'emprendedor':
-        return <span style={{ ...defaultStyle, background: 'rgba(59, 130, 246, 0.2)', color: '#93c5fd', border: '1px solid rgba(59, 130, 246, 0.5)' }}>Emprendedor</span>;
-      case 'basico':
-        return <span style={{ ...defaultStyle, background: 'rgba(34, 197, 94, 0.2)', color: '#86efac', border: '1px solid rgba(34, 197, 94, 0.5)' }}>Básico</span>;
-      default:
-        return <span style={{ ...defaultStyle, background: 'rgba(255, 255, 255, 0.1)', color: 'rgba(255, 255, 255, 0.7)', border: '1px solid rgba(255, 255, 255, 0.2)' }}>Gratis</span>;
+      case 'empresarial': bg = 'rgba(168, 85, 247, 0.15)'; color = '#d8b4fe'; border = '1px solid rgba(168, 85, 247, 0.3)'; break;
+      case 'comercial': bg = 'rgba(255, 115, 0, 0.15)'; color = 'var(--color-primary)'; border = '1px solid rgba(255, 115, 0, 0.3)'; break;
+      case 'emprendedor': bg = 'rgba(59, 130, 246, 0.15)'; color = '#93c5fd'; border = '1px solid rgba(59, 130, 246, 0.3)'; break;
+      case 'basico': bg = 'rgba(34, 197, 94, 0.15)'; color = '#86efac'; border = '1px solid rgba(34, 197, 94, 0.3)'; break;
+      default: bg = 'rgba(255, 255, 255, 0.05)'; color = 'rgba(255, 255, 255, 0.6)'; border = '1px solid rgba(255, 255, 255, 0.1)'; break;
     }
+    return <div style={{ ...defaultStyle, background: bg, color, border }}><span style={{ opacity: 0.7, marginRight: '4px', fontWeight: 500 }}>{type}:</span><span style={{textTransform: 'capitalize'}}>{tier}</span></div>;
   };
 
   return (
@@ -122,36 +121,68 @@ export default function AdminUsersTable({ users: initialUsers }: { users: Profil
                   </span>
                 </td>
                 <td style={{ padding: '16px 20px', whiteSpace: 'nowrap' }}>
-                  {getPlanBadge(user.plan_tier || 'gratis')}
+                  <div style={{ display: 'flex', flexDirection: 'column' }}>
+                    {user.product_plan_tier && user.product_plan_tier !== 'gratis' ? getPlanBadge(user.product_plan_tier, 'Prod') : null}
+                    {user.service_plan_tier && user.service_plan_tier !== 'gratis' ? getPlanBadge(user.service_plan_tier, 'Serv') : null}
+                    {(!user.product_plan_tier || user.product_plan_tier === 'gratis') && (!user.service_plan_tier || user.service_plan_tier === 'gratis') && (
+                      <span style={{ padding: '4px 8px', borderRadius: '12px', fontSize: '0.8rem', fontWeight: 600, whiteSpace: 'nowrap', background: 'rgba(255, 255, 255, 0.05)', color: 'rgba(255, 255, 255, 0.6)', border: '1px solid rgba(255, 255, 255, 0.1)', display: 'inline-block' }}>Gratis</span>
+                    )}
+                  </div>
                 </td>
                 <td style={{ padding: '16px 20px', color: 'var(--color-text-muted)', fontSize: '0.85rem' }}>
                   {user.created_at ? new Date(user.created_at).toLocaleDateString('es-AR') : '-'}
                 </td>
                 <td style={{ padding: '16px 20px', textAlign: 'right', whiteSpace: 'nowrap' }}>
-                  <div style={{ display: 'flex', gap: '8px', justifyContent: 'flex-end' }}>
-                    <select 
-                      disabled={isUpdating || user.is_superadmin}
-                      value={user.plan_tier || 'gratis'}
-                      onChange={async (e) => {
-                        setIsUpdating(true);
-                        const newPlan = e.target.value;
-                        const res = await adminChangePlan(user.id, newPlan);
-                        if (res.success) {
-                          setUsers(prev => prev.map(u => u.id === user.id ? { ...u, plan_tier: newPlan } : u));
-                          toast.success('Plan actualizado con éxito');
-                        } else {
-                          toast.error(res.error || 'Error al cambiar el plan');
-                        }
-                        setIsUpdating(false);
-                      }}
-                      style={{ padding: '6px', borderRadius: '6px', background: 'var(--color-bg-base)', border: '1px solid var(--color-border)', color: 'var(--color-text-main)', fontSize: '0.8rem', cursor: 'pointer' }}
-                    >
-                      <option value="gratis">Gratis</option>
-                      <option value="basico">Básico</option>
-                      <option value="emprendedor">Emprendedor</option>
-                      <option value="comercial">Comercial</option>
-                      <option value="empresarial">Empresarial</option>
-                    </select>
+                  <div style={{ display: 'flex', gap: '8px', justifyContent: 'flex-end', alignItems: 'center' }}>
+                    <div style={{ display: 'flex', flexDirection: 'column', gap: '4px' }}>
+                      <select 
+                        disabled={isUpdating || user.is_superadmin}
+                        value={user.product_plan_tier || 'gratis'}
+                        onChange={async (e) => {
+                          setIsUpdating(true);
+                          const newPlan = e.target.value;
+                          const res = await adminChangePlan(user.id, 'product_plan_tier', newPlan);
+                          if (res.success) {
+                            setUsers(prev => prev.map(u => u.id === user.id ? { ...u, product_plan_tier: newPlan } : u));
+                            toast.success('Plan de productos actualizado');
+                          } else {
+                            toast.error(res.error || 'Error al cambiar plan');
+                          }
+                          setIsUpdating(false);
+                        }}
+                        style={{ padding: '4px 6px', borderRadius: '6px', background: 'var(--color-bg-base)', border: '1px solid var(--color-border)', color: 'var(--color-text-main)', fontSize: '0.75rem', cursor: 'pointer' }}
+                      >
+                        <option value="gratis">Prod: Gratis</option>
+                        <option value="basico">Prod: Básico</option>
+                        <option value="emprendedor">Prod: Emprend</option>
+                        <option value="comercial">Prod: Comerc</option>
+                        <option value="empresarial">Prod: Empres</option>
+                      </select>
+
+                      <select 
+                        disabled={isUpdating || user.is_superadmin}
+                        value={user.service_plan_tier || 'gratis'}
+                        onChange={async (e) => {
+                          setIsUpdating(true);
+                          const newPlan = e.target.value;
+                          const res = await adminChangePlan(user.id, 'service_plan_tier', newPlan);
+                          if (res.success) {
+                            setUsers(prev => prev.map(u => u.id === user.id ? { ...u, service_plan_tier: newPlan } : u));
+                            toast.success('Plan de servicios actualizado');
+                          } else {
+                            toast.error(res.error || 'Error al cambiar plan');
+                          }
+                          setIsUpdating(false);
+                        }}
+                        style={{ padding: '4px 6px', borderRadius: '6px', background: 'var(--color-bg-base)', border: '1px solid var(--color-border)', color: 'var(--color-text-main)', fontSize: '0.75rem', cursor: 'pointer' }}
+                      >
+                        <option value="gratis">Serv: Gratis</option>
+                        <option value="basico">Serv: Básico</option>
+                        <option value="emprendedor">Serv: Emprend</option>
+                        <option value="comercial">Serv: Comerc</option>
+                        <option value="empresarial">Serv: Empres</option>
+                      </select>
+                    </div>
                     
                     {!user.is_superadmin && (
                       <button
