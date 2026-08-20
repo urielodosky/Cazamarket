@@ -78,6 +78,7 @@ export default async function AdminLayout({
             <Link href="/admin" style={{ color: 'var(--color-text-main)', textDecoration: 'none', padding: '10px', borderRadius: '8px', background: 'var(--color-bg-elevated)', whiteSpace: 'nowrap' }}>Dashboard</Link>
             <Link href="/admin/denuncias" style={{ color: 'var(--color-text-main)', textDecoration: 'none', padding: '10px', borderRadius: '8px', whiteSpace: 'nowrap' }}>Denuncias</Link>
             <Link href="/admin/usuarios" style={{ color: 'var(--color-text-main)', textDecoration: 'none', padding: '10px', borderRadius: '8px', whiteSpace: 'nowrap' }}>Usuarios</Link>
+            <Link href="/admin/bloqueados" style={{ color: 'var(--color-text-main)', textDecoration: 'none', padding: '10px', borderRadius: '8px', whiteSpace: 'nowrap' }}>Bloqueados</Link>
           </nav>
         </aside>
 

@@ -70,6 +70,7 @@ export async function adminToggleBlock(userId: string, currentlyBlocked: boolean
       // Unblocking
       updates.block_reason = null;
       updates.block_expires_at = null;
+      updates.block_appeal = null;
     }
 
     const { error } = await supabase
@@ -83,6 +84,35 @@ export async function adminToggleBlock(userId: string, currentlyBlocked: boolean
   } catch (error: any) {
     console.error('Error in adminToggleBlock:', error);
     return { success: false, error: error.message || 'Error al modificar estado de bloqueo' };
+  }
+}
+
+export async function submitBlockAppeal(appealMessage: string) {
+  try {
+    const supabase = await createClient();
+    const { data: { user } } = await supabase.auth.getUser();
+
+    if (!user) {
+      return { success: false, error: 'No autenticado' };
+    }
+
+    // Usar cliente admin para actualizar perfil bloqueado, ya que RLS puede estar restringiendo
+    const supabaseAdmin = createAdminClient(
+      process.env.NEXT_PUBLIC_SUPABASE_URL!,
+      process.env.SUPABASE_SERVICE_ROLE_KEY!
+    );
+
+    const { error } = await supabaseAdmin
+      .from('profiles')
+      .update({ block_appeal: appealMessage })
+      .eq('id', user.id);
+
+    if (error) throw error;
+
+    return { success: true };
+  } catch (error: any) {
+    console.error('Error in submitBlockAppeal:', error);
+    return { success: false, error: error.message || 'Error al enviar apelación' };
   }
 }
 

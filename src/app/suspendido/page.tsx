@@ -2,6 +2,7 @@ import Link from 'next/link';
 import { redirect } from 'next/navigation';
 import { createClient } from '@/lib/supabase/server';
 import { createClient as createAdminClient } from '@supabase/supabase-js';
+import AppealForm from '@/components/AppealForm';
 
 export default async function SuspendidoPage() {
   const supabase = await createClient();
@@ -13,7 +14,7 @@ export default async function SuspendidoPage() {
 
   const { data: profile } = await supabase
     .from('profiles')
-    .select('is_blocked, block_reason, block_expires_at')
+    .select('is_blocked, block_reason, block_expires_at, block_appeal')
     .eq('id', user.id)
     .single();
 
@@ -30,7 +31,7 @@ export default async function SuspendidoPage() {
     );
     await supabaseAdmin
       .from('profiles')
-      .update({ is_blocked: false, block_reason: null, block_expires_at: null })
+      .update({ is_blocked: false, block_reason: null, block_expires_at: null, block_appeal: null })
       .eq('id', user.id);
     
     redirect('/');
@@ -59,6 +60,17 @@ export default async function SuspendidoPage() {
         <div style={{ display: 'inline-block', background: 'rgba(239, 68, 68, 0.15)', color: '#ef4444', padding: '6px 12px', borderRadius: '6px', fontWeight: 600, fontSize: '0.9rem', border: '1px solid rgba(239, 68, 68, 0.3)' }}>
           {profile.block_expires_at ? `Expira el ${expirationText}` : 'Bloqueo Permanente'}
         </div>
+
+        {profile.block_appeal ? (
+          <div style={{ padding: '20px', background: 'rgba(34, 197, 94, 0.1)', border: '1px solid rgba(34, 197, 94, 0.3)', borderRadius: '12px', marginTop: '24px', textAlign: 'center' }}>
+            <h4 style={{ color: '#22c55e', margin: '0 0 8px 0', fontSize: '1.05rem' }}>Apelación Enviada</h4>
+            <p style={{ color: 'var(--color-text-muted)', fontSize: '0.95rem', margin: 0 }}>
+              Tu apelación fue recibida y está siendo revisada por nuestro equipo de moderación.
+            </p>
+          </div>
+        ) : (
+          <AppealForm />
+        )}
       </div>
       
       <div style={{ display: 'flex', gap: '16px' }}>
