@@ -1,7 +1,7 @@
 'use client';
 
 import { useState, useMemo } from 'react';
-import { adminChangePlan, adminToggleBlock } from '@/app/actions/userManagementAction';
+import { adminChangePlan, adminToggleBlock, adminSendNotification, adminSendGlobalNotification } from '@/app/actions/userManagementAction';
 import toast from 'react-hot-toast';
 
 type Profile = {
@@ -21,6 +21,7 @@ export default function AdminUsersTable({ users: initialUsers }: { users: Profil
   const [searchTerm, setSearchTerm] = useState('');
   const [currentPage, setCurrentPage] = useState(1);
   const [isUpdating, setIsUpdating] = useState(false);
+  const [showNotificationModal, setShowNotificationModal] = useState<{userId: string | null, isGlobal: boolean, title: string, message: string} | null>(null);
   const itemsPerPage = 10;
 
   const filteredUsers = useMemo(() => {
@@ -44,6 +45,25 @@ export default function AdminUsersTable({ users: initialUsers }: { users: Profil
     setCurrentPage(1); // Reset page on search
   };
 
+  const handleSendNotification = async () => {
+    if (!showNotificationModal || !showNotificationModal.title || !showNotificationModal.message) return;
+    setIsUpdating(true);
+    let res;
+    if (showNotificationModal.isGlobal) {
+      res = await adminSendGlobalNotification(showNotificationModal.title, showNotificationModal.message);
+    } else if (showNotificationModal.userId) {
+      res = await adminSendNotification(showNotificationModal.userId, showNotificationModal.title, showNotificationModal.message);
+    }
+    
+    if (res?.success) {
+      toast.success(showNotificationModal.isGlobal ? 'Notificación global enviada' : 'Notificación enviada');
+      setShowNotificationModal(null);
+    } else {
+      toast.error(res?.error || 'Error al enviar notificación');
+    }
+    setIsUpdating(false);
+  };
+
   const getPlanBadge = (tier: string, type: string) => {
     if (!tier || tier === 'gratis') return null;
     const defaultStyle = { padding: '4px 8px', borderRadius: '6px', fontSize: '0.75rem', fontWeight: 600, whiteSpace: 'nowrap' as const, display: 'inline-block', marginBottom: '4px', border: '1px solid var(--color-border)' };
@@ -65,23 +85,31 @@ export default function AdminUsersTable({ users: initialUsers }: { users: Profil
       <div style={{ padding: '20px', borderBottom: '1px solid var(--color-border)', display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap', gap: '16px' }}>
         <h3 style={{ margin: 0, fontSize: '1.2rem', color: 'var(--color-text-main)' }}>Directorio de Usuarios</h3>
         
-        <div style={{ position: 'relative', maxWidth: '300px', width: '100%' }}>
-          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" style={{ position: 'absolute', left: '12px', top: '50%', transform: 'translateY(-50%)', color: 'var(--color-text-muted)' }}><circle cx="11" cy="11" r="8"></circle><line x1="21" y1="21" x2="16.65" y2="16.65"></line></svg>
-          <input 
-            type="text" 
-            placeholder="Buscar por nombre o email..." 
-            value={searchTerm}
-            onChange={handleSearch}
-            style={{
-              width: '100%',
-              padding: '10px 10px 10px 38px',
-              borderRadius: '8px',
-              border: '1px solid var(--color-border)',
-              background: 'var(--color-bg-base)',
-              color: 'var(--color-text-main)',
-              fontSize: '0.9rem'
-            }}
-          />
+        <div style={{ display: 'flex', gap: '12px', alignItems: 'center', width: '100%', maxWidth: '450px' }}>
+          <button
+            onClick={() => setShowNotificationModal({ userId: null, isGlobal: true, title: '', message: '' })}
+            style={{ background: 'rgba(59, 130, 246, 0.1)', color: '#3b82f6', padding: '10px 16px', borderRadius: '8px', fontSize: '0.85rem', fontWeight: 600, border: '1px solid rgba(59, 130, 246, 0.3)', cursor: 'pointer', whiteSpace: 'nowrap' }}
+          >
+            Aviso Global
+          </button>
+          <div style={{ position: 'relative', width: '100%' }}>
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" style={{ position: 'absolute', left: '12px', top: '50%', transform: 'translateY(-50%)', color: 'var(--color-text-muted)' }}><circle cx="11" cy="11" r="8"></circle><line x1="21" y1="21" x2="16.65" y2="16.65"></line></svg>
+            <input 
+              type="text" 
+              placeholder="Buscar por nombre o email..." 
+              value={searchTerm}
+              onChange={handleSearch}
+              style={{
+                width: '100%',
+                padding: '10px 10px 10px 38px',
+                borderRadius: '8px',
+                border: '1px solid var(--color-border)',
+                background: 'var(--color-bg-base)',
+                color: 'var(--color-text-main)',
+                fontSize: '0.9rem'
+              }}
+            />
+          </div>
         </div>
       </div>
 
@@ -185,11 +213,19 @@ export default function AdminUsersTable({ users: initialUsers }: { users: Profil
                     </div>
                     
                     {!user.is_superadmin && (
-                      <button
-                        disabled={isUpdating}
-                        onClick={async () => {
-                          if (!confirm(`¿Estás seguro de que quieres ${user.is_blocked ? 'desbloquear' : 'bloquear'} a este usuario?`)) return;
-                          setIsUpdating(true);
+                      <div style={{ display: 'flex', flexDirection: 'column', gap: '4px' }}>
+                        <button
+                          disabled={isUpdating}
+                          onClick={() => setShowNotificationModal({ userId: user.id, isGlobal: false, title: '', message: '' })}
+                          style={{ padding: '6px 12px', borderRadius: '6px', background: 'rgba(59, 130, 246, 0.1)', border: '1px solid rgba(59, 130, 246, 0.5)', color: '#3b82f6', fontSize: '0.8rem', fontWeight: 600, cursor: 'pointer' }}
+                        >
+                          Aviso
+                        </button>
+                        <button
+                          disabled={isUpdating}
+                          onClick={async () => {
+                            if (!confirm(`¿Estás seguro de que quieres ${user.is_blocked ? 'desbloquear' : 'bloquear'} a este usuario?`)) return;
+                            setIsUpdating(true);
                           const res = await adminToggleBlock(user.id, user.is_blocked || false);
                           if (res.success) {
                             setUsers(prev => prev.map(u => u.id === user.id ? { ...u, is_blocked: !user.is_blocked } : u));
@@ -203,6 +239,7 @@ export default function AdminUsersTable({ users: initialUsers }: { users: Profil
                       >
                         {user.is_blocked ? 'Desbloquear' : 'Bloquear'}
                       </button>
+                    </div>
                     )}
                   </div>
                 </td>
@@ -239,6 +276,53 @@ export default function AdminUsersTable({ users: initialUsers }: { users: Profil
             >
               Siguiente
             </button>
+          </div>
+        </div>
+      )}
+
+      {showNotificationModal && (
+        <div style={{ position: 'fixed', inset: 0, background: 'rgba(0,0,0,0.5)', display: 'flex', alignItems: 'center', justifyContent: 'center', zIndex: 9999, padding: '20px' }}>
+          <div style={{ background: 'var(--color-bg-surface-elevated)', border: '1px solid var(--color-border)', borderRadius: '16px', padding: '24px', width: '100%', maxWidth: '400px' }}>
+            <h3 style={{ margin: '0 0 16px 0', color: 'var(--color-text-main)', fontSize: '1.2rem' }}>
+              {showNotificationModal.isGlobal ? 'Enviar Aviso Global' : 'Enviar Aviso a Usuario'}
+            </h3>
+            <div style={{ display: 'flex', flexDirection: 'column', gap: '16px' }}>
+              <div>
+                <label style={{ display: 'block', fontSize: '0.85rem', color: 'var(--color-text-muted)', marginBottom: '6px' }}>Título</label>
+                <input 
+                  type="text" 
+                  value={showNotificationModal.title}
+                  onChange={(e) => setShowNotificationModal({ ...showNotificationModal, title: e.target.value })}
+                  style={{ width: '100%', padding: '10px', borderRadius: '8px', border: '1px solid var(--color-border)', background: 'var(--color-bg-base)', color: 'var(--color-text-main)' }}
+                  placeholder="Ej: Actualización de términos"
+                />
+              </div>
+              <div>
+                <label style={{ display: 'block', fontSize: '0.85rem', color: 'var(--color-text-muted)', marginBottom: '6px' }}>Mensaje</label>
+                <textarea 
+                  value={showNotificationModal.message}
+                  onChange={(e) => setShowNotificationModal({ ...showNotificationModal, message: e.target.value })}
+                  style={{ width: '100%', padding: '10px', borderRadius: '8px', border: '1px solid var(--color-border)', background: 'var(--color-bg-base)', color: 'var(--color-text-main)', minHeight: '100px', resize: 'vertical' }}
+                  placeholder="Escribe el mensaje aquí..."
+                />
+              </div>
+              <div style={{ display: 'flex', gap: '12px', justifyContent: 'flex-end', marginTop: '8px' }}>
+                <button 
+                  onClick={() => setShowNotificationModal(null)}
+                  disabled={isUpdating}
+                  style={{ padding: '8px 16px', borderRadius: '8px', background: 'transparent', border: '1px solid var(--color-border)', color: 'var(--color-text-muted)', cursor: 'pointer' }}
+                >
+                  Cancelar
+                </button>
+                <button 
+                  onClick={handleSendNotification}
+                  disabled={isUpdating || !showNotificationModal.title || !showNotificationModal.message}
+                  style={{ padding: '8px 16px', borderRadius: '8px', background: 'var(--color-primary)', border: 'none', color: '#000', fontWeight: 600, cursor: (!showNotificationModal.title || !showNotificationModal.message) ? 'not-allowed' : 'pointer', opacity: (!showNotificationModal.title || !showNotificationModal.message) ? 0.5 : 1 }}
+                >
+                  {isUpdating ? 'Enviando...' : 'Enviar'}
+                </button>
+              </div>
+            </div>
           </div>
         </div>
       )}
