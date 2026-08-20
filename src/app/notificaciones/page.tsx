@@ -119,15 +119,15 @@ export default function NotificacionesPage() {
                     {getIconForType(n.type)}
                   </div>
                   <div className="flex-1 min-w-0 flex flex-col justify-center">
-                    <div className="flex justify-between items-center mb-1">
-                      <h3 className={`text-sm truncate pr-2 ${n.is_read ? 'text-gray-200 font-medium' : 'text-orange-500 font-bold'}`}>
+                    <div className="flex justify-between items-start mb-1">
+                      <h3 className={`text-sm line-clamp-3 pr-2 ${n.is_read ? 'text-gray-200 font-medium' : 'text-orange-500 font-bold'}`}>
                         {n.title}
                       </h3>
-                      <span className="text-xs text-gray-500 whitespace-nowrap">
+                      <span className="text-xs text-gray-500 whitespace-nowrap mt-0.5">
                         {new Date(n.created_at).toLocaleDateString('es-AR', { month: 'short', day: 'numeric' })}
                       </span>
                     </div>
-                    <p className="text-xs text-gray-400 truncate">
+                    <p className="text-xs text-gray-400 line-clamp-2 mt-1">
                       {n.message}
                     </p>
                   </div>
