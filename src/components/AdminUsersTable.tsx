@@ -44,7 +44,7 @@ export default function AdminUsersTable({ users: initialUsers }: { users: Profil
   };
 
   const getPlanBadge = (tier: string) => {
-    const defaultStyle = { padding: '4px 8px', borderRadius: '12px', fontSize: '0.8rem', fontWeight: 600 };
+    const defaultStyle = { padding: '4px 8px', borderRadius: '12px', fontSize: '0.8rem', fontWeight: 600, whiteSpace: 'nowrap' as const };
     switch (tier) {
       case 'empresarial':
         return <span style={{ ...defaultStyle, background: 'rgba(168, 85, 247, 0.2)', color: '#d8b4fe', border: '1px solid rgba(168, 85, 247, 0.5)' }}>Empresarial</span>;
@@ -106,28 +106,28 @@ export default function AdminUsersTable({ users: initialUsers }: { users: Profil
                   <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
                     {user.full_name || '-'}
                     {user.is_superadmin && (
-                      <span style={{ padding: '2px 6px', borderRadius: '4px', background: 'rgba(239, 68, 68, 0.15)', border: '1px solid rgba(239, 68, 68, 0.5)', fontSize: '0.7rem', color: '#ef4444', fontWeight: 700, textTransform: 'uppercase' }}>Admin</span>
+                      <span style={{ padding: '2px 6px', borderRadius: '4px', background: 'rgba(239, 68, 68, 0.15)', border: '1px solid rgba(239, 68, 68, 0.5)', fontSize: '0.7rem', color: '#ef4444', fontWeight: 700, textTransform: 'uppercase', whiteSpace: 'nowrap' }}>Admin</span>
                     )}
                     {user.is_blocked && (
-                      <span style={{ padding: '2px 6px', borderRadius: '4px', background: 'rgba(239, 68, 68, 0.15)', border: '1px solid rgba(239, 68, 68, 0.5)', fontSize: '0.7rem', color: '#ef4444', fontWeight: 700, textTransform: 'uppercase' }}>Bloqueado</span>
+                      <span style={{ padding: '2px 6px', borderRadius: '4px', background: 'rgba(239, 68, 68, 0.15)', border: '1px solid rgba(239, 68, 68, 0.5)', fontSize: '0.7rem', color: '#ef4444', fontWeight: 700, textTransform: 'uppercase', whiteSpace: 'nowrap' }}>Bloqueado</span>
                     )}
                   </div>
                 </td>
                 <td style={{ padding: '16px 20px', color: 'var(--color-text-muted)', fontSize: '0.9rem' }}>
                   {user.email}
                 </td>
-                <td style={{ padding: '16px 20px' }}>
+                <td style={{ padding: '16px 20px', whiteSpace: 'nowrap' }}>
                   <span style={{ padding: '4px 8px', borderRadius: '6px', background: 'var(--color-bg-base)', border: '1px solid var(--color-border)', fontSize: '0.8rem', color: 'var(--color-text-muted)' }}>
                     {user.person_type === 'juridica' ? 'Jurídica' : user.person_type === 'fisica' ? 'Física' : 'Comprador'}
                   </span>
                 </td>
-                <td style={{ padding: '16px 20px' }}>
+                <td style={{ padding: '16px 20px', whiteSpace: 'nowrap' }}>
                   {getPlanBadge(user.plan_tier || 'gratis')}
                 </td>
                 <td style={{ padding: '16px 20px', color: 'var(--color-text-muted)', fontSize: '0.85rem' }}>
                   {user.created_at ? new Date(user.created_at).toLocaleDateString('es-AR') : '-'}
                 </td>
-                <td style={{ padding: '16px 20px', textAlign: 'right' }}>
+                <td style={{ padding: '16px 20px', textAlign: 'right', whiteSpace: 'nowrap' }}>
                   <div style={{ display: 'flex', gap: '8px', justifyContent: 'flex-end' }}>
                     <select 
                       disabled={isUpdating || user.is_superadmin}
