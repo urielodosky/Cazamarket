@@ -76,7 +76,7 @@ export default function UserMenu() {
         </button>
 
         {isOpen && (
-          <div className="user-dropdown-menu overflow-hidden">
+          <div className="user-dropdown-menu overflow-hidden" style={{ width: showNotifications ? '340px' : undefined }}>
             {showNotifications ? (
               <NotificationsPanel 
                 notifications={notifications}
