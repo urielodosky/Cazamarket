@@ -125,7 +125,7 @@ export default function NegociosPage() {
   }, [q, filterCategoria, filterProvincia, filterLocalidad, filterTipo, filterRating]);
 
   return (
-    <div className="container-page" style={{ maxWidth: '1200px', margin: '0 auto', minHeight: '60vh', paddingBottom: 'var(--spacing-12)' }}>
+    <div className="container-page" style={{ maxWidth: '1200px', margin: '0 auto', minHeight: '60vh', paddingTop: '32px', paddingBottom: 'var(--spacing-12)' }}>
       {isVendorModeActive && (
         <div style={{ display: 'flex', flexWrap: 'wrap', gap: '16px', justifyContent: 'space-between', alignItems: 'center', marginBottom: 'var(--spacing-6)' }}>
           <div>

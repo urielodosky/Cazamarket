@@ -51,7 +51,26 @@ export default function UserMenu() {
             
             {/* Red Badge for Notifications */}
             {unreadCount > 0 && (
-              <div className="absolute -top-1 -right-1 w-3.5 h-3.5 bg-red-500 rounded-full border-2 border-[var(--color-bg-base)] z-10 animate-pulse"></div>
+              <div style={{ 
+                position: 'absolute', 
+                top: '-4px', 
+                right: '-4px', 
+                minWidth: '18px', 
+                height: '18px', 
+                backgroundColor: '#ef4444', 
+                borderRadius: '10px', 
+                border: '2px solid var(--color-bg-base)', 
+                zIndex: 10,
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'center',
+                color: 'white',
+                fontSize: '10px',
+                fontWeight: 'bold',
+                padding: '0 4px'
+              }}>
+                {unreadCount > 99 ? '99+' : unreadCount}
+              </div>
             )}
           </div>
         </button>
@@ -135,8 +154,24 @@ export default function UserMenu() {
                     </svg>
                     <span>Notificaciones</span>
                     {unreadCount > 0 && (
-                      <span className="bg-red-500 text-white text-[10px] font-bold px-2 py-0.5 rounded-full" style={{ position: 'absolute', right: '12px', top: '50%', transform: 'translateY(-50%)' }}>
-                        {unreadCount > 99 ? '+99' : unreadCount}
+                      <span style={{ 
+                        position: 'absolute', 
+                        right: '12px', 
+                        top: '50%', 
+                        transform: 'translateY(-50%)',
+                        backgroundColor: '#ef4444',
+                        color: 'white',
+                        fontSize: '11px',
+                        fontWeight: 'bold',
+                        padding: '2px 6px',
+                        borderRadius: '10px',
+                        minWidth: '20px',
+                        textAlign: 'center',
+                        display: 'flex',
+                        alignItems: 'center',
+                        justifyContent: 'center'
+                      }}>
+                        {unreadCount > 99 ? '99+' : unreadCount}
                       </span>
                     )}
                   </button>
