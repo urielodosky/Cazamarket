@@ -324,7 +324,7 @@ export default function RegistroPage() {
             email,
             password,
             username,
-            person_type: personType,
+            person_type: personType === 'Física' ? 'fisica' : 'juridica',
             cuit,
             birth_date: finalBirthDate,
             phone,
