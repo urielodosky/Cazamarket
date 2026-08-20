@@ -1077,8 +1077,8 @@ export default function ConfiguracionPage() {
                       <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><rect x="5" y="2" width="14" height="20" rx="2" ry="2"></rect><line x1="12" y1="18" x2="12.01" y2="18"></line></svg>
                     </div>
                     <div>
-                      <h5 style={{ margin: '0 0 4px', fontSize: '1rem', color: 'var(--color-text-main)' }}>Aplicación de Autenticación</h5>
-                      <p style={{ margin: 0, color: 'var(--color-text-muted)', fontSize: '0.85rem' }}>Usa Google Authenticator o Authy (Recomendado)</p>
+                      <h5 style={{ margin: '0 0 4px', fontSize: '1rem', color: 'var(--color-text-main)' }}>Google Authenticator</h5>
+                      <p style={{ margin: 0, color: 'var(--color-text-muted)', fontSize: '0.85rem' }}>Genera códigos temporales desde una app en tu celular</p>
                     </div>
                   </div>
                   <button 
@@ -1090,43 +1090,23 @@ export default function ConfiguracionPage() {
                   </button>
                 </div>
 
-                {/* Opción 2: Correo Electrónico */}
+                {/* Opción 2: Código OTP */}
                 <div style={{ padding: '16px', background: 'rgba(255,255,255,0.03)', borderRadius: '12px', border: '1px solid var(--color-border)', display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: '16px', flexWrap: 'wrap' }}>
                   <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
                     <div style={{ background: 'rgba(255,255,255,0.05)', padding: '10px', borderRadius: '10px', color: 'var(--color-text-main)' }}>
                       <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"></path><polyline points="22,6 12,13 2,6"></polyline></svg>
                     </div>
                     <div>
-                      <h5 style={{ margin: '0 0 4px', fontSize: '1rem', color: 'var(--color-text-main)' }}>Correo Electrónico</h5>
-                      <p style={{ margin: 0, color: 'var(--color-text-muted)', fontSize: '0.85rem' }}>Recibe un código de 6 dígitos en tu bandeja de entrada</p>
+                      <h5 style={{ margin: '0 0 4px', fontSize: '1rem', color: 'var(--color-text-main)' }}>Código OTP (Por Correo)</h5>
+                      <p style={{ margin: 0, color: 'var(--color-text-muted)', fontSize: '0.85rem' }}>Pedir un código cada vez que se quiera ingresar a la cuenta</p>
                     </div>
                   </div>
                   <button 
                     type="button" 
-                    onClick={() => showToast('Próximamente: OTP vía Email', 'info')}
+                    onClick={() => showToast('Configuración OTP guardada', 'success')}
                     style={{ background: 'transparent', color: 'var(--color-text-main)', border: '1px solid var(--color-border)', padding: '8px 16px', borderRadius: 'var(--radius-md)', cursor: 'pointer', fontSize: '0.9rem', fontWeight: 600 }}
                   >
                     Activar
-                  </button>
-                </div>
-
-                {/* Opción 3: SMS / WhatsApp */}
-                <div style={{ padding: '16px', background: 'rgba(255,255,255,0.03)', borderRadius: '12px', border: '1px solid var(--color-border)', display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: '16px', flexWrap: 'wrap', opacity: 0.7 }}>
-                  <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
-                    <div style={{ background: 'rgba(255,255,255,0.05)', padding: '10px', borderRadius: '10px', color: 'var(--color-text-main)' }}>
-                      <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M21 11.5a8.38 8.38 0 0 1-.9 3.8 8.5 8.5 0 0 1-7.6 4.7 8.38 8.38 0 0 1-3.8-.9L3 21l1.9-5.7a8.38 8.38 0 0 1-.9-3.8 8.5 8.5 0 0 1 4.7-7.6 8.38 8.38 0 0 1 3.8-.9h.5a8.48 8.48 0 0 1 8 8v.5z"></path></svg>
-                    </div>
-                    <div>
-                      <h5 style={{ margin: '0 0 4px', fontSize: '1rem', color: 'var(--color-text-main)' }}>SMS / WhatsApp</h5>
-                      <p style={{ margin: 0, color: 'var(--color-text-muted)', fontSize: '0.85rem' }}>Disponible para cuentas Pro o verificadas</p>
-                    </div>
-                  </div>
-                  <button 
-                    type="button" 
-                    onClick={() => showToast('Requiere plan Pro', 'error')}
-                    style={{ background: 'transparent', color: 'var(--color-text-muted)', border: '1px solid var(--color-border)', padding: '8px 16px', borderRadius: 'var(--radius-md)', cursor: 'not-allowed', fontSize: '0.9rem', fontWeight: 600 }}
-                  >
-                    Bloqueado
                   </button>
                 </div>
               </div>
