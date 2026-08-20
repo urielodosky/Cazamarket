@@ -133,7 +133,7 @@ export default function UserMenu() {
                       <path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"></path>
                       <path d="M13.73 21a2 2 0 0 1-3.46 0"></path>
                     </svg>
-                    Notificaciones
+                    <span>Notificaciones</span>
                     {unreadCount > 0 && (
                       <span className="bg-red-500 text-white text-[10px] font-bold px-2 py-0.5 rounded-full" style={{ position: 'absolute', right: '12px', top: '50%', transform: 'translateY(-50%)' }}>
                         {unreadCount > 99 ? '+99' : unreadCount}
