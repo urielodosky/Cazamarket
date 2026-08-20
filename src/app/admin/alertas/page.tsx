@@ -25,7 +25,7 @@ export default async function AdminAlertasPage() {
 
   const { data: logs, error } = await supabase
     .from('system_logs')
-    .select('*, profiles(email, full_name)')
+    .select('*, profiles(full_name)')
     .order('created_at', { ascending: false })
     .limit(50);
 
@@ -95,7 +95,6 @@ export default async function AdminAlertasPage() {
                         {log.profiles ? (
                           <div style={{ display: 'flex', flexDirection: 'column' }}>
                             <span style={{ color: 'var(--color-text-main)' }}>{log.profiles.full_name || 'Sin Nombre'}</span>
-                            <span style={{ fontSize: '0.8rem' }}>{log.profiles.email}</span>
                           </div>
                         ) : 'Sistema / Anónimo'}
                       </td>
