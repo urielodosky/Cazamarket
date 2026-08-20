@@ -1,9 +1,9 @@
+@import '../styles/tokens.css';
+@import '../styles/light-mode.css';
+
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
-
-@import '../styles/tokens.css';
-@import '../styles/light-mode.css';
 /* Global utilities and animations can go here */
 
 .sr-only {
