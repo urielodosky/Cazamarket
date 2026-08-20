@@ -119,7 +119,7 @@
   font-weight: 500;
 }
 
-.form-group-config input, .form-group-config select {
+.form-group-config input, .form-group-config select, .form-group-config textarea {
   width: 100%;
   box-sizing: border-box;
   padding: 10px 12px;
@@ -137,7 +137,7 @@
   appearance: auto;
 }
 
-.form-group-config input:focus, .form-group-config select:focus {
+.form-group-config input:focus, .form-group-config select:focus, .form-group-config textarea:focus {
   border-color: var(--color-primary);
   box-shadow: 0 0 0 2px rgba(255, 115, 0, 0.2);
 }
