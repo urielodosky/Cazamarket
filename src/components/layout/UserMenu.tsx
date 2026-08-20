@@ -7,7 +7,6 @@ import { useAuth } from '@/contexts/AuthContext';
 import { useTheme } from '@/contexts/ThemeContext';
 import { usePlan } from '@/contexts/PlanContext';
 import { useNotifications } from '@/hooks/useNotifications';
-import NotificationsPanel from './NotificationsPanel';
 import './UserMenu.css';
 
 export default function UserMenu() {
@@ -15,15 +14,13 @@ export default function UserMenu() {
   const { mode, toggleMode } = useTheme();
   const { permissions } = usePlan();
   const [isOpen, setIsOpen] = useState(false);
-  const [showNotifications, setShowNotifications] = useState(false);
   const menuRef = useRef<HTMLDivElement>(null);
-  const { notifications, unreadCount, markAsRead, markAllAsRead } = useNotifications();
+  const { unreadCount } = useNotifications();
 
   useEffect(() => {
     const handleClickOutside = (event: MouseEvent) => {
       if (menuRef.current && !menuRef.current.contains(event.target as Node)) {
         setIsOpen(false);
-        setShowNotifications(false);
       }
     };
     document.addEventListener('mousedown', handleClickOutside);
@@ -35,7 +32,7 @@ export default function UserMenu() {
       <div className="user-menu-container" ref={menuRef}>
         <button 
           className="user-menu-trigger avatar-only"
-          onClick={() => { setIsOpen(!isOpen); setShowNotifications(false); }}
+          onClick={() => setIsOpen(!isOpen)}
           aria-expanded={isOpen}
           title="Mi perfil"
         >
@@ -76,16 +73,7 @@ export default function UserMenu() {
         </button>
 
         {isOpen && (
-          <div className="user-dropdown-menu overflow-hidden" style={{ width: showNotifications ? '340px' : undefined }}>
-            {showNotifications ? (
-              <NotificationsPanel 
-                notifications={notifications}
-                unreadCount={unreadCount}
-                onMarkAsRead={markAsRead}
-                onMarkAllAsRead={markAllAsRead}
-                onClose={() => setShowNotifications(false)}
-              />
-            ) : (
+          <div className="user-dropdown-menu overflow-hidden">
               <>
                 <div className="mobile-only-logo">
                   <Image src="/logo.png" alt="CazaMarket Logo" width={140} height={40} style={{ objectFit: 'contain' }} />
@@ -142,10 +130,11 @@ export default function UserMenu() {
                     <span>{isVendorModeActive ? 'Cambiar a Comprador' : 'Cambiar a Vendedor'}</span>
                   </button>
 
-                  {/* INYECCIÓN DEL BOTÓN NOTIFICACIONES */}
-                  <button 
+                  {/* ENLACE A PÁGINA DE NOTIFICACIONES */}
+                  <Link 
+                    href="/notificaciones"
                     className="dropdown-item" 
-                    onClick={() => setShowNotifications(true)}
+                    onClick={() => setIsOpen(false)}
                     style={{ position: 'relative' }}
                   >
                     <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
@@ -174,7 +163,7 @@ export default function UserMenu() {
                         {unreadCount > 99 ? '99+' : unreadCount}
                       </span>
                     )}
-                  </button>
+                  </Link>
 
                   {isVendor && (
                     <>
@@ -246,8 +235,8 @@ export default function UserMenu() {
                     <span>Cerrar sesión</span>
                   </button>
                 </div>
+                </div>
               </>
-            )}
           </div>
         )}
       </div>
