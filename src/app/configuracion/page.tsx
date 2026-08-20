@@ -116,6 +116,7 @@ export default function ConfiguracionPage() {
   };
 
   const [fieldErrors, setFieldErrors] = useState<Record<string, string[]>>({});
+  const [is2FAEnabled, setIs2FAEnabled] = useState(false);
 
   // Estados del formulario controlados
   const [formData, setFormData] = useState({
@@ -1030,15 +1031,54 @@ export default function ConfiguracionPage() {
           {/* SECCIÓN SEGURIDAD (2FA) */}
           <div style={{ marginTop: '24px', borderTop: '1px dashed var(--color-border)', paddingTop: '24px' }}>
             <h4 style={{ margin: '0 0 8px', color: 'var(--color-text-main)' }}>Seguridad de la Cuenta</h4>
-            <p style={{ margin: '0 0 16px', color: 'var(--color-text-muted)', fontSize: '0.9rem' }}>Protege tu cuenta con la Autenticación de Dos Factores (2FA).</p>
-            <button 
-              type="button" 
-              onClick={() => window.location.href = '/configuracion/2fa'}
-              style={{ background: 'var(--color-primary)', color: '#fff', border: 'none', padding: '10px 20px', borderRadius: 'var(--radius-md)', cursor: 'pointer', fontSize: '0.95rem', fontWeight: 600, display: 'inline-flex', alignItems: 'center', gap: '8px' }}
-            >
-              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><rect x="3" y="11" width="18" height="11" rx="2" ry="2"></rect><path d="M7 11V7a5 5 0 0 1 10 0v4"></path></svg>
-              Configurar Autenticación de Dos Factores (2FA)
-            </button>
+            <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', background: 'var(--color-bg-base)', padding: '16px', borderRadius: '12px', border: '1px solid var(--color-border)' }}>
+              <div>
+                <h5 style={{ margin: '0 0 4px', fontSize: '1rem', color: 'var(--color-text-main)' }}>Autenticación de Dos Factores (2FA)</h5>
+                <p style={{ margin: 0, color: 'var(--color-text-muted)', fontSize: '0.85rem' }}>Añade una capa extra de seguridad a tu cuenta.</p>
+              </div>
+              <label style={{ display: 'inline-flex', alignItems: 'center', cursor: 'pointer', position: 'relative' }}>
+                <input 
+                  type="checkbox" 
+                  checked={is2FAEnabled}
+                  onChange={(e) => setIs2FAEnabled(e.target.checked)}
+                  style={{ opacity: 0, width: 0, height: 0, position: 'absolute' }} 
+                />
+                <div style={{ 
+                  width: '44px', height: '24px', 
+                  background: is2FAEnabled ? 'var(--color-primary)' : 'rgba(255,255,255,0.2)', 
+                  borderRadius: '24px', 
+                  position: 'relative', 
+                  transition: 'background 0.3s ease' 
+                }}>
+                  <div style={{ 
+                    width: '20px', height: '20px', 
+                    background: '#fff', 
+                    borderRadius: '50%', 
+                    position: 'absolute', 
+                    top: '2px', 
+                    left: is2FAEnabled ? '22px' : '2px', 
+                    transition: 'left 0.3s ease',
+                    boxShadow: '0 2px 4px rgba(0,0,0,0.2)'
+                  }}></div>
+                </div>
+              </label>
+            </div>
+            
+            {is2FAEnabled && (
+              <div style={{ marginTop: '16px', padding: '16px', background: 'rgba(255,115,0,0.05)', borderRadius: '12px', border: '1px solid rgba(255,115,0,0.2)', display: 'flex', flexDirection: 'column', gap: '12px' }}>
+                <p style={{ margin: 0, color: 'var(--color-text-main)', fontSize: '0.9rem' }}>
+                  Para completar la activación, necesitas configurar tu aplicación de autenticación (como Google Authenticator o Authy).
+                </p>
+                <button 
+                  type="button" 
+                  onClick={() => window.location.href = '/configuracion/2fa'}
+                  style={{ background: 'var(--color-primary)', color: '#000', border: 'none', padding: '10px 20px', borderRadius: 'var(--radius-md)', cursor: 'pointer', fontSize: '0.95rem', fontWeight: 600, display: 'inline-flex', alignItems: 'center', justifyContent: 'center', gap: '8px', alignSelf: 'flex-start' }}
+                >
+                  <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><rect x="3" y="11" width="18" height="11" rx="2" ry="2"></rect><path d="M7 11V7a5 5 0 0 1 10 0v4"></path></svg>
+                  Configurar App de Autenticación
+                </button>
+              </div>
+            )}
           </div>
         </details>
 
