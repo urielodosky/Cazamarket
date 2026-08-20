@@ -417,7 +417,7 @@ export default function ConfiguracionPage() {
         role: !isVendor ? 'negocio' : undefined
       }),
       updateBusinessProfile({
-        storeName: formData.storeName,
+        storeName: formData.username,
         storeDescription: formData.storeDescription,
         street: formData.calle,
         streetNumber: formData.numero,
@@ -610,18 +610,6 @@ export default function ConfiguracionPage() {
               </div>
               <input type="text" id="username" maxLength={30} value={formData.username || ''} onChange={(e) => { handleInputChange(e); setFieldErrors(prev => ({...prev, full_name: []})) }} required />
               {fieldErrors.full_name && fieldErrors.full_name.map((err, i) => (
-                <span key={i} className="inline-error" style={{ color: '#ff4d4d', fontSize: '0.8rem', display: 'block', marginTop: '4px' }}>{err}</span>
-              ))}
-            </div>
-            <div className="form-group-config">
-              <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-                <label htmlFor="storeName" style={{ marginBottom: 0 }}>Nombre de la Tienda / Negocio</label>
-                <span style={{ fontSize: '0.75rem', color: 'var(--color-text-muted)' }}>
-                  {(formData.storeName || '').length}/50
-                </span>
-              </div>
-              <input type="text" id="storeName" maxLength={50} value={formData.storeName || ''} onChange={(e) => { handleInputChange(e); setFieldErrors(prev => ({...prev, store_name: []})) }} placeholder="Ej. Mi Tienda Genial" required />
-              {fieldErrors.store_name && fieldErrors.store_name.map((err, i) => (
                 <span key={i} className="inline-error" style={{ color: '#ff4d4d', fontSize: '0.8rem', display: 'block', marginTop: '4px' }}>{err}</span>
               ))}
             </div>
